@@ -243,13 +243,16 @@ def numbers_of(variant):
 # ---------------------------------------------------------------------------------------------
 
 class PartShapes:
-    def __init__(self):
+    def __init__(self, order=None):
+        # The names of the materials a part may take, in the order its file lists them.
+        self.order = tuple(order) if order else MATERIAL_ORDER
         self.mesh = bmesh.new()
-        self.outlined = []       # (faces of one closed shell, thickness of its outline)
+        self.outlined = []       # (faces of one closed shell, thickness of its outline, its fade)
+        self.open_faces = []     # faces of shapes that are not closed: whoever adds them turns them
 
     def paint(self, faces, material):
         for face in faces:
-            face.material_index = MATERIAL_ORDER.index(material)
+            face.material_index = self.order.index(material)
 
     def shell(self, rings, sides, material, outline, smooth=True, fade=None):
         """One closed shell, as base.add_shell makes it. "outline" is the thickness of its outline
@@ -287,12 +290,14 @@ class PartShapes:
     def finish(self, name, origin, parent, materials, on_ground=False):
         """Turns the shapes into the object of the part, as base.make_part does, outlines included."""
         mesh = self.mesh
-        bmesh.ops.recalc_face_normals(mesh, faces=mesh.faces[:])
+        # An open shape has no inside to tell its outside from: it is left as it was turned.
+        open_faces = set(self.open_faces)
+        bmesh.ops.recalc_face_normals(mesh, faces=[face for face in mesh.faces if face not in open_faces])
         mesh.normal_update()
         self.add_outlines(on_ground)
         bmesh.ops.triangulate(mesh, faces=mesh.faces[:])
 
-        # The part carries only the materials it uses, in the order of MATERIAL_ORDER.
+        # The part carries only the materials it uses, in the order they were given.
         used = sorted({face.material_index for face in mesh.faces})
         for face in mesh.faces:
             face.material_index = used.index(face.material_index)
@@ -300,7 +305,7 @@ class PartShapes:
         mesh.to_mesh(data)
         mesh.free()
         for index in used:
-            data.materials.append(materials[MATERIAL_ORDER[index]])
+            data.materials.append(materials[self.order[index]])
         data.update()
 
         part = bpy.data.objects.new(name, data)

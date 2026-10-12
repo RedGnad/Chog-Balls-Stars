@@ -1,11 +1,15 @@
 # Builds the image a host runs (Dockerfile) on a Linux machine and starts it once. The build
 # itself replays the recorded matches with the image's own .NET (tools/release/check_judge.sh),
 # so a judge that does not work on Linux stops here and never reaches a host.
+#
+# Started by hand only (Actions, "release image", "Run workflow"). On 12 October 2026 the first
+# run, at the first push, was refused before it began: the account cannot run Actions on a
+# private repository ("recent account payments have failed or your spending limit needs to be
+# increased"). Running at every push would only add a failure to each push until that is
+# settled, or until the repository is public.
 name: release image
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:

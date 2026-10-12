@@ -576,16 +576,17 @@ animation controller are no longer played. They are still in the project and in 
 because the character prefabs still point at them: removing that link is an Editor change, not
 done.
 
-**Since 11 October a Chog body is in place** (`Assets/Chog/Resources/ChogBody.fbx`): every
-Genesis hero wears it. The first one (a belly, spikes on the back) did not look like a Chog;
-since 12 October the file is variant B of `tools/blender/make_chog_body_variants.py`, drawn
-after the official pictures of the character (`tools/blender/README.md`): a slim body in the
-Skin colour, big pink mittens and feet, a dark line around each part, and no spikes, since
-those belong to the head and the picture of the Genesis shows them. Its materials are told
-apart by name when the hero is coloured (`ChogBody.PartColour`): `ChogGlove` is pink,
-`ChogOutline` nearly black, everything else takes the Skin. It follows the contract below,
-except that its shoulders are closer to the middle (0.25 instead of 0.41); a better model
-replaces it by taking its place.
+**Since 11 October a Chog body is in place** (`Assets/Chog/Resources/ChogBody.fbx`, built by
+`tools/blender/make_chog_body.py`): every Genesis hero wears it. It has a belly and spikes
+on its back. On 12 October a second one was tried in the game for an hour (variant B of
+`tools/blender/make_chog_body_variants.py`: a slim body, pink mittens and feet, a dark
+outline, no spikes, since the picture of the Genesis shows them) and taken out again: the
+user found it worse, because taken alone the model had no head, no spikes and no face, so
+nothing of a Chog was left in 3D. The first body is back; a whole 3D Chog, head included,
+is being drawn (`tools/blender/README.md`). What stayed from that try: the materials of a
+body are told apart by name when the hero is coloured (`ChogBody.PartColour`): `ChogGlove`
+is pink, `ChogOutline` nearly black, everything else takes the Skin. The body follows the
+contract below; a better model replaces it by taking its place.
 
 **To hand over the Chog body**, export one model made of four parts and save it, as a prefab
 or a model file, under any `Resources` folder with the name `ChogBody` (for instance

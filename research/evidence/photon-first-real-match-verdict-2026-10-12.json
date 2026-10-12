@@ -1,0 +1,21 @@
+{
+  "winnerTeam": 1,
+  "scores": [
+    6,
+    10
+  ],
+  "endedAtTick": 4130,
+  "selectionEndedAtTick": 385,
+  "firstTick": 60,
+  "lastTick": 10772,
+  "updateRate": 30,
+  "players": [
+    {
+      "player": 0,
+      "team": 0,
+      "tokenId": 0
+    }
+  ],
+  "simulation": "4b445611af520bc23b0a18bf055edc286acd184edeba8a1160d902dc8525cb1f",
+  "at": "2026-10-12T01:17:09.802Z"
+}

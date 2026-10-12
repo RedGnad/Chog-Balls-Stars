@@ -18,10 +18,38 @@ stays in the phone's own browser (Reown AppKit loaded by the page on request; th
 a project id, and the window lists real wallets through the public address); a tower and a
 core for each team, with the match ended by a fallen core; a body drawn after the official
 Chog (slim, pink mittens and feet); and the container for a host (Dockerfile, never built).
-**Waiting on the user:** two pastes of the secret in Photon's dashboard (both forms are
-filled and open in their browser); a try of CONNECT WALLET on their phone through the public
-address, since nothing after the pick of a wallet was ever run; their word on the body; and
-their go to create a private repository, from which Render builds.
+**Since 03:17 the secured path runs with Photon's real cloud** (entry of 03:00 below): the
+user saved the dashboard, Photon asks us who each player is and sends us each match, and
+the judge gave its first verdict on a record that came from Photon. A private repository
+exists (`https://github.com/RedGnad/chogathon`). The user found the new body worse than the
+first (no head, no spikes, no face left in 3D): the first body is back in the game and a
+whole 3D Chog was drawn as pictures only, with three heads
+(`research/evidence/chog-full-3d-heads-blender-2026-10-12.png`).
+**Decided by the user on 12 October after seeing them:** the head H3 (thick blades, a row
+behind, head turned up 20 degrees) is the direction. The Genesis picture laid over the 3D
+face is refused. For a hero to look like its Genesis, **the traits are to be modelled in 3D
+by us, recognisable, a few at a time**, polished and extended over time; they asked for my
+view before any work starts, and allowed the push of the repository. Nothing of H3 is in the
+game. What the collection asks for, counted that day by
+`tools/genesis-art/trait_coverage.py` and looked at on sheets of real pictures
+(`tools/genesis-art/trait_sheet.py`): 66 Head values are 24 shapes, and one cap mesh, with
+another colour and print each time, is the hat of 951 Genesis (28 values; 1,204 hats are
+right with it, counting the 253 Genesis that wear none); 4 shapes give 1,531 right hats, 10
+give 1,834. The 58 Eyes values are 49 kinds: four objects (laser eyes 277, glasses 161,
+visors 157, VR headsets 51) and 45 drawn looks. 15 mouths. With 6 hat shapes and 14 eye
+kinds, 1,195 Genesis have the right hat and eyes; with 10 and 20, 1,587; with 15 and 30,
+1,928. Clothing is the long family: 96 values, 38 of them worn by 20 Genesis or more, and
+some are whole costumes with a hood or a helmet (shark, astronaut). 100 Genesis stand on
+another base (Skull, Radioactive, 1:1) and need their own head. The grouping into shapes
+was checked on pictures for the caps, bucket caps, beanies and headbands; the rest is read
+from the names.
+**Waiting on the user:** their answer to the view given on the traits in 3D (order of the
+families, what a Genesis shows while one of its traits is not modelled, where the hero is
+seen from close); a try of CONNECT WALLET on their phone through the public address, since
+nothing after the pick of a wallet was ever run; the creation of the service on Render from
+the repository (`render.yaml`); and whether to make a second Photon application for
+development, since the test entries `?token=` no longer give a Genesis now that every match
+passes the admission.
 **Next action (dev):** see a core fall in a real match (only tests and a forced replay show
 the match ending that way; the towers' hits are counted in real matches, their laser was
 never seen on a picture), then let the bots attack and defend the structures, and tune the
@@ -1142,6 +1170,47 @@ Progress of this session:
   seen on a phone. 67 view tests.
   The public address serves the build with all of this
   (`20261012T005009618Z-67649349660c4ffc9995937ba8b0cb9f`) since 02:54.
+
+- **12 October 03:00 to 03:20, Photon really calls us, a private repository, and the body
+  judged by the user.**
+  *Photon.* The user pasted the secret and saved ("c'est fait"). Found then: the plugin had
+  been saved with the secret alone (the fifteen other pairs sat in a form that was never
+  saved); the dev agent added them to the saved configuration and saved it. The box "Allow
+  anonymous clients" is not ticked, so a game that does not identify its player cannot
+  connect: the public instance now runs with `--photon-auth`, and so do the local test
+  services (port 8090). **Seen with Photon's real cloud, for the first time:** the game
+  identifies its player and Photon asks us who it is (`GET /api/photon/auth`, 200, a
+  visitor); then, for a match played in the headless browser from the public instance,
+  `game/create`, `game/configs`, `player/add`, `player/added`, `replay/start` and a
+  `replay/chunk` every ten seconds, all answered 200 and kept under
+  `.artifacts/services-public/matches/`. The player had asked for Genesis 1795 by the test
+  entry `?token=`, without any right to it: the admission recorded `askedToken 1795`,
+  `tokenId 0`, a recruit (D35 at work), and the game did play a recruit. When the room closed
+  Photon sent `game/result`, `player/removed`, `game/leave` and `game/close`, and the judge
+  replayed Photon's own record (36 slices) within seconds: team 1 won, 6 to 10, which is
+  what the game had announced ([journal](../research/evidence/photon-first-real-match-journal-2026-10-12.json),
+  [verdict](../research/evidence/photon-first-real-match-verdict-2026-10-12.json)). Not seen
+  yet: a signed-in wallet or a guest going through, two players, a stake.
+  **Consequence for development:** every match of this
+  Photon application now passes the admission, from any address, so the test entries
+  `?token=` no longer give a Genesis to the player (the bots still are Genesis); a Genesis
+  is played by its holder, its renter or a guest with a pass. A second Photon application
+  without webhooks, for local builds, would give the test entries back; not created.
+  *The repository.* Asked by the user for Render ("oui crée le dépôt"): 
+  `https://github.com/RedGnad/chogathon`, private, one commit by the user's GitHub identity
+  (13,113 files, 188 MB packed; `.artifacts/`, the build outputs of the contracts, a crash
+  dump and the downloaded archives stay out). The image build on GitHub was refused before
+  it began (the account cannot run Actions on a private repository: a payment or a spending
+  limit to settle): the workflow is now started by hand only, a change not pushed yet. So
+  the container still has never been built; Render's own build will be its first.
+  *The body.* The user looked at the models and found variant B worse than the first body:
+  taken alone it has no head, so no spikes and no face, and nothing of a Chog is left in 3D
+  ("il n'a même plus de tête ... et encore moins de visage"); they asked whether the dev
+  agent can make 3D characters at all, and offered to make it themselves. Answered: yes by
+  script, stylised; a whole 3D Chog (big head, crown of spikes, cream face, eyes, body,
+  mittens) is being drawn in three head styles, as pictures first, with a try of the
+  Genesis's own face on the 3D head. The first body is back in the game (build
+  `20261012T011501109Z-c65f190d2ad8495a86c41c7e61bf78bb`, online since 03:18).
 
 - **Running on the Mac since 12 October 02:10.** The public address is the tunnel
   (`ngrok http 8087`, a background task of the dev agent's session) in front of

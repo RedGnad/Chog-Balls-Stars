@@ -54,11 +54,38 @@ Three bodies that follow these were drawn on 12 October by `make_chog_body_varia
 Half of each count is the dark outline, a second shell inside the mesh of the part it
 outlines. Materials: `ChogSkin`, `ChogGlove` (hands and feet), `ChogOutline`, and `ChogCloth`
 in C. The shoulders are 0.25 from the middle (0.41 on the first body), which the game's
-animator does not mind: it only turns the parts. **Variant B is the body in the game since
-12 October** (`game/Assets/Chog/Resources/ChogBody.fbx` is a copy of
-`variants/B/ChogBody.fbx`); C waits for the game to know the colour of each Genesis's
-clothing. `check_chog_body.py` still measures the first body's rules (3,000 triangles, one
-material, long toes) and fails the variants on those three.
+animator does not mind: it only turns the parts. **Variant B was in the game for an hour on
+12 October and was taken out**: shown the models, the user found them worse than the first
+body, because a body alone has no head, no spikes and no face, and nothing of a Chog is
+left in 3D. The first body is back in `game/Assets/Chog/Resources/ChogBody.fbx`.
+`check_chog_body.py` still measures the first body's rules (3,000 triangles, one material,
+long toes) and fails the variants on those three.
+
+## The whole character, with a head (12 October 2026, pictures only)
+
+`make_chog_full.py` (`-- --style H1|H2|H3`) builds a whole Chog into
+`.artifacts/chog-body/full/<style>/`: the body of variant B and a real 3D head, big, with a
+crown of spikes, a cream face, eyes and blush. `render_chog_full.py` renders it and
+`make_chog_full_comparison.py` lays the three heads beside the first body and variant B on
+one sheet, kept as `research/evidence/chog-full-3d-heads-blender-2026-10-12.png`.
+
+| Head | What it is | Seen from the game's camera |
+| --- | --- | --- |
+| H1 | seven flat blades in one plane around the head, as in the drawing | the crown is seen almost edge on, the face is lost |
+| H2 | round spikes on the top and the back | reads as a hedgehog |
+| H3 | the blades of H1 made thick, a row behind, the head turned up 20 degrees | reads best: face, crown and pink hands |
+
+4,937 to 5,921 triangles; six materials (`ChogSkin`, `ChogFace`, `ChogGlove`, `ChogEye`,
+`ChogBlush`, `ChogOutline`); the head's origin is at the neck (0.597) and the shoulders are
+0.145 from the middle. The phone-size pictures assume the game draws the model 1.5 times
+larger than today.
+
+**The user chose H3 as the direction on 12 October** and refused the Genesis picture laid
+over the 3D face (last row of the sheet): the traits of a Genesis are to be modelled in 3D,
+a few at a time. **Nothing of this is in the game**: no import in Unity, and the game as it
+is would hide the `Head` part and tint every material one colour. Still crude: the eyes are
+round and generic where a Chog looks sideways, and the blades are faceted where the drawing
+has soft leaves.
 
 The sections below describe the first body, which `make_chog_body.py` still builds.
 

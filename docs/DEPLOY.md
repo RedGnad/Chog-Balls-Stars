@@ -71,7 +71,8 @@ message a wallet signs names that address.
 
 The secured match (D33) needs Photon's cloud to call the game services. That takes a public
 https address for the services and about ten minutes in Photon's dashboard, on the Quantum
-application the game uses. **Not done: Photon has never called these services.** The values
+application the game uses. **Done on 12 October 2026 with the address of the tunnel, and
+Photon calls these services** (what was seen is at the end of this section). The values
 below come from Photon's manual as read on 11 October 2026
 (`doc.photonengine.com/quantum/current/manual/webhooks` and
 `.../realtime/current/reference/custom-authentication`).
@@ -88,8 +89,13 @@ provider for: CUSTOM SERVER" and, under "Plugins", "Quantum 3" with EDIT, which 
 key and value pairs. That night the dev agent filled both forms in the user's browser with
 the public address of the tunnel and every value below except the secret, which it is not
 allowed to type into a page; the secret was put in the clipboard for the user to paste twice
-and save. **Not saved when this was written.** A secret is copied without being shown with
-`tr -d '\n' < <data folder>/photon-secret | pbcopy`.
+and save. The user saved the authentication provider from the prepared form, and the plugin
+from another form that held the secret alone; the dev agent then added the fifteen other
+pairs to that saved configuration and saved it (16 pairs in all). A secret is copied without
+being shown with `tr -d '\n' < <data folder>/photon-secret | pbcopy`. The page of the
+application also has a box "Allow anonymous clients to connect, independently of configured
+providers", which is not ticked: since the provider exists, a game that does not identify
+its player cannot connect at all.
 
 1. **Authentication** (dashboard, the application, "Authentication", custom server):
 
@@ -129,11 +135,31 @@ and save. **Not saved when this was written.** A secret is copied without being 
    `replay-chunk-*.json` and, a few seconds after the room closes, `verdict.json`. If the
    shape of what Photon sends differs from the manual, it will show here first.
 
-Once the webhooks are set, every match created with this Photon application calls the public
-address, from whichever page the players opened (the local test addresses too). The manual
-says a webhook that fails is tried three more times, then "the request fails"; that this
-refuses the creation of the match is expected and **not yet seen**. To go back: clear
-`WebHookBaseUrl` in the dashboard.
+**What was seen on 12 October 2026, 03:06 to 03:17, with Photon's real cloud** (one match
+played in the headless browser from the public instance, as a visitor who asked for Genesis
+1795 by the test entry `?token=`):
+
+| Step | What Photon sent | What came of it |
+| --- | --- | --- |
+| Connecting | `GET /api/photon/auth` with the key | 200: a visitor, with a name of its own |
+| Creating the match | `game/create`, `game/configs` | 200; the match is named `Quantum:RU:<room>~<our suffix>` |
+| Entering | `player/add`, `player/added` | the admission records `askedToken 1795`, `tokenId 0`: no right to it, a recruit, and the game does play a recruit |
+| Playing | `replay/start`, then a `replay/chunk` every 10 seconds (36 in all) | kept as sent |
+| The end | `game/result`, `player/removed`, `game/leave`, `game/close` | the judge replays Photon's record a few seconds later: team 1 won, 6 to 10 by coins, as the game announced ("Defeat" for team 0) |
+
+The journal and the verdict of that match are kept as
+`research/evidence/photon-first-real-match-journal-2026-10-12.json` and
+`photon-first-real-match-verdict-2026-10-12.json`. **Not seen:** a signed-in wallet or a
+guest with a pass going through (only a visitor did), two players in one match, a match with
+a stake, what Photon does when the address does not answer.
+
+Since the webhooks are set, every match created with this Photon application calls the
+public address, from whichever page the players opened (the local test addresses too): a
+test entry `?token=` no longer gives its Genesis, since the admission knows no right to it.
+The manual says a webhook that fails is tried three more times, then "the request fails";
+that this refuses the creation of the match is expected and **not yet seen**. To go back:
+clear `WebHookBaseUrl` in the dashboard, and tick "Allow anonymous clients" or keep
+`--photon-auth`.
 
 ## A public address from this Mac (a tunnel)
 
@@ -224,9 +250,11 @@ Tried on 11 October, on the Mac: a whole staked match with Photon's part played 
 
 Tried on 12 October: the same host program behind an https tunnel (section above).
 
+Tried on 12 October, later: Photon's real cloud calling these services through the tunnel,
+for a whole match that the judge then replayed ("Photon" section).
+
 Not tried: Render itself, a container, a domain name, a real wallet, a phone on the public
-address, more than one player at a time on the services, and anything that needs Photon to
-call the services.
+address, more than one player at a time on the services.
 
 ## To decide (the user)
 

@@ -86,8 +86,13 @@ OUTLINE_COLOUR = (0.035, 0.03, 0.045)
 # The views: those of render_chog_body.py, and the body seen straight from behind.
 VIEWS = dict(render.VIEWS)
 VIEWS["behind"] = (180.0, 4.0, True, 0.58, 1.9, False)
+VIEWS["front_head"] = (0.0, 4.0, True, 0.92, 2.5, True)
+VIEWS["back_head"] = (180.0, 4.0, True, 0.92, 2.5, True)
 GAME_VIEWS = ("game_head", "game_front_head")
 STUDIO_VIEWS = ("front", "behind", "three_quarter", "back")
+# The whole hero as the game shows it today, the flat picture always turned to the camera, seen
+# from where the game never looks: to set it beside a character that has a head of its own.
+FLAT_HEAD_VIEWS = ("front_head", "three_quarter_head", "back_head")
 
 
 def clothing_colour(picture, mask):
@@ -175,6 +180,7 @@ def dress(parts, remembered, colours):
             part.data.materials.append(made[material_name])
         part.data.polygons.foreach_set("material_index", taken)
         part.data.update()
+    return made
 
 
 def brick_material(axes):
@@ -323,6 +329,9 @@ def render_colour(variant, blend, folder, colour_name, size, phone, options):
     if options.only in (None, "studio"):
         for view_name in STUDIO_VIEWS:
             shoot(view_name, False)
+    if options.only == "flat":
+        for view_name in FLAT_HEAD_VIEWS:
+            shoot(view_name, False)
 
 
 def main():
@@ -337,7 +346,9 @@ def main():
     parser.add_argument("--cloth", default=None, help="colour of the cloth (candidate C): a name or RRGGBB "
                         "(default: guessed from the portrait shown as the head)")
     parser.add_argument("--outline", default=None, help="colour of the outline: a name or RRGGBB")
-    parser.add_argument("--only", default=None, choices=("game", "studio"), help="one family of pictures")
+    parser.add_argument("--only", default=None, choices=("game", "studio", "flat"), help="one family of pictures; "
+                        "\"flat\" is the hero with its flat picture from the front, three quarter and back, which "
+                        "is not rendered otherwise")
     parser.add_argument("--head", default=None, help="number of the Genesis shown as the head, for every colour")
     parser.add_argument("--ring", default="red", help="the colours shown on the green disc the game draws under "
                         "the player's own hero, separated by commas; the others stand on the bare floor")
