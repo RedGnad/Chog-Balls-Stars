@@ -1,0 +1,39 @@
+{
+  "recorded_on": "2026-10-09",
+  "what": "The special attack of a Genesis is the signature of its Eyes: five shapes, each firing and dealing its own damage in online matches.",
+  "build": ".artifacts/unity/20261009T070900528Z-5fc2dc35dfd04fec864540670472844b",
+  "build_status_detail": "WebGL build finished. Genesis roster: 1969 heroes, 3 of 3 roles with a character, 5 of 5 shapes with a signature, ruleset genesis-0.3.0, asset [065760736FC09D1D].",
+  "url": "http://127.0.0.1:8083/?token=1795&perf=1",
+  "method": "Two online matches in headless Chrome (one idle human, five bots), 75 s and 90 s. With ?perf=1 the game logs one CHOG_COMBAT line per skill use and per damage event; the lines were counted from the browser console.",
+  "authored_numbers": {
+    "beam": "1400 damage, radius 0.35, speed 24 for 0.45 s, stops at walls",
+    "wave": "1100 damage, radius 1.5, speed 9 for 0.75 s, passes over walls",
+    "flash": "1600 damage, radius 1.7, standing 2 units in front for 0.35 s",
+    "nova": "1300 damage, radius 3 around the caster for 0.4 s",
+    "puddle": "600 damage per second for 3 s, radius 3, lobbed up to 8 units"
+  },
+  "run_1": {
+    "skills_fired": {"ArcherBasicSkillData": 180, "SpellcasterBasicSkillData": 55, "KnightBasicSkillData": 49,
+                     "GenesisNovaSkillData": 5, "GenesisPuddleSkillData": 2, "GenesisBeamSkillData": 1},
+    "damage_events": {"825": 48, "875": 29, "468": 8, "1300": 4, "600": 4, "1400": 1}
+  },
+  "run_2": {
+    "skills_fired": {"ArcherBasicSkillData": 488, "SpellcasterBasicSkillData": 67,
+                     "GenesisWaveSkillData": 3, "GenesisBeamSkillData": 2, "GenesisFlashSkillData": 1},
+    "damage_events": {"825": 49, "468": 33, "1100": 2, "1600": 1}
+  },
+  "observed": [
+    "All five signature skills fired at least once across the two runs, and each of the five authored damage values appeared at least once.",
+    "No class special of the sample (Knight, Archer or Spellcaster special) fired: every special used was a Genesis signature.",
+    "No error and no missing-asset warning in the browser console."
+  ],
+  "tests": "python3 tools/quantum/headless.py test: 30 catalog checks and 19 Quantum tests pass, including 'a Genesis fires the signature of its Eyes, whatever class its Body gives'.",
+  "limits": [
+    "Fired by bots; no human fired a signature in these runs, and the aim preview of the special was not seen.",
+    "Counts come from one client's console; a damage value proves a hit of that attack, not that its area or timing feel right.",
+    "Visuals are borrowed from the sample's attack prefabs and do not match the size of each area.",
+    "The numbers are placeholders: no kit budget, no balance pass.",
+    "Effect (Aura) and delivery (Base and Tier) change nothing yet: every signature is raw and direct.",
+    "Software rendering, no phone, no second device."
+  ]
+}

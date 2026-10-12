@@ -1,0 +1,46 @@
+﻿// The Bots steering is done either via Context steering or Nav Mesh steering
+
+// Context steering = the character defines a specific target that it is interested into, and will:
+// - Try to get to the ThreatDistance (and apply simple evasion maneuvers while there)
+// - Try to run away based on the RunDistance
+
+// NavMesh steering = the character simply follows the desired direction defined by the navigation agent, based on the nav mesh
+
+component AISteering
+{
+	Boolean Debug;
+
+	[HideInInspector] SteeringData MainSteeringData;
+
+	[HideInInspector] FPVector2 CurrentDirection;
+
+	FP MaxEvasionDuration;
+	[HideInInspector] FP EvasionTimer;
+	[HideInInspector] Int32 EvasionDirection;
+	[HideInInspector] FPVector2 EvasionDirectionVector;
+
+	FP MainSteeringWeight;
+	FP AvoidanceWeight;
+
+	FP LerpFactor;
+}
+
+// ---- Steering Entries
+
+union SteeringData
+{
+	SteeringEntryNavMesh SteeringEntryNavMesh;
+	SteeringEntryContext SteeringEntryContext;
+}
+
+struct SteeringEntryNavMesh
+{
+	FPVector2 NavMeshDirection;
+}
+
+struct SteeringEntryContext
+{
+	EntityRef CharacterRef;
+	FP RunDistance;
+	FP ThreatDistance;
+}

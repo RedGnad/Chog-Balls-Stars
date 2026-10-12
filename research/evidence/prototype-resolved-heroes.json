@@ -1,0 +1,65 @@
+[
+  {
+    "archetypeId": "ranger",
+    "basicAttackId": "ranger.shot",
+    "catalogHash": "26cc1e481f3d5c42d327e39c2460b5d31a4bcde217f12e5075f559316d7aa1aa",
+    "classAbilityId": "ranger.dash",
+    "displayName": "CHOG #4",
+    "explanation": [
+      "Base=Origin; Tier=Uncommon -> echo",
+      "Body=Grey Shirt -> ranger",
+      "Head=Choggie Beanie -> inherit",
+      "Eyes=Chog Viper -> neutral",
+      "Aura=<absent> -> inherit"
+    ],
+    "identityKey": "143:0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763:512",
+    "metadataHash": "6122fa9685f22d7dfbf5c81aed61b1ec35e861b23fdaf4d12152530f4eeca659",
+    "metadataId": 4,
+    "rulesetVersion": "prototype-0.1.0",
+    "signatureFamilyId": "neutral",
+    "tier": "Uncommon",
+    "tierExpressionId": "echo",
+    "uniqueId": null
+  },
+  {
+    "archetypeId": "controller",
+    "basicAttackId": "controller.bolt",
+    "catalogHash": "26cc1e481f3d5c42d327e39c2460b5d31a4bcde217f12e5075f559316d7aa1aa",
+    "classAbilityId": "controller.slow-zone",
+    "displayName": "CHOG #53 — Blaze",
+    "explanation": [
+      "Base=1:1; Tier=Legendary -> inversion",
+      "Genesis 561 / metadata 53 -> blaze"
+    ],
+    "identityKey": "143:0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763:561",
+    "metadataHash": "e5b3aad60010489c10d0e169d977ddc16d51258b535cfc10b4d6afd8e90d3510",
+    "metadataId": 53,
+    "rulesetVersion": "prototype-0.1.0",
+    "signatureFamilyId": "fire",
+    "tier": "Legendary",
+    "tierExpressionId": "inversion",
+    "uniqueId": "blaze"
+  },
+  {
+    "archetypeId": "ranger",
+    "basicAttackId": "ranger.shot",
+    "catalogHash": "26cc1e481f3d5c42d327e39c2460b5d31a4bcde217f12e5075f559316d7aa1aa",
+    "classAbilityId": "ranger.dash",
+    "displayName": "CHOG #465",
+    "explanation": [
+      "Base=Origin; Tier=Common -> direct",
+      "Body=Black Trackset -> ranger",
+      "Head=Russian Hat -> inherit",
+      "Eyes=Round Crying -> neutral",
+      "Aura=Fire -> fire"
+    ],
+    "identityKey": "143:0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763:973",
+    "metadataHash": "015ca21e8fabfa45c9316fe2913a79470a2047e6c9a014d0f90b16bf3bc7a44c",
+    "metadataId": 465,
+    "rulesetVersion": "prototype-0.1.0",
+    "signatureFamilyId": "fire",
+    "tier": "Common",
+    "tierExpressionId": "direct",
+    "uniqueId": null
+  }
+]

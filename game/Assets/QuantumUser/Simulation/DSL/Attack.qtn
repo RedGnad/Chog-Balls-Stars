@@ -1,0 +1,78 @@
+﻿// Every Attack is composed by two important parts:
+// - The data asset, which is created and filled in Unity with important data. Such assets also has polymorphic logic
+// - The attack Runtime Data, which is stored on the attack's component and has data entries that can needs to be changed in runtime
+
+// Also, every character has a BASIC and a SPECIAL attack, so there are both assets AND runtime data for these two types of attack
+
+component Attack
+{
+	asset_ref<AttackData> AttackData;
+
+	AttackRuntimeData AttackRuntimeData;
+
+	// The character who created this Attack
+	EntityRef Source;
+
+	FP TTL;
+}
+
+// The RuntimeData (RD) contains the specific data types that are needed for specific attacks
+// Some attacks, such as the Basic attack of the Archer, doesn't need any runtime data, so it is just not declared as part of the union
+union AttackRuntimeData
+{
+	ArcherSpecialAttackRD ArcherSpecialAttackRD;
+
+	SpellcasterBasicAttackRD SpellcasterBasicAttackRD;
+	SpellcasterSpecialAttackRD SpellcasterSpecialAttackRD;
+
+	KnightBasicAttackRD KnightBasicAttackRD;
+	KnightSpecialAttackRD KnightSpecialAttackRD;
+
+	GenesisSweepAttackRD GenesisSweepAttackRD;
+}
+
+// -- Archer
+struct ArcherSpecialAttackRD
+{
+    FPVector2 TargetPosition;
+	FP EffectInterval;
+}
+
+
+// -- Spellcaster
+struct SpellcasterBasicAttackRD
+{
+    FPVector2 TargetPosition;
+	FP EffectInterval;
+}
+
+struct SpellcasterSpecialAttackRD
+{
+    FPVector2 TargetPosition;
+	FP EffectInterval;
+}
+
+// -- Knight
+struct KnightBasicAttackRD
+{
+	EntityRef SkillEntity;
+}
+
+struct KnightSpecialAttackRD
+{
+	list<EntityRef> Targets;
+}
+
+// -- Genesis signatures
+// Every target the area has already affected: a sweep applies its effects once per target.
+struct GenesisSweepAttackRD
+{
+	list<EntityRef> Targets;
+}
+
+// -- SIGNALS
+signal OnCreateAttack(EntityRef attackEntity, Attack* attack);
+signal OnDisableAttack(EntityRef attackEntity);
+
+// -- EVENTS
+event OnCreateAttack{ AssetGuid skillData; }

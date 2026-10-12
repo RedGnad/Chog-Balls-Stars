@@ -1,0 +1,6 @@
+{
+  "name": "Chog.Controls",
+  "rootNamespace": "Chog.Controls",
+  "references": ["Unity.InputSystem"],
+  "autoReferenced": true
+}

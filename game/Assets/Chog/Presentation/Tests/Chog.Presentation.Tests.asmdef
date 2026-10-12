@@ -1,0 +1,7 @@
+{
+  "name": "Chog.Presentation.Tests",
+  "references": ["Chog.Presentation"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

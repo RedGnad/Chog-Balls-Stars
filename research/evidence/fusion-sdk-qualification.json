@@ -1,0 +1,52 @@
+{
+  "recorded_date": "2026-10-08",
+  "archive": "Photon-Fusion-2.1.3-Stable-2390.unitypackage",
+  "archive_sha256": "375e21bc771ce5f7cea942b5f804e7c28c8f4d858f7e9aab96725214564bc52e",
+  "sdk_build": "2.1.3 Stable 2390",
+  "archive_asset_entries": 301,
+  "baseline_files": 542,
+  "baseline_missing_files": [],
+  "unity_version": "6000.6.4f1",
+  "project": "game-fusion",
+  "mono_cecil_version": "1.10.2",
+  "app_id_configured": true,
+  "network_evidence": "research/evidence/fusion-network-qualification.json",
+  "vendor_files_changed": [
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-inline-selector.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-inline-box.png.meta",
+    "Assets/Photon/Fusion/Runtime/Statistics/Icons/StatsMultipeerIcon.png.meta",
+    "Assets/Photon/Fusion/Runtime/Statistics/Icons/RadialChartIcon.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-light-help-button-on.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-dark-help-button-off.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-inline-box-no-vertical-borders.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-inline-box-2x.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-inline-help-box.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-logo.png.meta",
+    "Assets/Photon/Fusion/Runtime/NetworkSceneManagerDefault.cs",
+    "Assets/Photon/Fusion/Editor/EditorResources/networked-property-icon.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-script-header-2x.png.meta",
+    "Assets/Photon/Fusion/Runtime/Statistics/Icons/StatisticsButtonIcon.png.meta",
+    "Assets/Photon/Fusion/Runtime/Statistics/Icons/StatsArrowIcon.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-logo-2x.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-dark-help-button-on.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-outline-box.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-script-header.png.meta",
+    "Assets/Photon/Fusion/Editor/EditorResources/Fusion-light-help-button-off.png.meta",
+    "Assets/Photon/Fusion/Runtime/Statistics/Icons/StatsCloseIcon.png.meta"
+  ],
+  "code_patch": {
+    "path": "tools/unity/patches/fusion-2.1.3-scene-initialization.patch",
+    "reason": "Scene registry was null after actual Unity runtime Start in headless Editor. Initialize now calls existing ClearStatics if registry is null.",
+    "line_endings_preserved": true
+  },
+  "other_vendor_changes": "20 image import .meta files rewritten by Unity; no other vendor source/binary changes.",
+  "redistribution_rights_reviewed": false,
+  "webgl_build": {
+    "result": "Succeeded",
+    "output_bytes": 12674084,
+    "evidence": "research/evidence/fusion-webgl-qualification.json"
+  },
+  "phone_runtime_tested": false,
+  "linux_server_build_tested": false,
+  "editor_script_compilation_passed": true
+}

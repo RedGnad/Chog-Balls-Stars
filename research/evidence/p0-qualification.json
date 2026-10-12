@@ -1,0 +1,126 @@
+{
+  "observed_on": "2026-10-07",
+  "phase": "P0 partial; independent shared catalog implemented; Unity qualification pending",
+  "environment": {
+    "os": "macOS arm64",
+    "unity_cli": "1.0.0-beta.8",
+    "hub_editor_registration": "6000.3.24f1",
+    "registered_editor_path": "/Applications/Unity/Hub/Editor/6000.3.24f1/Unity.app",
+    "editor_executable_exists": false,
+    "webgl_module_on_disk_verified": false,
+    "hub_reports_module": "Web",
+    "connected_pipeline_instances": 0,
+    "download_cache_bytes": 0,
+    "free_disk_gib_reported": 4.8,
+    "editor_and_webgl_download_bytes": 6722962640,
+    "install_performed": false,
+    "dotnet_sdk_found": false,
+    "compiler": "Mono mcs 6.12.0.0",
+    "runtime": "Mono 6.12.0.162",
+    "limits": [
+      "No Pipeline instance is not proof that no Editor process exists.",
+      "Sandbox doctor reported unreachable network/licensing and keychain access; this does not establish a missing license.",
+      "Unity install --dry-run worked with network access; no reinstall or deletion performed."
+    ]
+  },
+  "sample": {
+    "name": "Quantum 3 Twin Stick Shooter 3.0.9",
+    "acquired": false,
+    "local_search": "No matching archive in Downloads or scanned project paths.",
+    "public_download_response": "HTTP 200 text/html for HEAD; official prior page requested sign-in. No ZIP acquired.",
+    "user_input_requested": "Local path to official downloaded ZIP."
+  },
+  "catalog": {
+    "version": "prototype-0.1.0",
+    "rules_hash": "26cc1e481f3d5c42d327e39c2460b5d31a4bcde217f12e5075f559316d7aa1aa",
+    "real_fixtures": 3,
+    "whole_collection_coverage": false,
+    "capability_assets_linked": false,
+    "ownership_authentication_implemented": false,
+    "unity_integration_verified": false
+  },
+  "validation": {
+    "compile_command": "python3 tools/hero-catalog/run.py test",
+    "warnings_as_errors": true,
+    "tests_passed": 27,
+    "tests_failed": 0,
+    "test_names": [
+      "canonical token ID stays separate from displayed CHOG number",
+      "aura-absent Uncommon resolves to authored ranger/neutral/echo",
+      "real Fire Common resolves to ranger/fire/direct",
+      "Blaze works with only Base and Tier using its verified token binding",
+      "wrong chain rejected",
+      "different collection rejected",
+      "address capitalization is normalized without changing identity",
+      "zero, negative, leading-zero and uint256-overflow IDs rejected",
+      "metadata number cannot silently replace the canonical token ID",
+      "metadata from a different root rejected",
+      "changed metadata rejected against the recorded hash",
+      "unmapped body is rejected instead of silently receiving a fallback",
+      "unmapped aura is rejected even when eyes have a valid rule",
+      "duplicate trait is rejected independently of list order",
+      "rare tier plus Origin cannot stack incompatible lineage benefits",
+      "unknown rarity rejected",
+      "another 1:1 cannot use Blaze's entry",
+      "missing body has an explicit authored role",
+      "literal None is not equivalent to a missing body",
+      "authored Head override is visible in the profile",
+      "unknown cosmetic trait does not change the combat profile",
+      "duplicate mapping fails at catalog load",
+      "broken role reference fails at catalog load",
+      "missing required catalog field fails at load",
+      "catalog version and content hash travel with each hero",
+      "resolving another hero cannot mutate an earlier profile",
+      "changed rules remain isolated in a new catalog instance"
+    ],
+    "inspection_artifact": "prototype-resolved-heroes.json",
+    "scope": "C# compilation and execution on Mono; not a .NET SDK, Unity, IL2CPP, WebGL or multiplayer build."
+  },
+  "metadata": {
+    "before": 240,
+    "new_saved": 62,
+    "after": 302,
+    "complete_ids_1_through": 300,
+    "remaining": 1667,
+    "full_census": false,
+    "session_completed": true
+  },
+  "source_hashes": [
+    {
+      "path": "shared/Chog.Heroes/CatalogData.cs",
+      "sha256": "a04ab78341a4fb927c5f9f4d585c09cda501a9264934ee56658d45412547276c"
+    },
+    {
+      "path": "shared/Chog.Heroes/GenesisSnapshot.cs",
+      "sha256": "cc49a8e1e05e98c4cf294d6b4fd976d831a87dee940085d3402d7e95960d02ec"
+    },
+    {
+      "path": "shared/Chog.Heroes/HeroCatalog.cs",
+      "sha256": "6d9a5ee7de07db53905461d36f9189c8386934c7885753807c0972af73ff4153"
+    },
+    {
+      "path": "shared/Chog.Heroes/HeroDefinition.cs",
+      "sha256": "45843a7ea201b49ca8eb190b82f6ff5ce46e3418ea438b2a45bc0b715c4fc4e5"
+    },
+    {
+      "path": "shared/Chog.Heroes/Chog.Heroes.csproj",
+      "sha256": "d21030208e6c60d82d0c5b9651395dac1904bec8546bc6c1cdaf0effe2e13d5d"
+    },
+    {
+      "path": "content/hero-catalog.prototype.json",
+      "sha256": "26cc1e481f3d5c42d327e39c2460b5d31a4bcde217f12e5075f559316d7aa1aa"
+    },
+    {
+      "path": "tools/hero-catalog/Program.cs",
+      "sha256": "3887f8f79a8f8db159dee51b49cacc61828b66407cc7fd1fe30a597d44d71790"
+    },
+    {
+      "path": "tools/hero-catalog/run.py",
+      "sha256": "828118c774d8376229283be7756e125b6293ab4a501064813c390644cefc2697"
+    },
+    {
+      "path": "tests/fixtures/genesis/manifest.json",
+      "sha256": "0901c7ee35c0a6c711ea408bcc79eceeab3a8007226329ba56691df016d0dfeb"
+    }
+  ]
+}

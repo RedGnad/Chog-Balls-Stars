@@ -1,0 +1,46 @@
+{
+  "chainId": 143,
+  "collection": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
+  "bindingsEvidence": "research/evidence/prototype-genesis-bindings.json",
+  "blockHex": "0x6a34039",
+  "fixtures": [
+    {
+      "tokenId": "512",
+      "metadataId": 4,
+      "metadataUri": "ipfs://bafybeid4ybujnscdipkno7ps5utqelp5ry5ryreqhay3zhgk3a6x4jruqu/4.json",
+      "file": "512.json",
+      "sha256": "6122fa9685f22d7dfbf5c81aed61b1ec35e861b23fdaf4d12152530f4eeca659",
+      "captureKind": "original-gateway-json",
+      "metadataEvidence": "research/evidence/genesis-metadata.jsonl"
+    },
+    {
+      "tokenId": "561",
+      "metadataId": 53,
+      "metadataUri": "ipfs://bafybeid4ybujnscdipkno7ps5utqelp5ry5ryreqhay3zhgk3a6x4jruqu/53.json",
+      "file": "561.json",
+      "sha256": "e5b3aad60010489c10d0e169d977ddc16d51258b535cfc10b4d6afd8e90d3510",
+      "captureKind": "original-gateway-json",
+      "metadataEvidence": "research/evidence/genesis-metadata.jsonl"
+    },
+    {
+      "tokenId": "973",
+      "metadataId": 465,
+      "metadataUri": "ipfs://bafybeid4ybujnscdipkno7ps5utqelp5ry5ryreqhay3zhgk3a6x4jruqu/465.json",
+      "file": "973.json",
+      "sha256": "015ca21e8fabfa45c9316fe2913a79470a2047e6c9a014d0f90b16bf3bc7a44c",
+      "captureKind": "parsed-response-reencoded-as-json",
+      "metadataEvidence": "research/evidence/genesis-metadata-gateway-probe.json"
+    },
+    {
+      "tokenId": "1795",
+      "metadataId": 1287,
+      "metadataUri": "ipfs://bafybeid4ybujnscdipkno7ps5utqelp5ry5ryreqhay3zhgk3a6x4jruqu/1287.json",
+      "file": "1795.json",
+      "sha256": "9fd67400efac7b907af45ae88d5841f2734241584efb44300ca37a87eb3b2c11",
+      "captureKind": "gateway-json-reencoded-byte-identical",
+      "metadataEvidence": "research/evidence/user-genesis-1795.json",
+      "bindingBlockHex": "0x6a9f4f9",
+      "note": "Genesis held by the project owner per their statement; gateway bytes hash 9fd67400efac7b907af45ae88d5841f2734241584efb44300ca37a87eb3b2c11"
+    }
+  ]
+}

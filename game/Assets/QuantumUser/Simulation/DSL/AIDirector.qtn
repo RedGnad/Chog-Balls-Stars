@@ -1,0 +1,14 @@
+﻿// Every Team has it's own AIDirector, which is responsible for gathering useful information for the team, and to
+// decide what are the Strategies that are allowed at the moment
+
+struct AIDirector
+{
+	byte TickInterval;
+	int TeamIndex;
+	AIDirectorMemory Memory;
+}
+
+struct AIDirectorMemory
+{
+	byte AvailableCoins;
+}

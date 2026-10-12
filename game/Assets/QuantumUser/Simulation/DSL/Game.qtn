@@ -1,0 +1,31 @@
+﻿#define MAX_AIM_DISTANCE 10
+
+enum GameState{
+    None,
+    CharacterSelection,
+    Playing,
+    Over
+}
+
+global
+{
+	FP MatchTimer;
+	FP MatchDuration;
+
+	Boolean ControllersEnabled;
+	GameState State;
+
+	HFSMData GameManagerHFSM;
+}
+
+signal OnCharacterSelectionStart();
+signal OnFinish();
+signal OnGameStart();
+signal OnToggleControllers(Boolean value);
+signal OnGameOver(Boolean value);
+
+synced event StartCharacterSelection{}
+synced event ArenaPresentation{}
+synced event CountdownStarted{}
+synced event CountdownStopped{}
+synced event GameOver{ Int32 WinnerTeam; }

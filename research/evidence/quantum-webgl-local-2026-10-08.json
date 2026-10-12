@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-08",
+  "candidate": "Quantum Twin Stick Shooter 3.0.9 local bot scene",
+  "editor": "Unity 6000.6.4f1 arm64",
+  "build": {
+    "result": "Succeeded",
+    "scene": "Assets/QuantumUser/Scenes/Gameplay.unity",
+    "sizeBytes": 22193639,
+    "errors": 0,
+    "warnings": 106,
+    "report": ".artifacts/unity/20261008T211903735Z-493cd8a128e3468b95bbda4ad3c4ff7b/build-report.json",
+    "log": ".artifacts/unity/decision-2026-10-08/quantum-local-webgl-escalated.log"
+  },
+  "browser": {
+    "urlServedLocally": "http://127.0.0.1:8081/",
+    "browser": "Chrome headless with SwiftShader",
+    "observed": "The Team Preparation menu displayed Archer, Knight and Spellcaster. Clicking Start entered the local match; the gameplay screenshot shows the player, arena, controls and a 0-1 score.",
+    "runtimeErrorsObserved": 0,
+    "warningsObserved": 2,
+    "menuScreenshot": ".artifacts/unity/decision-2026-10-08/browser-menu.png",
+    "gameplayScreenshot": ".artifacts/unity/decision-2026-10-08/browser-after-click.png",
+    "eventLog": ".artifacts/unity/decision-2026-10-08/browser-smoke-events.json"
+  },
+  "phoneUserReport": {
+    "device": "Redmi 11C",
+    "reportedAt": "2026-10-08",
+    "userQuote": "surl redmi oui ca foncitonne. C'est assez fluide meme si ca lague un peu mais il faut dire que mon telephone est peu performant de base",
+    "observation": "The user opened the Quantum local WebGL build on the phone, reports that it works and feels fairly fluid, with some lag on a device they consider low-performance.",
+    "limits": "Qualitative report only; no measured FPS, frame times, memory, network latency or representative 3v3 MOBA load. Exact browser version and whether both virtual joysticks were exercised were not separately recorded."
+  },
+  "limits": [
+    "Local bot mode only: no Quantum AppId, online players or authenticated results tested.",
+    "Redmi 11C result is a qualitative user report, not an instrumented performance test.",
+    "Build size is not runtime memory, latency or frame rate.",
+    "The screenshots and smoke test do not verify every hero, skill or match completion.",
+    "Original sample asset licences still require review before public distribution."
+  ]
+}

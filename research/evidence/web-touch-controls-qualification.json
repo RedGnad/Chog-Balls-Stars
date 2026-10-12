@@ -1,0 +1,140 @@
+{
+  "client_date": "2026-10-08",
+  "recorded_utc": "2026-10-08T01:35:33.230195+00:00",
+  "unity_version": "6000.6.4f1",
+  "input_system_version": "1.20.0",
+  "baseline_local_sample": {
+    "user_report": "ok je viens de tester ca fonctionne bien",
+    "scope": "Local sample before touch adaptations; no measured match outcome",
+    "log_local_starts_observed": 2
+  },
+  "implemented": [
+    "Runtime touch UI visibility including WebGL, with editor preview flag preserved",
+    "Input actions read independently of build platform symbols",
+    "Mouse actions suppressed when touch UI is active",
+    "Aim cached separately for basic/special actions, including the release input tick",
+    "One owning pointer per joystick/button; unrelated drags/releases ignored",
+    "Controls reset on focus loss, pause or disable; Quantum callback unsubscribed on disable",
+    "Local WebGL build command includes Gameplay only, without changing online build scene settings"
+  ],
+  "verification": {
+    "isolated_compiler_method": "Installed Unity Roslyn and real Unity-generated references; no API stubs",
+    "isolated_compilers": [
+      {
+        "assembly": "Chog.Controls",
+        "exit_code": 0,
+        "errors": [],
+        "log": ".artifacts/unity/compile-check/Chog.Controls.controls-check.log"
+      },
+      {
+        "assembly": "Assembly-CSharp",
+        "exit_code": 0,
+        "errors": [],
+        "log": ".artifacts/unity/compile-check/Assembly-CSharp.controls-check.log"
+      },
+      {
+        "assembly": "Chog.Controls.Tests",
+        "exit_code": 0,
+        "errors": [],
+        "log": ".artifacts/unity/compile-check/Chog.Controls.Tests.controls-check.log"
+      },
+      {
+        "assembly": "Chog.Editor",
+        "exit_code": 0,
+        "errors": [],
+        "log": ".artifacts/unity/compile-check/Chog.Editor.controls-check.log"
+      }
+    ],
+    "declared_editmode_test_count": 9,
+    "test_fixture": "Official UnityEngine.InputSystem.InputTestFixture; actual PlayerControls.inputactions JSON",
+    "runtime_test_result": {
+      "recordedAtUtc": "2026-10-08T01:31:25.8488220Z",
+      "unityVersion": "6000.6.4f1",
+      "result": "Passed",
+      "xmlPath": ".artifacts/unity/controls-tests-20261008T013125404Z/results.xml",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "inconclusive": 0,
+      "durationSeconds": 0.1115151,
+      "test_cases": [
+        {
+          "name": "Chog.Controls.Tests.CombatInputTests.AnotherFingerCannotStealOrReleaseACapturedControl",
+          "result": "Passed"
+        },
+        {
+          "name": "Chog.Controls.Tests.CombatInputTests.CancellationAllowsANewFingerWithoutAnOldRelease",
+          "result": "Passed"
+        },
+        {
+          "name": "Chog.Controls.Tests.CombatInputTests.DesktopMouseKeepsBothActionsAndPointerPosition",
+          "result": "Passed"
+        },
+        {
+          "name": "Chog.Controls.Tests.CombatInputTests.ReleasingBasicPreservesAimForTheReleaseCast",
+          "result": "Passed"
+        },
+        {
+          "name": "Chog.Controls.Tests.CombatInputTests.ResetDropsCachedAimAfterControlsAreCancelled",
+          "result": "Passed"
+        },
+        {
+          "name": "Chog.Controls.Tests.CombatInputTests.SpecialReadsItsSeparateJoystick",
+          "result": "Passed"
+        },
+        {
+          "name": "Chog.Controls.Tests.CombatInputTests.SpecialReleaseKeepsItsAimEvenWhenBasicIsStillHeld",
+          "result": "Passed"
+        },
+        {
+          "name": "Chog.Controls.Tests.CombatInputTests.TouchModeIgnoresMouseClicksEmulatedByTheBrowser",
+          "result": "Passed"
+        },
+        {
+          "name": "Chog.Controls.Tests.CombatInputTests.TouchModeReadsMovementAndBasicAimSimultaneously",
+          "result": "Passed"
+        }
+      ]
+    },
+    "runtime_tests_executed": true,
+    "request_pending": false,
+    "next_action": "Build Local WebGL (Bots), serve over HTTP(S), test on the user-reported Redmi 11C; configure Quantum 3 AppId for online test.",
+    "result_summary_path": ".artifacts/unity/latest-controls-tests.json"
+  },
+  "source_sha256": {
+    "game/Assets/Chog/Controls/CombatInputReader.cs": "061368e1e5529e7b541bed39f655cfc7b1b23181d3df0bb84efc7f9a8fe196e7",
+    "game/Assets/Chog/Controls/PointerCapture.cs": "74422fadb1a889d1f00331c6a011d4a4a822f2d516ddc6c1e15bea149fec83a5",
+    "game/Assets/Chog/Controls/Tests/CombatInputTests.cs": "3fa01f2597040646e3a543a706e853e6e68284df75df5193158d629924086ac3",
+    "game/Assets/Chog/Editor/ControlsQualification.cs": "f780169499ae20efaf49a3ca61b24fb3a7c15ba9e3d1c61f1d9c8ee6bf562f23",
+    "game/Assets/Chog/Editor/QualificationBuild.cs": "546da2caf6eab8b5065c7db0dce22d34d22e8242576110585a9b79a388a0ea8f",
+    "game/Assets/TwinStickShooter/Scripts/TopDownInput.cs": "e70b21703838a4f6516e517e657f63b274f2087a8fc74bf3d9b9ef5f6e7ccc4f",
+    "game/Assets/TwinStickShooter/Scripts/UI/MobileButtonsManager.cs": "441f4adb403b246edf33327baf04bdea2d2ef7a3586bd671f4d6c9d1f79f5bb2",
+    "game/Assets/TwinStickShooter/Scripts/UI/ScreenControl.cs": "8ec0828f83ee0f8855251107f4dd1998cd7e6ec8d317dc2d19fbaaea7e633d91",
+    "game/Assets/TwinStickShooter/Scripts/UI/ScreenStick.cs": "17643f5fbb8aefd3011ab9b3159e1e4227954e09a241408e10f81d0c53309317",
+    "game/Assets/TwinStickShooter/Scripts/UI/ScreenButton.cs": "7f39ea13cb4c829fff26170c5020c8ad67feb8936170d066c43c2403d71dd0d4",
+    "game/Assets/TwinStickShooter/Scripts/UI/JoystickPositionBaheviour.cs": "5a63a5fb085da53b14e78db8aa72c2a06c54423e216ca93a85aa3410e55fbe62"
+  },
+  "preserved_assets": [
+    "MobileLayout.prefab, Touch Controller.prefab, PlayerControls.inputactions and existing asset GUIDs unchanged"
+  ],
+  "inspected_primary_sources": [
+    "game/Library/PackageCache/com.unity.inputsystem@7a4e1a2a8194/InputSystem/Runtime/Plugins/OnScreen/OnScreenControl.cs",
+    "game/Library/PackageCache/com.unity.inputsystem@7a4e1a2a8194/Tests/TestFixture/InputTestFixture.cs",
+    "game/Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/Api/TestRunnerApi.cs",
+    "game/Assets/QuantumUser/Simulation/System/CharacterSkillCreationSystem.cs"
+  ],
+  "external_reference": "https://doc.photonengine.com/quantum/v3/reference/create-quantum-appid",
+  "limitations": [
+    "No WebGL build, physical phone multitouch, online session or measured performance verified.",
+    "Input routing and pointer ownership tests do not establish browser UI event delivery or touch ergonomics.",
+    "The sample still has two actions and a single shared aim direction; simultaneous differently aimed releases in the same tick require an input-protocol design decision in P1.",
+    "This prepares mobile web controls, not an installable PWA shell or a completed MOBA."
+  ],
+  "target_phone": {
+    "user_reported_model": "Redmi 11C",
+    "browser": null,
+    "android_version": null,
+    "ram": null,
+    "tested": false
+  }
+}

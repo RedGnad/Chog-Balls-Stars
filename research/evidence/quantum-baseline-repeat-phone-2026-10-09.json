@@ -1,0 +1,176 @@
+{
+  "date": "2026-10-09",
+  "title": "Five solo online runs on the phone that all used the untuned configuration",
+  "whatHappened": "The user ran the five URLs prepared for the tuning comparison, but no new WebGL build had been made: the newest build folder was still 20261009T025947057Z (05:03), whose overlay ignores the hz, checksum, fps and quality parameters. All five runs therefore used the same settings: 60 Hz, ChecksumInterval 60, and the build's default quality, later read as 0 'Fastest' (not 3 'Good' as first written; see quantum-tuning-runs-phone-2026-10-09.json).",
+  "proofThatOverridesWereNotApplied": [
+    "The screenshots show the first overlay layout (five lines, 'slow >33ms'), not the extended one ('under 20ms', 'busy ms', 'session ... Hz').",
+    "The sample's frame counter advances about 61 ticks per overlay second in every run, including the three whose URL asked for hz=30.",
+    "No build folder newer than 05:03 existed under .artifacts/unity at 05:37; the string 'under 20ms' is absent from the served data file."
+  ],
+  "setup": {
+    "device": "1508x560, ANGLE (ARM, Mali-G52 MC2, OpenGL ES 3.2)",
+    "mode": "online, phone alone as room creator (party room), bots fill the other five slots",
+    "build": ".artifacts/unity/20261009T025947057Z-912aa5a2ec38420b92878eba2aa16c8a"
+  },
+  "runs": [
+    {
+      "screenshot": "quantum-baseline-repeat-0524-run1.jpg",
+      "sha256": "30b99cb0c9df4cd225f3f480f49282d21b2cf7701645bfa9b51fd3cdb8fd5302",
+      "phoneClock": "05:24",
+      "urlQuery": "?perf=1",
+      "sessionSeconds": 97,
+      "frames": 2474,
+      "averageFps": 26.3,
+      "frameMs": {
+        "p50": 36.0,
+        "p95": 62.0,
+        "p99": 83.0,
+        "worst": 177
+      },
+      "over33msPercent": 63.5,
+      "over50msPercent": 12.3,
+      "simulationMs": {
+        "p50": 14.0,
+        "p95": 28.8,
+        "max": 108.1
+      },
+      "predicted": {
+        "average": 7.2,
+        "max": 24
+      },
+      "ping": 79,
+      "inputOffset": 0,
+      "sampleFrameCounter": 5986,
+      "ticksPerOverlaySecond": 61.7
+    },
+    {
+      "screenshot": "quantum-baseline-repeat-0527-run2.jpg",
+      "sha256": "1d5ae3e41d70ccc28a6796efa8170c43e2b62f6a87f9b3aba1e4ee62882f6f31",
+      "phoneClock": "05:27",
+      "urlQuery": "?perf=1&checksum=0",
+      "sessionSeconds": 126,
+      "frames": 2997,
+      "averageFps": 24.4,
+      "frameMs": {
+        "p50": 38.0,
+        "p95": 61.0,
+        "p99": 107.0,
+        "worst": 498
+      },
+      "over33msPercent": 72.3,
+      "over50msPercent": 12.4,
+      "simulationMs": {
+        "p50": 15.4,
+        "p95": 29.4,
+        "max": 208.3
+      },
+      "predicted": {
+        "average": 7.7,
+        "max": 51
+      },
+      "ping": 136,
+      "inputOffset": 2,
+      "sampleFrameCounter": 7857,
+      "ticksPerOverlaySecond": 62.4
+    },
+    {
+      "screenshot": "quantum-baseline-repeat-0530-run3.jpg",
+      "sha256": "d9e7b0187e0bf358d808ded9cbcd55b57c945cb61b216dd616599ce03ea3ea86",
+      "phoneClock": "05:30",
+      "urlQuery": "?perf=1&checksum=0&hz=30",
+      "sessionSeconds": 103,
+      "frames": 2669,
+      "averageFps": 26.7,
+      "frameMs": {
+        "p50": 36.0,
+        "p95": 55.0,
+        "p99": 77.0,
+        "worst": 261
+      },
+      "over33msPercent": 63.4,
+      "over50msPercent": 8.2,
+      "simulationMs": {
+        "p50": 14.4,
+        "p95": 25.7,
+        "max": 116.1
+      },
+      "predicted": {
+        "average": 7.2,
+        "max": 24
+      },
+      "ping": 65,
+      "inputOffset": 0,
+      "sampleFrameCounter": 6319,
+      "ticksPerOverlaySecond": 61.3
+    },
+    {
+      "screenshot": "quantum-baseline-repeat-0533-run4.jpg",
+      "sha256": "bfe2f4ba491e8f8df5484f760d37c42c35da10f7ccb228ae841169aee8abeb48",
+      "phoneClock": "05:33",
+      "urlQuery": "?perf=1&checksum=0&hz=30&fps=-1",
+      "sessionSeconds": 152,
+      "frames": 3796,
+      "averageFps": 25.5,
+      "frameMs": {
+        "p50": 39.0,
+        "p95": 54.0,
+        "p99": 67.0,
+        "worst": 206
+      },
+      "over33msPercent": 75.6,
+      "over50msPercent": 8.7,
+      "simulationMs": {
+        "p50": 15.5,
+        "p95": 25.8,
+        "max": 79.1
+      },
+      "predicted": {
+        "average": 7.5,
+        "max": 19
+      },
+      "ping": 65,
+      "inputOffset": 0,
+      "sampleFrameCounter": 9234,
+      "ticksPerOverlaySecond": 60.8
+    },
+    {
+      "screenshot": "quantum-baseline-repeat-0536-run5.jpg",
+      "sha256": "25e0ea4919e98a7a22909cadcab156a1fddfcdde4f796f5e8b43fa4aaf9c4676",
+      "phoneClock": "05:36",
+      "urlQuery": "?perf=1&checksum=0&hz=30&fps=-1&quality=1",
+      "sessionSeconds": 102,
+      "frames": 2458,
+      "averageFps": 24.8,
+      "frameMs": {
+        "p50": 41.0,
+        "p95": 57.0,
+        "p99": 73.0,
+        "worst": 155
+      },
+      "over33msPercent": 77.6,
+      "over50msPercent": 14.1,
+      "simulationMs": {
+        "p50": 16.4,
+        "p95": 27.8,
+        "max": 58.9
+      },
+      "predicted": {
+        "average": 7.8,
+        "max": 18
+      },
+      "ping": 94,
+      "inputOffset": 0,
+      "sampleFrameCounter": 6308,
+      "ticksPerOverlaySecond": 61.8
+    }
+  ],
+  "reading": [
+    "Repeatability of the untuned configuration, solo with five bots: median frame 36 to 41 ms (about 24 to 27 frames per second on average), p95 54 to 62 ms, Quantum update median 14.0 to 16.4 ms, 7.2 to 7.8 predicted ticks on average.",
+    "Median frame time drifted from 36 ms to 41 ms across the series (battery 27 to 23 percent). Run-to-run noise or heating is therefore about 10 to 15 percent; a tuning change must move the numbers by more than that to count.",
+    "Solo with five bots is slower than the earlier two-human run (median 33 ms, simulation 12.8 ms), consistent with bot AI being part of the simulation cost; not isolated."
+  ],
+  "limits": [
+    "These runs say nothing about 30 Hz, checksums off, browser-paced frames or a cheaper quality level.",
+    "Readings were taken at different session times (97 to 152 s)."
+  ]
+}

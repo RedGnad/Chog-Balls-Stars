@@ -1,0 +1,37 @@
+{
+  "recorded_on": "2026-10-09",
+  "what": "Why the Genesis portraits never showed on the user's phone, the fix, and the first distinct visuals of the signatures.",
+  "build": ".artifacts/unity/20261009T080024517Z-9ebb8f517e23499491afef49c3850bab",
+  "portrait_defect": {
+    "user_report": "On the phone no portrait appeared anywhere, even with portrait=200, and no visual difference between characters.",
+    "server_log": "The phone (192.168.1.155) loaded the page and the build three times between 09:22 and 09:25 and never requested /genesis-art/.",
+    "reproduction": "Headless Chrome on http://192.168.1.85:8083/?token=1795 (the LAN address) made no portrait request and logged 'Non-secure network connections disabled in Player Settings' and 'InvalidOperationException: Insecure connection not allowed'. The same page on http://127.0.0.1:8083 loaded the portraits.",
+    "cause": "PlayerSettings.insecureHttpOption was 0 (not allowed): UnityWebRequest refuses plain HTTP except to loopback, and throws from SendWebRequest, which ended the loading coroutine silently.",
+    "fix": "The qualification build sets PlayerSettings.insecureHttpOption to AlwaysAllowed; GenesisPortrait catches the refusal, retries failed downloads, shows a grey disc while an image is missing, and reports counters in the performance overlay.",
+    "verified": "Headless Chrome on the LAN address: six /genesis-art/ requests answered 200 and the overlay line read 'portraits shown 7 requests 6 loaded 6 failed 0 last error none, from http://192.168.1.85:8083/genesis-art/256/'.",
+    "screenshot": "research/evidence/genesis-portrait-lan-headless-2026-10-09.png",
+    "not_verified": "The user's phone itself, after the fix."
+  },
+  "signature_visuals": {
+    "how": "One generic attack prefab (QuantumUser/Resources/Genesis/GenesisAttack.prefab) whose view, GenesisAttackView, instantiates the effect named by the attack data and scales it; the effects come from the Cartoon FX pack bundled with the sample and from the sample's own VFX.",
+    "assigned": {
+      "beam": "Light/CFXR3 Lightball A + Trail",
+      "wave": "TwinStickShooter/Prefabs/VFX/EnergyPulse, scale 1.9",
+      "flash": "Light/CFXR3 Hit Light B (Air), scale 2.2",
+      "nova": "Explosions/CFXR2 WW Explosion (Omni), scale 1.5",
+      "puddle": "unchanged: the sample's lobbed projectile and arrow zone"
+    },
+    "seen": [
+      "Nova: a large orange cartoon explosion centred on the hero, about the size of its area (genesis-signature-nova-headless-2026-10-09.png).",
+      "Flash: a ring with sparks in front of the hero, captured late in its life (genesis-signature-flash-headless-2026-10-09.png); its aim preview is a cone in front of the hero (genesis-signature-flash-aim-headless-2026-10-09.png)."
+    ],
+    "not_seen": "Beam and wave visuals: the automated browser runs at about 5 frames per second and its emulated touch does not always fire, so neither was captured. Both fired and dealt their damage in the earlier log-based runs.",
+    "defect_found_and_fixed": "The first build with the generic prefab shipped without its entity prototype in the Quantum asset database; every signature then threw 'Could not find prototype asset'. The importer now checks the prototype's registration too. That broken build was live on the local server for about four minutes."
+  },
+  "test_option": "Page option charged=1 (for the player who creates the room): every character enters with its special charged. Verified: the charge ring is lit at spawn and bots fire signatures in the first seconds.",
+  "limits": [
+    "Software rendering at about 5 frames per second: timing, brightness and feel are not representative.",
+    "Effects are not tinted by team, and the cone preview of the flash is longer than its real area.",
+    "Numbers are still placeholders; Aura and Tier change nothing yet."
+  ]
+}

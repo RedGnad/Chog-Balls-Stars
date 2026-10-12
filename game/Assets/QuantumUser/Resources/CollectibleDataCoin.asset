@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44451f43842c6b743898aecffe5cce4f, type: 3}
+  m_Name: CollectibleDataCoin
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/CollectibleDataCoin
+    Guid:
+      Value: 3968043992299650749
+  Prototype:
+    Id:
+      Value: 931788579796606410

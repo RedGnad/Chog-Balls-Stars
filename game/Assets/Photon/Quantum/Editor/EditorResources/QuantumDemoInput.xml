@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>QuantumDemoInput</name>
+    </assembly>
+    <members>
+        <member name="T:Quantum.QuantumDemoInputPlatformer2DPolling">
+            <summary>
+            A Unity script that creates empty input for any Quantum game.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumDemoInputPlatformer2DPolling.PollInput(Quantum.CallbackPollInput)">
+            <summary>
+            Set an empty input when polled by the simulation.
+            </summary>
+            <param name="callback"></param>
+        </member>
+        <member name="T:Quantum.QuantumDemoInputShooter3DPolling">
+            <summary>
+            A Unity script that creates empty input for any Quantum game.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumDemoInputShooter3DPolling.PollInput(Quantum.CallbackPollInput)">
+            <summary>
+            Set an empty input when polled by the simulation.
+            </summary>
+            <param name="callback"></param>
+        </member>
+        <member name="T:Quantum.QuantumDemoInputTopDownPolling">
+            <summary>
+            A Unity script that creates empty input for any Quantum game.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumDemoInputTopDownPolling.PollInput(Quantum.CallbackPollInput)">
+            <summary>
+            Set an empty input when polled by the simulation.
+            </summary>
+            <param name="callback"></param>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,159 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d2fe2c694564034da0046180c7418fb, type: 3}
+  m_Name: TSS-SystemsConfig
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/TSS-SystemsConfig
+    Guid:
+      Value: 390253067663065201
+  Entries:
+  - SystemType:
+      AssemblyQualifiedName: Quantum.Core.CullingSystem2D, Quantum.Simulation, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    SystemName: 
+    StartDisabled: 0
+    Children: []
+  - SystemType:
+      AssemblyQualifiedName: Quantum.Core.PhysicsSystem2D, Quantum.Simulation, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    SystemName: 
+    StartDisabled: 0
+    Children: []
+  - SystemType:
+      AssemblyQualifiedName: Quantum.Core.NavigationSystem, Quantum.Simulation, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    SystemName: 
+    StartDisabled: 0
+    Children: []
+  - SystemType:
+      AssemblyQualifiedName: Quantum.Core.EntityPrototypeSystem, Quantum.Simulation,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    SystemName: 
+    StartDisabled: 0
+    Children: []
+  - SystemType:
+      AssemblyQualifiedName: Quantum.Core.PlayerConnectedSystem, Quantum.Simulation,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    SystemName: 
+    StartDisabled: 0
+    Children: []
+  - SystemType:
+      AssemblyQualifiedName: Quantum.BotSDK.BotSDKDebuggerSystem, Quantum.Simulation
+    SystemName: 
+    StartDisabled: 0
+    Children: []
+  - SystemType:
+      AssemblyQualifiedName: Quantum.InventorySystem, Quantum.Simulation
+    SystemName: 
+    StartDisabled: 0
+    Children: []
+  - SystemType:
+      AssemblyQualifiedName: Quantum.CharacterSelectionSystem, Quantum.Simulation
+    SystemName: 
+    StartDisabled: 0
+    Children: []
+  - SystemType:
+      AssemblyQualifiedName: Quantum.GameplaySystemsGroup, Quantum.Simulation
+    SystemName: Gameplay Systems
+    StartDisabled: 0
+    Children:
+    - SystemType:
+        AssemblyQualifiedName: Quantum.MatchSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.PlayerJoiningSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.CommandsSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.GameManagerSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.MemorySystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.AISystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.TeamDataSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.AttributesSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.HealthSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.ImmuneSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.VisibilitySystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.InputSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.MovementSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.RotationSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.CharacterSkillCreationSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.SkillSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.AttackSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []
+    - SystemType:
+        AssemblyQualifiedName: Quantum.RespawnSystem, Quantum.Simulation
+      SystemName: 
+      StartDisabled: 0
+      Children: []

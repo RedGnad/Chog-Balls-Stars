@@ -1,0 +1,4 @@
+﻿component InputContainer
+{
+    [HideInInspector] QuantumDemoInputTopDown Input;
+}

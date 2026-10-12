@@ -1,0 +1,11 @@
+﻿component Inventory
+{
+	Int32 CollectiblesAmount;
+	asset_ref<CollectibleData> CollectibleData;
+	asset_ref<CollectibleData> AttractionCollectibleData;
+}
+
+component Collectible
+{
+	asset_ref<CollectibleData> CollectibleData;
+}

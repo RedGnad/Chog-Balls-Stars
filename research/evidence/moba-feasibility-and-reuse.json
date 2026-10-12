@@ -1,0 +1,180 @@
+{
+  "observed_on": "2026-10-07",
+  "user_confirmed_scope": {
+    "genre": "MOBA multijoueur",
+    "view": "Vue du dessus, 3D ou 3D isométrique",
+    "distribution": "PWA mobile préférée",
+    "engine": "Unity envisagé et expérience confirmée par l'utilisateur",
+    "NFT": "Genesis comme personnages, classes ou capacités issues de leurs traits",
+    "currency": "CHOG comme monnaie payante"
+  },
+  "validation_scope": "Lecture statique d'une copie locale et documentation primaire. Aucun template acquis, compilé ou exécuté ; aucun résultat de latence, performance ou délai de développement mesuré. Aucune opération portefeuille.",
+  "existing_project": {
+    "repository": "https://github.com/RedGnad/chogtanks-dev",
+    "inspected_local_copy": "/Users/red.g/CascadeProjects/chogtanks-dev-main-10",
+    "commit_status": "Archive locale sans .git à la racine. La correspondance complète avec HEAD distant n'est pas établie. Le hash de ChogTanksNFTManager.cs correspond au fichier précédemment lu au commit d22b7007d9e7406961202d46e0f1de2a243cc10a.",
+    "observations": [
+      {
+        "fact": "Version de projet Unity 6000.3.24f1",
+        "source": "ProjectSettings/ProjectVersion.txt:1"
+      },
+      {
+        "fact": "Reown AppKit Unity 1.4.1 référencé",
+        "source": "Packages/manifest.json:4"
+      },
+      {
+        "fact": "PhotonLauncher et contrôleurs héritent de Photon.Pun ; réseau PUN 2, pas Fusion dans les contrôleurs examinés",
+        "source": "Assets/Utility/PhotonLauncher.cs:7"
+      },
+      {
+        "fact": "Déplacement horizontal Rigidbody2D, gravité, sol, saut ; gameplay en 2D latérale",
+        "source": "Assets/Utility/TankMovement2D.cs"
+      },
+      {
+        "fact": "Visée, tirs chargés, projectiles et propulsion par recul",
+        "source": "Assets/Utility/TankShoot2D.cs"
+      },
+      {
+        "fact": "Création et accès par code de salons ; maxPlayers déclaré à 8",
+        "source": "Assets/Utility/PhotonLauncher.cs"
+      },
+      {
+        "fact": "Collision du projectile traitée par son client propriétaire, dégâts envoyés par RPC ; ce chemin ne démontre pas une simulation serveur autoritaire",
+        "source": "Assets/Utility/ShellCollisionHandler.cs:296"
+      },
+      {
+        "fact": "RPC de dégâts reçu sans vérification de l'émetteur dans cette méthode",
+        "source": "Assets/Utility/TankHealth2D.cs:43"
+      },
+      {
+        "fact": "Configuration AppKit de Monad testnet 10143",
+        "source": "Assets/Scripts/AppKitInit.cs:187"
+      },
+      {
+        "fact": "Gestion NFT couplée au contrat propre à CHOGTANKS, avec fonctions mint/evolve/getLevel",
+        "source": "Assets/Scripts/ChogTanksNFTManager.cs:115"
+      }
+    ],
+    "file_hashes": [
+      {
+        "path": "ProjectSettings/ProjectVersion.txt",
+        "sha256": "7a43a06dfe51c4e3933c5a7848320925ce96e667f8c7736557d13a02007e9860",
+        "lines": 2
+      },
+      {
+        "path": "Packages/manifest.json",
+        "sha256": "038e18b5fb83edecdc86d44805327c9167495df90d607ff3e420e6d6b63c46af",
+        "lines": 75
+      },
+      {
+        "path": "Assets/Scripts/AppKitInit.cs",
+        "sha256": "b2e7c47e65c60dc98af3406ca00b88bc06c63324e995edbc90baa36703836f03",
+        "lines": 388
+      },
+      {
+        "path": "Assets/Scripts/ChogTanksNFTManager.cs",
+        "sha256": "e7279389d9b082b51b11a11e86761443b181242a60367e3c701fcce1592a19df",
+        "lines": 2853
+      },
+      {
+        "path": "Assets/Utility/PhotonLauncher.cs",
+        "sha256": "c20f815a34cd2510bd6bfc7b824f6568f6dd026ce6aa69a0027e23280e574e9b",
+        "lines": 569
+      },
+      {
+        "path": "Assets/Utility/TankMovement2D.cs",
+        "sha256": "8d9711006eff908505ca4d450640ee297d3968d5031131a6c6d2ad8f46d1e33e",
+        "lines": 209
+      },
+      {
+        "path": "Assets/Utility/TankShoot2D.cs",
+        "sha256": "3a21c63538ccc00fd51d23da254dcaddceac1429e4ac458f4c7b1d100ff56856",
+        "lines": 372
+      },
+      {
+        "path": "Assets/Utility/TankHealth2D.cs",
+        "sha256": "f6ef76ad5ba571f2188c6e798c0e5360d587af8f5bf0d872dea63738d63f4f4a",
+        "lines": 66
+      },
+      {
+        "path": "Assets/Utility/ShellCollisionHandler.cs",
+        "sha256": "1861ce236d9cf353de1e28ccd71821eb26616a57d17754914d257864115ac2bf",
+        "lines": 501
+      },
+      {
+        "path": "Assets/Utility/SimpleTankRespawn.cs",
+        "sha256": "726ebbf97eac82480fad78a31605ec55a4202f17480ad55178ea446513db8846",
+        "lines": 438
+      },
+      {
+        "path": "Assets/Scripts/ScoreManager.cs",
+        "sha256": "7e88041d7ccf7817b006b4a6165f2764ab9b4f4b46a80fba09d95e7c10a8f525",
+        "lines": 796
+      }
+    ],
+    "reuse_candidates": "Connexion wallet, accès RPC NFT, éléments de salons et interface. Une migration PUN vers Fusion/Quantum modifie les scripts qui utilisent directement leurs API ; ce n'est pas un remplacement de package transparent."
+  },
+  "sources": [
+    {
+      "url": "https://doc.photonengine.com/quantum/v3/game-samples/twin-stick-shooter",
+      "access": "Description et sections des fonctionnalités et assets.",
+      "facts": "Quantum 3 ; source complète, top-down, 3 personnages et 2 capacités chacun, bots de remplissage et remplacement de joueurs déconnectés, export web annoncé. Mode fourni Coin Grab, pas MOBA à tours. Assets tiers gratuits/CC0 décrits.",
+      "limits": "Non téléchargé et non exécuté. Compatibility Unity 6000.3 et performance PWA à mesurer. La logique Quantum déterministe se distingue des MonoBehaviours PUN existants."
+    },
+    {
+      "url": "https://doc.photonengine.com/quantum/v2/game-samples/rogue-moba",
+      "access": "Documentation primaire.",
+      "facts": "Quantum 2.1.8, release du 2 avril 2024 ; Unity 2020.3.20f1 annoncé ; 3v3 mono-voie, tours, base, minions, 6 héros, 12 capacités. Gaming Circle requis. Des assets tiers exigent une licence pour un projet commercial.",
+      "limits": "Pas de version Quantum 3 de ce sample établie. Coût réel de migration et licence non testé."
+    },
+    {
+      "url": "https://assetstore.unity.com/packages/templates/packs/multiplayer-top-down-shooter-template-photon-fusion-2-278970",
+      "access": "Fiche Asset Store primaire.",
+      "facts": "Template HEAVYART pour Fusion 2 ; prix affiché 35 USD hors taxes. Compatibilité rendue pour Unity 2022.3.7f1, 6000.2.10f1 et 6000.5.5f1 ; 6000.3.24f1 non explicitement listé.",
+      "limits": "Pas acheté. Description détaillée non rendue par le lecteur web ; capacités de lobby, combat et IA décrites sur le site de l'éditeur. Ce n'est pas un template MOBA complet."
+    },
+    {
+      "url": "https://heavyart.games/",
+      "access": "Présentation primaire indexée de l'éditeur.",
+      "facts": "Shooter top-down : salons publics/à code, contrôleur, 3 armes, drops, IA de combat et paramètres centralisés.",
+      "limits": "Fonctionnalités annoncées ; non exécutées."
+    },
+    {
+      "url": "https://docs.reown.com/appkit/unity/core/installation",
+      "access": "Documentation officielle.",
+      "facts": "Unity 2022.3+, plateformes Android/iOS/desktop/WebGL annoncées ; sample WebGL disponible ; Project ID requis. Gamma et code stripping Minimal indiqués.",
+      "limits": "Aucun essai de connexion ou de signature mobile effectué. Compatibilité globale annoncée ne prouve pas celle de notre combinaison."
+    },
+    {
+      "url": "https://docs.reown.com/appkit/unity/core/options",
+      "access": "Documentation officielle.",
+      "facts": "Chaînes EVM personnalisées configurables.",
+      "limits": "Monad mainnet non connecté durant cette recherche."
+    },
+    {
+      "url": "https://doc.photonengine.com/quantum/v3/manual/cheat-protection",
+      "access": "Sections configurations, résultats et serveur.",
+      "facts": "Les webhooks peuvent contrôler RuntimePlayer et configurations ; les résultats des clients ne sont pas automatiquement une validation serveur. Résimulation possible à partir d'entrées enregistrées.",
+      "limits": "La disponibilité technique n'est pas une validation réalisée. Le déterminisme ne protège pas tout, notamment les informations cachées."
+    },
+    {
+      "url": "https://doc.photonengine.com/quantum/v3/manual/webgl",
+      "access": "Documentation officielle.",
+      "facts": "WebGL supporté ; transport navigateur WebSocket/TCP, performances et changement d'onglet à prendre en compte.",
+      "limits": "Aucune mesure sur les téléphones cibles."
+    },
+    {
+      "url": "https://www.photonengine.com/quantum/pricing",
+      "access": "Tarifs publics consultés.",
+      "facts": "Offre gratuite de lancement 100 CCU limitée à une application par client, 0.3 TB de trafic/mois ; free development 20 CCU également affiché.",
+      "limits": "CCU désigne les connexions simultanées. Aucun plan ou abonnement activé ; aucune promesse de nombre d'utilisateurs mensuels."
+    }
+  ],
+  "proposed_not_implemented": {
+    "scope": "3v3, une carte et une voie, tours et base, 3 classes, attaque de base et 2 capacités par classe, sessions courtes, bots pour compléter les parties.",
+    "recommended_first_candidate": "Quantum 3 Twin Stick Shooter, avec comparaison à Fusion sur une partie WebGL multi-clients avant arrêt de la stack.",
+    "sponsor_integration": "Identité héros par chainId/contract/tokenId, traits fonctionnels, état évolutif externe à Genesis. Achats CHOG au lobby, équipement enregistré après paiement confirmé, profil vérifié par backend avant entrée en match.",
+    "acceptance_probe": "Rejoindre la même session depuis plusieurs clients, contrôler un personnage en vue du dessus, utiliser une compétence, déconnecter/revenir ; tester navigateur iOS et Android. Aucun de ces checks encore réalisé.",
+    "timing": "Deux semaines est une hypothèse de production pour le périmètre proposé, pas un délai mesuré."
+  }
+}

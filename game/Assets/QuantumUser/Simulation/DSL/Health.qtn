@@ -1,0 +1,8 @@
+﻿component Health
+{
+	Boolean IsDead;
+	Boolean CanSelfHeal;
+
+	[HideInInspector] FP StartHealingTime;
+	[HideInInspector] FP NextHealTime;
+}

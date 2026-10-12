@@ -1,0 +1,109 @@
+{
+  "observed_on": "2026-10-09",
+  "rpc": "https://rpc.monad.xyz",
+  "chain_id": 143,
+  "block_hex": "0x6a9f4f9",
+  "block_number": 111801593,
+  "contract": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
+  "token_id": 1795,
+  "requests": [
+    {
+      "jsonrpc": "2.0",
+      "id": "tokenURI",
+      "method": "eth_call",
+      "params": [
+        {
+          "to": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
+          "data": "0xc87b56dd0000000000000000000000000000000000000000000000000000000000000703"
+        },
+        "0x6a9f4f9"
+      ]
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": "ownerOf",
+      "method": "eth_call",
+      "params": [
+        {
+          "to": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
+          "data": "0x6352211e0000000000000000000000000000000000000000000000000000000000000703"
+        },
+        "0x6a9f4f9"
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "jsonrpc": "2.0",
+      "result": "0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000004c697066733a2f2f6261667962656964347962756a6e73636469706b6e6f37707335757471656c70357279357279726571686179337a68676b33613678346a727571752f313238372e6a736f6e0000000000000000000000000000000000000000",
+      "id": "tokenURI"
+    },
+    {
+      "jsonrpc": "2.0",
+      "result": "0x00000000000000000000000080fb079237af2a634ba9b95263ba0bd53d20cd64",
+      "id": "ownerOf"
+    }
+  ],
+  "token_uri": "ipfs://bafybeid4ybujnscdipkno7ps5utqelp5ry5ryreqhay3zhgk3a6x4jruqu/1287.json",
+  "metadata_id": 1287,
+  "owner_at_block": "0x80fb079237af2a634ba9b95263ba0bd53d20cd64",
+  "metadata_url": "https://gateway.pinata.cloud/ipfs/bafybeid4ybujnscdipkno7ps5utqelp5ry5ryreqhay3zhgk3a6x4jruqu/1287.json",
+  "metadata_sha256": "9fd67400efac7b907af45ae88d5841f2734241584efb44300ca37a87eb3b2c11",
+  "metadata_bytes": 931,
+  "metadata": {
+    "name": "CHOG #1287",
+    "description": "CHOG — a 1969-piece collection on Monad.",
+    "image": "ipfs://bafybeihau2egcccbdxymeckmmbrqytbfor5gkt3en6d5fsbueymdbq7g6e/1287.webp",
+    "attributes": [
+      {
+        "trait_type": "Background",
+        "value": "Fresh Green"
+      },
+      {
+        "trait_type": "Aura",
+        "value": "Clean"
+      },
+      {
+        "trait_type": "Base",
+        "value": "Origin"
+      },
+      {
+        "trait_type": "Skin",
+        "value": "Red"
+      },
+      {
+        "trait_type": "Side",
+        "value": "Right"
+      },
+      {
+        "trait_type": "Mouth",
+        "value": "Gold Tooth"
+      },
+      {
+        "trait_type": "Eyes",
+        "value": "Anime Glass"
+      },
+      {
+        "trait_type": "Head",
+        "value": "TISM Cap"
+      },
+      {
+        "trait_type": "Form",
+        "value": "Chog"
+      },
+      {
+        "trait_type": "Tier",
+        "value": "Common"
+      },
+      {
+        "trait_type": "Naked",
+        "value": "No"
+      }
+    ]
+  },
+  "source": "User statement in conversation on 2026-10-09: 'TOKEN #1795' is the Genesis they hold. Ownership by the user's wallet is not verified here: the user's address is not known to this record.",
+  "limits": [
+    "Read at one block; ownership can change.",
+    "HTTPS gateway bytes; the IPFS DAG was not verified cryptographically."
+  ]
+}

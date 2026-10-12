@@ -1,0 +1,22 @@
+{
+    "recordedAtUtc": "2026-10-08T09:41:03.0181270Z",
+    "unityVersion": "6000.6.4f1",
+    "sdk": "Fusion 2.1.3 build 2390",
+    "result": "Passed",
+    "error": "",
+    "room": "chog-qual-9fbc709a4aad",
+    "scenario": "One GameMode.Server and two independent GameMode.Client runners in one headless Unity Editor process; real Photon session, separate physics scenes; not a browser/phone test.",
+    "passedChecks": [
+        "Real Photon room: dedicated server plus two clients, no server player slot, isolated peer physics scenes.",
+        "Server owns authoritative heroes; clients own only their own input.",
+        "Client input moves the server hero; other client converges to the same position.",
+        "Server creates projectile and applies hit; both clients receive authoritative damage.",
+        "A release creates one seven-arrow volley, with no duplicate casts from repeated network input.",
+        "Ballistic special spawns an authoritative damage zone observed by both clients.",
+        "Leaving client removes its hero on server and remaining client.",
+        "New client can join the same surviving server session after disconnect (fresh join, not authenticated resume)."
+    ],
+    "authoritativeMovementDistance": 1.3649954795837402,
+    "authoritativeShots": 7,
+    "authoritativeReceivedHits": 2
+}

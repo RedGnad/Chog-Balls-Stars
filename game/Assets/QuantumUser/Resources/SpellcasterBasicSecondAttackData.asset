@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5a1d60f6169ab4f809f7bcc2334462, type: 3}
+  m_Name: SpellcasterBasicSecondAttackData
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/SpellcasterBasicSecondAttackData
+    Guid:
+      Value: 2582718344266224052
+  SFX:
+    Clip: {fileID: 8300000, guid: 4a0bc2ae0048e1b49b55675424a8b807, type: 3}
+    Volume: 1
+  TTL:
+    RawValue: 196608
+  IgnoreOwner: 1
+  HitEnemies: 1
+  HitAlies: 0
+  DestroyOnHitDynamic: 0
+  DestroyOnHitStatic: 0
+  EffectsOnOthers:
+  - Value:
+      RawValue: 54067200
+    AttributeType: 1
+    Appliance: 1
+    Operation: 2
+    Duration:
+      RawValue: 0
+    ApplyOnSummonParent: 0
+  EffectsOnSource:
+  - Value:
+      RawValue: 6553
+    AttributeType: 4
+    Appliance: 1
+    Operation: 1
+    Duration:
+      RawValue: 0
+    ApplyOnSummonParent: 0
+  EffectInterval:
+    RawValue: 65536
+  EffectRepeatCount:
+    RawValue: 196608
+  Shape:
+    ShapeType: 1
+    PolygonCollider:
+      Id:
+        Value: 0
+    CircleRadius:
+      RawValue: 104857
+    CapsuleSize:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    EdgeExtent:
+      RawValue: 0
+    BoxExtents:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    PositionOffset:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    RotationOffset:
+      RawValue: 0
+    UserTag: 0
+    IsPersistent: 1
+    CompoundShapes: []

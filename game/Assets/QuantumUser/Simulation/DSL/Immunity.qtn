@@ -1,0 +1,4 @@
+﻿component Immunity
+{
+	[HideInInspector] FP Timer;
+}

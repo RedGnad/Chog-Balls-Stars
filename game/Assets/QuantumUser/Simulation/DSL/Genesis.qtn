@@ -1,0 +1,24 @@
+// Which Genesis a character is, and the kit its traits resolve to.
+// Role, Shape, Effect, Expression and Tier are positions in the id tables of the GenesisRoster asset.
+// A signature touched a target. Effect is a position in the roster's effect table (0 is raw);
+// Duration is how long the effect stays on the target, 0 when it is instant.
+event GenesisSignatureHit
+{
+	EntityRef Target;
+	Byte Effect;
+	FP Duration;
+}
+
+component GenesisHero
+{
+	Int32 TokenId;
+	Int32 MetadataId;
+	Byte Role;
+	Byte Shape;
+	Byte Effect;
+	Byte Expression;
+	Byte Tier;
+	// Which form of its signature the hero plays: 0 is the first one, 1 the second form its
+	// player equipped.
+	Byte Form;
+}

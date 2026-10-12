@@ -1,0 +1,7 @@
+
+signal OnCommandFinishCharacterSelection();
+signal OnCreatePlayerCharacter(player_ref player, asset_ref<EntityPrototype> prototype);
+signal OnChangePlayerTeam(player_ref player);
+signal OnDestroyPlayerCharacter(player_ref player);
+
+synced event FinishCharacterSelection{}

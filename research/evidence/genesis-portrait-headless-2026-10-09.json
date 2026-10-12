@@ -1,0 +1,28 @@
+{
+  "recorded_on": "2026-10-09",
+  "what": "The real image of a Genesis is shown as a round portrait above its character and beside its team slot.",
+  "build": ".artifacts/unity/20261009T062835831Z-d3ecf1a0e4a0416a92c3e3afca6ad5c9",
+  "url": "http://127.0.0.1:8083/?token=1795",
+  "method": "node tools/unity/qualify_webgl.mjs in headless Chrome (software WebGL), Party Menu, Create, Start, on-screen stick pushed up for 4.5 s.",
+  "observed": [
+    "Preparation screen: the portrait of CHOG #1287 (red skin, TISM cap, glasses, green background) sits to the left of the first slot of team 1.",
+    "Match: the same portrait is above the label 'CHOG #1287'; the bot labelled 'CHOG #200' also carries a portrait.",
+    "Server log of that run: /genesis-art/256/1287.jpg, 200.jpg, 63.jpg and 166.jpg answered 200; 483.jpg and 459.jpg answered 404 because those copies were not made yet, and those bots simply had no portrait."
+  ],
+  "screenshots": [
+    "research/evidence/genesis-portrait-selection-headless-2026-10-09.png",
+    "research/evidence/genesis-portrait-match-headless-2026-10-09.png"
+  ],
+  "image_source": {
+    "originals": "ipfs://bafybeihau2egcccbdxymeckmmbrqytbfor5gkt3en6d5fsbueymdbq7g6e/{metadata id}.webp, 1000 x 1000",
+    "mirror_used": "https://ipfs2.seadn.io/ipfs/ (bytes for 1287.webp hash to 41e70c8b..., identical to ipfs.filebase.io)",
+    "copies": ".artifacts/genesis-art/256/{metadata id}.jpg, 256 px JPEG, about 20 KB each, with a provenance line per file in .artifacts/genesis-art/manifest.jsonl"
+  },
+  "tests": "Five EditMode tests of Chog.Match (URL token, portrait folder) pass when run outside Unity with a reflection runner; they were not run in the Unity Test Runner.",
+  "limits": [
+    "Software rendering, one client: says nothing about the phone, where the portrait is about a centimetre wide at most and its legibility is still to be judged by the user.",
+    "The image copies are local test files; the right to redistribute the art is not established.",
+    "Only the Genesis whose metadata is recorded have a copy; the download was still running at the time of this record.",
+    "No tint from Skin or Background and no change to the 3D body: the hero is still the sample's Knight, Archer or Spellcaster."
+  ]
+}

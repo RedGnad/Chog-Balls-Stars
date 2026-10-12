@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- Keep SDK-generated C# and binaries outside the local Unity package. -->
+    <ArtifactsPath>$(MSBuildThisFileDirectory).artifacts/dotnet-build</ArtifactsPath>
+  </PropertyGroup>
+</Project>

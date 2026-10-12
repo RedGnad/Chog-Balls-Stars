@@ -1,0 +1,6 @@
+﻿component MovementData
+{
+	[HideInInspector] FP DirectionTimer;
+	[HideInInspector] FP MovementTimer;
+	[HideInInspector] FPVector2 LastAutoAimDirection;
+}

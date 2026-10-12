@@ -1,0 +1,71 @@
+{
+  "recorded_on": "2026-10-09",
+  "what": "The two attacks that were still generic effects (wave and nova, 1,074 Genesis) are drawn from the eyes of each Genesis; the Rare and Epic rarities get their delivery (return, persistent zone); a web page shows any Genesis as its hero card.",
+  "method": "Headless Chrome, muted, touch emulation, through the LAN address on staging port 8084, then the build was put on port 8083. The browser is software-rendered at about five frames a second: it shows what is drawn and what the simulation logs, never how fast a phone draws it.",
+  "build_on_port_8083": ".artifacts/unity/20261009T122744789Z-8ad6009ac2244d6487d10f5f4df521fe (since 14:33; the captures below were made on the four builds before it)",
+  "one_of_ones": {
+    "built": "The ten 1:1 Genesis have no Eyes and no Skin value: a look is authored per token (GenesisSignatureImporter.Uniques) after looking at their ten portraits (metadata 53, 392, 434, 494, 973, 1006, 1159, 1290, 1373, 1376).",
+    "seen": [
+      "Blaze (token 561): eight glowing yellow eyes on orange discs over an orange disc (genesis-unique-blaze-headless-2026-10-09.png)",
+      "Midas (token 1881): a gold fan of light (genesis-unique-midas-headless-2026-10-09.png)",
+      "Burning Skully (token 900): a bone-coloured strip with two black sockets (genesis-unique-skully-headless-2026-10-09.png)"
+    ],
+    "not_seen": "The seven others; the colour their heroes' bodies take was not looked at in a capture.",
+    "contrast": "Hearts were hard to read on red skin; an eye of nearly the colour of the skin now gets a lighter skin (genesis-burst-heart-headless-2026-10-09.png is the capture after the change)."
+  },
+  "eyes": {
+    "reference": "Portraits looked at before drawing: metadata 1473, 1500, 1492, 1506, 1469, 1537 (wave), 1483, 1474, 1515, 1514, 1485, 1519 (nova), 1524, 1512, 1504, 1476, 1545, 1505, 1889, 1472, 1503, 1572, 1480, 1531, and the colour variants 625, 140, 1849, 1813, 1745, 1192.",
+    "built": "Thirteen ways to draw an eye (GenesisEyeGlyph) and forty-one Eyes values mapped to them, with their colours, in GenesisSignatureImporter.EyeLooks. A stare (wave) is the pair of eyes on a strip in the hero's Skin colour, above a disc on the ground that shows the area; a burst (nova) is eight discs with one eye each, opening in a ring.",
+    "seen": [
+      "CHOG #1500 (Dead, yellow): a yellow strip with two X, travelling forward (genesis-stare-dead-headless-2026-10-09.png)",
+      "CHOG #1514 (Heart, red): eight red hearts on red discs in a ring around the hero (genesis-burst-heart-headless-2026-10-09.png)",
+      "CHOG #1537 (MOG): one goggle band, orange, yellow and blue (genesis-stare-goggles-headless-2026-10-09.png)",
+      "CHOG #1505 (Thug, echo): two strips with pixel sunglasses, one behind the other (genesis-stare-shades-headless-2026-10-09.png)",
+      "CHOG #31 (Green Round Eye, burn): eight white eyes with a green rim and pupil over an orange disc (genesis-burst-ring-eyes-headless-2026-10-09.png)"
+    ],
+    "not_seen": "Each of the other thirty-six Eyes values one by one (the captures of Happy and of Retard missed the attack); the returning leg of a stare; any of it on the phone.",
+    "approximations": "Eleven rare colour variants were mapped from their name and their family without looking at an image. The strip takes the colour of the Skin trait, which in the art is the colour of hair and spikes, not of the cream face: a red heart on a red disc has little contrast."
+  },
+  "signs_and_lookbook": {
+    "built": "Ten drawn signs, one per Aura effect, replace the ten Cartoon FX prefabs that marked the targets (GenesisIcons, GenesisCombatFeedback). A page option, lookbook=1, shows every drawing on one screen (GenesisLookbook).",
+    "seen": "The lookbook captured on the build now on port 8083 (20261009T125154034Z): 57 drawings, the ten signs in their Aura colours and 47 pairs of eyes, each under its name (genesis-lookbook-headless-2026-10-09.png). The first capture showed the eyelids of Side Eye, Tired, Angry and Halo sticking out of the strip; they were shortened and captured again.",
+    "match": "A 45 s headless match with burn, toxin, hex and chill bots ran without a console error after the change.",
+    "not_seen": "A sign on a target in a match capture: twelve screenshots of one match caught none at the moment of a hit."
+  },
+  "rare_deliveries": {
+    "collection": "return: 60 Rare Skull (wave 25, nova 17, beam 15, flash 3). persistent-zone: 30 Epic Radioactive (nova 16, wave 14). No Genesis has the puddle with either.",
+    "import": "Roster import summary: '180 signatures authored for 50 pairs of shape and effect'.",
+    "match": "The player was token 181 and the bots tokens 70, 539, 111, 428 and 186, named with the new test option '?bots='; page options charged=1 and perf=1.",
+    "skill_actions_with_ticks": {
+      "GenesisWaveBurnReturn (player)": "ticks 673 and 699: 26 ticks, 0.87 s",
+      "GenesisBeamBurnReturn": "14 ticks, 0.47 s",
+      "GenesisNovaMendReturn": "25 ticks, 0.83 s, twice",
+      "GenesisWaveRallyReturn": "26 ticks"
+    },
+    "damage_seen": {
+      "960 then 1280": "nova, mend (80% share): 2000 x 0.6 x 0.8 out, 2000 x 0.8 x 0.8 back",
+      "918": "wave, rally (85%): 1800 x 0.6 x 0.85 out",
+      "924": "beam, burn (70%): 2200 x 0.6 x 0.7 out",
+      "810 then 450 per tick": "wave, veil (90%), persistent zone: 1800 x 0.5 x 0.9, then 500 x 0.9",
+      "700 then 350 per tick": "nova, burn (70%), persistent zone: 2000 x 0.5 x 0.7, then 500 x 0.7"
+    },
+    "zone_colour": "First capture: the zone left by an expression-eyed hero took the colours of its eyes (a green and white disc). Fixed so a zone takes the colour of its Aura, or green without one; the fix is in the build on port 8083 and was type-checked, not captured again.",
+    "repeated_lines": "In the first run, before ticks were logged, the player's own return skill wrote six action lines in 2.6 s where two were expected; every bot wrote clean pairs. Skill events are raised on predicted frames. A later run with ticks shows it happening: the player's first action is written at tick 674 and again at tick 675, then the second action at tick 701, 26 ticks after. So a corrected prediction writes the same use again one tick apart; the simulation fires two actions. The six lines of the first run are read the same way, without their ticks to prove it."
+  },
+  "hero_page": {
+    "what": "web/hero/: number or wallet address in, hero cards out, with career and a top ten. Data generated by tools/web/build_hero_data.py from the roster and from content/genesis-card-text.json, which the Unity roster import now writes.",
+    "seen": "At 390 x 844 (phone emulation) the card of CHOG #1287; at 1100 px the sixteen Genesis of 0x80ef...bb13 read on Monad through the services. No sideways overflow, no console error, no failed request.",
+    "screenshots": [
+      "research/evidence/genesis-hero-page-phone-2026-10-09.png",
+      "research/evidence/genesis-hero-page-wallet-2026-10-09.png"
+    ],
+    "not_done": "Not deployed. The Share button and the 'Use my wallet' button were not exercised (no wallet and no share sheet in the test browser). No preview image for shared links."
+  },
+  "tests": "22 Quantum tests (new: named bots enter first), 13 view tests outside Unity, 21 service tests (new: the top list).",
+  "limits": [
+    "inversion (10 Legendary 1:1) is not built: those heroes play like a direct hit and their card says so.",
+    "No simulation test steps a return or a zone through its lifetime: both are read from the code and from the logged ticks and damage of one headless match.",
+    "The shares (60 and 80 for a return, 50 plus 500 a tick for a zone) are first numbers. A zone applies its Aura at every tick, like the puddle: a hex zone roots again and again.",
+    "Not measured on the phone: a burst is eight more draws for half a second, a stare two."
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "consulted_date": "2026-10-07",
+  "purpose": "Distinguish a simple pitch from production effort; inspect mechanisms outside the previously proposed genres.",
+  "method": "Targeted primary-source reading, not a systematic review or meta-analysis. Reference games were not played during this research. Developer reports are not independent causal evaluations.",
+  "references": [
+    {
+      "name": "Stick Fight",
+      "url": "https://landfall.se/stick-fight-press-kit",
+      "observations": [
+        "Developer reports about three months of evenings/weekends after a one-person jam prototype.",
+        "Prototype reused the TABS physics system.",
+        "Released feature list includes up to four players and 100 maps."
+      ],
+      "limit": "Full commercial release scope differs from a hackathon prototype; this is not a lower bound on our schedule."
+    },
+    {
+      "name": "ROUNDS",
+      "url": "https://landfall.se/rounds-press-kit",
+      "observations": [
+        "Developer reports five months of development.",
+        "The loser of a round receives upgrades.",
+        "Released feature list includes online play, 65+ power-ups and 70+ maps."
+      ],
+      "limit": "Does not isolate the time spent on networking, feel, assets or content."
+    },
+    {
+      "name": "Crawl",
+      "url": "https://www.powerhoof.com/press/sheet.php?p=crawl",
+      "observations": [
+        "One player is the hero, others control monsters; killing the hero transfers the hero role.",
+        "Developer describes an initial prototype made in a few days.",
+        "Early access in August 2014; full release on April 11, 2017.",
+        "Supports local multiplayer and AI opponents."
+      ],
+      "limit": "Role inversion has an established precedent; neither global novelty nor online implementation ease follows from this reference."
+    },
+    {
+      "name": "One Million Checkboxes",
+      "url": "https://eieio.games/blog/scaling-one-million-checkboxes/",
+      "observations": [
+        "Creator reports an initial build in two days.",
+        "Creator reports over 650 million checkbox actions during two weeks before deliberately closing the site.",
+        "Article documents outages, scaling work and a server rewrite."
+      ],
+      "limit": "Action count is not a user count or retention measure; launch distribution and bots confound comparisons."
+    },
+    {
+      "name": "Desktop Goose",
+      "url": "https://samperson.itch.io/desktop-goose",
+      "observations": [
+        "Creator distributes native Windows and macOS builds.",
+        "Character interacts with the desktop, cursor, notes and memes."
+      ],
+      "limit": "No source-code reuse, current OS compatibility or production duration was verified."
+    },
+    {
+      "name": "Rapier JavaScript determinism",
+      "url": "https://www.rapier.rs/docs/user_guides/javascript/determinism/",
+      "observations": [
+        "Official documentation describes cross-platform determinism for the WASM/JavaScript version under identical version, initialization and operation ordering.",
+        "Application-side initialization can break determinism."
+      ],
+      "limit": "A physics capability is not a complete multiplayer architecture or evidence of enjoyable gameplay."
+    },
+    {
+      "name": "Clash of Clans Builder Base 2.0",
+      "url": "https://supercell.com/en/games/clashofclans/blog/news/attacking-and-defending-in-builder-base-2-0/",
+      "observations": [
+        "Supercell described removal of head-to-head battles in May 2023.",
+        "Each attack opens the player base to a defense; another attack can begin without waiting for the previous opponent.",
+        "This version awards loot without stealing the other player resources."
+      ],
+      "limit": "Describes a specific Clash mode, not every current Clash mechanic or measured demand among Chog users."
+    },
+    {
+      "name": "Builder Base design rationale",
+      "url": "https://supercell.com/en/games/clashofclans/blog/news/builder-base-2-0-staying-small-going-deeper-2/",
+      "observations": [
+        "The game lead described preserving the focused feel of smaller bases and using fewer stronger troops."
+      ],
+      "limit": "Developer-reported design rationale and feedback; no controlled comparison or sample size supplied."
+    },
+    {
+      "name": "Heroes of Mavia",
+      "url": "https://docs.mavia.com/",
+      "observations": [
+        "Official documentation describes attacking player-built bases and NFT land ownership, rental or partnerships."
+      ],
+      "limit": "Direct precedent against claiming that the bases/NFT/crypto combination is new; no activity, retention or current economic sustainability audited."
+    },
+    {
+      "name": "Kenney Tower Defense Kit",
+      "url": "https://kenney.nl/assets/tower-defense-kit",
+      "observations": [
+        "Publisher lists a 3D asset pack under CC0 with 160 files."
+      ],
+      "limit": "Availability and license inspected; files, animation coverage and suitability for Chog art direction not tested."
+    },
+    {
+      "name": "Strategy Kit: RTS Engine",
+      "url": "https://assetstore.unity.com/packages/tools/game-toolkits/strategy-kit-rts-engine-79732",
+      "observations": [
+        "Asset Store lists a Unity 6000 version; publisher documentation covers unit combat, building placement and optional modules."
+      ],
+      "limit": "No package purchased, installed or tested. Module documentation does not establish a ready-to-use asynchronous game backend or secure result verification."
+    }
+  ],
+  "decision_status": "No product selected; no new gameplay prototype or user test conducted."
+}

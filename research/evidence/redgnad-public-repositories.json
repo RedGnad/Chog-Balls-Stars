@@ -1,0 +1,367 @@
+{
+  "consulted_date_client": "2026-10-06",
+  "source": "https://api.github.com/users/RedGnad/repos?per_page=100&sort=updated",
+  "public_repo_count": 36,
+  "repos": [
+    {
+      "name": "Viky-index",
+      "html_url": "https://github.com/RedGnad/Viky-index",
+      "description": "Viky's gifts, days, payouts and refunds on Monad, indexed from the contracts' own events with Envio HyperIndex",
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-10-04T00:15:13Z"
+    },
+    {
+      "name": "Rob-a-Base",
+      "html_url": "https://github.com/RedGnad/Rob-a-Base",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-09-25T21:48:31Z"
+    },
+    {
+      "name": "Mordant",
+      "html_url": "https://github.com/RedGnad/Mordant",
+      "description": "The programmable recourse layer for tokenized receivables.",
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-08-12T22:41:12Z"
+    },
+    {
+      "name": "puddleswap",
+      "html_url": "https://github.com/RedGnad/puddleswap",
+      "description": null,
+      "language": null,
+      "fork": true,
+      "archived": false,
+      "default_branch": "master",
+      "updated_at": "2026-08-01T13:34:35Z"
+    },
+    {
+      "name": "Axion",
+      "html_url": "https://github.com/RedGnad/Axion",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "slice-price-hire",
+      "updated_at": "2026-07-11T16:51:06Z"
+    },
+    {
+      "name": "Sentri",
+      "html_url": "https://github.com/RedGnad/Sentri",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-06-28T15:46:19Z"
+    },
+    {
+      "name": "Blob",
+      "html_url": "https://github.com/RedGnad/Blob",
+      "description": null,
+      "language": "Python",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-06-21T00:00:52Z"
+    },
+    {
+      "name": "Neutrino",
+      "html_url": "https://github.com/RedGnad/Neutrino",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-06-15T02:02:26Z"
+    },
+    {
+      "name": "Osmium",
+      "html_url": "https://github.com/RedGnad/Osmium",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-06-12T18:24:54Z"
+    },
+    {
+      "name": "Cambium",
+      "html_url": "https://github.com/RedGnad/Cambium",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-05-20T23:25:20Z"
+    },
+    {
+      "name": "Tend",
+      "html_url": "https://github.com/RedGnad/Tend",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-05-08T16:08:41Z"
+    },
+    {
+      "name": "Pulse",
+      "html_url": "https://github.com/RedGnad/Pulse",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-04-23T21:17:22Z"
+    },
+    {
+      "name": "n8n-workflows",
+      "html_url": "https://github.com/RedGnad/n8n-workflows",
+      "description": null,
+      "language": null,
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-03-09T22:58:05Z"
+    },
+    {
+      "name": "Ectoplasma",
+      "html_url": "https://github.com/RedGnad/Ectoplasma",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-01-11T21:41:37Z"
+    },
+    {
+      "name": "Endless-Assistant",
+      "html_url": "https://github.com/RedGnad/Endless-Assistant",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2026-01-06T02:39:15Z"
+    },
+    {
+      "name": "Chog-Zombies",
+      "html_url": "https://github.com/RedGnad/Chog-Zombies",
+      "description": null,
+      "language": "ShaderLab",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-12-15T01:36:15Z"
+    },
+    {
+      "name": "Starclub-gang",
+      "html_url": "https://github.com/RedGnad/Starclub-gang",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-11-27T03:59:16Z"
+    },
+    {
+      "name": "minimal-wagmi-modal",
+      "html_url": "https://github.com/RedGnad/minimal-wagmi-modal",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-11-06T02:51:02Z"
+    },
+    {
+      "name": "Dumb-Wallet-Worker",
+      "html_url": "https://github.com/RedGnad/Dumb-Wallet-Worker",
+      "description": null,
+      "language": "JavaScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-10-23T22:10:43Z"
+    },
+    {
+      "name": "dumb-wallet-miniapp",
+      "html_url": "https://github.com/RedGnad/dumb-wallet-miniapp",
+      "description": null,
+      "language": "HTML",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-10-23T21:52:27Z"
+    },
+    {
+      "name": "dashboard",
+      "html_url": "https://github.com/RedGnad/dashboard",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-10-23T09:32:25Z"
+    },
+    {
+      "name": "Dumb-Wallet",
+      "html_url": "https://github.com/RedGnad/Dumb-Wallet",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "DumbWallet",
+      "updated_at": "2025-10-22T21:53:04Z"
+    },
+    {
+      "name": "chogtanks-dev",
+      "html_url": "https://github.com/RedGnad/chogtanks-dev",
+      "description": "chog + tanks",
+      "language": "C#",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main-10",
+      "updated_at": "2025-09-25T16:18:49Z"
+    },
+    {
+      "name": "Juiceboost-V1",
+      "html_url": "https://github.com/RedGnad/Juiceboost-V1",
+      "description": null,
+      "language": "HTML",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-09-25T01:20:15Z"
+    },
+    {
+      "name": "chogtanks-mclip",
+      "html_url": "https://github.com/RedGnad/chogtanks-mclip",
+      "description": null,
+      "language": "C#",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-09-17T11:08:46Z"
+    },
+    {
+      "name": "monad-id",
+      "html_url": "https://github.com/RedGnad/monad-id",
+      "description": null,
+      "language": "HTML",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-09-16T22:26:53Z"
+    },
+    {
+      "name": "chogtanks-servers-clean",
+      "html_url": "https://github.com/RedGnad/chogtanks-servers-clean",
+      "description": null,
+      "language": "JavaScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-09-13T12:24:23Z"
+    },
+    {
+      "name": "CHOGTANKS",
+      "html_url": "https://github.com/RedGnad/CHOGTANKS",
+      "description": "chog + tanks",
+      "language": "C#",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-08-22T01:29:14Z"
+    },
+    {
+      "name": "m4u-package-fork",
+      "html_url": "https://github.com/RedGnad/m4u-package-fork",
+      "description": null,
+      "language": "C#",
+      "fork": true,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-07-22T04:53:30Z"
+    },
+    {
+      "name": "CHOGTANKS-testbuild-2",
+      "html_url": "https://github.com/RedGnad/CHOGTANKS-testbuild-2",
+      "description": null,
+      "language": "HTML",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-07-12T03:56:51Z"
+    },
+    {
+      "name": "juiceboost-buildwebGL",
+      "html_url": "https://github.com/RedGnad/juiceboost-buildwebGL",
+      "description": null,
+      "language": "HTML",
+      "fork": false,
+      "archived": false,
+      "default_branch": "master",
+      "updated_at": "2025-06-24T17:26:28Z"
+    },
+    {
+      "name": "MonStacks",
+      "html_url": "https://github.com/RedGnad/MonStacks",
+      "description": null,
+      "language": "ShaderLab",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-04-10T03:29:19Z"
+    },
+    {
+      "name": "relay",
+      "html_url": "https://github.com/RedGnad/relay",
+      "description": null,
+      "language": "TypeScript",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-04-10T03:12:42Z"
+    },
+    {
+      "name": "privacy-policy",
+      "html_url": "https://github.com/RedGnad/privacy-policy",
+      "description": null,
+      "language": "HTML",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-04-08T06:05:06Z"
+    },
+    {
+      "name": "pokenads",
+      "html_url": "https://github.com/RedGnad/pokenads",
+      "description": null,
+      "language": "C#",
+      "fork": false,
+      "archived": false,
+      "default_branch": "main",
+      "updated_at": "2025-03-21T22:47:00Z"
+    },
+    {
+      "name": "pokenads-01",
+      "html_url": "https://github.com/RedGnad/pokenads-01",
+      "description": null,
+      "language": "ShaderLab",
+      "fork": false,
+      "archived": false,
+      "default_branch": "master",
+      "updated_at": "2025-03-08T15:40:14Z"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-08",
+  "app_id": {
+    "source": "provided by user in conversation",
+    "configuration": "config/photon-fusion.json",
+    "uuid_format_valid": true,
+    "dashboard_application_type_verified": false,
+    "cloud_connection_tested": false,
+    "free_100_ccu_activation_verified": false
+  },
+  "sdk": {
+    "candidate": "Fusion 2.1.3 stable build 2390",
+    "official_versions_url": "https://doc.photonengine.com/fusion/v2/getting-started/sdk-download",
+    "official_package_url": "https://downloads.photonengine.com/download/fusion/photon-fusion-2.1.3-stable-2390.unitypackage?pre=sp",
+    "web_access_result": "403 page: Sign in to download; Downloads are available to signed-in Photon users.",
+    "archive_downloaded": false,
+    "imported": false,
+    "compiled": false,
+    "unity_6000_6_compatibility_verified": false
+  },
+  "sample": {
+    "official_url": "https://doc.photonengine.com/fusion/v2/game-samples/fusion-starter/download",
+    "candidate": "Fusion Starter Host Mode 2.1.1",
+    "download_url": "https://downloads.photonengine.com/download/fusion/fusionstarter-hostmode-2.1.1.zip?pre=sp",
+    "web_access_result": "403 page: Sign in to download",
+    "archive_downloaded": false,
+    "note": "Documentation lists WebGL support for the Shared project. No WebGL support for our Server setup is inferred from this sample listing; explicit client/server setup and testing remain required."
+  },
+  "local_archive_search": {
+    "directories": [
+      "/Users/red.g/Downloads",
+      "/Users/red.g/CascadeProjects"
+    ],
+    "formats": [
+      "zip",
+      "unitypackage"
+    ],
+    "result": "No Fusion or Fusion Starter package found; existing Quantum archive preserved."
+  },
+  "free_disk_observed_gib_approx": 4.5,
+  "next_action": "Test WebGL multiplayer and physical Redmi with authoritative server; add Genesis classes for P1.",
+  "snapshot_scope": "Initial unauthenticated web acquisition attempt, before user provided local SDK; booleans below describe that initial attempt. See followup for current state.",
+  "followup": {
+    "date": "2026-10-08",
+    "archive_source": "Local unitypackage supplied by user in conversation",
+    "archive": "Photon-Fusion-2.1.3-Stable-2390.unitypackage",
+    "archive_sha256": "375e21bc771ce5f7cea942b5f804e7c28c8f4d858f7e9aab96725214564bc52e",
+    "imported": true,
+    "app_id_applied_to_native_asset": true,
+    "cloud_connection_tested": true,
+    "free_100_ccu_activation_verified": false,
+    "sdk_evidence": "research/evidence/fusion-sdk-qualification.json",
+    "network_evidence": "research/evidence/fusion-network-qualification.json",
+    "sample_imported": false,
+    "sample_note": "Original Server/Client placeholder arena implemented directly against inspected SDK, not the Host/Shared Starter sample.",
+    "editor_script_compilation_passed": true,
+    "webgl_build_succeeded": true
+  }
+}

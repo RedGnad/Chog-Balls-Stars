@@ -1,0 +1,44 @@
+// What each team has to defend: a tower that shoots the heroes of the other team, and a core.
+// A structure has Health, Attributes (health only) and TeamInfo, so every attack hurts it as it
+// hurts a hero, and no Character, so nothing made for heroes (bots, respawn, team health)
+// counts it. A match ends at once when a core is destroyed: the other team wins.
+
+enum EStructureKind : Byte
+{
+	Tower,
+	Core
+}
+
+component Structure
+{
+	EStructureKind Kind;
+
+	// A tower hurts the nearest living enemy hero within Range, once every Interval seconds.
+	// A core has a Range of 0 and never shoots.
+	FP Range;
+	FP Damage;
+	FP Interval;
+	FP NextShotTime;
+}
+
+global
+{
+	// 0 while both cores stand; afterwards 1 + the team whose core was destroyed.
+	Byte DestroyedCore;
+}
+
+// A tower hurt a hero.
+event StructureShot
+{
+	EntityRef Structure;
+	EntityRef Target;
+	FP Damage;
+}
+
+// A structure lost its last health. Team is the team that owned it.
+event StructureDestroyed
+{
+	EntityRef Structure;
+	Int32 Team;
+	EStructureKind Kind;
+}

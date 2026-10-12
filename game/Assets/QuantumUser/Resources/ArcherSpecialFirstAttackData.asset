@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d677eac30bde9d144b987bde2952e6f6, type: 3}
+  m_Name: ArcherSpecialFirstAttackData
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/ArcherSpecialFirstAttackData
+    Guid:
+      Value: 188032002334481170
+  SFX:
+    Clip: {fileID: 0}
+    Volume: 1
+  TTL:
+    RawValue: 327680
+  IgnoreOwner: 1
+  HitEnemies: 0
+  HitAlies: 0
+  DestroyOnHitDynamic: 0
+  DestroyOnHitStatic: 0
+  EffectsOnOthers: []
+  EffectsOnSource: []
+  Velocity:
+    RawValue: 393216
+  PostImpactPrototype:
+    Id:
+      Value: 3826977731877830097

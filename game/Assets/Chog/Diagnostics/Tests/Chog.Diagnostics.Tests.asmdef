@@ -1,0 +1,7 @@
+{
+  "name": "Chog.Diagnostics.Tests",
+  "references": ["Chog.Diagnostics"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

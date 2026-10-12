@@ -1,0 +1,164 @@
+{
+  "observed_on": "2026-10-07",
+  "scope": "Préparation du plan de développement. Recherche, lectures de documentation, collecte de metadata et rédaction seulement. Aucun template téléchargé, éditeur lancé, prototype exécuté, transaction diffusée ou essai utilisateur.",
+  "collection_research": {
+    "contract": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
+    "chain_id": 143,
+    "base_cid": "bafybeid4ybujnscdipkno7ps5utqelp5ry5ryreqhay3zhgk3a6x4jruqu",
+    "raw_file": "genesis-metadata.jsonl",
+    "analysis_file": "genesis-trait-census-first240.json",
+    "retrieved": 240,
+    "expected": 1969,
+    "complete": false,
+    "sampling": "IDs demandés à partir de 1 ; seules les réponses réussies sont enregistrées. Ce n'est pas un échantillon aléatoire ni représentatif établi.",
+    "stop_reason": "Après 240 réponses sauvegardées, le téléchargement a été arrêté pendant une série d'échecs. HTTP 429 observé sur cette passerelle. Le script initial autorisait 24 workers / 5 débuts de requête par seconde ; le helper conservé réduit le rythme et s'arrête au premier HTTP 429.",
+    "limitations": [
+      "Pas de vérification cryptographique du DAG IPFS ; SHA256 des octets HTTPS bruts conservé pour les 240 entrées.",
+      "Pas de recensement de propriétaires ni de joueurs.",
+      "Pas d'extrapolation des fréquences partielles à toute la collection.",
+      "Pas d'association de capacité objectivement donnée par les metadata : le mapping de jeu est une création à tester."
+    ],
+    "observations": [
+      {
+        "fact": "Les cinq tiers sont présents dans les 240 entrées.",
+        "counts": {
+          "Common": 166,
+          "Uncommon": 64,
+          "Rare": 7,
+          "Epic": 2,
+          "Legendary": 1
+        }
+      },
+      {
+        "fact": "Base Origin apparaît dans 230 des 240 entrées ; les classes ne doivent donc pas être déterminées par Base seule dans la proposition.",
+        "scope": "Observation partielle ; choix de design, pas preuve de répartition globale."
+      },
+      {
+        "fact": "Le seul Legendary du corpus, metadata #53 nommé CHOG #53 — Blaze, ne comporte que Base: 1:1 et Tier: Legendary.",
+        "scope": "N'affirme pas que tous les Legendary ont ce schéma."
+      },
+      {
+        "fact": "Aura absente dans 129 entrées, Body dans 26, Head dans 39, Mouth dans 19.",
+        "scope": "Dénominateur 240 entrées récupérées."
+      },
+      {
+        "fact": "Les sept Rare observés ont Base Skull ; les deux Epic ont Base Radioactive.",
+        "scope": "Associations du corpus partiel ; ne pas traiter systématiquement lignée et tier comme deux sources indépendantes de puissance."
+      }
+    ],
+    "raw_prefix_lines": 240
+  },
+  "sources": [
+    {
+      "id": "mda",
+      "url": "https://www.cs.northwestern.edu/~hunicke/pubs/MDA.pdf",
+      "access": "PDF primaire consulté, 5 pages.",
+      "fact": "Cadre reliant mécanismes, dynamiques de jeu et expérience ; itération entre ces niveaux.",
+      "limits": "Cadre de conception publié en 2004 ; aucune preuve statistique de succès ni méta-analyse."
+    },
+    {
+      "id": "supercell",
+      "url": "https://supercell.com/en/games/brawlstars/blog/game-updates/release-notes-october-2025/",
+      "access": "Article officiel indexé consulté.",
+      "fact": "Réduction annoncée de bonus Hypercharge, motivation de contre-jeu donnée par le studio.",
+      "limits": "Une décision de studio ne prouve pas un optimum pour notre jeu."
+    },
+    {
+      "id": "valve",
+      "url": "https://www.dota2.com/datafeed/patchnotes?version=7.41&language=english",
+      "access": "JSON primaire consulté.",
+      "fact": "Les notes générales annoncent la suppression des Facets.",
+      "limits": "La cause de la suppression n'est pas établie par cette ligne ; aucune explication de joueurs n'est traitée comme fait."
+    },
+    {
+      "id": "sample",
+      "url": "https://doc.photonengine.com/quantum/v3/game-samples/twin-stick-shooter",
+      "access": "Documentation consultée ; téléchargement essayé.",
+      "fact": "Source complète annoncée, trois personnages/deux capacités chacun, bots et mode Coin Grab ; export web annoncé.",
+      "limits": "Lien de téléchargement renvoie une page No Access demandant Sign In. Aucun package acquis."
+    },
+    {
+      "id": "assets",
+      "url": "https://doc.photonengine.com/quantum/v3/manual/assets/assets-simulation",
+      "access": "Documentation primaire.",
+      "fact": "Données d'assets immuables ; références modifiables dans l'état de simulation. Modifier l'asset lui-même pendant le match enfreint le déterminisme.",
+      "limits": "L'adaptation de nos signatures n'est pas implémentée."
+    },
+    {
+      "id": "systems",
+      "url": "https://doc.photonengine.com/quantum/v3/manual/quantum-ecs/systems",
+      "access": "Documentation primaire.",
+      "fact": "Systèmes sans état mutable externe, état dans Frame et calculs déterministes.",
+      "limits": "Aucun système de notre jeu compilé."
+    },
+    {
+      "id": "webhooks",
+      "url": "https://doc.photonengine.com/quantum/v3/manual/webhooks",
+      "access": "Configuration, AddPlayer, GameResult et ReplayStart/ReplayChunk lus.",
+      "fact": "Le backend peut remplacer RuntimePlayer ; résultat client non fiable par défaut. Replays capturables depuis Photon via webhooks authentifiables.",
+      "limits": "Activation, couverture, authentification et performances du chemin complet à tester."
+    },
+    {
+      "id": "replay",
+      "url": "https://doc.photonengine.com/quantum/v3/manual/replay",
+      "access": "Sections enregistrement et .Net Application lues.",
+      "fact": "Runner .NET documenté ; requiert bonnes versions des bibliothèques, configurations, asset DB, LUT et inputs. Option de checksum interplateforme décrite.",
+      "limits": "Pas de runner généré ou exécuté ; aucun coût CPU mesuré."
+    },
+    {
+      "id": "webgl",
+      "url": "https://doc.photonengine.com/quantum/v3/manual/webgl",
+      "access": "Documentation primaire.",
+      "fact": "WebGL, transport WebSocket/TCP, contraintes arrière-plan, performance et builds Release/IL2CPP.",
+      "limits": "PWA et appareils cibles non testés."
+    },
+    {
+      "id": "reown",
+      "url": "https://docs.reown.com/appkit/unity/core/installation",
+      "access": "Documentation primaire.",
+      "fact": "Prérequis documentés Gamma, stripping Minimal et support WebGL.",
+      "limits": "Combinaison de packages non qualifiée."
+    },
+    {
+      "id": "siwe",
+      "url": "https://eips.ethereum.org/EIPS/eip-4361",
+      "access": "Spécification primaire consultée.",
+      "fact": "Référence de message d'authentification avec domaine, adresse, nonce, chaîne et temporalité.",
+      "limits": "Pas d'implémentation ou signature effectuée."
+    },
+    {
+      "id": "erc20",
+      "url": "https://docs.openzeppelin.com/contracts/5.x/api/token/erc20",
+      "access": "Documentation primaire consultée.",
+      "fact": "SafeERC20 fournit des opérations de transfert adaptées à différentes conventions de retour ERC20.",
+      "limits": "N'établit pas les comportements de l'implémentation CHOG ; test/fork à effectuer avant paiement réel."
+    }
+  ],
+  "planning_status": {
+    "confirmed_by_user": [
+      "MOBA multijoueur 3D/isométrique",
+      "PWA préférée",
+      "NFT/traits/rareté centraux",
+      "CHOG monnaie payante",
+      "placeholders d'abord",
+      "prototype fonctionnel rapide, possibilités d'amélioration",
+      "plan consultable avant développement"
+    ],
+    "recommended_not_approved_as_final": [
+      "3v3, une voie, trois archétypes",
+      "Tier modifie la signature avec contreparties",
+      "carrière et achats attachés au NFT",
+      "Quantum comme candidat prioritaire à qualifier",
+      "backend C# et replay .NET",
+      "spécialisation horizontale payante"
+    ],
+    "not_measured": [
+      "Délai de prototype 24–48 h",
+      "livraison en 14 jours",
+      "plancher 30 FPS",
+      "budgets poids/démarrage",
+      "équilibrage",
+      "rétention ou envie de payer"
+    ]
+  }
+}

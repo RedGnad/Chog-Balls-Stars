@@ -1,0 +1,68 @@
+{
+  "recorded_on": "2026-10-09",
+  "what": "A player connects the wallet of the browser, sees the Chog Genesis that wallet holds, picks one, signs in, plays, and the career of that Genesis is recorded. A player without a Genesis plays a recruit.",
+  "method": "Headless Chrome, muted, touch emulation, through the LAN address (http://192.168.1.85). The browser wallet is replaced by a stand-in injected before the page loads (tools/unity/qualify_webgl.mjs). The game services are the local stand-in (node server/src/local.js) behind the WebGL test server. No real wallet was used.",
+  "ownership_read": {
+    "how": "One Multicall3 call of ownerOf for the 1,969 tokens on Monad mainnet (chain 143), about 1.2 s on rpc.monad.xyz, reused 20 s.",
+    "checked": [
+      "0x80fb079237af2a634ba9b95263ba0bd53d20cd64 holds [1795] (block 111875227), as in the owner scan recorded the same morning",
+      "0x80ef2e24d7f903868079f672059e761799f6bb13 holds 16 tokens (3, 4, 8, 9, 29, 69, 77, 196, 197, 215, 229, 256, 911, 1084, 1140, 1594)",
+      "0x0000000000000000000000000000000000000001 and 0x1111111111111111111111111111111111111111 hold none"
+    ]
+  },
+  "wallet_cases": {
+    "build": ".artifacts/unity/20261009T105649918Z-691dab1f392e4d06a151d9a33c6d76af (the panel layout changed afterwards; the cases were run again on the final build, see final_run)",
+    "no_wallet": "The panel reads 'No wallet in this browser...' and what a recruit is; no button.",
+    "refusal": "The stand-in answers code 4001 as a player closing the wallet: the panel goes back to CONNECT WALLET, console 'CHOG_WALLET refused 4001'.",
+    "wallet_without_genesis": "0x1111...1111: 'CHOG_WALLET genesis 0'; on the preparation screen the three class buttons stay and a note above them reads 'RECRUIT 15% less health, no Genesis attack. Connect a wallet that holds a Chog Genesis to play it.'",
+    "holder_of_one": "0x80fb...cd64: the panel shows 'YOUR GENESIS', the portrait of CHOG #1287 and 'BRUTE / FLASH / PURIFY / DIRECT'.",
+    "holder_of_sixteen": "0x80ef...bb13: six portraits, page '1 / 3', arrows; the third portrait tapped, the overlay then reads 'chosen 8' and the preparation card shows that Genesis (wave, chill, Uncommon echo)."
+  },
+  "signed_path": {
+    "build": ".artifacts/unity/20261009T111055566Z-da391ea6251345119adda3444f90d0e5",
+    "why_a_test_key": "No private key of a real holder is available here and none must be. The stand-in wallet used the private key published in the web3.js documentation, a public test value, and really signed. A second copy of the services (port 8091, its own data folder) was started with --pretend-holder so that this address is answered as the holder of tokens 408, 1795 and 3; the real services answer that it holds nothing.",
+    "seen": [
+      "CHOG_WALLET address 0x2c75...5c23, genesis 3",
+      "panel: 'SIGN IN TO RECORD ITS CAREER'; after the tap, services log POST /api/session/challenge 200 and POST /api/session 200, console 'CHOG_WALLET signed in', panel 'CAREER no match yet'",
+      "a whole match played by the bots around the idle player (about three minutes), 'Left Team wins!' 10 to 2",
+      "services log POST /api/career/result 200; console 'CHOG_CAREER credited token 408 : 1 matches, 1 wins'",
+      "GET /api/career?tokens=408 then answers matches 1, wins 1, badges First match and First win, confirmed 0"
+    ],
+    "screenshots": [
+      "research/evidence/genesis-wallet-connected-headless-2026-10-09.png (sixteen Genesis, the third chosen, the sign-in button)",
+      "research/evidence/genesis-wallet-signed-in-headless-2026-10-09.png (signed in, the career of the chosen Genesis)",
+      "research/evidence/genesis-career-recorded-headless-2026-10-09.png (end of a match: 'CHOG #1869 career recorded, 2 matches, 1 win [First match] [First win]')",
+      "research/evidence/genesis-recruit-note-headless-2026-10-09.png (preparation screen of a player without a Genesis)"
+    ]
+  },
+  "final_run": {
+    "builds": ".artifacts/unity/20261009T114709572Z-fb36798b1d3045a58519a291c3ff1f73 for the signed path and the first two wallet cases, .artifacts/unity/20261009T115508836Z-aa75436b16954bc99c5a8b98c713b4b0 (the one put on port 8083) for the last three; the two builds differ by one line in the drawing of a zone.",
+    "signed_path": "Connected, signed in, a second whole match, 'CHOG_CAREER credited token 408 : 2 matches, 1 wins', and the band on screen at the end of the match.",
+    "wallet_cases": "The five cases again, same results. No console error; the only failed requests are the Photon region pings the client itself aborts and one aborted re-read of the game data file."
+  },
+  "later_checks_same_day": {
+    "after_disconnect": "Leaving a session with the DISCONNECT button of the in-match menu brings back the main menu with the panel, the sixteen Genesis and the choice intact (build 20261009T131346574Z).",
+    "after_reload": "Connect, tap the third Genesis, sign in, then load the page again in the same browser (build 20261009T133145106Z, the one on port 8083): the wallet is recognised without a tap, the third Genesis is still chosen, and the career line shows in place of the sign-in button (research/evidence/genesis-wallet-after-reload-headless-2026-10-09.png). The stand-in wallet remembers within the browser session that it shared its address, as a wallet does; the game's part is what it wrote to the browser's storage.",
+    "third_match": "The signed path again on build 20261009T131346574Z: 'credited token 408 : 3 matches, 1 wins'.",
+    "resend": "A result whose request fails or gets a 5xx answer is sent again, three attempts in all; only the rule that decides it is tested (view test), no failing service was simulated in a browser."
+  },
+  "open_in_metamask": {
+    "what": "On a phone browser without a wallet, over HTTPS, the menu panel offers OPEN IN METAMASK, which leaves for https://link.metamask.io/dapp/<address>, the format given in MetaMask's documentation (docs.metamask.io, 'Use deeplinks', read 2026-10-09).",
+    "method": "A throwaway local HTTPS host with a self-signed certificate (port 8443), headless Chrome with a phone user agent and touch emulation, no wallet injected, certificate errors ignored for this run only.",
+    "seen": "The button shows (research/evidence/genesis-open-in-metamask-headless-2026-10-09.png). After the tap the browser requested the link; link.metamask.io answered a phone user agent with HTTP 307 to 'intent://open?...;scheme=metamask;package=io.metamask', the Android intent for the MetaMask app. The test browser cannot follow an intent (request failed: ERR_ABORTED intent://open...), so the page stayed.",
+    "not_done": "A real phone with the MetaMask app. Whether the app then opens the game address, with or without its path, is not known from this test. iOS was not simulated."
+  },
+  "tests": {
+    "services": "20 tests (node --test): owner scan encoding and decoding, cache and fresh read before a credit, endpoint fallback, EIP-55 vectors, the personal_sign example of the web3.js documentation (an independent implementation), challenge and session forgery cases, career rules (once per match, 60 s spacing, badges, confirmation by another address), the HTTP flow including a holder who sells the token.",
+    "simulation": "22 Quantum tests, including 'a player without a Genesis is a recruit with less health, in a Genesis match only'.",
+    "view_logic": "13 tests outside Unity: choice among the tokens held, services address, kept session, match name, career text."
+  },
+  "limits": [
+    "No real wallet was tried: MetaMask, Rabby or Backpack, as an extension or in their phone browser, may behave differently from the stand-in (prompts, chain selection, personal_sign encoding).",
+    "The match accepts any declared token: ownership is checked by the services when they credit, not at the door of the match. The '?token=' test entry still lets anyone play any Genesis.",
+    "A result is what the player's own page reports. A holder who writes requests by hand can invent results for their own Genesis. 'confirmed' needs a second signed-in player and stayed 0 here.",
+    "A smart-contract wallet (ERC-1271) cannot sign in.",
+    "The services run on this Mac only; nothing is deployed, and the careers live in one JSON file.",
+    "Not seen on the phone."
+  ]
+}

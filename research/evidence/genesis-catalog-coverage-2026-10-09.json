@@ -1,0 +1,31 @@
+{
+  "recorded_on": "2026-10-09",
+  "command": "python3 tools/hero-catalog/run.py coverage",
+  "inputs": {
+    "catalog": "content/hero-catalog.prototype.json",
+    "metadata": "research/evidence/genesis-metadata.jsonl",
+    "bindings": "research/evidence/genesis-bindings-2026-10-09.json"
+  },
+  "result": {
+    "rulesetVersion": "genesis-0.3.0",
+    "catalogHash": "e9d98fbfd883e08a97d8a45da08108777169a56e738f8788ceb355cdef5c191a",
+    "bindingBlock": 111801894,
+    "tokens": 1969,
+    "metadataAvailable": 1969,
+    "resolved": 1969,
+    "rejected": 0,
+    "roles": {"ranger": 725, "brute": 655, "controller": 589},
+    "shapes": {"nova": 596, "wave": 478, "flash": 370, "beam": 279, "puddle": 246},
+    "effects": {"raw": 985, "burn": 205, "chill": 184, "hex": 175, "haste": 112, "rally": 106, "mend": 74, "purify": 60, "veil": 58, "toxin": 10},
+    "expressions": {"direct": 1279, "echo": 590, "return": 60, "persistent-zone": 30, "inversion": 10},
+    "distinctKits": 237
+  },
+  "previous_result": "Ruleset genesis-0.2.0 on the 552 Genesis recorded earlier the same day: 552 resolved, 160 kits.",
+  "changes_in_0_3_0": "10 Body, 13 Eyes and 2 Aura values that only appeared in the rest of the collection were mapped with the same reading as their families, and the six remaining 1:1 heroes (Frogger, Grim, Halo, Krown, Midas, Redd) received an authored kit chosen from their picture. Recorded in tools/hero-catalog/extend_catalog_0_3.py.",
+  "limits": [
+    "The trait tables are design decisions of this project; the traits themselves are public metadata.",
+    "Resolving a hero is not owning it: no wallet or ownership check happens here.",
+    "Token bindings were read at block 111801894; metadata is final per the contract, ownership is not part of this file.",
+    "The ids are content identifiers: no signature is implemented yet."
+  ]
+}

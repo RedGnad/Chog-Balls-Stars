@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <!-- No "user-scalable=no": gestures are turned off with touch-action below, and a wallet
+         connection window opened over the page keeps working. -->
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, shrink-to-fit=yes, viewport-fit=cover">
+    <title>Chog Genesis</title>
+    <meta name="description" content="3v3 arena. Your Chog Genesis is your hero.">
+    <meta name="theme-color" content="#0b1026">
+    <!-- Opened from the home screen of a phone, the page has no browser bars. -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Chog Genesis">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/png" href="TemplateData/icon-192.png">
+    <link rel="apple-touch-icon" href="TemplateData/apple-touch-icon.png">
+    <style>
+      html, body {
+        margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+        background: #0b1026; color: #ffffff;
+        font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        overscroll-behavior: none; touch-action: none;
+        -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      #unity-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
+      #unity-canvas { display: block; width: 100%; height: 100%; background: #0b1026; outline: none; }
+      .cover {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0b1026;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; padding: 24px; box-sizing: border-box;
+      }
+      #unity-loading-container { z-index: 10; }
+      #chog-title { font-size: 34px; font-weight: 800; letter-spacing: 2px; }
+      #chog-line { margin-top: 6px; font-size: 15px; color: #a9adc2; }
+      #chog-bar { margin-top: 26px; width: 240px; max-width: 70%; height: 8px; border-radius: 4px; background: #232a48; overflow: hidden; }
+      #chog-bar-full { width: 0; height: 100%; background: #54d18f; transition: width 0.2s; }
+      #chog-note { margin-top: 18px; min-height: 20px; max-width: 520px; font-size: 14px; line-height: 1.4; color: #a9adc2; }
+      #unity-warning { margin-top: 10px; max-width: 520px; font-size: 13px; color: #ff9c8a; }
+      .action {
+        margin-top: 18px; padding: 12px 26px; border: 0; border-radius: 6px; background: #54d18f;
+        color: #0d1f29; font-size: 16px; font-weight: 800; letter-spacing: 1px; touch-action: manipulation;
+      }
+      .quiet { background: #ede8d9; }
+      /* A phone held upright: the game is drawn for a screen on its side. */
+      #chog-turn { display: none; z-index: 20; }
+      @media (orientation: portrait) { body.touch.turn #chog-turn { display: flex; } }
+      #chog-phone { width: 46px; height: 82px; border: 4px solid #54d18f; border-radius: 10px; animation: turn 2.4s ease-in-out infinite; }
+      @keyframes turn { 0%, 30% { transform: rotate(0deg); } 60%, 100% { transform: rotate(-90deg); } }
+    </style>
+  </head>
+  <body>
+    <div id="unity-container">
+      <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
+    </div>
+
+    <div id="unity-loading-container" class="cover">
+      <div id="chog-title">CHOG GENESIS</div>
+      <div id="chog-line">3v3 arena. Your Genesis is your hero.</div>
+      <div id="chog-bar"><div id="chog-bar-full"></div></div>
+      <div id="chog-note">Loading...</div>
+      <div id="unity-warning"></div>
+      <button id="chog-retry" class="action" style="display: none">TRY AGAIN</button>
+    </div>
+
+    <div id="chog-turn" class="cover">
+      <div id="chog-phone"></div>
+      <div id="chog-note-turn" style="margin-top: 26px; font-size: 18px; font-weight: 700;">Turn your phone on its side to play</div>
+      <button id="chog-upright" class="action quiet">CONTINUE UPRIGHT</button>
+    </div>
+
+    <!-- The wallet of the page: the browser's own, or a wallet app connected on request. -->
+    <script src="TemplateData/wallet-connector.js"></script>
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
+      var loading = document.querySelector("#unity-loading-container");
+      var bar = document.querySelector("#chog-bar-full");
+      var note = document.querySelector("#chog-note");
+      var warning = document.querySelector("#unity-warning");
+      var retry = document.querySelector("#chog-retry");
+
+      var isTouch = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      var isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      // Opened from the home screen: the browser bars are already gone.
+      var isInstalled = window.navigator.standalone === true ||
+        (window.matchMedia && (window.matchMedia("(display-mode: fullscreen)").matches || window.matchMedia("(display-mode: standalone)").matches));
+      if (isTouch) document.body.classList.add("touch", "turn");
+
+      // A browser that cannot turn (the one inside some wallet apps is locked upright) must not
+      // be a dead end: the player may go on upright.
+      document.querySelector("#chog-upright").onclick = function () { document.body.classList.remove("turn"); };
+
+      // An iPhone page cannot take the whole screen by itself; from the home screen it does.
+      if (isApple && !isInstalled) note.textContent = "Loading... For the whole screen on iPhone: Share, then Add to Home Screen.";
+
+      // ---- The whole screen, on its side ----
+      // A phone browser only gives the whole screen in answer to a touch, so the first touch
+      // asks for it, then asks to keep the screen on its side. Where the browser refuses (an
+      // iPhone, or a browser inside another app), nothing is asked again and the page stays as it is.
+      var fullScreenRefused = false, fullScreenAsked = false;
+      function inFullScreen() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+      function keepOnItsSide() {
+        if (screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").catch(function () {});
+      }
+      function askForFullScreen() {
+        if (!isTouch || isInstalled || fullScreenRefused || fullScreenAsked || inFullScreen()) return;
+        var page = document.documentElement;
+        var request = page.requestFullscreen || page.webkitRequestFullscreen;
+        if (!request) { fullScreenRefused = true; return; }
+        fullScreenAsked = true;
+        var asked;
+        try { asked = request.call(page, { navigationUI: "hide" }); } catch (error) { fullScreenRefused = true; fullScreenAsked = false; return; }
+        Promise.resolve(asked).then(
+          function () { fullScreenAsked = false; keepOnItsSide(); },
+          function () { fullScreenAsked = false; fullScreenRefused = true; });
+      }
+      ["pointerup", "touchend", "click"].forEach(function (name) { document.addEventListener(name, askForFullScreen, true); });
+      if (isInstalled) keepOnItsSide();
+
+      // ---- Loading the game, and loading it again when a file did not arrive ----
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/webgl.loader.js";
+      // The engine's loader never recovers from a file that did not arrive (it only reports
+      // it), so the page is opened again: twice by itself, then at the player's request. The
+      // count is kept for the visit, since each try is a new page.
+      var maxReloads = 2, lastProblem = "", gaveUp = false;
+      function reloads(set) {
+        try {
+          if (set !== undefined) window.sessionStorage.setItem("chog.page.reloads", String(set));
+          return Number(window.sessionStorage.getItem("chog.page.reloads") || 0);
+        } catch (error) {
+          // Without a place to count, nothing is tried again unasked.
+          return maxReloads;
+        }
+      }
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/webgl.data.gz",
+        frameworkUrl: buildUrl + "/webgl.framework.js.gz",
+        codeUrl: buildUrl + "/webgl.wasm.gz",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "Chog Genesis",
+        productVersion: "1.0",
+        // What the engine has to say while it loads: a problem starts the page again,
+        // anything else goes to the console.
+        showBanner: function (message, type) {
+          console.warn("CHOG_PAGE " + type + ": " + message);
+          if (type === "error") failed(String(message).replace(/<[^>]*>/g, " "));
+        },
+        // The engine listens to every error of the page and answers with a dialog that
+        // freezes it. That is right for an error of the game. An error of another script
+        // (the wallet connector, an extension of the browser) or one that names nothing is
+        // only written to the console: the game goes on. Returning true means "dealt with".
+        errorHandler: function (message, file, line) {
+          var text = String(message || "") + " " + String(file || "");
+          var fromTheGame = text.indexOf("/" + buildUrl + "/") >= 0;
+          var namesAScript = /[a-z][a-z0-9+.-]*:\/\//i.test(text);
+          var saysNothing = text.indexOf("An unspecified error occured.") >= 0;
+          if (fromTheGame || (!namesAScript && !saysNothing)) return false;
+          console.warn("CHOG_PAGE an error outside the game was ignored: " + text.slice(0, 400));
+          return true;
+        },
+      };
+
+      function failed(problem) {
+        if (gaveUp || lastProblem) return;
+        lastProblem = String(problem || "loading failed");
+        var done = reloads();
+        console.warn("CHOG_PAGE loading failed after " + done + " automatic tries: " + lastProblem);
+        if (done < maxReloads) {
+          reloads(done + 1);
+          note.textContent = "The connection dropped. Loading again...";
+          setTimeout(function () { window.location.reload(); }, 1500);
+          return;
+        }
+        // The last screen: what went wrong, and one button.
+        gaveUp = true;
+        note.textContent = "The game could not be loaded. Check the connection of this device, then try again.";
+        warning.textContent = lastProblem;
+        retry.style.display = "inline-block";
+      }
+      retry.onclick = function () { reloads(0); window.location.reload(); };
+
+      function start() {
+        createUnityInstance(canvas, config, function (progress) {
+          bar.style.width = Math.round(100 * progress) + "%";
+        }).then(function (unityInstance) {
+          window.unityInstance = unityInstance;
+          reloads(0);
+          loading.style.display = "none";
+        }).catch(failed);
+      }
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = start;
+      script.onerror = function () { failed("Unable to load file " + loaderUrl); };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-09",
+  "candidate": "Quantum 3.0.9 Twin Stick Shooter sample, online menu build (WebGL) and Unity Editor",
+  "source": "User report in conversation, after the network WebGL build recorded in quantum-online-webgl-2026-10-09.json",
+  "setup": {
+    "clients": ["Unity Editor 6000.6.4f1 on the Mac (room creator)", "Chrome on the user's phone, reported as Redmi 11C"],
+    "humans": 2,
+    "bots": 4,
+    "network": "Same home Wi-Fi; the phone loaded the build from the Mac at http://192.168.1.85:8082/",
+    "matchmaking": "Party code (PARTY MENU > CREATE in the Editor, PARTY MENU > JOIN with the session code on the phone)",
+    "sessionConfigAtTest": {
+      "file": "game/Assets/QuantumUser/Resources/SessionConfig.asset",
+      "UpdateFPS": 60,
+      "RollbackWindow": 60,
+      "ChecksumInterval": 60,
+      "InputDelayMin": 0
+    },
+    "photonServerSettingsAtTest": {
+      "file": "game/Assets/QuantumUser/Resources/PhotonServerSettings.asset",
+      "FixedRegion": "eu",
+      "PlayerTtlInSeconds": 0,
+      "EmptyRoomTtlInSeconds": 0
+    }
+  },
+  "userReport": {
+    "partyCode": "Worked: both clients met in the same room and played.",
+    "quickPlay": "Did not match the two clients; both pressed Quick Play a few seconds apart.",
+    "feel": "Fluid and playable on the phone in this two-player, four-bot online match (user quote: 'oui c'etait fluide et jouable, en tout cas dans ce test a 2 joueurs et 4 bots')."
+  },
+  "quickPlayAnalysis": {
+    "status": "Cause not attributed: the Editor log of that session was overwritten and the phone has no log.",
+    "codeFacts": [
+      "QuantumMenuUIMain.OnPlayButtonPressed sets ConnectionArgs.Region to PreferredRegion, empty by default, so the menu's FixedRegion override is empty and each client selects its own best region by ping (game/Assets/Photon/QuantumMenu/Runtime/QuantumMenuUIMain.cs and QuantumMenuConnectionBehaviourSDK.cs).",
+      "The party flow encodes the region index into the session code and decodes it on join, so both clients are forced into one region (QuantumMenuUIParty.cs, QuantumMenuPartyCodeGenerator.EncodeRegion and DecodeRegion).",
+      "Quick Play uses JoinRandomOrCreateRoom with ExpectedMaxPlayers equal to the client's MaxPlayers (game/Assets/Photon/PhotonRealtime/Code/MatchmakingExtensions.cs, BuildJoinRandomRoomArgs).",
+      "AppVersion is the menu machine id on both clients; a mismatch would also have broken the party code join, which worked."
+    ],
+    "candidates": [
+      "Different best region on the two clients (most likely given the code path and the few seconds between presses).",
+      "Both clients creating a room before either was listed (race window of a few seconds).",
+      "Different MaxPlayers saved in the Editor's menu settings."
+    ],
+    "productConsequence": "The final lobby should pin one region for matchmaking while the player population is small; matchmaking will be driven by the game backend, not by the sample menu."
+  },
+  "limits": [
+    "Qualitative report only: no frame time, simulation time, memory or ping was recorded.",
+    "Six heroes only: no minions, towers or MOBA objectives, so this is not the representative 3v3 load defined in docs/PHOTON-ARCHITECTURE-AUDIT.md section 7.",
+    "Exact phone model, Chrome version and session length not recorded; 'Redmi 11C' is not a released model name.",
+    "No disconnection or reconnection was tested; PlayerTtlInSeconds is 0, so a dropped client cannot rejoin its slot.",
+    "Same Wi-Fi only; no 4G run."
+  ]
+}

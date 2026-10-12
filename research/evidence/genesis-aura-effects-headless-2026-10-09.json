@@ -1,0 +1,40 @@
+{
+  "recorded_on": "2026-10-09",
+  "what": "The Aura of a Genesis changes what its signature does: fifty signatures (five shapes by ten effects), checked in one online match.",
+  "build_status_detail": "Genesis roster: 1969 heroes, 3 of 3 roles with a character, 50 of 50 signatures authored, ruleset genesis-0.3.0.",
+  "url": "http://192.168.1.85:8083/?token=1795&charged=1&perf=1",
+  "method": "One online match in headless Chrome through the LAN address (one idle human, five bots, specials charged at spawn), 80 s. Skill uses and damage events counted from the CHOG_COMBAT console lines.",
+  "authored": {
+    "shape_damage": {"beam": 2200, "wave": 1800, "flash": 2600, "nova": 2000, "puddle_per_second": 900},
+    "effects": {
+      "raw": "full damage",
+      "burn": "70% damage, then 300 per second for 3 s",
+      "chill": "85% damage, target slowed for 2.5 s",
+      "hex": "75% damage, target rooted for 1.2 s",
+      "mend": "80% damage, caster healed 700 per enemy touched",
+      "purify": "90% damage, target loses 2 of its attack energy",
+      "rally": "85% damage, caster deals 35% more for 4 s",
+      "haste": "90% damage, caster regains 2 attack energy",
+      "veil": "90% damage, target loses half of its special charge",
+      "toxin": "50% damage, then 220 per second for 5 s"
+    }
+  },
+  "skills_fired": {"GenesisBeamRawSkillData": 5, "GenesisWaveBurnSkillData": 3, "GenesisWaveRawSkillData": 2,
+                   "GenesisFlashRawSkillData": 1, "GenesisNovaRallySkillData": 1,
+                   "ArcherBasicSkillData": 432, "KnightBasicSkillData": 44},
+  "damage_events": {"468": 39, "875": 30, "2200": 6, "632": 4, "1260": 2, "300": 2, "1800": 1, "2600": 1, "1700": 1},
+  "reading": [
+    "2200, 1800 and 2600 are the raw beam, wave and flash.",
+    "1260 is the burning wave (70% of 1800) and the two events of 300 are its burn.",
+    "1700 is the rally nova (85% of 2000); 632 is an arrow of 468 fired during the rally bonus (468 x 1.35), which shows the bonus applies to the caster's other attacks.",
+    "No error and no missing asset in the console."
+  ],
+  "tests": "python3 tools/quantum/headless.py test: 30 catalog checks and 19 Quantum tests pass; the signature test now checks that the same Eyes with another Aura give another special and that token 1795 reads 'brute / flash / purify'.",
+  "limits": [
+    "Only raw, burn and rally appeared in this run, by the luck of which Genesis the bots were; chill, hex, mend, purify, haste, veil and toxin use the same mechanism but were not observed.",
+    "The on-target feedback (burst in the Aura colour, lasting fire, stars or bubbles) and the tint of the attacks were not seen: the automated browser is too slow to capture them.",
+    "Whether a burn that finishes a target gives the kill to its caster was not checked.",
+    "The numbers are a first pass, not a balance: no kit budget, and the delivery of each Tier is still not applied.",
+    "The lobbed shot of the puddle was reported hard to see by the user; cause not found yet."
+  ]
+}

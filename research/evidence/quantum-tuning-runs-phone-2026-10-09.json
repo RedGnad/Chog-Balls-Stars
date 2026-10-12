@@ -1,0 +1,178 @@
+{
+  "date": "2026-10-09",
+  "title": "Tuning runs on the phone with URL overrides (extended overlay build 20261009T034106742Z)",
+  "setup": {
+    "device": "1508x560, ANGLE (ARM, Mali-G52 MC2, OpenGL ES 3.2)",
+    "mode": "online, phone alone as room creator, bots fill five slots",
+    "server": "port 8083"
+  },
+  "runs": [
+    {
+      "screenshot": "quantum-tuning-0554-hz30-raf-fast.jpg",
+      "sha256": "a2dd2f420fdceaf2cbe7266825dd729618fa6ff83f66828a3cfba6ce593d297b",
+      "phoneClock": "05:54",
+      "urlQuery": "?perf=1&checksum=0&hz=30&fps=-1&quality=1",
+      "sessionInForce": {
+        "simulationRate": 30,
+        "rollbackWindow": 60,
+        "checksumInterval": 0,
+        "targetFrameRate": -1,
+        "quality": "1 Fast"
+      },
+      "sessionSeconds": 79,
+      "frames": 2408,
+      "averageFps": 31.7,
+      "frameMs": {
+        "p50": 30.0,
+        "p95": 49.0,
+        "p99": 67.0,
+        "worst": 309
+      },
+      "under20msPercent": 8.9,
+      "over40msPercent": 13.7,
+      "over100msFrames": 3,
+      "busyMs": {
+        "p50": 25.8,
+        "p95": 41.0
+      },
+      "otherMs": {
+        "p50": 17.7,
+        "p95": 25.9
+      },
+      "simulationMs": {
+        "p50": 8.1,
+        "p95": 16.6,
+        "max": 70.6
+      },
+      "predicted": {
+        "average": 2.9,
+        "max": 14
+      },
+      "ping": 64,
+      "inputOffset": 0,
+      "managedHeapMb": 26,
+      "sampleFrameCounter": 2477
+    },
+    {
+      "screenshot": "quantum-tuning-0558-hz30-raf.jpg",
+      "sha256": "f23b92f6c1d41a0f08e0ee71254a871540268fc51d9aacc7fb351da85abea6ee",
+      "phoneClock": "05:58",
+      "urlQuery": "?perf=1&checksum=0&hz=30&fps=-1",
+      "sessionInForce": {
+        "simulationRate": 30,
+        "rollbackWindow": 60,
+        "checksumInterval": 0,
+        "targetFrameRate": -1,
+        "quality": "1 Fast"
+      },
+      "sessionSeconds": 91,
+      "frames": 2790,
+      "averageFps": 31.7,
+      "frameMs": {
+        "p50": 31.0,
+        "p95": 47.0,
+        "p99": 67.0,
+        "worst": 214
+      },
+      "under20msPercent": 6.7,
+      "over40msPercent": 11.8,
+      "over100msFrames": 4,
+      "busyMs": {
+        "p50": 25.6,
+        "p95": 39.2
+      },
+      "otherMs": {
+        "p50": 17.7,
+        "p95": 25.9
+      },
+      "simulationMs": {
+        "p50": 7.8,
+        "p95": 15.3,
+        "max": 48.2
+      },
+      "predicted": {
+        "average": 2.9,
+        "max": 15
+      },
+      "ping": 62,
+      "inputOffset": 0,
+      "managedHeapMb": 26,
+      "sampleFrameCounter": 2812
+    },
+    {
+      "screenshot": "quantum-tuning-0600-untuned.jpg",
+      "sha256": "611ba684a4a0eca969f38b9c550ac5ae90e72804ad28a28db106fe5e16e4c2cb",
+      "phoneClock": "06:00",
+      "urlQuery": "?perf=1",
+      "sessionInForce": {
+        "simulationRate": 60,
+        "rollbackWindow": 60,
+        "checksumInterval": 60,
+        "targetFrameRate": -1,
+        "quality": "1 Fast"
+      },
+      "sessionSeconds": 86,
+      "frames": 2191,
+      "averageFps": 26.4,
+      "frameMs": {
+        "p50": 37.0,
+        "p95": 58.0,
+        "p99": 79.0,
+        "worst": 159
+      },
+      "under20msPercent": 3.0,
+      "over40msPercent": 36.5,
+      "over100msFrames": 6,
+      "busyMs": {
+        "p50": 32.4,
+        "p95": 49.5
+      },
+      "otherMs": {
+        "p50": 16.9,
+        "p95": 26.3
+      },
+      "simulationMs": {
+        "p50": 15.0,
+        "p95": 27.6,
+        "max": 56.6
+      },
+      "predicted": {
+        "average": 7.3,
+        "max": 18
+      },
+      "ping": 67,
+      "inputOffset": 0,
+      "managedHeapMb": 27,
+      "sampleFrameCounter": 5305
+    }
+  ],
+  "comparison": {
+    "design": "Two tuned runs (30 Hz, checksums off) against one untuned run (60 Hz, checksum interval 60) on the same build, same phone, within six minutes. Frame pacing and quality were identical in all three (target frame rate -1, quality 1 Fast), so they are not variables here.",
+    "averageFps": "31.7 and 31.7 tuned against 26.4 untuned",
+    "medianFrameMs": "30.0 and 31.0 against 37.0",
+    "framesOver40msPercent": "13.7 and 11.8 against 36.5",
+    "busyMedianMs": "25.8 and 25.6 against 32.4",
+    "simulationMedianMs": "8.1 and 7.8 against 15.0",
+    "otherMedianMs": "17.7 and 17.7 against 16.9 (unchanged, as expected)",
+    "predictedTicksAverage": "2.9 and 2.9 against 7.3",
+    "attribution": "The gain is the simulation: 30 Hz halves the ticks to simulate and to re-simulate. Checksums changed in the same step and were not isolated; at one checksum per 60 ticks they cannot explain a halved median."
+  },
+  "findings": [
+    "The sample menu already leaves Application.targetFrameRate at -1 on this build, so frames were browser-paced in every earlier run; fps=-1 is not a lever.",
+    "A fresh headless Chrome profile with no override shows 'quality 0 Fastest' (perf-overlay-default-quality-headless-2026-10-09.png): the WebGL build starts at the lowest Unity quality level because ProjectSettings/QualitySettings.asset has no per-platform default for WebGL. The earlier statement that the build ran at 'Good' with soft shadows was an inference from m_CurrentQuality and was wrong.",
+    "The phone shows 'quality 1 Fast' without the parameter after the 05:54 run: the level forced by the overlay was kept by the sample menu's stored graphics settings in that browser. Levels 0 and 1 both have shadows and pixel lights off, so earlier phone runs are comparable.",
+    "Non-simulation main-thread work is a median 17 to 18 ms at the lowest quality levels. No rendering setting is left to lower on this phone; a steady 30 frames per second is the realistic target there, with about 7 ms of median headroom per frame for new systems.",
+    "Desktop and stronger phones also start at 'Fastest' today, which makes the game look flatter than it needs to."
+  ],
+  "decision": "Project session config set to 30 Hz with ChecksumInterval 0 (game/Assets/QuantumUser/Resources/SessionConfig.asset); RollbackWindow left at 60 as tested. Bot timings counted in ticks converted through Quantum.TickIntervals so they keep their real-time pace.",
+  "limits": [
+    "One untuned run only in this build; the five earlier untuned runs (other overlay version) agree with it.",
+    "Six heroes, no minions or towers.",
+    "Responsiveness at 30 Hz: the user reports the game felt fluid; no blind comparison was made."
+  ],
+  "appliedBuild": {
+    "build": ".artifacts/unity/20261009T040520862Z-ebf3958dfaec496bba2f19687ac32cf3 (258 s, 0 errors)",
+    "headlessCheck": "With ?perf=1 and no override, the overlay report reads simulationRate 30, checksumInterval 0, quality 0 Fastest; a party match ran 95 s with bots scoring 5 to 4 (perf-30hz-default-build-headless-2026-10-09.png).",
+    "incident": "A first headless run right after the build ended with 'Network error ClientTimeout': the Mac's load average was about 80 and the software-rendered Chrome stalled for 8.4 s, longer than the client timeout. The rerun on the same build, with the load falling, showed no error. Not reproduced on the phone; attributed to machine load, not to the 30 Hz setting."
+  }
+}

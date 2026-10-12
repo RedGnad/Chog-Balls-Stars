@@ -1,0 +1,63 @@
+﻿#define MAX_TEAM_SIZE 3
+
+enum ETactics : Byte
+{
+	None,
+	
+	// Fight Strategy
+	Engage,
+	Ambush,
+
+	// Score Strategy
+	Collect,
+
+	// Run Strategy
+	Run,
+	Hide,
+	TakeCover,
+	
+	// Fallback case, not tied to any strategy
+	GuardObjective
+}
+
+[Flags]
+enum ETeamStatus : Byte
+{
+	None = 1,
+	Winning = 2,
+	SafelyWinning = 4,
+	LowHealth = 8,
+	MidHealth = 16,
+	HighHealth = 32,
+}
+
+struct TeamData
+{
+	byte Index;
+	
+	Boolean StrategyFightActivated;
+	Boolean StrategyScoreActivated;
+	Boolean StrategyRunActivated;
+
+	Int32 Score;
+	FP HealthsMax;
+	FP HealthsCurrent;
+	FP HealthsAverage;
+	FP HealthsPercentage;
+
+	Boolean HasLowScoreAgent;
+
+	ETeamStatus TeamStatus;
+
+	AIDirector AIDirector;
+}
+
+component TeamInfo
+{
+	Int32 Index;
+}
+
+global
+{
+	list<TeamData> TeamsData;
+}

@@ -1,0 +1,22 @@
+{
+  "recorded_on": "2026-10-09",
+  "what": "A shop contract (contracts/src/ChogShop.sol) that sells items for one Chog Genesis token id, paid in $CHOG, tried against the real token and the real collection on a local copy of Monad mainnet. Nothing was deployed and no transaction was sent to the chain.",
+  "tool": "Foundry forge 1.8.1, solc 0.8.28, evm version cancun, optimizer 800 runs (the settings of the Genesis contract). The copy of the chain needs the option --network monad.",
+  "chain_facts_read_today": {
+    "chog_token": "0x350035555E10d9AfAF1566AaebfCeD5BA6C27777: name 'Chog', symbol 'CHOG', 18 decimals, totalSupply 1e27, DOMAIN_SEPARATOR 0x5e3d1e5b797c9a8020ac422be278ef7aebb2fe62a508c81ce14268b32deef11c (cast call on rpc.monad.xyz)",
+    "not_the_token": "0x7f64ccfeb3e3afd7691ea0ef404e947786cefae8 is the implementation behind the token (the address in the Sourcify link of the research report): it answers an empty name, a zero supply and a zero domain separator. It must not be used as the token.",
+    "genesis": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763"
+  },
+  "unit_tests": "13 pass against stand-ins, one of them a fuzz test over price and burned share (256 runs).",
+  "fork_tests": {
+    "command": "MONAD_FORK=1 forge test --network monad --match-contract ChogShopForkTest -vv",
+    "setup": "The shop deployed on the copy with a burned share of 50%; a test key given 1000 $CHOG on the copy with the test runner's 'deal'.",
+    "test_TheRealTokenAcceptsThePermitThePaymentAndTheBurn": "pass: buyWithPermit for token 1795 with a permit signed over the token's on-chain domain separator; the buyer's balance drops by exactly 100, the treasury receives 50, the total supply drops by 50, the allowance is back to 0, the buyer's nonce is 1.",
+    "test_ATokenIdThatIsNotAGenesisIsRefusedByTheRealCollection": "pass: token id 1970 reverts, nothing is paid."
+  },
+  "limits": [
+    "A copy of the chain is not the chain: no real transaction, no real wallet, no gas paid. Monad charges gas on the limit; the limit to give a wallet was not measured.",
+    "The contract was not reviewed by anyone else and not audited.",
+    "What is sold, where the $CHOG goes and who deploys are not decided; the game does not read the contract."
+  ]
+}

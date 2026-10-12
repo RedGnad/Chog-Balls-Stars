@@ -1,0 +1,32 @@
+{
+  "recorded_on": "2026-10-09",
+  "what": "Performance on the user's phone after the Genesis effects were lightened, read from the reports the game posts to the local server.",
+  "build": ".artifacts/unity/20261009T085825263Z-12e303562a3a41faa19ced1dd40602c4",
+  "source": ".artifacts/perf-reports.jsonl, client 192.168.1.155 (the phone), read with tools/unity/read_perf_reports.py",
+  "before": "User report at about 11:00 on the previous build: 'since the effects the game lags a lot', worse as the match goes on. No numbers were recorded for that build.",
+  "run": {
+    "page_options": "token=1795&perf=1",
+    "quality": "Fast",
+    "effects": "on",
+    "minute_1": {"fps": 31, "frame_p50_ms": 32.0, "frame_p95_ms": 53.0, "busy_p50_ms": 26.8, "simulation_p50_ms": 8.9,
+                 "frames_over_100_ms": 7, "effects_spawned": 23, "effects_skipped": 0},
+    "minute_2": {"fps": 32, "frame_p50_ms": 31.0, "frame_p95_ms": 48.0, "busy_p50_ms": 26.1, "simulation_p50_ms": 8.3,
+                 "frames_over_100_ms": 8, "effects_spawned": 44, "effects_skipped": 0}
+  },
+  "user_statement": "'ah ben la le 1 est fluide'",
+  "reading": [
+    "About 31 to 32 frames per second with a median frame of 31 to 32 ms, the same as the 30 Hz baseline measured the same morning without any Genesis effect (about 32 fps, median 30 to 31 ms, simulation 8 ms).",
+    "No degradation between the first and the second minute; one frame over 100 ms in the second minute.",
+    "44 effects were shown in two minutes and the cap of ten live effects was never reached."
+  ],
+  "what_changed_between_the_two_builds": [
+    "Cartoon FX real-time lights and camera shake globally disabled; any Light on a spawned effect disabled.",
+    "At most 30 particles per particle system on mobile, at most 10 live effects, shorter fades.",
+    "The hidden preparation screen no longer refreshes its texts and portraits during the match."
+  ],
+  "limits": [
+    "Which of those changes fixed it is not known: they shipped together and the runs without effects (fx=0, quality=0) were not played.",
+    "Two minutes on one phone; a longer match and heat build-up beyond two minutes were not measured.",
+    "The lagging build itself was never measured, so the size of the regression is the user's impression only."
+  ]
+}

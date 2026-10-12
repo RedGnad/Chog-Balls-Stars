@@ -1,0 +1,9 @@
+[
+  {
+    "metadata_id": 553,
+    "error": "HTTP Error 429: Too Many Requests",
+    "url": "https://gateway.pinata.cloud/ipfs/bafybeid4ybujnscdipkno7ps5utqelp5ry5ryreqhay3zhgk3a6x4jruqu/553.json",
+    "retry_after": "3600",
+    "collection_stopped_on_rate_limit": true
+  }
+]

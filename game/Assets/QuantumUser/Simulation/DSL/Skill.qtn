@@ -1,0 +1,42 @@
+﻿component Skill
+{
+	asset_ref<SkillData> SkillData;
+
+	SkillRuntimeData SkillRuntimeData;
+
+	EntityRef Source;
+
+	FPVector2 ActionVector;
+
+	FP TTL;
+
+	FP ActionTimer;
+}
+
+union SkillRuntimeData
+{
+	KnightBasicSkillRD KnightBasicSkillRD;
+
+	SpellcasterSpecialSkillRD SpellcasterSpecialSkillRD;
+}
+
+// -- Knight
+struct KnightBasicSkillRD
+{
+	list<EntityRef> Attacks;
+	list<EntityRef> AlreadyAffected;
+}
+
+// -- Spellcaster
+struct SpellcasterSpecialSkillRD
+{
+	FPVector2 TargetPosition;
+}
+
+// -- SIGNALS
+signal OnCreateSkill(EntityRef character, FPVector2 characterPos, SkillData data, FPVector2 actionDirection);
+signal OnDisableSkill(EntityRef character, SkillData data);
+
+// -- EVENTS
+event CharacterSkill{ EntityRef character; }
+event SkillAction{ AssetGuid skillData; }

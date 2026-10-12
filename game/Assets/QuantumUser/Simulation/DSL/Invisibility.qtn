@@ -1,0 +1,23 @@
+﻿component Invisibility
+{
+	[HideInInspector] Int32 InvisibilitySpotsCount;
+	[HideInInspector] Boolean IsInvisible;
+	[HideInInspector] FP ExposureTimer;
+	[HideInInspector] Int32 StaticColliderId;
+}
+
+component InvisibilitySpot
+{
+	byte GroupId;
+	int StaticColliderId;
+
+	int NorthNeighborId;
+	int SouthNeighborId;
+	int EastNeighborId;
+	int WestNeighborId;
+}
+
+global
+{
+	dictionary<int, EntityRef> InvisibilitySpots;
+}

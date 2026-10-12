@@ -1,0 +1,6 @@
+{
+  "name": "Chog.Diagnostics",
+  "rootNamespace": "Chog.Diagnostics",
+  "references": ["Quantum.Unity", "Quantum.Simulation"],
+  "autoReferenced": false
+}

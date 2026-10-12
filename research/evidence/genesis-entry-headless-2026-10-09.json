@@ -1,0 +1,36 @@
+{
+  "recorded_on": "2026-10-09",
+  "what": "A player enters an online Quantum match as a Genesis declared by token id; bots are Genesis of the roster.",
+  "build": ".artifacts/unity/20261009T055102597Z-f142cdb0f88e40cf81c7720c36542d54",
+  "build_status_detail": "WebGL build finished. Genesis roster: 553 heroes, 3 of 3 roles with a character, ruleset genesis-0.2.0, asset [065760736FC09D1D].",
+  "url": "http://127.0.0.1:8083/?token=1795",
+  "method": "node tools/unity/qualify_webgl.mjs in headless Chrome (software WebGL), Party Menu, Create, Start, then the on-screen stick pushed up for 4.5 s (CHOG_BROWSER_DRAG).",
+  "observed": [
+    "Selection screen: only the Knight button remains and it is disabled; the team slot reads 'CHOG #1287 - Knight'.",
+    "In the match the local character is labelled 'CHOG #1287' with 6000 health (the Knight).",
+    "A bot of the same team is labelled 'CHOG #313'.",
+    "No 'Unable to find asset' warning in the browser console."
+  ],
+  "screenshots": [
+    "research/evidence/genesis-entry-selection-headless-2026-10-09.png",
+    "research/evidence/genesis-entry-match-headless-2026-10-09.png"
+  ],
+  "tests": {
+    "catalog": "python3 tools/hero-catalog/run.py test: 30 passed",
+    "simulation": "python3 tools/quantum/headless.py test: 30 catalog checks and 18 Quantum tests passed, including three on the Genesis cast in a real Frame",
+    "roster_current": "python3 tools/hero-catalog/run.py roster --check: exit 0"
+  },
+  "defect_found_and_fixed": {
+    "symptom": "First build (20261009T054141817Z): the match logged 'Unable to find asset [065760736FC09D1D] (Quantum.GenesisRoster)' 81 times and silently used the sample cast.",
+    "cause": "Quantum registers a new asset in its database on a delayed Editor call; the build started before that call ran.",
+    "fix": "GenesisRosterImporter now checks the roster is registered, forces a database refresh otherwise, and fails the build request if it is still missing. The build status records which roster was embedded."
+  },
+  "limits": [
+    "The token id is a declaration typed in the URL: no wallet is connected and ownership is not checked.",
+    "One client and software rendering: no second device, no phone, no performance meaning.",
+    "Only one bot label was captured on screen; the uniqueness of bot Genesis in a match is covered by the simulation test, not observed here.",
+    "The roster holds 553 of 1,969 Genesis: those whose metadata is recorded. The others cannot enter a match yet.",
+    "Shape, effect and expression are carried by the character but no signature is implemented.",
+    "Starting the Gameplay scene directly in the Editor uses its local config, which has no roster."
+  ]
+}

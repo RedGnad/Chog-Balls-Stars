@@ -1,0 +1,443 @@
+{
+  "schemaVersion": 2,
+  "rulesetVersion": "genesis-0.3.0",
+  "chainId": 143,
+  "collection": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
+  "metadataRoot": "ipfs://bafybeid4ybujnscdipkno7ps5utqelp5ry5ryreqhay3zhgk3a6x4jruqu/",
+  "roles": [
+    {
+      "id": "brute",
+      "basicAttackId": "brute.strike",
+      "classAbilityId": "brute.charge"
+    },
+    {
+      "id": "ranger",
+      "basicAttackId": "ranger.shot",
+      "classAbilityId": "ranger.dash"
+    },
+    {
+      "id": "controller",
+      "basicAttackId": "controller.bolt",
+      "classAbilityId": "controller.slow-zone"
+    }
+  ],
+  "shapes": [
+    "beam",
+    "flash",
+    "puddle",
+    "wave",
+    "nova"
+  ],
+  "effects": [
+    "raw",
+    "burn",
+    "chill",
+    "hex",
+    "mend",
+    "purify",
+    "rally",
+    "haste",
+    "veil",
+    "toxin"
+  ],
+  "expressions": [
+    "direct",
+    "echo",
+    "return",
+    "persistent-zone",
+    "inversion"
+  ],
+  "bodyRules": [
+    {
+      "resultId": "brute",
+      "values": [
+        null,
+        "Golden Armor",
+        "Army Vest",
+        "Squid Game Guard",
+        "Squid Game",
+        "Shark Suit",
+        "Dragon suit",
+        "Banana suit",
+        "Duck Float",
+        "toad blue suit",
+        "Toad green Suit",
+        "Toad pink suit",
+        "Mummy",
+        "Inmate",
+        "Prisoner",
+        "Gangster suit",
+        "Chug Life",
+        "Tank Top",
+        "White Tank",
+        "Blue Sleeveless",
+        "Orange Sleeveless",
+        "Red Sleeveless",
+        "White Sleeveless",
+        "Purple Tank",
+        "Blue Mafia"
+      ]
+    },
+    {
+      "resultId": "ranger",
+      "values": [
+        "Black Trackset",
+        "Red Trackset",
+        "Yellow 143 Jersey",
+        "Blue 143 Jersey",
+        "Red 143 Jersey",
+        "Six Seven",
+        "Orange Hoodie",
+        "Yellow Hoodie",
+        "Sky Hoodie",
+        "Peach Hoodie",
+        "Mon Hoodie",
+        "white tee",
+        "dark tee",
+        "blue tee",
+        "Yellow Shirt",
+        "Red shirt",
+        "White Shirt",
+        "Grey Shirt",
+        "Purple Shirt",
+        "Cyan Shirt",
+        "Pink Shirt",
+        "Stripe Shirt",
+        "Stripes",
+        "White Pure Shirt",
+        "Fire Shirt",
+        "Farmer Shirt",
+        "Hawaiian Polo",
+        "Brown Homeless Shirt",
+        "Blue Homeless Shirt",
+        "Grey Homeless Shirt",
+        "dark jacket",
+        "Blue jacket",
+        "Red jacket",
+        "Virgin",
+        "MILF Lover",
+        "Zero THOTS",
+        "BBC",
+        "CWO",
+        "Black Shirt",
+        "red tee",
+        "Stripe shirts",
+        "Boner",
+        "Blue Holed Jacket",
+        "Orange Holed Jacket"
+      ]
+    },
+    {
+      "resultId": "controller",
+      "values": [
+        "Tuxedo",
+        "White tuxedo",
+        "Red Tuxedo",
+        "Cream Tuxedo",
+        "Pink Tuxedo",
+        "Aqua Tuxedo",
+        "Blue tuxedo",
+        "Cyan tuxedo",
+        "Black Vest",
+        "pink vest",
+        "purple vest",
+        "dark vest",
+        "Kings Robe",
+        "Wizard",
+        "Wizard Cape",
+        "Jesus",
+        "Blue Chinese",
+        "Red Chinese",
+        "White Yukata",
+        "Yellow Yukata",
+        "Astro Suit",
+        "Sci Fi",
+        "Gojo",
+        "Guko",
+        "Glitch Hoodie",
+        "Electro Hoodie",
+        "CEO Vest",
+        "Jesus Robe"
+      ]
+    }
+  ],
+  "eyeRules": [
+    {
+      "resultId": "beam",
+      "values": [
+        "fire laser",
+        "Purple laser",
+        "Green laser",
+        "cyan laser"
+      ]
+    },
+    {
+      "resultId": "flash",
+      "values": [
+        "Plasma visor",
+        "Gradient visor",
+        "Sunset visor",
+        "Classic VR",
+        "Modern VR",
+        "Anime Glass",
+        "Retro Glass",
+        "3D Glass",
+        "BTC Glass"
+      ]
+    },
+    {
+      "resultId": "puddle",
+      "values": [
+        "Round Crying",
+        "Round Tear",
+        "Teary",
+        "Closed Eye Crying"
+      ]
+    },
+    {
+      "resultId": "wave",
+      "values": [
+        "Dead",
+        "Side Eye",
+        "Angry",
+        "Frog",
+        "Chog Viper",
+        "Vertical",
+        "Clown Eye",
+        "Clown Eye Mix",
+        "MOG",
+        "Smirk",
+        "Green Smirk",
+        "Retard",
+        "Mixed Retard",
+        "Thug",
+        "Green Side Eye",
+        "Mixed Side Eye",
+        "Blue Retard",
+        "Red Retard",
+        "Blue Smirk",
+        "Up",
+        "Green Retard"
+      ]
+    },
+    {
+      "resultId": "nova",
+      "values": [
+        "Happy",
+        "Mixed Happy",
+        "Normal Eye",
+        "Round",
+        "Round Eye",
+        "Blue Round Eye",
+        "Green Round Eye",
+        "Heart",
+        "Base",
+        "Tired",
+        "Worried",
+        "Flat",
+        "XD",
+        "Red Round Eye",
+        "Mixed Round Eye",
+        "Red Flat",
+        "Blue Flat",
+        "Blue Happy",
+        "Green Happy",
+        "Normal"
+      ]
+    }
+  ],
+  "auraRules": [
+    {
+      "resultId": "raw",
+      "values": [
+        null
+      ]
+    },
+    {
+      "resultId": "burn",
+      "values": [
+        "Fiery Aura",
+        "Burning Aura",
+        "Fire"
+      ]
+    },
+    {
+      "resultId": "chill",
+      "values": [
+        "Aqua Aura",
+        "Cool Aura",
+        "Mint"
+      ]
+    },
+    {
+      "resultId": "hex",
+      "values": [
+        "Light Purple",
+        "Purple",
+        "Violet"
+      ]
+    },
+    {
+      "resultId": "mend",
+      "values": [
+        "Rose Aura",
+        "Rose Scent",
+        "Pink Mist"
+      ]
+    },
+    {
+      "resultId": "purify",
+      "values": [
+        "Clean",
+        "White Aura"
+      ]
+    },
+    {
+      "resultId": "rally",
+      "values": [
+        "Royal Aura",
+        "Royal Blue Aura",
+        "Royal Blue"
+      ]
+    },
+    {
+      "resultId": "haste",
+      "values": [
+        "Wind",
+        "Yellow Aura",
+        "Electric Shock"
+      ]
+    },
+    {
+      "resultId": "veil",
+      "values": [
+        "Smoke"
+      ]
+    },
+    {
+      "resultId": "toxin",
+      "values": [
+        "Green Aura"
+      ]
+    }
+  ],
+  "tiers": [
+    {
+      "tier": "Common",
+      "base": "Origin",
+      "expressionId": "direct"
+    },
+    {
+      "tier": "Uncommon",
+      "base": "Origin",
+      "expressionId": "echo"
+    },
+    {
+      "tier": "Rare",
+      "base": "Skull",
+      "expressionId": "return"
+    },
+    {
+      "tier": "Epic",
+      "base": "Radioactive",
+      "expressionId": "persistent-zone"
+    },
+    {
+      "tier": "Legendary",
+      "base": "1:1",
+      "expressionId": "inversion"
+    }
+  ],
+  "uniqueHeroes": [
+    {
+      "tokenId": "561",
+      "metadataId": 53,
+      "id": "blaze",
+      "roleId": "controller",
+      "shapeId": "nova",
+      "effectId": "burn",
+      "expressionId": "inversion"
+    },
+    {
+      "tokenId": "900",
+      "metadataId": 392,
+      "id": "burning-skully",
+      "roleId": "brute",
+      "shapeId": "wave",
+      "effectId": "burn",
+      "expressionId": "inversion"
+    },
+    {
+      "tokenId": "942",
+      "metadataId": 434,
+      "id": "chog-scream",
+      "roleId": "controller",
+      "shapeId": "wave",
+      "effectId": "hex",
+      "expressionId": "inversion"
+    },
+    {
+      "tokenId": "1002",
+      "metadataId": 494,
+      "id": "chogbomination",
+      "roleId": "brute",
+      "shapeId": "nova",
+      "effectId": "toxin",
+      "expressionId": "inversion"
+    },
+    {
+      "tokenId": "1481",
+      "metadataId": 973,
+      "id": "frogger",
+      "roleId": "brute",
+      "shapeId": "puddle",
+      "effectId": "toxin",
+      "expressionId": "inversion"
+    },
+    {
+      "tokenId": "1514",
+      "metadataId": 1006,
+      "id": "grim",
+      "roleId": "ranger",
+      "shapeId": "beam",
+      "effectId": "veil",
+      "expressionId": "inversion"
+    },
+    {
+      "tokenId": "1667",
+      "metadataId": 1159,
+      "id": "halo",
+      "roleId": "controller",
+      "shapeId": "nova",
+      "effectId": "mend",
+      "expressionId": "inversion"
+    },
+    {
+      "tokenId": "1798",
+      "metadataId": 1290,
+      "id": "krown",
+      "roleId": "brute",
+      "shapeId": "wave",
+      "effectId": "rally",
+      "expressionId": "inversion"
+    },
+    {
+      "tokenId": "1881",
+      "metadataId": 1373,
+      "id": "midas",
+      "roleId": "ranger",
+      "shapeId": "flash",
+      "effectId": "haste",
+      "expressionId": "inversion"
+    },
+    {
+      "tokenId": "1884",
+      "metadataId": 1376,
+      "id": "redd",
+      "roleId": "controller",
+      "shapeId": "beam",
+      "effectId": "burn",
+      "expressionId": "inversion"
+    }
+  ]
+}

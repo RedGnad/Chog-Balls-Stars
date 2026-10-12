@@ -1,0 +1,64 @@
+﻿// The Attributes are created and maintained in a Dictionary within a component, based on the enum values
+// A charater may or may not have all the attribute types. For example, a stationary tower entity would not need Speed
+
+enum EAttributeType : Byte
+{
+	None = 0,
+	Health = 1,
+	Energy = 2,
+	Speed = 3,
+	Special = 4,
+	Stun = 5,
+	Rage = 6,
+	Power = 7
+}
+
+
+enum EModifierAppliance : Byte
+{
+	// The different ways of applying a value to an attribute
+	// OneTime = applies the pure value once. Good for one hit damage or heal
+	// Continuous = applies a value during an interval. The value per tick is: (pure value * deltaTime). Good for damage over time effects, like Poison
+	// Temporary = the pure value is applied to the attribute, and after an interval the opposite value is applied. Useful for temporary buffs, such as: increase the Speed for 5 seconds
+	// TemporaryGreatestOnly = has a timer logic similar to Temporary, but only the greatest modifier with this value is actually applied to the Current value. Useful for Speed debuffs where only the biggest value matters
+	None = 0,
+	OneTime = 1,
+	Continuous = 2,
+	Temporary = 3,
+	TemporaryGreatestOnly = 4
+}
+
+enum EModifierOperation : Byte
+{
+	None = 0,
+	Add = 1,
+	Subtract = 2
+}
+
+component Attributes
+{
+	dictionary<EAttributeType, AttributeData> DataDictionary;
+}
+
+struct AttributeData
+{
+	FP InitialValue;
+	FP MaxValue;
+	[HideInInspector] FP CurrentValue;
+
+	// The list of modifiers applied to this attribute at the moment
+	// Use for Continuous and the two Temporary types
+	// This is how we maintain a modifier effectiveness within many frames
+	// It is possible to add an attribute which already has a modifier on Unity's prototype,
+	// which is useful for the Energy bar which is always healing
+	list<AttributeModifier> Modifiers;
+}
+
+struct AttributeModifier
+{
+	EModifierAppliance ModifierAppliance;
+	EModifierOperation ModifierOperation;
+	FP Amount;
+	FP Duration;
+	[HideInInspector] FP Timer;
+}

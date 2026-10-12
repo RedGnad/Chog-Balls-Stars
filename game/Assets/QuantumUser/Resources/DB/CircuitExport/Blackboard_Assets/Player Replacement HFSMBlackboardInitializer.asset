@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1895591977, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: Player Replacement HFSMBlackboardInitializer
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/Blackboard_Assets/Player Replacement
+      HFSMBlackboardInitializer
+    Guid:
+      Value: 1072442845577384622
+  ReportMissingEntries: 1
+  AIBlackboard:
+    Id:
+      Value: 3777100340895521836
+  InitialValues: []

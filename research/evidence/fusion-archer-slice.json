@@ -1,0 +1,236 @@
+{
+  "recordedAtUtc": "2026-10-08T09:54:04.949029+00:00",
+  "scope": "First Archer gameplay and presentation slice ported from local Quantum Twin Stick Shooter sample to Fusion Server/Client; offline sparring bot, not MOBA/Genesis completion.",
+  "implementation": {
+    "unity": "6000.6.4f1 arm64",
+    "fusion": "2.1.3 build 2390",
+    "project": "game-fusion",
+    "noQuantumRuntimeComponentsInNewPrefab": true,
+    "sourceHashes": {
+      "game-fusion/Assets/Chog/Arena/ArcherRules.cs": {
+        "sha256": "6a1d5bc550ff74258b04fe7bb5f8aa80516c9fb46eb0e475f99b2a1050ff4406",
+        "bytes": 1246
+      },
+      "game-fusion/Assets/Chog/Arena/ArenaInput.cs": {
+        "sha256": "d294ccf170c069e3186ffcffca31b63db69acd6927ad8593f9bb92fc9ba84c31",
+        "bytes": 938
+      },
+      "game-fusion/Assets/Chog/Arena/ArenaControls.cs": {
+        "sha256": "d26be246dca2c1596119849efc9c3a4773a3bbc01f670e4fb308963017ea4548",
+        "bytes": 5365
+      },
+      "game-fusion/Assets/Chog/Arena/ArenaHero.cs": {
+        "sha256": "16e6186ae0f200f08fcaca8cb4ec13ad2674b889c8c6bca9187d9dc8a7ab2791",
+        "bytes": 9921
+      },
+      "game-fusion/Assets/Chog/Arena/ArenaProjectile.cs": {
+        "sha256": "4a862517d6eb4b5be26e1d1beab0e5472466c014622197622355b5f2bdfbea1d",
+        "bytes": 3039
+      },
+      "game-fusion/Assets/Chog/Arena/ArenaZone.cs": {
+        "sha256": "2afd36caaee25a569f619e6430d425d370c2d4b11e119559833a21634ae945e4",
+        "bytes": 2023
+      },
+      "game-fusion/Assets/Chog/Arena/ArenaSession.cs": {
+        "sha256": "63b1e1e1b49bf4b96be8a750464b505e1ca00bcaa772dfe43cdd5ebd5b814cbb",
+        "bytes": 6929
+      },
+      "game-fusion/Assets/Chog/Arena/ArenaHeroView.cs": {
+        "sha256": "cda28091b73d6a9edeb50438a6998805dd500ab7b56e2e7010390495e020b13d",
+        "bytes": 6385
+      },
+      "game-fusion/Assets/Chog/Arena/ArenaCameraFollow.cs": {
+        "sha256": "a8ef6134374172875acb4bf56c8fd96fa7d61bafc43fcc969178a2043cf70031",
+        "bytes": 1272
+      },
+      "game-fusion/Assets/Chog/Arena/ArenaHud.cs": {
+        "sha256": "b0b7d851bb031310cbdf020592bd9b6f7ebbc6db381ff5c4e226571351021a99",
+        "bytes": 8024
+      },
+      "game-fusion/Assets/Chog/Arena/ArenaTouchStick.cs": {
+        "sha256": "16745a0d34fffc8c1bb63832ed6287bc8a3df4a067b06e2ab59057071346942c",
+        "bytes": 1825
+      },
+      "game-fusion/Assets/Chog/Arena/ArenaTouchAbility.cs": {
+        "sha256": "951fa0a730eb085e18516aa24a371754d6256b702aa353e6d02e01fc128f6e95",
+        "bytes": 1077
+      },
+      "game-fusion/Assets/Chog/Editor/FusionProjectSetup.cs": {
+        "sha256": "6b7e40d0beb3957897845259da6e62171e6e6fb76ed6c81ef2cda5e00f680a76",
+        "bytes": 15461
+      },
+      "game-fusion/Assets/Chog/Editor/FusionNetworkQualification.cs": {
+        "sha256": "89d233ec3fd83f12bba8ef3f831ccc3f46038f7ea1877532b4dcfad1fb8b3fbf",
+        "bytes": 12658
+      },
+      "game-fusion/Assets/Chog/Resources/Chog/Hero.prefab": {
+        "sha256": "cb881ad3d7a9aed9aaa6b01c1b8f4a4f867527bb3c400d526d7fb3750893e732",
+        "bytes": 31031
+      },
+      "game-fusion/Assets/Chog/Resources/Chog/Zone.prefab": {
+        "sha256": "57f7e643e580a82bd29c6b39f947725d053b436e795ab3caa0ad506df7bafb0d",
+        "bytes": 5102
+      },
+      "game-fusion/Assets/Chog/Scenes/Arena.unity": {
+        "sha256": "84491dd0e9e34999e857c622d94adc638eba9cf565fdadf8e4e5679244b3d7a0",
+        "bytes": 26236
+      },
+      "tools/unity/qualify_webgl.mjs": {
+        "sha256": "e5c8e1185111ad8bb6b189239484b084ae72b314283a942e3bc2558a480bc40f",
+        "bytes": 7907
+      }
+    }
+  },
+  "artProvenance": {
+    "copies": [
+      {
+        "source": "game/Assets/TwinStickShooter/Third Party Assets/KayKit Dungeon Pack 1.0/Characters/character_barbarian.fbx",
+        "target": "game-fusion/Assets/Chog/SampleArt/character_barbarian.fbx",
+        "sameBytes": true,
+        "sha256": "bbd79e694e6680abbcff0e1239c913469187489d022fe069e06b126a0630df1e"
+      },
+      {
+        "source": "game/Assets/TwinStickShooter/Third Party Assets/KayKit Dungeon Pack 1.0/Scenario and Props/crossbow_rare.fbx",
+        "target": "game-fusion/Assets/Chog/SampleArt/crossbow_rare.fbx",
+        "sameBytes": true,
+        "sha256": "c65f618da53d7ddd24200a5b88f3a3d353ea0453314d90d9d7f312b1da8e4657"
+      },
+      {
+        "source": "game/Assets/TwinStickShooter/Third Party Assets/Audio/100-CC0-SFX/metal_11.ogg",
+        "target": "game-fusion/Assets/Chog/SampleArt/metal_11.ogg",
+        "sameBytes": true,
+        "sha256": "8f52c3a878e87ea2abb8f7a9fba90d0ec32034393661ddf87ba2b2b086024195"
+      },
+      {
+        "source": "game/Assets/TwinStickShooter/Third Party Assets/Audio/100-CC0-SFX/pot_01.ogg",
+        "target": "game-fusion/Assets/Chog/SampleArt/pot_01.ogg",
+        "sameBytes": true,
+        "sha256": "5ceca8a2a860e8c8c0e96f74714b4b4f66a562e76353fdbf62bc94868e797778"
+      },
+      {
+        "source": "game/Assets/TwinStickShooter/Third Party Assets/Audio/100-CC0-SFX/explosion.ogg",
+        "target": "game-fusion/Assets/Chog/SampleArt/explosion.ogg",
+        "sameBytes": true,
+        "sha256": "f31e12359b96b5e4d43edbcd533630b32421e55bc0b08aec4520d2ed45cd1a93"
+      },
+      {
+        "source": "game/Assets/TwinStickShooter/Art/Animations/Characters/Character Animator.controller",
+        "target": "game-fusion/Assets/Chog/SampleArt/Character Animator.controller",
+        "sameBytes": true,
+        "sha256": "fe1e5167f0c7e88985e970ff1f0d0c8fe2c63641ee5c1397531046ed8f1bf114"
+      }
+    ],
+    "originalSampleLicense": "game/License.txt (sample assets require their own license for distribution)",
+    "individualLicenses": [
+      "https://kaylousberg.itch.io/kaykit-dungeon",
+      "https://kaylousberg.itch.io/kaykit-animations",
+      "game/Assets/TwinStickShooter/Third Party Assets/Audio/100-CC0-SFX/Lisence.txt"
+    ],
+    "distributionReview": "The five .anim clips and Character Animator.controller copied from the Photon sample are authorized only for internal prototype under game/License.txt unless separate rights are established. Replace with direct KayKit exports and an original controller, or verify a separate license, before public distribution."
+  },
+  "network": {
+    "report": "research/evidence/fusion-archer-network-qualification.json",
+    "reportHash": {
+      "sha256": "889b04aadb6bae4b2d292a68b977ab4c7af42603e20033f52ec6e2e140c59d95",
+      "bytes": 1329
+    },
+    "result": "Passed",
+    "passedCheckCount": 8,
+    "authoritativeShots": 7,
+    "authoritativeReceivedHits": 2,
+    "scenario": "One GameMode.Server and two independent GameMode.Client runners in one headless Unity Editor process; real Photon session, separate physics scenes; not a browser/phone test."
+  },
+  "webgl": {
+    "report": "research/evidence/fusion-archer-webgl-build.json",
+    "reportHash": {
+      "sha256": "e6cce7ec1acd8bdc4d8d7707f9f64d96efce3b7be37f6f261d5605e020a163af",
+      "bytes": 331
+    },
+    "result": "Succeeded",
+    "buildBytes": 12944041,
+    "servedGzipAndMime": {
+      "framework": "text/javascript + gzip",
+      "data": "application/octet-stream + gzip",
+      "wasm": "application/wasm + gzip",
+      "loader": "text/javascript"
+    },
+    "http": "127.0.0.1:8080 local only"
+  },
+  "browser": {
+    "desktop": {
+      "report": "research/evidence/fusion-archer-desktop-browser.json",
+      "reportHash": {
+        "sha256": "bbd1aac68f9140bb8a1656dfb81bc077b5038f88c78d647373925f76d57de08a",
+        "bytes": 274
+      },
+      "browser": "Chrome/155.0.8059.40",
+      "recordedAtUtc": "2026-10-08T09:51:34.526Z",
+      "touchEmulated": false,
+      "runtimeErrorCount": 0,
+      "screenshots": {
+        "training": {
+          "path": "research/evidence/fusion-archer-desktop-training.png",
+          "sha256": "60b0f5c0a174700734fc00c6b574facd77bd231768a8db812bdbd0127739093b",
+          "bytes": 73627
+        },
+        "volley": {
+          "path": "research/evidence/fusion-archer-desktop-volley.png",
+          "sha256": "455ca65d4756b6e52f9605faf9a64f59a52ac6bc9386224389b79b4b4f924d63",
+          "bytes": 74846
+        },
+        "zone": {
+          "path": "research/evidence/fusion-archer-desktop-zone.png",
+          "sha256": "2444de242a03dc77323c06cf29352c7ac6c08b06f34ca6046d3a7de2c944e0fc",
+          "bytes": 75365
+        }
+      }
+    },
+    "touch": {
+      "report": "research/evidence/fusion-archer-touch-browser.json",
+      "reportHash": {
+        "sha256": "60e674e7b05d427156e3cc18786084a99c870a5e001a8057b5f2f38781f647e1",
+        "bytes": 273
+      },
+      "browser": "Chrome/155.0.8059.40",
+      "recordedAtUtc": "2026-10-08T09:52:13.820Z",
+      "touchEmulated": true,
+      "runtimeErrorCount": 0,
+      "screenshots": {
+        "training": {
+          "path": "research/evidence/fusion-archer-touch-training.png",
+          "sha256": "746ed29b10a75c9b62c44413d15febc91473303e5f8cb870db59271a266ee8df",
+          "bytes": 56568
+        },
+        "volley": {
+          "path": "research/evidence/fusion-archer-touch-volley.png",
+          "sha256": "484491c5060c844805d044b998d17627060026a022e4fcbec95f8d4704c4ef6c",
+          "bytes": 55282
+        },
+        "zone": {
+          "path": "research/evidence/fusion-archer-touch-zone.png",
+          "sha256": "72071062372576a21aef700cf526f294a6e08124ee97927b4af90720d75676fb",
+          "bytes": 55936
+        },
+        "aim": {
+          "path": "research/evidence/fusion-archer-touch-aim.png",
+          "sha256": "3eeed4fa141f7cc4335715c1ed517e843a6c198df32afac1046d331b90219049",
+          "bytes": 55680
+        },
+        "zoneAim": {
+          "path": "research/evidence/fusion-archer-touch-zone-aim.png",
+          "sha256": "ea3718ff2680ddf072505b864a1e690575d07bf2674a23e46f436eb397e5c7d6",
+          "bytes": 57111
+        }
+      }
+    },
+    "visualInspection": "Captured HUD shows HP 100 before actions; one primary cast then one special cast; zone appears at the previewed target on desktop and emulated touch. Screenshots inspected manually."
+  },
+  "limitations": [
+    "Chrome 155 headless/SwiftShader and emulated touch are not a Redmi 11C test or a mobile FPS/memory measurement.",
+    "Network test uses one headless Unity Editor process with separate peers; WebGL client versus separate Unity server remains untested.",
+    "New join is not authenticated resume. Bot training is not MOBA AI.",
+    "No side-by-side measured parity with Quantum sample; damage/health rescaled and training bot retimed.",
+    "No Genesis character resolution in match, third signature action, MOBA objectives, wallet or $CHOG payment, Linux server build or 100 CCU load test.",
+    "Licensing of copied sample .anim clips and Animator controller is unresolved for public distribution; see artProvenance.distributionReview."
+  ]
+}

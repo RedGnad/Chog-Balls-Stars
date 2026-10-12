@@ -1,0 +1,22 @@
+{
+  "recorded_at": "2026-10-07T16:07:26.185972+00:00",
+  "archive": {
+    "path": "/Users/red.g/CascadeProjects/quantum-twinstickshooter-3.0.9.zip",
+    "sha256": "c53a32036d1d92bea64d64aa7d5cd20640c1c6c9ecdf9a2e93eb40d9f082142d",
+    "bytes": 54788457,
+    "uncompressed_bytes": 301668768,
+    "files": 6656
+  },
+  "destination": "game",
+  "unity_editor_version": "2021.3.45f2",
+  "checks": {
+    "path_traversal_and_symlinks_rejected": true,
+    "crc_all_entries": true,
+    "extracted_file_hashes_match_archive": true
+  },
+  "baseline_manifest": "quantum-sample-baseline-sha256.json",
+  "limitations": [
+    "No Unity import, compilation, WebGL build or gameplay executed.",
+    "Assets in sample are limited to internal development unless individually licensed. See game/License.txt."
+  ]
+}

@@ -1,0 +1,1363 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8977782325970552039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1225980562, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: DebugAction_15
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|DebugAction_15
+    Guid:
+      Value: 2238871355881588305
+  Label: 
+  Message: GAME OVER
+--- !u!114 &-8029974405419163701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0d9ef53892aab4285c53d22cf3840f, type: 3}
+  m_Name: GetTeamScore_3
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|GetTeamScore_3
+    Guid:
+      Value: 2670608999204234674
+  TeamId: 0
+--- !u!114 &-7875672246918738148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1943870150, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: Gameplay_4
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|Gameplay_4
+    Guid:
+      Value: 3067454869371943826
+  Label: Gameplay
+  Index: 5
+  OnUpdateLinks: []
+  OnEnterLinks:
+  - Id:
+      Value: 3767770448675219066
+  - Id:
+      Value: 1817422214679698461
+  OnExitLinks: []
+  Transitions:
+  - Id: 446e9a05-f280-42e4-a0ff-d8d2dd658271
+    EventKey: 0
+    DecisionLink:
+      Id:
+        Value: 2397883492724371217
+    StateLink:
+      Id:
+        Value: 835288112579322719
+    TransitionSetLink:
+      Id:
+        Value: 0
+  ChildrenLinks:
+  - Id:
+      Value: 1954703686838994532
+  - Id:
+      Value: 462957869920022378
+  ParentLink:
+    Id:
+      Value: 0
+  Level: 0
+--- !u!114 &-7786925220202694404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1943870150, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: Finalization_5
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|Finalization_5
+    Guid:
+      Value: 835288112579322719
+  Label: Finalization
+  Index: 6
+  OnUpdateLinks: []
+  OnEnterLinks:
+  - Id:
+      Value: 3656392210388878146
+  - Id:
+      Value: 2001998636326644579
+  - Id:
+      Value: 3886484351678901633
+  - Id:
+      Value: 3897746378151365579
+  - Id:
+      Value: 2238871355881588305
+  OnExitLinks: []
+  Transitions: []
+  ChildrenLinks: []
+  ParentLink:
+    Id:
+      Value: 0
+  Level: 0
+--- !u!114 &-5946775304837213182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1124702037, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: HFSMOrDecision_6
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|HFSMOrDecision_6
+    Guid:
+      Value: 1827656122894708078
+  Label: 
+  Decisions:
+  - Id:
+      Value: 824697813203327943
+  - Id:
+      Value: 2799729307885738536
+--- !u!114 &-5271156105534049183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9014a618b67c0344f9baf62acc9af5f6, type: 3}
+  m_Name: CheckFPValue_5
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|CheckFPValue_5
+    Guid:
+      Value: 3783614558035322840
+  Label: 
+  ValueA:
+    Source: 4
+    Key: 
+    DefaultValue:
+      RawValue: 0
+    FunctionRef:
+      Id:
+        Value: 521114827879869148
+  ValueB:
+    Source: 4
+    Key: 
+    DefaultValue:
+      RawValue: 0
+    FunctionRef:
+      Id:
+        Value: 4189601784910081890
+  Comparison: 3
+--- !u!114 &-4623194130688471727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9014a618b67c0344f9baf62acc9af5f6, type: 3}
+  m_Name: CheckFPValue_16
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|CheckFPValue_16
+    Guid:
+      Value: 2397883492724371217
+  Label: 
+  ValueA:
+    Source: 4
+    Key: 
+    DefaultValue:
+      RawValue: 0
+    FunctionRef:
+      Id:
+        Value: 1971477612144112719
+  ValueB:
+    Source: 1
+    Key: 
+    DefaultValue:
+      RawValue: 0
+    FunctionRef:
+      Id:
+        Value: 0
+  Comparison: 1
+--- !u!114 &-4617816619207878005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1943870150, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: State_CharacterSelection_P7PIBwsGKkSh9Qx
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|State_CharacterSelection_P7PIBwsGKkSh9Qx
+    Guid:
+      Value: 600999479422426755
+  Label: CharacterSelection
+  Index: 3
+  OnUpdateLinks: []
+  OnEnterLinks:
+  - Id:
+      Value: 190235260832709840
+  OnExitLinks: []
+  Transitions:
+  - Id: 3a656599-fc2d-4fc9-a8ba-bb425ca74fea
+    EventKey: 1
+    DecisionLink:
+      Id:
+        Value: 0
+    StateLink:
+      Id:
+        Value: 3159826001695553768
+    TransitionSetLink:
+      Id:
+        Value: 0
+  ChildrenLinks: []
+  ParentLink:
+    Id:
+      Value: 0
+  Level: 0
+--- !u!114 &-4275408725594972362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2fd0cd876b8b614796eb88ef27598c4, type: 3}
+  m_Name: TriggerQuantumSignal_7
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TriggerQuantumSignal_7
+    Guid:
+      Value: 3026867690993737276
+  Label: 
+  Signal: 3
+  BoolValue: 0
+--- !u!114 &-4108168147277894976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0d9ef53892aab4285c53d22cf3840f, type: 3}
+  m_Name: GetTeamScore_1
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|GetTeamScore_1
+    Guid:
+      Value: 4537587618987583326
+  TeamId: 1
+--- !u!114 &-4086059872553378908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0d9ef53892aab4285c53d22cf3840f, type: 3}
+  m_Name: GetTeamScore_5
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|GetTeamScore_5
+    Guid:
+      Value: 518916315512760643
+  TeamId: 1
+--- !u!114 &-3700800507520138986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9014a618b67c0344f9baf62acc9af5f6, type: 3}
+  m_Name: CheckFPValue_12
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|CheckFPValue_12
+    Guid:
+      Value: 2864612225835668733
+  Label: 
+  ValueA:
+    Source: 4
+    Key: 
+    DefaultValue:
+      RawValue: 0
+    FunctionRef:
+      Id:
+        Value: 2670608999204234674
+  ValueB:
+    Source: 1
+    Key: 
+    DefaultValue:
+      RawValue: 655360
+    FunctionRef:
+      Id:
+        Value: 0
+  Comparison: 1
+--- !u!114 &-3266971236736639851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1084331888, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: HFSMNotDecision_8
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|HFSMNotDecision_8
+    Guid:
+      Value: 2799729307885738536
+  Label: 
+  Decisions:
+  - Id:
+      Value: 2331390624022479253
+--- !u!114 &-3004496194523250818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f5c5803f9be51647aabf38a5e565664, type: 3}
+  m_Name: SpawnWithRandomRadius_1
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|SpawnWithRandomRadius_1
+    Guid:
+      Value: 2220532599074532217
+  Label: 
+  Radius:
+    RawValue: 65536
+  Amount:
+    RawValue: 65536
+  Prototype:
+    Id:
+      Value: 931788579796606410
+  Origin:
+    X:
+      RawValue: 0
+    Y:
+      RawValue: 0
+--- !u!114 &-2521975533275337083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1124702037, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: HFSMOrDecision_10
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|HFSMOrDecision_10
+    Guid:
+      Value: 921556215700810004
+  Label: 
+  Decisions:
+  - Id:
+      Value: 382149541575640822
+  - Id:
+      Value: 4606438840812522793
+--- !u!114 &-2346567654995489402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1943870150, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: Idle_6
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|Idle_6
+    Guid:
+      Value: 1954703686838994532
+  Label: Idle
+  Index: 7
+  OnUpdateLinks: []
+  OnEnterLinks: []
+  OnExitLinks: []
+  Transitions:
+  - Id: ef44965a-db95-4dbf-a25e-01eda3a104e3
+    EventKey: 0
+    DecisionLink:
+      Id:
+        Value: 3554932210798565103
+    StateLink:
+      Id:
+        Value: 462957869920022378
+    TransitionSetLink:
+      Id:
+        Value: 0
+  ChildrenLinks:
+  - Id:
+      Value: 1440205755098257827
+  ParentLink:
+    Id:
+      Value: 3067454869371943826
+  Level: 1
+--- !u!114 &-1998134708230365472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0d9ef53892aab4285c53d22cf3840f, type: 3}
+  m_Name: GetTeamScore_7
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|GetTeamScore_7
+    Guid:
+      Value: 521114827879869148
+  TeamId: 0
+--- !u!114 &-1867425799083188107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 822516949, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: HFSMAndDecision_0
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|HFSMAndDecision_0
+    Guid:
+      Value: 3554932210798565103
+  Label: 
+  Decisions:
+  - Id:
+      Value: 4522152932798762517
+  - Id:
+      Value: 2162684207925344485
+--- !u!114 &-1284654064174780452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2fd0cd876b8b614796eb88ef27598c4, type: 3}
+  m_Name: TriggerQuantumSignal_11
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TriggerQuantumSignal_11
+    Guid:
+      Value: 3656392210388878146
+  Label: 
+  Signal: 4
+  BoolValue: 1
+--- !u!114 &-1220419345644586111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1084331888, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: HFSMNotDecision_4
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|HFSMNotDecision_4
+    Guid:
+      Value: 2162684207925344485
+  Label: 
+  Decisions:
+  - Id:
+      Value: 3783614558035322840
+--- !u!114 &-823666732554075683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbe8789a9232aec40a565b4756bbd881, type: 3}
+  m_Name: TriggerQuantumEvent_5
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TriggerQuantumEvent_5
+    Guid:
+      Value: 3824972169868187648
+  Label: 
+  Event: 3
+--- !u!114 &-713721787943080810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1943870150, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: Preparation_3
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|Preparation_3
+    Guid:
+      Value: 3159826001695553768
+  Label: Preparation
+  Index: 4
+  OnUpdateLinks: []
+  OnEnterLinks:
+  - Id:
+      Value: 3457914965288096542
+  - Id:
+      Value: 3026867690993737276
+  - Id:
+      Value: 254586119857616173
+  OnExitLinks:
+  - Id:
+      Value: 2982270039956417895
+  Transitions:
+  - Id: ed6d0ce0-726a-4f3c-a151-cf3997a1df23
+    EventKey: 0
+    DecisionLink:
+      Id:
+        Value: 1827656122894708078
+    StateLink:
+      Id:
+        Value: 3067454869371943826
+    TransitionSetLink:
+      Id:
+        Value: 0
+  ChildrenLinks: []
+  ParentLink:
+    Id:
+      Value: 0
+  Level: 0
+--- !u!114 &-676485665495899322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0d9ef53892aab4285c53d22cf3840f, type: 3}
+  m_Name: GetTeamScore_6
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|GetTeamScore_6
+    Guid:
+      Value: 2170752696018831351
+  TeamId: 0
+--- !u!114 &-497850592118611518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2af7436e870ab5e4d955182db29c3023, type: 3}
+  m_Name: TimerDecisionNoEntity_17
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TimerDecisionNoEntity_17
+    Guid:
+      Value: 1248359484932589257
+  Label: 
+  TimeToTrueState:
+    Source: 1
+    Key: 
+    DefaultValue:
+      RawValue: 524288
+    FunctionRef:
+      Id:
+        Value: 0
+--- !u!114 &-469822614599366814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f5c5803f9be51647aabf38a5e565664, type: 3}
+  m_Name: SpawnWithRandomRadius_0
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|SpawnWithRandomRadius_0
+    Guid:
+      Value: 3167434313245665426
+  Label: 
+  Radius:
+    RawValue: 65536
+  Amount:
+    RawValue: 65536
+  Prototype:
+    Id:
+      Value: 931788579796606410
+  Origin:
+    X:
+      RawValue: 0
+    Y:
+      RawValue: 0
+--- !u!114 &-407490889977840555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0d9ef53892aab4285c53d22cf3840f, type: 3}
+  m_Name: GetTeamScore_4
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|GetTeamScore_4
+    Guid:
+      Value: 182572842138305167
+  TeamId: 0
+--- !u!114 &-91297283464257989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2fd0cd876b8b614796eb88ef27598c4, type: 3}
+  m_Name: TriggerQuantumSignal_13
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TriggerQuantumSignal_13
+    Guid:
+      Value: 3886484351678901633
+  Label: 
+  Signal: 3
+  BoolValue: 0
+--- !u!114 &-38461175207055925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b57aaaabd7a777f4c8d165e21cc06e53, type: 3}
+  m_Name: ChangeTimer_2
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|ChangeTimer_2
+    Guid:
+      Value: 1572029213392667327
+  Label: 
+  Operation: 3
+  ValueIsDeltaTime: 1
+  Value:
+    RawValue: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1727795870, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: Coin Grab Manager
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager
+    Guid:
+      Value: 2936509112808977188
+  Label: Coin Grab Manager
+  StatesLinks:
+  - Id:
+      Value: 600999479422426755
+  - Id:
+      Value: 3159826001695553768
+  - Id:
+      Value: 3067454869371943826
+  - Id:
+      Value: 835288112579322719
+  EventsNames:
+  - OnFinishCharacterSelection
+--- !u!114 &94356778963202326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2af7436e870ab5e4d955182db29c3023, type: 3}
+  m_Name: TimerDecisionNoEntity_15
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TimerDecisionNoEntity_15
+    Guid:
+      Value: 4108815331443744214
+  Label: 
+  TimeToTrueState:
+    Source: 1
+    Key: 
+    DefaultValue:
+      RawValue: 524288
+    FunctionRef:
+      Id:
+        Value: 0
+--- !u!114 &986090499067949371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbe8789a9232aec40a565b4756bbd881, type: 3}
+  m_Name: TriggerQuantumEvent_12
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TriggerQuantumEvent_12
+    Guid:
+      Value: 2001998636326644579
+  Label: 
+  Event: 4
+--- !u!114 &1629925719455043742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9014a618b67c0344f9baf62acc9af5f6, type: 3}
+  m_Name: CheckFPValue_3
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|CheckFPValue_3
+    Guid:
+      Value: 1534958374898932291
+  Label: 
+  ValueA:
+    Source: 4
+    Key: 
+    DefaultValue:
+      RawValue: 0
+    FunctionRef:
+      Id:
+        Value: 4537587618987583326
+  ValueB:
+    Source: 1
+    Key: 
+    DefaultValue:
+      RawValue: 589824
+    FunctionRef:
+      Id:
+        Value: 0
+  Comparison: 2
+--- !u!114 &1693695844975858691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1225980562, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: DebugAction_10
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|DebugAction_10
+    Guid:
+      Value: 3767770448675219066
+  Label: 
+  Message: Start Gameplay
+--- !u!114 &2162719978479417687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0d9ef53892aab4285c53d22cf3840f, type: 3}
+  m_Name: GetTeamScore_8
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|GetTeamScore_8
+    Guid:
+      Value: 3108495626834197141
+  TeamId: 1
+--- !u!114 &2191461744841480047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b57aaaabd7a777f4c8d165e21cc06e53, type: 3}
+  m_Name: ChangeTimer_8
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|ChangeTimer_8
+    Guid:
+      Value: 254586119857616173
+  Label: 
+  Operation: 1
+  ValueIsDeltaTime: 0
+  Value:
+    RawValue: 983040
+--- !u!114 &2536648388105355435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b57aaaabd7a777f4c8d165e21cc06e53, type: 3}
+  m_Name: ChangeTimer_3
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|ChangeTimer_3
+    Guid:
+      Value: 3735717983216600712
+  Label: 
+  Operation: 1
+  ValueIsDeltaTime: 0
+  Value:
+    RawValue: 983040
+--- !u!114 &2770801061660259081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbe8789a9232aec40a565b4756bbd881, type: 3}
+  m_Name: TriggerQuantumEvent_4
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TriggerQuantumEvent_4
+    Guid:
+      Value: 1896700891601467955
+  Label: 
+  Event: 2
+--- !u!114 &2863774997428725527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 822516949, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: HFSMAndDecision_11
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|HFSMAndDecision_11
+    Guid:
+      Value: 382149541575640822
+  Label: 
+  Decisions:
+  - Id:
+      Value: 2864612225835668733
+  - Id:
+      Value: 3597354171088233839
+--- !u!114 &2893396654310822969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74053c192679a4b49932c997f8cbeac1, type: 3}
+  m_Name: GetTimer_2
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|GetTimer_2
+    Guid:
+      Value: 1971477612144112719
+--- !u!114 &3596142579305251697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9014a618b67c0344f9baf62acc9af5f6, type: 3}
+  m_Name: CheckFPValue_2
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|CheckFPValue_2
+    Guid:
+      Value: 403793436823912100
+  Label: 
+  ValueA:
+    Source: 4
+    Key: 
+    DefaultValue:
+      RawValue: 0
+    FunctionRef:
+      Id:
+        Value: 182572842138305167
+  ValueB:
+    Source: 1
+    Key: 
+    DefaultValue:
+      RawValue: 589824
+    FunctionRef:
+      Id:
+        Value: 0
+  Comparison: 2
+--- !u!114 &3848559819777266152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2fd0cd876b8b614796eb88ef27598c4, type: 3}
+  m_Name: TriggerQuantumSignal_FPfkAceC3kSRueV
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TriggerQuantumSignal_FPfkAceC3kSRueV
+    Guid:
+      Value: 190235260832709840
+  Label: 
+  Signal: 1
+  BoolValue: 0
+--- !u!114 &4234347680912909108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2fd0cd876b8b614796eb88ef27598c4, type: 3}
+  m_Name: TriggerQuantumSignal_p6z47MvIPk67uwl
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TriggerQuantumSignal_p6z47MvIPk67uwl
+    Guid:
+      Value: 1817422214679698461
+  Label: 
+  Signal: 2
+  BoolValue: 1
+--- !u!114 &5645185731262486494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1943870150, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: Spawn Coin_0
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|Spawn
+      Coin_0
+    Guid:
+      Value: 1440205755098257827
+  Label: Spawn Coin
+  Index: 2
+  OnUpdateLinks: []
+  OnEnterLinks:
+  - Id:
+      Value: 3167434313245665426
+  OnExitLinks: []
+  Transitions:
+  - Id: 1db4116e-9561-4655-85e3-e3f3eeb7c2b6
+    EventKey: 0
+    DecisionLink:
+      Id:
+        Value: 1248359484932589257
+    StateLink:
+      Id:
+        Value: 1440205755098257827
+    TransitionSetLink:
+      Id:
+        Value: 0
+  ChildrenLinks: []
+  ParentLink:
+    Id:
+      Value: 1954703686838994532
+  Level: 2
+--- !u!114 &5663295084018550891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2fd0cd876b8b614796eb88ef27598c4, type: 3}
+  m_Name: TriggerQuantumSignal_9
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TriggerQuantumSignal_9
+    Guid:
+      Value: 2982270039956417895
+  Label: 
+  Signal: 3
+  BoolValue: 1
+--- !u!114 &6001626543728397544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0d9ef53892aab4285c53d22cf3840f, type: 3}
+  m_Name: GetTeamScore_0
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|GetTeamScore_0
+    Guid:
+      Value: 4189601784910081890
+  TeamId: 1
+--- !u!114 &6090084314714765950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1943870150, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: Spawn Coin_1
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|Spawn
+      Coin_1
+    Guid:
+      Value: 265936218891696122
+  Label: Spawn Coin
+  Index: 1
+  OnUpdateLinks: []
+  OnEnterLinks:
+  - Id:
+      Value: 2220532599074532217
+  OnExitLinks: []
+  Transitions:
+  - Id: 78968b32-2308-4b4e-8c10-6b82b401fe2b
+    EventKey: 0
+    DecisionLink:
+      Id:
+        Value: 4108815331443744214
+    StateLink:
+      Id:
+        Value: 265936218891696122
+    TransitionSetLink:
+      Id:
+        Value: 0
+  ChildrenLinks: []
+  ParentLink:
+    Id:
+      Value: 462957869920022378
+  Level: 2
+--- !u!114 &6249820811190306325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9014a618b67c0344f9baf62acc9af5f6, type: 3}
+  m_Name: CheckFPValue_14
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|CheckFPValue_14
+    Guid:
+      Value: 4606438840812522793
+  Label: 
+  ValueA:
+    Source: 4
+    Key: 
+    DefaultValue:
+      RawValue: 0
+    FunctionRef:
+      Id:
+        Value: 2170752696018831351
+  ValueB:
+    Source: 4
+    Key: 
+    DefaultValue:
+      RawValue: 0
+    FunctionRef:
+      Id:
+        Value: 3108495626834197141
+  Comparison: 3
+--- !u!114 &6446260628277920028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbe8789a9232aec40a565b4756bbd881, type: 3}
+  m_Name: TriggerQuantumEvent_6
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TriggerQuantumEvent_6
+    Guid:
+      Value: 3457914965288096542
+  Label: 
+  Event: 1
+--- !u!114 &6661538483266134339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2af7436e870ab5e4d955182db29c3023, type: 3}
+  m_Name: TimerDecisionNoEntity_7
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TimerDecisionNoEntity_7
+    Guid:
+      Value: 824697813203327943
+  Label: 
+  TimeToTrueState:
+    Source: 1
+    Key: 
+    DefaultValue:
+      RawValue: 262144
+    FunctionRef:
+      Id:
+        Value: 0
+--- !u!114 &6999601995039077526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1124702037, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: HFSMOrDecision_1
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|HFSMOrDecision_1
+    Guid:
+      Value: 4522152932798762517
+  Label: 
+  Decisions:
+  - Id:
+      Value: 403793436823912100
+  - Id:
+      Value: 1534958374898932291
+--- !u!114 &7247001211850340374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9014a618b67c0344f9baf62acc9af5f6, type: 3}
+  m_Name: CheckFPValue_13
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|CheckFPValue_13
+    Guid:
+      Value: 3597354171088233839
+  Label: 
+  ValueA:
+    Source: 4
+    Key: 
+    DefaultValue:
+      RawValue: 0
+    FunctionRef:
+      Id:
+        Value: 518916315512760643
+  ValueB:
+    Source: 1
+    Key: 
+    DefaultValue:
+      RawValue: 655360
+    FunctionRef:
+      Id:
+        Value: 0
+  Comparison: 1
+--- !u!114 &7608944867344887918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1943870150, guid: 19b3f061e0d562b4a97261f0aa32250f, type: 3}
+  m_Name: Countdown_2
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|Countdown_2
+    Guid:
+      Value: 462957869920022378
+  Label: Countdown
+  Index: 0
+  OnUpdateLinks:
+  - Id:
+      Value: 1572029213392667327
+  OnEnterLinks:
+  - Id:
+      Value: 3735717983216600712
+  - Id:
+      Value: 1896700891601467955
+  OnExitLinks:
+  - Id:
+      Value: 3824972169868187648
+  Transitions:
+  - Id: a243f581-ea56-4777-b6e8-7b0b4df588e8
+    EventKey: 0
+    DecisionLink:
+      Id:
+        Value: 921556215700810004
+    StateLink:
+      Id:
+        Value: 1954703686838994532
+    TransitionSetLink:
+      Id:
+        Value: 0
+  ChildrenLinks:
+  - Id:
+      Value: 265936218891696122
+  ParentLink:
+    Id:
+      Value: 3067454869371943826
+  Level: 1
+--- !u!114 &8435731421218168275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bc28675d6139264094b9bf778b29575, type: 3}
+  m_Name: ShowIntroductionDecision_9
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|ShowIntroductionDecision_9
+    Guid:
+      Value: 2331390624022479253
+  Label: 
+--- !u!114 &8437435005186102032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2fd0cd876b8b614796eb88ef27598c4, type: 3}
+  m_Name: TriggerQuantumSignal_14
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/HFSM_Assets/Coin Grab Manager|TriggerQuantumSignal_14
+    Guid:
+      Value: 3897746378151365579
+  Label: 
+  Signal: 0
+  BoolValue: 1

@@ -1,0 +1,71 @@
+[
+  {
+    "jsonrpc": "2.0",
+    "id": "chain",
+    "method": "eth_chainId",
+    "params": []
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": "block",
+    "method": "eth_blockNumber",
+    "params": []
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": "code",
+    "method": "eth_getCode",
+    "params": [
+      "0x350035555E10d9AfAF1566AaebfCeD5BA6C27777",
+      "latest"
+    ]
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": "name",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x350035555E10d9AfAF1566AaebfCeD5BA6C27777",
+        "data": "0x06fdde03"
+      },
+      "latest"
+    ]
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": "symbol",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x350035555E10d9AfAF1566AaebfCeD5BA6C27777",
+        "data": "0x95d89b41"
+      },
+      "latest"
+    ]
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": "decimals",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x350035555E10d9AfAF1566AaebfCeD5BA6C27777",
+        "data": "0x313ce567"
+      },
+      "latest"
+    ]
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": "supply",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x350035555E10d9AfAF1566AaebfCeD5BA6C27777",
+        "data": "0x18160ddd"
+      },
+      "latest"
+    ]
+  }
+]

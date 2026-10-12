@@ -1,0 +1,127 @@
+{
+    "rulesetVersion": "genesis-0.3.0",
+    "roles": [
+        {
+            "id": "brute",
+            "summary": "tough, fights up close",
+            "color": ""
+        },
+        {
+            "id": "ranger",
+            "summary": "fires fast from a distance",
+            "color": ""
+        },
+        {
+            "id": "controller",
+            "summary": "lobs zones that hold ground",
+            "color": ""
+        }
+    ],
+    "shapes": [
+        {
+            "id": "beam",
+            "summary": "a laser from the eyes that pierces every enemy on its line",
+            "color": ""
+        },
+        {
+            "id": "flash",
+            "summary": "a fan of light from the eyes, right in front of you",
+            "color": ""
+        },
+        {
+            "id": "puddle",
+            "summary": "a lobbed shot that leaves a damaging zone for 3 s",
+            "color": ""
+        },
+        {
+            "id": "wave",
+            "summary": "a stare that rolls forward as a wide front, even over walls",
+            "color": ""
+        },
+        {
+            "id": "nova",
+            "summary": "a burst of looks all around you",
+            "color": ""
+        }
+    ],
+    "effects": [
+        {
+            "id": "raw",
+            "summary": "full damage, nothing else",
+            "color": ""
+        },
+        {
+            "id": "burn",
+            "summary": "less damage at once, then burns for 3 s",
+            "color": "#FF731A"
+        },
+        {
+            "id": "chill",
+            "summary": "slows the target for 2.5 s",
+            "color": "#59BFFF"
+        },
+        {
+            "id": "hex",
+            "summary": "roots the target for 1.2 s",
+            "color": "#B24CFF"
+        },
+        {
+            "id": "mend",
+            "summary": "heals you for each enemy hit",
+            "color": "#FF80BF"
+        },
+        {
+            "id": "purify",
+            "summary": "drains the target's attack energy",
+            "color": "#FFFFFF"
+        },
+        {
+            "id": "rally",
+            "summary": "your attacks hit 35% harder for 4 s",
+            "color": "#4066FF"
+        },
+        {
+            "id": "haste",
+            "summary": "refills your attack energy",
+            "color": "#FFE633"
+        },
+        {
+            "id": "veil",
+            "summary": "removes half of the target's special charge",
+            "color": "#8C8C99"
+        },
+        {
+            "id": "toxin",
+            "summary": "a weak hit, then poison for 5 s",
+            "color": "#66E633"
+        }
+    ],
+    "deliveries": [
+        {
+            "id": "direct",
+            "summary": "one hit at full strength",
+            "color": ""
+        },
+        {
+            "id": "echo",
+            "summary": "fires twice, half a second apart, 60% each",
+            "color": ""
+        },
+        {
+            "id": "return",
+            "summary": "goes out at 60%, then comes back to you at 80%",
+            "color": ""
+        },
+        {
+            "id": "persistent-zone",
+            "summary": "hits at 50%, then leaves a zone for 3 s",
+            "color": ""
+        },
+        {
+            "id": "inversion",
+            "summary": "not built yet, plays like a direct hit",
+            "color": ""
+        }
+    ],
+    "recruitHealthPercent": 85
+}

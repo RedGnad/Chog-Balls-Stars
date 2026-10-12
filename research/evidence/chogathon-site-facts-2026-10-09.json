@@ -1,0 +1,37 @@
+{
+  "consulted_date_client": "2026-10-09",
+  "url": "https://chogathon.chog.xyz/",
+  "access": "curl with a browser User-Agent, HTTP 200, 159328 bytes",
+  "response_sha256": "f2d357b769bdc2ccb3b79fdb198ab207d490f5b84f0de0ab2d8f416602593b09",
+  "supersedes_for_dates": "chogathon-site-facts.json (consulted 2026-10-06, sign-up window then 48 h)",
+  "countdown_code_excerpt": "const SIGNUP_END = Date.parse(\"2026-10-06T15:00:00Z\") + 72 * 36e5; /* 2026-10-09 15:00 UTC */ const HACK_END = SIGNUP_END + 14 * 864e5;",
+  "signup_end_utc": "2026-10-09T15:00:00Z",
+  "signup_end_paris": "2026-10-09T17:00:00+02:00",
+  "hack_end_utc_derived": "2026-10-23T15:00:00Z",
+  "hack_end_paris_derived": "2026-10-23T17:00:00+02:00",
+  "date_status": "Derived from client code; the page text also states 'It opens when submissions close - Oct 9, 15:00 UTC' for the dashboard. No organiser announcement read.",
+  "user_registration": "User confirmed on 2026-10-09 that the team is registered.",
+  "deliverables_quoted": [
+    "01 Your project: Project name, team members, Discord and X handles.",
+    "02 What you built: Tell us what the experience does and what makes it new.",
+    "03 Why Chog matters: Show us why the Chog NFT is essential to the experience.",
+    "04 Show it working: Share a working demo, a demo video of up to 3 minutes, and simple testing instructions.",
+    "05 Under the hood: Share your repository, tech stack, and any pre-existing work you used.",
+    "06 What's next? Share any user feedback or usage you've gathered and tell us where you'd take the project next."
+  ],
+  "judging_quoted": {
+    "Novelty 30%": "Does it introduce a new way to use or interact with NFTs?",
+    "Fun 20%": "Is it enjoyable, engaging, or exciting to use?",
+    "Retention 20%": "Will people come back and use it again?",
+    "Clarity 15%": "Is it easy to understand and use?",
+    "Execution 15%": "Does it work well, and is the idea well executed?",
+    "$CHOG Bonus": "Using the $CHOG token is optional, but meaningful integration can earn you bonus points.",
+    "Requirement": "The Chog NFT must be essential."
+  },
+  "tagline_quoted": "take the NFT out, does it still work?",
+  "prizes": "Top 50 qualifying projects; first place $4,500 of a planned $15,000 pool, reducible to $10,000 (first place $2,450) if submissions do not meet the quality threshold.",
+  "consequences": [
+    "The derived end moved from 2026-10-22 to 2026-10-23 17:00 Paris because sign-up was extended from 48 h to 72 h.",
+    "A repository must be shared and pre-existing work declared: the Photon Twin Stick Shooter sample, its assets and the CC0 packs must be listed; the project is not yet under version control."
+  ]
+}

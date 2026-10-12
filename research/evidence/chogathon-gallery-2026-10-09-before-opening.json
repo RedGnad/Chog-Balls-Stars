@@ -1,0 +1,21 @@
+{
+ "recorded_at_utc": "2026-10-09T13:39:01+00:00",
+ "site": "https://chogathon.chog.xyz/",
+ "page_http_status": 200,
+ "page_bytes": 164211,
+ "page_sha256": "80dd4b691cb8198caf3d020894381de80ef1ac1f7a530dc78c049816ae558e8c",
+ "signup_end_expression": "Date.parse(\"2026-10-06T15:00:00Z\") + 72 * 36e5",
+ "source": "table 'projects' of the site's Supabase project, read with the public client key of the page (not recorded here)",
+ "read_http_status": 200,
+ "applications_shown_by_the_page": 307,
+ "example_projects_written_in_the_page": [
+  "TYPEMAXX",
+  "Lagos Life",
+  "Deathwish Racer",
+  "Chog Trader",
+  "Chog Farm"
+ ],
+ "project_count": 0,
+ "columns": [],
+ "projects": []
+}

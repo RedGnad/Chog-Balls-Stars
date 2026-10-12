@@ -1,0 +1,11 @@
+﻿component Respawn
+{
+	[HideInInspector] FP SpawnTimer;
+}
+
+component SpawnPoint
+{
+	Int32 Team;
+}
+
+signal OnRespawnCharacter(EntityRef character, Boolean IsFirstSpawn);

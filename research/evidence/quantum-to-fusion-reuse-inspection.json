@@ -1,0 +1,1057 @@
+{
+  "inspected_at_utc": "2026-10-08T05:09:55.677949+00:00",
+  "method": "Read-only local source, serialized parameters and transitive Unity GUID references",
+  "runtime_port_implemented": false,
+  "runtime_parity_verified": false,
+  "limitations": [
+    "GUID closure is not a portable asset bundle or a license clearance.",
+    "Quantum numeric AssetRefs, runtime loads and package GUIDs are not resolved.",
+    "C# type dependencies are not traced; mentions_quantum is only a textual coupling signal.",
+    "Source inspection does not measure game feel or mobile performance.",
+    "Fixed-point values use Q48.16 per Photon documentation; floats are inspection output, not a simulation port."
+  ],
+  "fixed_point_reference": "https://doc.photonengine.com/quantum/v3/manual/quantum-ecs/fixed-point",
+  "hero_prefabs": [
+    {
+      "source": {
+        "path": "game/Assets/QuantumUser/Resources/Character_Playable_Knight.prefab",
+        "bytes": 34564,
+        "sha256": "badc0cac8e49642fe6a4abe9a72837d724bd1ccf7023ec3b6904c6828f951866"
+      },
+      "scripts": [
+        {
+          "guid": "9b5daaca196126f4499f3d2eb97bab88",
+          "path": "game/Assets/TwinStickShooter/Scripts/GameView/CharacterMaterialController.cs",
+          "mentions_quantum": false
+        },
+        {
+          "guid": "b156eeaae3f741b40af66649a4748430",
+          "path": "game/Assets/Photon/Quantum/Assemblies/Quantum.Engine.dll",
+          "mentions_quantum": null
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "game/Assets/QuantumUser/Resources/Character_Playable_Archer.prefab",
+        "bytes": 38244,
+        "sha256": "59e81a764ec7a872e61c3d8eaccef5675a94799d94889748e79eb0550939fb77"
+      },
+      "scripts": [
+        {
+          "guid": "9b5daaca196126f4499f3d2eb97bab88",
+          "path": "game/Assets/TwinStickShooter/Scripts/GameView/CharacterMaterialController.cs",
+          "mentions_quantum": false
+        },
+        {
+          "guid": "b156eeaae3f741b40af66649a4748430",
+          "path": "game/Assets/Photon/Quantum/Assemblies/Quantum.Engine.dll",
+          "mentions_quantum": null
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "game/Assets/QuantumUser/Resources/Character_Playable_Spellcaster.prefab",
+        "bytes": 35188,
+        "sha256": "b40c32cb113d3a1b9c5aa1358ebfd7e476c4eef27c8ea4adf18756eaf04e7e9e"
+      },
+      "scripts": [
+        {
+          "guid": "9b5daaca196126f4499f3d2eb97bab88",
+          "path": "game/Assets/TwinStickShooter/Scripts/GameView/CharacterMaterialController.cs",
+          "mentions_quantum": false
+        },
+        {
+          "guid": "b156eeaae3f741b40af66649a4748430",
+          "path": "game/Assets/Photon/Quantum/Assemblies/Quantum.Engine.dll",
+          "mentions_quantum": null
+        }
+      ]
+    }
+  ],
+  "hero_guid_closure": {
+    "asset_count": 83,
+    "asset_bytes_excluding_meta": 7948336,
+    "extensions": {
+      ".FBX": 1,
+      ".anim": 5,
+      ".asset": 3,
+      ".controller": 1,
+      ".cs": 36,
+      ".dll": 1,
+      ".fbx": 6,
+      ".mat": 7,
+      ".png": 5,
+      ".prefab": 16,
+      ".shader": 1,
+      ".ttf": 1
+    },
+    "unresolved_guids": [
+      "0b178db3c9e8755499da46a52e53ce76",
+      "0cd44c1031e13a943bb63640046fad76",
+      "71c1514a6bd24e1e882cebbe1904ce04",
+      "dc42784cf147c0c48a680349fa168899",
+      "f4688fdb7df04437aeb418b961361dc5",
+      "fe87c0e1cc204ed48ad3b37840f39efc"
+    ],
+    "files": [
+      {
+        "path": "game/Assets/Photon/Quantum/Assemblies/Quantum.Engine.dll",
+        "bytes": 1212928,
+        "sha256": "6c5f4751fee9df0676340c37e3194493c18f44619142a21adcf81072cef9c279",
+        "guid": "b156eeaae3f741b40af66649a4748430"
+      },
+      {
+        "path": "game/Assets/Photon/Quantum/Runtime/QuantumEntityPrototype.cs",
+        "bytes": 32653,
+        "sha256": "8cdbd35a0651998cb159ee9b29e6edfc4e707b8aa68345ba903f6e0e350731be",
+        "guid": "836dcb7e0f6259748b850a10912ce727",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/Photon/Quantum/Runtime/QuantumEntityView.cs",
+        "bytes": 45579,
+        "sha256": "9ded6ab137feb9ff440672facf642bfb80cee1dc01eea4126689a702cdbd9858",
+        "guid": "0008c51fe3af00b4da5d44f02d9b3dff",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/Resources/Character_Base.prefab",
+        "bytes": 160627,
+        "sha256": "03cc51bdcc67ab8d9c9a01881d3638542e3b1c85e051dc7b1ec9dae79f7a4720",
+        "guid": "269787b2e70c2e0488bd1bff38ee7c6f"
+      },
+      {
+        "path": "game/Assets/QuantumUser/Resources/Character_Base_Playable.prefab",
+        "bytes": 48707,
+        "sha256": "bc5d8c486b5ff7cbcd21bfcefe0113119642707f322ce6bd3bd14ed69f9f4638",
+        "guid": "3338789d9bdbc4a4ba0b70c238caad48"
+      },
+      {
+        "path": "game/Assets/QuantumUser/Resources/Character_Playable_Archer.prefab",
+        "bytes": 38244,
+        "sha256": "59e81a764ec7a872e61c3d8eaccef5675a94799d94889748e79eb0550939fb77",
+        "guid": "24d3eb3baa8a0a5438a1fde5332456b7"
+      },
+      {
+        "path": "game/Assets/QuantumUser/Resources/Character_Playable_Knight.prefab",
+        "bytes": 34564,
+        "sha256": "badc0cac8e49642fe6a4abe9a72837d724bd1ccf7023ec3b6904c6828f951866",
+        "guid": "50ad9cd970ad01e4d90f74b296944fb9"
+      },
+      {
+        "path": "game/Assets/QuantumUser/Resources/Character_Playable_Spellcaster.prefab",
+        "bytes": 35188,
+        "sha256": "b40c32cb113d3a1b9c5aa1358ebfd7e476c4eef27c8ea4adf18756eaf04e7e9e",
+        "guid": "aca96e4ec9dd17849b87cdc0b0b91d29"
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeAIMemory.cs",
+        "bytes": 1337,
+        "sha256": "31df39a6f10c44b6312085890ed327db61ac7f7d97fb0fd4c900630ff78ad2ab",
+        "guid": "872bf294da2a77c49b95eb20f3689200",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeAISteering.cs",
+        "bytes": 1351,
+        "sha256": "8ff2528d6422b1a3aabf14625fc07585a4132e86a1404ef9c8ce6988df259464",
+        "guid": "2b233949084a79a4187f7b75f06036b7",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeAttributes.cs",
+        "bytes": 1250,
+        "sha256": "35ffb9e6d0898addd9bb3bf8a44e15708e5e47244e489e4007721a125869c1e7",
+        "guid": "d6d6304f7dc09264b9801ec22279e1f0",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeBot.cs",
+        "bytes": 1208,
+        "sha256": "77eff47ea7d17c94400496f93910ca49ea5446bd3e1b4b23999e9c09bf1cf120",
+        "guid": "66bcf642189a0dc48be91646776b648e",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeCharacter.cs",
+        "bytes": 1244,
+        "sha256": "bdf62152737ba175182b547b85bfb6430a55e22e220caffc36e2bf521b06aa59",
+        "guid": "a964f605d8497bf40ba9d4df687ca678",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeCharacterAttacks.cs",
+        "bytes": 1286,
+        "sha256": "12e8fac913830fb219c8da6676f0dc829149a516e32da26c0655f73e0d6def1d",
+        "guid": "ba253f8192ad9524ba9098d7067a9e8d",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeHealth.cs",
+        "bytes": 1226,
+        "sha256": "f556f3ffa83d523ea4f885ae799932c2ebf01db27e175ab16e0f9d5bc668b107",
+        "guid": "31c428af8950fcc4cb48a7e468eeaa13",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeImmunity.cs",
+        "bytes": 1238,
+        "sha256": "0d1b7bdfaa58e535476ce975948f2ba6ca507b7e3d9c7628483a3abe108f30b8",
+        "guid": "beb9e2cc60d7fd24789666a774d9ec1e",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeInputContainer.cs",
+        "bytes": 1274,
+        "sha256": "0db1c9a989de4644f84e3d3c8611c4c83c67313586c8a1e01a9bc3bc4fff12fe",
+        "guid": "37b9acab4191f08418ba5ca8556d32c7",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeInventory.cs",
+        "bytes": 1244,
+        "sha256": "55f88c4866ba3cd853f2b8099f39cf428932a91cde0d5a75fa3fde0f715b7051",
+        "guid": "784d954c8f25ea94b9bb085364840a35",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeInvisibility.cs",
+        "bytes": 1262,
+        "sha256": "a6d3cae833cb97a2df8e89ecd18f8b162653ffce2e22a0d29752442feee4f19c",
+        "guid": "f9a17565cfeac6d418c26f547fc7d9b1",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeKCC.cs",
+        "bytes": 1208,
+        "sha256": "93f65cabd87fccf41d02e2732f86740304b75358800c0f80e65de27fa9a9bd79",
+        "guid": "438ec6a75a041cb4f842513fec0d0d4d",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeMovementData.cs",
+        "bytes": 1262,
+        "sha256": "e4ac2d2299fd19155e2482d241c8136678a126e96c311d79d389785521465f97",
+        "guid": "f2779d66940809e4090005c157ad8461",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypePlayerLink.cs",
+        "bytes": 1250,
+        "sha256": "9678abd3c08024e7024394897a044cd993fe19bd87555421a507c89b8528f99d",
+        "guid": "6ab948bc4aa2c20419f05cd0c43f8d0f",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeRespawn.cs",
+        "bytes": 1232,
+        "sha256": "6d65ba4e195ef10ce394acb639c7c0f44096bceaa74c5f1049b9729daf7a329a",
+        "guid": "40e090a780bee4e4bafe1d79ac186bc5",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/QuantumUser/View/Generated/QPrototypeTeamInfo.cs",
+        "bytes": 1238,
+        "sha256": "4e456c3e72820cadbbe4b1f4c9f20448feef416c20facee88a704e9ebf20f8de",
+        "guid": "822b885e261d4f541a8c33c9ebd6ab3c",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TextMesh Pro/Fonts/LiberationSans.ttf",
+        "bytes": 350200,
+        "sha256": "e5b0af421ea2bfbc1ac8d251d647268087ae82786234c57f757d1f0b90fa8b49",
+        "guid": "e3265ab4bf004d28a9537516768c1c75"
+      },
+      {
+        "path": "game/Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset",
+        "bytes": 9365,
+        "sha256": "e2d77876f2b90d98ba2424f6fc32b1403ea701de8fd24a8fe8e571ecc3cdc10a",
+        "guid": "2e498d1c8094910479dc3e1b768306a4"
+      },
+      {
+        "path": "game/Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF Outline.asset",
+        "bytes": 2257175,
+        "sha256": "8d03ad4317b88c056ae815db93514401ad436c0efbe5805061e633483ab4e835",
+        "guid": "2adda86cc49f0e0498163e8479070b8f"
+      },
+      {
+        "path": "game/Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset",
+        "bytes": 2256862,
+        "sha256": "c3ff50e3133d989180b187748ffc67903f1fede099a5b85b4fcbd8cb6e8be958",
+        "guid": "8f586378b4e144a9851e7b34d9b748ee"
+      },
+      {
+        "path": "game/Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile.shader",
+        "bytes": 8074,
+        "sha256": "44c39aabc7e88e7e1feffc1880df754f4adf86b62e9512aa89e9d2d65171aff4",
+        "guid": "fe393ace9b354375a9cb14cdbbc28be4"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Animations/Characters/Character Animator.controller",
+        "bytes": 10761,
+        "sha256": "fe1e5167f0c7e88985e970ff1f0d0c8fe2c63641ee5c1397531046ed8f1bf114",
+        "guid": "0d1cd01731690d045bde202ef4022c6a"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Animations/Characters/Cheer.anim",
+        "bytes": 73885,
+        "sha256": "29590fd9539b691765b9f913c584ae808a0bf669c6c389647104fd33bbb81103",
+        "guid": "af56e7f9f5a60844c86cb6ebd3a97459"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Animations/Characters/Defeated.anim",
+        "bytes": 26752,
+        "sha256": "4ec5fdcb29532006a528c601b7ad9452459fd483a3e6ff22c0b932b986fc10c6",
+        "guid": "ef7b9ce989e225f46945bf4de74c63d2"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Animations/Characters/Idle.anim",
+        "bytes": 99679,
+        "sha256": "4d55434ac6fc65ff2d951718b5d0c4fb75ee60e5b2888df4c7742f9ba9e48725",
+        "guid": "48d57c620a79d2b45b1ab38d88264790"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Animations/Characters/Run.anim",
+        "bytes": 223417,
+        "sha256": "d7f599642883d3bd23c8fe87ec744e4f2a59b64b1f4f3361082ca1d05db1a582",
+        "guid": "43edaf5d19b37094d8b99ae28a524cfc"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Animations/Characters/Shooting.anim",
+        "bytes": 57481,
+        "sha256": "592bbeeb2cc1c95dcb7e95e79bcb039563993d8ece8b7185e5baced6fd08ff18",
+        "guid": "7a4408909f6e48543817b728226db245"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Materials/AttackPreview.mat",
+        "bytes": 2198,
+        "sha256": "763b42d8322a7787feed6f9e57becfd672d63cde788b6c11c1b47573c00ea7e9",
+        "guid": "46f979fbbf584a64e90d415e3cdef46e"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Materials/AttackPreviewCircle.mat",
+        "bytes": 2253,
+        "sha256": "9dadc06cf137aea81cbae14a6b0a700a884139eec74190b7a87ff24890d56b73",
+        "guid": "b72e4cb89703b8744a679d11f545fa29"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Materials/BallisticPreviewMaterial.mat",
+        "bytes": 2567,
+        "sha256": "594cdb568d605d6267f5ebe9d75d1bc17fd901ef9146290a5fef3221b0ea4312",
+        "guid": "35c2ce7671c825e4d81df9e1b1ec1f66"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Materials/ImmunityVFX.mat",
+        "bytes": 2212,
+        "sha256": "4d951ce04ae34898dc4ecbb7dd777555a3a0fc072c87a4f4ddff8fd42cf7c2d5",
+        "guid": "292314ea5ae1bbf4881dc6169cfb11de"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Materials/ImmunityVFXInternal.mat",
+        "bytes": 2205,
+        "sha256": "1594f3a696726dd6672e86a969ed55dc3179c6e0368a8332103f0352aac8947b",
+        "guid": "167de7c0f54212a4585dc0cf5ffce61a"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/Textures/FadedCircle.png",
+        "bytes": 16217,
+        "sha256": "6f7d07604700b92927a210211663ffc36086f4b844ed6fe130b565fc13922fc8",
+        "guid": "38dc87c63baaef946ade483c700f7379"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/UI/Coin.png",
+        "bytes": 6727,
+        "sha256": "f0522bef8120ecac2793e8bb608688b166a1dd0ee1aabdcae65dc49a99a4fbc4",
+        "guid": "e6af46f14744ba04dbfe8a674d0f2767"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/UI/SimpleBar.png",
+        "bytes": 348,
+        "sha256": "0cde23ff71853171c786fdfcfc46c615c026fb0e6c6628b31eca28d0686dd4b2",
+        "guid": "5de138638b314d44280a5abd99f717ca"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Art/arch.fbx",
+        "bytes": 16748,
+        "sha256": "eff7affc350a43bc1b8920c6b82d764865ebcb41ec80c3c072fff232f0ed0095",
+        "guid": "660f5542a1c7cf94e991eeba7abef502"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Prefabs/UI/AttackPreview.prefab",
+        "bytes": 17386,
+        "sha256": "40ce56d106b6427322036daf3cc83a819d241856174c9e037f5c8f0e5ec1a3d9",
+        "guid": "9759d66bddd5ad14dba7d8eb35f2bc67"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Prefabs/UI/CoinUI.prefab",
+        "bytes": 8557,
+        "sha256": "718bf2b5238b66c8b5c828863a1d49f9c69b819da0bfc03d66dd60396aecc2c7",
+        "guid": "c734e24a259a335469a5d4a814e6a14c"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Prefabs/UI/FilledBarUI.prefab",
+        "bytes": 7412,
+        "sha256": "bbe175628fbdc963301fbfafeb51180f9eea5e7d7e15a8877e11ed8c005d233c",
+        "guid": "ea858e9ee6813914da1dc24ce8d2a701"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Prefabs/UI/NameUI.prefab",
+        "bytes": 6262,
+        "sha256": "3b8d794b031d204fb729ec9c30d0be6ba3e1a7b11d2a9a4df2b9a1fcf75acf77",
+        "guid": "4b47e127de6aaff4e85c8ab62188281e"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Prefabs/UI/NumberedBarUI.prefab",
+        "bytes": 12209,
+        "sha256": "45f8ddbaee7869b84c9c2575303c90cd91af9c1c8528d67ee86fa77dada4782b",
+        "guid": "7d8f89a3511763547808dae9baa3bcb4"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Prefabs/UI/PowerUpUI.prefab",
+        "bytes": 8551,
+        "sha256": "6e7ee19651669132db0a61c271be4d0467d2d5bcaaa8731aaa3df2715fd1ef71",
+        "guid": "eddac1aa0206b6940802cae8bc17fd85"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Prefabs/UI/SlicedBarUI.prefab",
+        "bytes": 10565,
+        "sha256": "d6bf1c63987e26078ef146bde9e51be220ae698f6338ebe5a8f8fe3eac9ae6f8",
+        "guid": "a76fae9e24bda9240b3b0e00e500a365"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Prefabs/UI/SpecialIndicator.prefab",
+        "bytes": 7124,
+        "sha256": "8d17754d58c8b8939309ce0a70da30a683ab996bb8461e31b0d7da3366119ef3",
+        "guid": "ebd364ae6876e514297e09f110d5ac89"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Prefabs/UI/TacticsDebugUI.prefab",
+        "bytes": 6154,
+        "sha256": "714d85927930127bd521afa1985382b6381199cd6d429ff7b695a17fb130a108",
+        "guid": "7a9d7a4ff38c42e4fba2e9f455b2c964"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Prefabs/UI/TeamIndicator.prefab",
+        "bytes": 3357,
+        "sha256": "2437cbcc238afe1b8dc260f37f07e43b7431379bbf3e6b8f1b730bc1a368b4ee",
+        "guid": "e6fd80985d38d46479f11b0d3bcd32a0"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Prefabs/VFX/StepsSmoke.prefab",
+        "bytes": 119019,
+        "sha256": "e340820eba5146beed55fc8f2c10e367ce0feef2cc3916e70effa857ece6834e",
+        "guid": "c9b453bdc837ac84caef5e29a5011e39"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/GameView/CharacterAnimations.cs",
+        "bytes": 1735,
+        "sha256": "4fa22e8bd316a1282bc66bc4933080fe2e22b72e2235a7c779ca9b630d535faa",
+        "guid": "aa4440dc82661d849a42a9ee13f5a237",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/GameView/CharacterHeadView.cs",
+        "bytes": 1517,
+        "sha256": "b47ca77546c8ed4d443e208c1b4cb2d5d07b4a627a889996aea9cc9a4753ee61",
+        "guid": "f8590627b83cb21418a533b7a8a81332",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/GameView/CharacterHealingView.cs",
+        "bytes": 1074,
+        "sha256": "546b1999f7d53f5901c29df82e1ffbfd9d843b9e0effdc525adedbddef9445b8",
+        "guid": "3ee8ac5c6f0a2134a940f12b022bb169",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/GameView/CharacterMaterialController.cs",
+        "bytes": 1582,
+        "sha256": "005abc0b3ae644148bdce6848e19a6b8a251175f953e6f5287262dc7aaaf8334",
+        "guid": "9b5daaca196126f4499f3d2eb97bab88",
+        "mentions_quantum": false
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/GameView/CharacterView.cs",
+        "bytes": 3133,
+        "sha256": "ed72402f8a4738573e496fd28256ae1761d2f649e1bd1976de8d1a6fd93ee36b",
+        "guid": "623d79be90bc591408c1e3378bb16987",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/GameView/TeamIndicatorController.cs",
+        "bytes": 1198,
+        "sha256": "f00612c45d0da2e0045b48945a18c7a20915c05f768b71f86098aa5a283aa839",
+        "guid": "01fa0acd480589747be333cc610ea427",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/GameView/UIColorSetter.cs",
+        "bytes": 527,
+        "sha256": "a28d4436a5d0459e83ec16fd643e2fbdfcfe5d650c8987cad6836a8addc638b1",
+        "guid": "e361398dd3fe9054caa45ac9ae833c26",
+        "mentions_quantum": false
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/GameView/WorldUIColorSetter.cs",
+        "bytes": 686,
+        "sha256": "ed0f1a1d59879a0bdaed49e8b794de118c60eaf29c5b208387fa373eccfb2bdf",
+        "guid": "0b9e35c8a6b13854b921804f55d20259",
+        "mentions_quantum": false
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/UI/AttackPreview.cs",
+        "bytes": 5132,
+        "sha256": "44c477c6fdadc5d898ee3e6896afb46fab803cb6d3fbda80ddc80099bd0193a3",
+        "guid": "efd322dd136b376438113b4a68977132",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/UI/AttackPreviewDynamicMesh.cs",
+        "bytes": 5366,
+        "sha256": "e72bd45c0f786af9c952e25868cb6a4c27ad1054164081e6d90f91f79be3ec8e",
+        "guid": "129b68ae58bb3324c85503f9eb0f8915",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/UI/CharacterUIFollow.cs",
+        "bytes": 2161,
+        "sha256": "0357bb5bd184d5c73046640e502972cb704d535d6fa09ebbc239401710d67f8e",
+        "guid": "e39a00d14535df04b9900561dccb8c36",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/UI/CollectiblesUI.cs",
+        "bytes": 1266,
+        "sha256": "2e77e2be2b6cb893c06f4dd76a927fcc00edf181e435249a30162ace3f752678",
+        "guid": "d97d406fc31100a47b095999d2ecfe89",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/UI/FilledBarUI.cs",
+        "bytes": 2172,
+        "sha256": "4a6a0b6b28131e632790fdc64c19d754cc5a5a008ede24717f192f99ac2a5067",
+        "guid": "71d941ac6e1b1af4997f4bf377e70e06",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/UI/LockRotationUI.cs",
+        "bytes": 819,
+        "sha256": "e17804c0c86d160625d6c2a904e38f35d1afc37d696d930cf3ffd9872e8122c1",
+        "guid": "b3c8a01c27e16af469da3702fd258dbd",
+        "mentions_quantum": false
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/UI/NameUI.cs",
+        "bytes": 1119,
+        "sha256": "f7a3ca880a552c2c75153fb2d92376dcae337e8d66858a6459ebc69e9b88509d",
+        "guid": "8dd3e640253b97e46a7db3bfd5a7f4e5",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/UI/NumberedBarUI.cs",
+        "bytes": 300,
+        "sha256": "4d2e981b4534ddcaf963a9dd4292183c1ca75d6cab8812eeda4dd46dd5525d7a",
+        "guid": "1b0a1b3b55695eb4e845a46e373a994a",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/UI/SpecialFillBarUI.cs",
+        "bytes": 866,
+        "sha256": "4c7b47bcf97bad94f37d77eccab7274a476ae4e2d7bc91d3a54b86fe130e514c",
+        "guid": "eec3f01d9429264438a46b08b502d4b2",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Scripts/UI/TacticsUI.cs",
+        "bytes": 341,
+        "sha256": "0dcaeb17f65ecfed42336dba6a5762c47debd3940a161140951c5e1815d911b9",
+        "guid": "f74363c364583254abf303aa9dfa109d",
+        "mentions_quantum": true
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Third Party Assets/JMO Assets/Cartoon FX (legacy)/Materials/Light/CFX3_GlowStar ADD.mat",
+        "bytes": 821,
+        "sha256": "e5701bc724491cae16db1b304fba65c7102ca298ffd5db504e09aa71a2e4ca5f",
+        "guid": "6b22999712355474795091cef25021b4"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Third Party Assets/JMO Assets/Cartoon FX (legacy)/Mesh/CFX_Mesh_Circular2.FBX",
+        "bytes": 20297,
+        "sha256": "637b3fd1321344618d0a9c0c3c1884d654d2776189175a214cb65276476fd22b",
+        "guid": "645a11d137d568d4bb4e5e97f259a333"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Third Party Assets/JMO Assets/Cartoon FX (legacy)/Textures/CFX3_T_GlowStar.png",
+        "bytes": 4946,
+        "sha256": "72fc9d43b79b665c1536ee9ddfb7f4dd64d1270f8bd9eb9d375db9ccac3f4c67",
+        "guid": "91d3d754c3f2ed742b805399cbbbe0e9"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Third Party Assets/JMO Assets New/Cartoon FX (legacy)/Materials/Misc/CFX2_SingleSmoke AB.mat",
+        "bytes": 1229,
+        "sha256": "9ee51d551a7c758aaa5631efeb6081ffceb7c32699f6b6b576db879bc571fc65",
+        "guid": "99e23f3877c77604682d49df6c56b077"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Third Party Assets/JMO Assets New/Cartoon FX (legacy)/Textures/CFX2_T_SingleSmoke.png",
+        "bytes": 2387,
+        "sha256": "c137348ba6959d225a131e367a13355fcf1803fbf255fb17b68db51aaa3eb183",
+        "guid": "9c417cec7cc414f44998f10de1b85938"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Third Party Assets/KayKit Dungeon Pack 1.0/Characters/character_barbarian.fbx",
+        "bytes": 194188,
+        "sha256": "bbd79e694e6680abbcff0e1239c913469187489d022fe069e06b126a0630df1e",
+        "guid": "9ca94e8c5ad6f54458705ae962094857"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Third Party Assets/KayKit Dungeon Pack 1.0/Characters/character_knight.fbx",
+        "bytes": 177068,
+        "sha256": "0edd7292dd5f511a84d8f351325ab72915d94d3d06a991a249c5ba69b8b56e1d",
+        "guid": "41d4c62bcc12ea841886268676c67bae"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Third Party Assets/KayKit Dungeon Pack 1.0/Characters/character_mage.fbx",
+        "bytes": 197340,
+        "sha256": "360d221c203e37faa2f52b03d20df2c0341e6d84e2be257415a20e7b6bce0c23",
+        "guid": "ad093b4d8b0cd474cad7588c753752ba"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Third Party Assets/KayKit Dungeon Pack 1.0/Scenario and Props/crossbow_rare.fbx",
+        "bytes": 32476,
+        "sha256": "c65f618da53d7ddd24200a5b88f3a3d353ea0453314d90d9d7f312b1da8e4657",
+        "guid": "f96cf0055e89c9747b2df314169b65f1"
+      },
+      {
+        "path": "game/Assets/TwinStickShooter/Third Party Assets/KayKit Dungeon Pack 1.0/Scenario and Props/hammer_uncommon.fbx",
+        "bytes": 26268,
+        "sha256": "403cded5615771cbb1d1c8743262b5fb91a507c443b565c383bdb218054a3c9a",
+        "guid": "3d5b61674e7840240827f0f51cbe6caa"
+      }
+    ]
+  },
+  "skills": {
+    "ArcherBasicSkillData": {
+      "source": {
+        "path": "game/Assets/QuantumUser/Resources/ArcherBasicSkillData.asset",
+        "bytes": 990,
+        "sha256": "0eceab5714211813032c5da7a68e9176c107ba5e3c6ef2a0c4438d2216f0a7f0"
+      },
+      "fixed_point_scale": 65536,
+      "ActionInterval": {
+        "raw": 4915,
+        "decoded": 0.0749969482421875
+      },
+      "RotationLockDuration": {
+        "raw": 65536,
+        "decoded": 1.0
+      },
+      "MovementLockDuration": {
+        "raw": 0,
+        "decoded": 0.0
+      },
+      "Cost": {
+        "raw": 65536,
+        "decoded": 1.0
+      },
+      "AutoAimRadius": {
+        "raw": 655360,
+        "decoded": 10.0
+      },
+      "HasTTL": 1,
+      "ActionAmount": 7,
+      "AutoAimCheckSight": 1,
+      "CostType": 2
+    },
+    "ArcherSpecialSkillData": {
+      "source": {
+        "path": "game/Assets/QuantumUser/Resources/ArcherSpecialSkillData.asset",
+        "bytes": 1030,
+        "sha256": "643d853850286f66e14c2be77312f23dbdd714acac7105dce536bc28a9645761"
+      },
+      "fixed_point_scale": 65536,
+      "ActionInterval": {
+        "raw": 65536,
+        "decoded": 1.0
+      },
+      "RotationLockDuration": {
+        "raw": 32768,
+        "decoded": 0.5
+      },
+      "MovementLockDuration": {
+        "raw": 0,
+        "decoded": 0.0
+      },
+      "Cost": {
+        "raw": 65536,
+        "decoded": 1.0
+      },
+      "AutoAimRadius": {
+        "raw": 655360,
+        "decoded": 10.0
+      },
+      "MaxDistance": {
+        "raw": 524288,
+        "decoded": 8.0
+      },
+      "HasTTL": 1,
+      "ActionAmount": 1,
+      "AutoAimCheckSight": 0,
+      "CostType": 4
+    },
+    "KnightBasicSkillData": {
+      "source": {
+        "path": "game/Assets/QuantumUser/Resources/KnightBasicSkillData.asset",
+        "bytes": 1088,
+        "sha256": "95d2617214e78af2de3ef618421e2cb1e9a504e3f1bc23803895eb3a0b7a3749"
+      },
+      "fixed_point_scale": 65536,
+      "ActionInterval": {
+        "raw": 0,
+        "decoded": 0.0
+      },
+      "RotationLockDuration": {
+        "raw": 49152,
+        "decoded": 0.75
+      },
+      "MovementLockDuration": {
+        "raw": 19660,
+        "decoded": 0.29998779296875
+      },
+      "Cost": {
+        "raw": 65536,
+        "decoded": 1.0
+      },
+      "AutoAimRadius": {
+        "raw": 655360,
+        "decoded": 10.0
+      },
+      "HasTTL": 0,
+      "ActionAmount": 0,
+      "AutoAimCheckSight": 1,
+      "CostType": 2,
+      "Angles": [
+        21.0,
+        7.0,
+        -7.0,
+        -21.0
+      ]
+    },
+    "KnightSpecialSkillData": {
+      "source": {
+        "path": "game/Assets/QuantumUser/Resources/KnightSpecialSkillData.asset",
+        "bytes": 991,
+        "sha256": "f57e77e14b3f2a29aae83c96f9a67532482e593fb40e950e217961f4a6f111be"
+      },
+      "fixed_point_scale": 65536,
+      "ActionInterval": {
+        "raw": 0,
+        "decoded": 0.0
+      },
+      "RotationLockDuration": {
+        "raw": 45875,
+        "decoded": 0.6999969482421875
+      },
+      "MovementLockDuration": {
+        "raw": 0,
+        "decoded": 0.0
+      },
+      "Cost": {
+        "raw": 65536,
+        "decoded": 1.0
+      },
+      "AutoAimRadius": {
+        "raw": 655360,
+        "decoded": 10.0
+      },
+      "HasTTL": 1,
+      "ActionAmount": 1,
+      "AutoAimCheckSight": 1,
+      "CostType": 4
+    },
+    "SpellcasterBasicSkillData": {
+      "source": {
+        "path": "game/Assets/QuantumUser/Resources/SpellcasterBasicSkillData.asset",
+        "bytes": 1036,
+        "sha256": "c5021099a3b9db1481b89fe1dc3ce789b27dac92f959f5b8c944fd920bb97985"
+      },
+      "fixed_point_scale": 65536,
+      "ActionInterval": {
+        "raw": 65536,
+        "decoded": 1.0
+      },
+      "RotationLockDuration": {
+        "raw": 32768,
+        "decoded": 0.5
+      },
+      "MovementLockDuration": {
+        "raw": 0,
+        "decoded": 0.0
+      },
+      "Cost": {
+        "raw": 65536,
+        "decoded": 1.0
+      },
+      "AutoAimRadius": {
+        "raw": 655360,
+        "decoded": 10.0
+      },
+      "MaxDistance": {
+        "raw": 524288,
+        "decoded": 8.0
+      },
+      "HasTTL": 1,
+      "ActionAmount": 1,
+      "AutoAimCheckSight": 0,
+      "CostType": 2
+    },
+    "SpellcasterSpecialSkillData": {
+      "source": {
+        "path": "game/Assets/QuantumUser/Resources/SpellcasterSpecialSkillData.asset",
+        "bytes": 1072,
+        "sha256": "8746d23abd996f5350886c78295d9e5bda859d23f337735564ec8c7a2fb08e01"
+      },
+      "fixed_point_scale": 65536,
+      "ActionInterval": {
+        "raw": 13107,
+        "decoded": 0.1999969482421875
+      },
+      "RotationLockDuration": {
+        "raw": 65536,
+        "decoded": 1.0
+      },
+      "MovementLockDuration": {
+        "raw": 0,
+        "decoded": 0.0
+      },
+      "Cost": {
+        "raw": 65536,
+        "decoded": 1.0
+      },
+      "AutoAimRadius": {
+        "raw": 655360,
+        "decoded": 10.0
+      },
+      "MaxDistance": {
+        "raw": 524288,
+        "decoded": 8.0
+      },
+      "Radius": {
+        "raw": 111411,
+        "decoded": 1.6999969482421875
+      },
+      "HasTTL": 1,
+      "ActionAmount": 5,
+      "AutoAimCheckSight": 0,
+      "CostType": 4
+    }
+  },
+  "camera": {
+    "source": {
+      "path": "game/Assets/TwinStickShooter/Scripts/GameView/LocalPlayerCameraFollow.cs",
+      "bytes": 3756,
+      "sha256": "36a6f937cbdcefea6107f1ad4496831e4c242f79c39dfbc6763b51b9ccb7b8b4"
+    },
+    "prefab": {
+      "path": "game/Assets/TwinStickShooter/Prefabs/GameEssentials.prefab",
+      "bytes": 40439,
+      "sha256": "709fd806b813f23989a0cb2db0d0c80705dfee6e39012cf9fc84d42a849ba338"
+    },
+    "scene": {
+      "path": "game/Assets/QuantumUser/Scenes/Gameplay.unity",
+      "bytes": 2463995,
+      "sha256": "30800d34333a1a1342768fe03cc6c3ef9f9b34f8cd80255f77947a065c44efde"
+    },
+    "prefab_values": {
+      "InterpolationSpeed": "5",
+      "BaseOffset": "{x: 0, y: 25, z: -7.5}",
+      "MaxZ": "3",
+      "MinZ": "-18",
+      "InvertedMaxZ": "19",
+      "InvertedMinZ": "-5",
+      "InitialPosition": "{x: 0, y: 30, z: -6.75}",
+      "CanMove": "0",
+      "LockXCoordinate": "1",
+      "InitialDelay": "2",
+      "GameStartDelay": "4",
+      "field_of_view": "35",
+      "orthographic": "0"
+    },
+    "matching_scene_override_fields": [],
+    "limit": "Static values; intro events and team bounds affect runtime camera behaviour."
+  },
+  "inspected_sources": [
+    {
+      "path": "game/License.txt",
+      "bytes": 670,
+      "sha256": "040e21d8be8679a07a7fe8835249de9cade7e55a659488c0fc9f6ac95df7f2b0"
+    },
+    {
+      "path": "game/Assets/Photon/Quantum/Assemblies/Quantum.Deterministic.xml",
+      "bytes": 614411,
+      "sha256": "da94efd7b7f5866d5e8cd75817800a0579b94812e5c28295dbcd2514418c6785"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/System/CharacterSkillCreationSystem.cs",
+      "bytes": 2284,
+      "sha256": "961eb4ebdbcda4581da2f3f8dfa2d83f0932a9127c1413b9a8f488a6626b0dd8"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/System/SkillSystem.cs",
+      "bytes": 1337,
+      "sha256": "55b46b87bfd840fbe96f08bff8bd36f91fd95cd95b48eeb4c6d08890b10fd349"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/SkillData.cs",
+      "bytes": 2951,
+      "sha256": "9e7406d7efa72a853dd8f79eabf1fbafbb5f72723c73432df1a2e89ff359121d"
+    },
+    {
+      "path": "game/Assets/TwinStickShooter/Scripts/UI/AttackPreview.cs",
+      "bytes": 5132,
+      "sha256": "44c477c6fdadc5d898ee3e6896afb46fab803cb6d3fbda80ddc80099bd0193a3"
+    },
+    {
+      "path": "game/Assets/TwinStickShooter/Scripts/GameView/CharacterAnimations.cs",
+      "bytes": 1735,
+      "sha256": "4fa22e8bd316a1282bc66bc4933080fe2e22b72e2235a7c779ca9b630d535faa"
+    },
+    {
+      "path": "game/Assets/TwinStickShooter/Scripts/GameView/CharacterView.cs",
+      "bytes": 3133,
+      "sha256": "ed72402f8a4738573e496fd28256ae1761d2f649e1bd1976de8d1a6fd93ee36b"
+    },
+    {
+      "path": "game/Assets/TwinStickShooter/Scripts/GameView/BallisticAttackView.cs",
+      "bytes": 1158,
+      "sha256": "88a37eb5aa138c5977b1137a0b48036cfab2c45972c928b14b4e5bcab838b7ed"
+    },
+    {
+      "path": "game/Assets/TwinStickShooter/Scripts/Audio/AudioManager.cs",
+      "bytes": 1408,
+      "sha256": "63e29aac02ec94178944de9d5eb0c92f86182727f85e3cc2cb5ac81f5346f1c4"
+    },
+    {
+      "path": "game/Assets/TwinStickShooter/Scripts/Audio/GameplaySFX.cs",
+      "bytes": 801,
+      "sha256": "f66aa688891be110079406f03071be8945485b1cbb817761f07f85b850b062fd"
+    },
+    {
+      "path": "game/Assets/TwinStickShooter/Third Party Assets/Audio/Audio Credits.txt",
+      "bytes": 185,
+      "sha256": "a02ba26a185e7a1877f2526ea4818b62af96a2d37f1d770af09e15054e261494"
+    },
+    {
+      "path": "game/ProjectSettings/GraphicsSettings.asset",
+      "bytes": 2321,
+      "sha256": "57b8bc15e4d6ab1769f80f15b72175e14f019d8569acb8836281178c99a07063"
+    },
+    {
+      "path": "game-fusion/ProjectSettings/GraphicsSettings.asset",
+      "bytes": 2825,
+      "sha256": "87bac5a6c9c3246744f81dd6b6df6db039b519976a9b0e552760754ee8ac3816"
+    },
+    {
+      "path": "game-fusion/Assets/Chog/Arena/ArenaHero.cs",
+      "bytes": 3132,
+      "sha256": "42e24240f66e13d411ef16e3f8f851dd083c43d7c89ef869db3fa0ede50ce84e"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/ArcherBasicAttackData.cs",
+      "bytes": 382,
+      "sha256": "85e3e41a42782f74cc9e16d3e326ba5f82054cf8cde61670104c4c48d2453ff8"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/ArcherBasicSkillData.cs",
+      "bytes": 169,
+      "sha256": "2e492e2b481f341af46039f3fbf442645eeae9bc91ef2c74a46fe69523815333"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/ArcherSpecialFirstAttackData.cs",
+      "bytes": 514,
+      "sha256": "44c27f28b0efd6adc015f1fb211f90ce675126d0d7cf0fae30318a83fcbd6835"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/ArcherSpecialSecondAttackData.cs",
+      "bytes": 1030,
+      "sha256": "e4045c74d3789da6373ecb7f4315b5affc6cb4a2924751b206efa0cd5d1046c9"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/ArcherSpecialSkillData.cs",
+      "bytes": 524,
+      "sha256": "17b8678aaee95f70ee32cff1ef47110e55ab22492d921107ed9dbab791d1f138"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/AreaOfEffectAttackData.cs",
+      "bytes": 1276,
+      "sha256": "59f3b7910e0cba3a4679557c2048149388d83e1b5d8648dddfbb02d5f0fa91a4"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/BallisticAttackData.cs",
+      "bytes": 2530,
+      "sha256": "3025cf58a8f5b58df1c7942a65c3785e81b51a5c7ba1e4e76fa57a5c062e974b"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/BallisticSkillData.cs",
+      "bytes": 1152,
+      "sha256": "5f1309f3a298d492f5d1dcf35ee97f3e25514f9501562426d04052b23150d56b"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/KnightBasicAttackData.cs",
+      "bytes": 1190,
+      "sha256": "8dd8b3eabe73452d40b322af43e3f0b8818b1506d9896f3152783227502662a0"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/KnightBasicSkillData.cs",
+      "bytes": 2348,
+      "sha256": "2f48e79a639168bff5f67627fff40ea7d11d1a0ccfd691978c0a5516f04cfd9a"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/KnightSpecialAttackData.cs",
+      "bytes": 2527,
+      "sha256": "ff2623be8b034eb12a53aa82ae87a044e719f639a9eb786edd43921da03829f5"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/KnightSpecialSkillData.cs",
+      "bytes": 171,
+      "sha256": "d34d53e15152e4594343685803d11df290b654fbe0109ecaf3e50e610d9f62a9"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/RangedAttackData.cs",
+      "bytes": 1410,
+      "sha256": "c38855f7d6b96ac24396adb4a52c0f947f3b063f9e51e9b43506c978363a6c74"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/SpellcasterBasicFirstAttackData.cs",
+      "bytes": 522,
+      "sha256": "89f9f09ebd0b3918ebb56a0a44e35bff6e92195b079e14000f335203aae0f393"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/SpellcasterBasicSecondAttackData.cs",
+      "bytes": 1039,
+      "sha256": "16357f4cc38833895ee08b1659380df43dd30ef9193a5b1c83059532d4a86c7e"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/SpellcasterBasicSkillData.cs",
+      "bytes": 533,
+      "sha256": "172a4ce6a21171a0cbf083e8c748500adc010e560416642ddf356a2e171acd68"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/SpellcasterSpecialFirstAttackData.cs",
+      "bytes": 526,
+      "sha256": "74caaf6079651fef1f9c9127c0277abb403c3d37ee1ef3c984cec5884ef7aa2e"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/SpellcasterSpecialSecondAttackData.cs",
+      "bytes": 855,
+      "sha256": "7d3d4c6a2f18ba5d9b2fb798c9b38b3244730a6d93d217b0384c037d52f1ad4e"
+    },
+    {
+      "path": "game/Assets/QuantumUser/Simulation/AssetDefinition/SpellcasterSpecialSkillData.cs",
+      "bytes": 2190,
+      "sha256": "f30bb531d84e478fc388503b8a33907c7b486e5abca4700ce9b1c5ba90944963"
+    }
+  ]
+}

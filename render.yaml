@@ -1,0 +1,53 @@
+# Render blueprint: the whole game behind one address (docs/DEPLOY.md).
+# One container (Dockerfile) serves the WebGL build, the hero page, the portraits and the
+# services, and judges the matches with the .NET runtime it carries.
+# Not applied yet: nothing is deployed until this file is used to create the service.
+services:
+  - type: web
+    name: chog-genesis-game
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # The free instance, chosen by the user on 12 October 2026 for the first tries, kept awake
+    # by a ping from outside. It cannot have a disk: the careers and the records of the
+    # matches are lost each time the container is replaced (a new deploy, a restart). Before
+    # the submission: plan "starter" and the disk at the end of this file.
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      # The public address of the game, without a trailing slash. Asked when the service is
+      # created; it is written in the message a wallet signs.
+      - key: PUBLIC_ORIGIN
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      # What Photon's dashboard must send with its requests (docs/DEPLOY.md, "Photon"): copy
+      # this value into the dashboard as WebHookSecret and as the "key" of the authentication.
+      - key: PHOTON_SECRET
+        generateValue: true
+      # Set to 1 once Photon's dashboard asks this service who a player is. Before that the
+      # game must connect as it always did, or nobody could enter a match.
+      - key: PHOTON_AUTH
+        sync: false
+      # The Reown project id (docs/DEPLOY.md, "The wallet connector"): lets a phone's normal
+      # browser connect a wallet app. Leave empty to offer only the wallet of the browser.
+      - key: REOWN_PROJECT_ID
+        sync: false
+      # The deployed shop contract (contracts/README.md). Leave empty while there is none: the
+      # game then sells nothing.
+      - key: SHOP_ADDRESS
+        sync: false
+      # The deployed rental contract (contracts/README.md). Leave empty while there is none: the
+      # game then offers no rental.
+      - key: RENTAL_ADDRESS
+        sync: false
+      # The deployed wager contract and the key of its referee (contracts/README.md): both or
+      # neither. Leave empty while there is none: no match is then staked on.
+      - key: WAGER_ADDRESS
+        sync: false
+      - key: REFEREE_KEY
+        sync: false
+    # With plan "starter" (512 MB, half a CPU), add this disk so the careers survive:
+    # disk:
+    #   name: chog-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

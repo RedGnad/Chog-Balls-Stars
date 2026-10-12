@@ -1,0 +1,7 @@
+{
+  "name": "Chog.Match",
+  "rootNamespace": "Chog.Match",
+  "references": ["Chog.Diagnostics", "Quantum.Simulation", "Quantum.Unity", "UnityEngine.UI", "CFXRRuntime"],
+  "allowUnsafeCode": true,
+  "autoReferenced": true
+}

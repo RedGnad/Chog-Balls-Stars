@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find your Chog Genesis hero</title>
+<meta name="description" content="Every Chog Genesis is a hero: its outfit gives its class, its eyes its attack, its aura its effect, its rarity the way the attack is delivered. Look yours up.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Every Chog Genesis is a hero. Which one is yours?">
+<meta property="og:description" content="Type the number of your Genesis and see how it fights: class from the outfit, attack from the eyes, effect from the aura, delivery from the rarity.">
+<meta name="twitter:card" content="summary">
+<style>
+  :root {
+    --night: #1b1230;
+    --night-2: #2a1c4a;
+    --ink: #15101f;
+    --paper: #f6efe2;
+    --paper-2: #e9dfcc;
+    --muted: #6b6478;
+    --on-night: #f3ecff;
+    --on-night-muted: #b9aed6;
+    --green: #55d08f;
+    --pink: #f372ac;
+    --gold: #b7791f;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--night);
+    color: var(--on-night);
+    font: 16px/1.45 ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 980px; margin: 0 auto; padding: 28px 16px 64px; }
+  h1 { font-size: clamp(28px, 6vw, 46px); line-height: 1.05; margin: 0 0 10px; letter-spacing: -0.01em; text-wrap: balance; }
+  h2 { font-size: 22px; margin: 44px 0 14px; }
+  p.lead { margin: 0 0 22px; color: var(--on-night-muted); max-width: 60ch; }
+  .rules { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 26px; padding: 0; list-style: none; }
+  .rules li { background: var(--night-2); border-radius: 999px; padding: 6px 12px; font-size: 14px; color: var(--on-night-muted); }
+  .rules b { color: var(--on-night); }
+
+  form { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+  label { display: block; width: 100%; font-weight: 700; margin-bottom: 2px; }
+  input[type=text] {
+    flex: 1 1 240px; min-width: 0;
+    font: inherit; font-size: 18px; padding: 13px 14px;
+    border: 3px solid var(--ink); border-radius: 14px; background: var(--paper); color: var(--ink);
+  }
+  button, a.button {
+    font: inherit; font-weight: 800; font-size: 16px; cursor: pointer; text-decoration: none;
+    padding: 13px 18px; border: 3px solid var(--ink); border-radius: 14px;
+    background: var(--green); color: var(--ink); box-shadow: 0 4px 0 var(--ink);
+  }
+  button.quiet, a.button.quiet { background: var(--paper); }
+  button:active, a.button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+  :focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
+  [hidden] { display: none !important; }
+
+  #message { min-height: 1.5em; margin: 16px 0 0; color: var(--on-night-muted); }
+  #message.problem { color: #ffb3c7; }
+
+  #cards { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); margin-top: 18px; }
+  .card {
+    background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: var(--radius);
+    box-shadow: 0 6px 0 var(--ink); padding: 16px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .card header { display: flex; gap: 14px; align-items: center; }
+  .card img { width: 92px; height: 92px; border-radius: 50%; border: 3px solid var(--ink); background: var(--paper-2); flex: none; object-fit: cover; }
+  .card h3 { margin: 0; font-size: 22px; line-height: 1.1; }
+  .tier { display: inline-block; margin-top: 6px; padding: 2px 10px; border-radius: 999px; border: 2px solid var(--ink); font-size: 13px; font-weight: 800; background: #fff; }
+  .career { margin: 6px 0 0; font-size: 14px; color: var(--gold); font-weight: 700; }
+  dl { margin: 0; display: grid; gap: 10px; }
+  .line { border-top: 2px dashed var(--paper-2); padding-top: 10px; }
+  .line dt { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .line dd { margin: 2px 0 0; }
+  .gives { font-weight: 900; text-transform: uppercase; margin-right: 6px; }
+  .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--ink); margin-right: 6px; vertical-align: -1px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; }
+  .actions button, .actions a.button { font-size: 14px; padding: 9px 14px; }
+
+  #top { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  #top li { display: flex; align-items: center; gap: 12px; background: var(--night-2); border-radius: 14px; padding: 8px 12px; }
+  #top img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--ink); background: var(--paper-2); flex: none; }
+  #top .rank { width: 1.6em; font-weight: 900; color: var(--on-night-muted); text-align: right; font-variant-numeric: tabular-nums; }
+  #top .who { flex: 1; min-width: 0; font-weight: 800; }
+  #top .who small { display: block; font-weight: 500; color: var(--on-night-muted); }
+  #top .score { font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  footer { margin-top: 48px; color: var(--on-night-muted); font-size: 14px; max-width: 70ch; }
+  footer a { color: var(--green); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Every Chog Genesis is a hero. Which one is yours?</h1>
+  <p class="lead">The traits of your Genesis decide how it fights. Type the number in its name, or the address of the wallet that holds it.</p>
+  <ul class="rules" aria-label="How traits become a hero">
+    <li><b>Outfit</b> gives the class</li>
+    <li><b>Eyes</b> give the attack</li>
+    <li><b>Aura</b> gives the effect</li>
+    <li><b>Rarity</b> gives the delivery</li>
+  </ul>
+
+  <form id="search" autocomplete="off">
+    <label for="query">Genesis number or wallet address</label>
+    <input id="query" type="text" inputmode="text" spellcheck="false" placeholder="1287 or 0x80fb...">
+    <button type="submit">Find</button>
+    <button type="button" id="connect" class="quiet" hidden>Use my wallet</button>
+    <a id="openInWallet" class="button quiet" hidden>Open in MetaMask</a>
+  </form>
+  <p id="message" role="status" aria-live="polite"></p>
+  <div id="cards"></div>
+
+  <h2>Genesis with the most wins</h2>
+  <ol id="top"></ol>
+  <p id="top-message" class="lead"></p>
+
+  <footer>
+    <p>The kit of each Genesis comes from its on-chain metadata and from rules that are the same for the 1,969 of them. The career belongs to the Genesis, not to the wallet: it follows the token when it changes hands. Results are reported by the players' own games and are not verified by replay yet.</p>
+    <p><a href="../">Open the game</a> with the wallet that holds your Genesis to play it, or to lend it: a link lets a friend play your Genesis without a wallet, and their matches count for its career.</p>
+  </footer>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const ART = '../genesis-art/256/';
+  const API = '../api/';
+  const MAX_CARDS = 60;
+
+  const $ = id => document.getElementById(id);
+  const element = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+
+  let data = null;
+  const byToken = new Map();
+  const byNumber = new Map();
+
+  function say(text, problem) {
+    $('message').textContent = text;
+    $('message').classList.toggle('problem', Boolean(problem));
+  }
+
+  // A row of heroes.json as an object.
+  function heroOf(row) {
+    const hero = {};
+    data.heroFields.forEach((field, index) => { hero[field] = row[index]; });
+    return hero;
+  }
+
+  // The four lines of the hero card, as the game writes them.
+  function cardLines(hero) {
+    const authored = hero.body === 0 && hero.eye === 0 && hero.aura === 0 && hero.tier === data.tiers.length - 1;
+    const value = (table, position) => (authored ? 'one of one' : (position > 0 && table[position]) || 'none');
+    return [
+      { trait: 'Outfit', value: value(data.bodies, hero.body), gives: data.roles[hero.role] },
+      { trait: 'Eyes', value: value(data.eyes, hero.eye), gives: data.shapes[hero.shape] },
+      { trait: 'Aura', value: value(data.auras, hero.aura), gives: data.effects[hero.effect] },
+      { trait: 'Rarity', value: data.tiers[hero.tier], gives: data.deliveries[hero.expression] },
+    ];
+  }
+
+  function describeCareer(career) {
+    if (!career || career.matches === 0) return 'No match yet';
+    const badges = (career.badges || []).map(badge => badge.name).join(', ');
+    // Matches a guest played with a link of the holder are part of the career, and said.
+    // So are the matches of players who rented it from the holder.
+    const others = [
+      career.guestMatches > 0 ? `${career.guestMatches} by guests` : '',
+      career.rentedMatches > 0 ? `${career.rentedMatches} by renters` : '',
+    ].filter(Boolean).join(', ');
+    const guests = others ? ` (${others})` : '';
+    // Mastery is earned by playing: a level, and the points towards the next one.
+    const mastery = career.mastery
+      ? `Mastery ${career.mastery.level}${career.mastery.next ? ` (${career.mastery.points}/${career.mastery.next})` : ''} · `
+      : '';
+    return `${mastery}${career.matches} ${career.matches === 1 ? 'match' : 'matches'}${guests}, ${career.wins} ${career.wins === 1 ? 'win' : 'wins'}`
+      + (badges ? ` · ${badges}` : '');
+  }
+
+  function card(hero) {
+    const article = element('article', 'card');
+    article.dataset.token = hero.tokenId;
+
+    const header = element('header');
+    const portrait = element('img');
+    portrait.src = `${ART}${hero.metadataId}.jpg`;
+    portrait.alt = `Portrait of ${hero.name}`;
+    portrait.width = 92;
+    portrait.height = 92;
+    portrait.loading = 'lazy';
+    const title = element('div');
+    title.append(element('h3', '', hero.name), element('span', 'tier', data.tiers[hero.tier]), element('p', 'career', ''));
+    header.append(portrait, title);
+
+    const lines = element('dl');
+    for (const line of cardLines(hero)) {
+      const row = element('div', 'line');
+      const gives = element('dd');
+      if (line.gives.color) {
+        const swatch = element('span', 'swatch');
+        swatch.style.background = line.gives.color;
+        gives.append(swatch);
+      }
+      gives.append(element('span', 'gives', line.gives.id), document.createTextNode(line.gives.summary));
+      row.append(element('dt', '', `${line.trait}: ${line.value}`), gives);
+      lines.append(row);
+    }
+
+    const actions = element('div', 'actions');
+    const share = element('button', 'quiet', 'Share');
+    share.type = 'button';
+    share.addEventListener('click', () => shareHero(hero, share));
+    const play = element('a', 'button', 'Play it');
+    play.href = '../';
+    actions.append(share, play);
+
+    article.append(header, lines, actions);
+    return article;
+  }
+
+  async function shareHero(hero, button) {
+    const link = new URL(location.pathname, location.href);
+    link.searchParams.set('n', hero.metadataId);
+    const kit = cardLines(hero).map(line => line.gives.id).join(' / ');
+    const text = `${hero.name} is a ${kit} in the Chog Genesis game. What is yours?`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: hero.name, text, url: link.href });
+        return;
+      }
+      await navigator.clipboard.writeText(`${text} ${link.href}`);
+      button.textContent = 'Link copied';
+    } catch (error) {
+      if (error && error.name === 'AbortError') return;
+      button.textContent = 'Copy failed';
+    }
+    setTimeout(() => { button.textContent = 'Share'; }, 2500);
+  }
+
+  async function readJson(path) {
+    const response = await fetch(path, { headers: { Accept: 'application/json' } });
+    const body = await response.json().catch(() => null);
+    if (!response.ok || !body) throw new Error((body && body.message) || `the services answered ${response.status}`);
+    return body;
+  }
+
+  async function showCareers(heroes) {
+    for (let start = 0; start < heroes.length; start += 64) {
+      const tokens = heroes.slice(start, start + 64).map(hero => hero.tokenId);
+      try {
+        const { careers } = await readJson(`${API}career?tokens=${tokens.join(',')}`);
+        for (const career of careers) {
+          const line = document.querySelector(`.card[data-token="${career.tokenId}"] .career`);
+          if (line) line.textContent = describeCareer(career);
+        }
+      } catch {
+        // The card is complete without its career; leave the line empty.
+      }
+    }
+  }
+
+  function show(heroes, note) {
+    const cards = $('cards');
+    cards.replaceChildren(...heroes.slice(0, MAX_CARDS).map(card));
+    say(note + (heroes.length > MAX_CARDS ? ` Showing the first ${MAX_CARDS}.` : ''));
+    showCareers(heroes.slice(0, MAX_CARDS));
+  }
+
+  async function findWallet(address) {
+    say('Reading the wallet on Monad...');
+    $('cards').replaceChildren();
+    try {
+      const owned = await readJson(`${API}genesis/owned?address=${address}`);
+      const heroes = owned.tokens.map(token => byToken.get(token)).filter(Boolean);
+      if (heroes.length === 0) {
+        say('This wallet holds no Chog Genesis. In the game it plays a recruit: '
+          + `${100 - data.recruitHealthPercent}% less health and no Genesis attack.`);
+        return;
+      }
+      show(heroes, `This wallet holds ${heroes.length} Genesis.`);
+    } catch (error) {
+      say(`The wallet could not be read: ${error.message}.`, true);
+    }
+  }
+
+  function find(query) {
+    const text = query.trim();
+    if (/^0x[0-9a-fA-F]{40}$/.test(text)) {
+      history.replaceState(null, '', `?wallet=${text}`);
+      return findWallet(text);
+    }
+    const digits = text.replace(/chog/i, '').replace('#', '').trim();
+    if (/^\d{1,4}$/.test(digits) && byNumber.has(Number(digits))) {
+      history.replaceState(null, '', `?n=${Number(digits)}`);
+      show([byNumber.get(Number(digits))], '');
+      return undefined;
+    }
+    $('cards').replaceChildren();
+    say(`Type the number in the name of a Genesis, from 1 to ${byNumber.size}, or a wallet address that starts with 0x.`, true);
+    return undefined;
+  }
+
+  async function showTop() {
+    try {
+      const { careers } = await readJson(`${API}career/top?limit=10`);
+      const rows = careers.map((career, index) => {
+        const hero = byToken.get(career.tokenId);
+        if (!hero) return null;
+        const row = element('li');
+        const portrait = element('img');
+        portrait.src = `${ART}${hero.metadataId}.jpg`;
+        portrait.alt = '';
+        portrait.width = 44;
+        portrait.height = 44;
+        portrait.loading = 'lazy';
+        const who = element('span', 'who', hero.name);
+        who.append(element('small', '', cardLines(hero).map(line => line.gives.id).join(' / ')));
+        row.append(element('span', 'rank', String(index + 1)), portrait, who,
+          element('span', 'score', `${career.wins} W · ${career.matches} played`));
+        return row;
+      }).filter(Boolean);
+      $('top').replaceChildren(...rows);
+      $('top-message').textContent = rows.length === 0 ? 'No match recorded yet. Sign in with your wallet in the game and be the first.' : '';
+    } catch {
+      $('top-message').textContent = 'The careers could not be read right now.';
+    }
+  }
+
+  async function start() {
+    try {
+      data = await readJson('heroes.json');
+    } catch (error) {
+      say(`The heroes could not be loaded: ${error.message}.`, true);
+      return;
+    }
+    for (const row of data.heroes) {
+      const hero = heroOf(row);
+      byToken.set(hero.tokenId, hero);
+      byNumber.set(hero.metadataId, hero);
+    }
+
+    $('search').addEventListener('submit', event => {
+      event.preventDefault();
+      find($('query').value);
+    });
+
+    if (window.ethereum && typeof window.ethereum.request === 'function') {
+      $('connect').hidden = false;
+      $('connect').addEventListener('click', async () => {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          if (accounts && accounts[0]) {
+            $('query').value = accounts[0];
+            find(accounts[0]);
+          }
+        } catch {
+          say('The wallet shared no address.', true);
+        }
+      });
+    } else if (location.protocol === 'https:' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      // A phone browser without a wallet: MetaMask's documented link reopens this page in the
+      // browser of its app, where the wallet is.
+      $('openInWallet').href = `https://link.metamask.io/dapp/${location.host}${location.pathname}`;
+      $('openInWallet').hidden = false;
+    }
+
+    const asked = new URLSearchParams(location.search);
+    const first = asked.get('wallet') || asked.get('n');
+    if (first) {
+      $('query').value = first;
+      find(first);
+    }
+    showTop();
+  }
+
+  start();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+Staked match rehearsal, 11 October 2026, 14:47 to 14:50 (Paris)
+================================================================
+
+Command: sh tools/contracts/rehearse_secure_match.sh <record> <build folder> [cheat]
+Record:  .artifacts/replays/20261011T144714-winner0-tick5507.json, sent by the game page of the
+         host of a match of two pages in opposite teams (browser_check.sh duel-host / duel-guest),
+         played on Photon's Public Cloud with the build 20261011T123422287Z-effb1c47.
+         The game itself announced team 0 as the winner (the "winner0" of the file name).
+Chain:   a local copy of Monad mainnet (anvil), put back as it was after each run. No transaction
+         was sent to the real chain. Referee key: the public test key of the web3.js documentation.
+Real:    the game services (sign-in, Photon authentication, webhooks, tickets, lock, judge,
+         referee), the wager contract, the record of the match, the program that replays it.
+Played:  Photon's cloud. The script sends the requests Photon's manual describes, built from the
+         record. That Photon sends exactly this is NOT verified here.
+
+1. Honest match
+---------------
+record: 5448 ticks (60 to 5507), 120210 bytes of input
+host 0x70997970c51812dc3a010c7d01b50e0d17dc79c8: Genesis 1795, 10000 $CHOG
+guest 0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc: Genesis 408, 10000 $CHOG
+host is named 0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+guest is named 0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc
+the match is named 0:eu:rehearsal-1791722859098~1fdeb21d1f4ab1cda3
+host staked on team 0
+guest staked on team 1
+held by the contract: 50 $CHOG
+locked at 2026-10-11T12:47:39.680Z: 0x709979 on team 0, 0x3c44cd on team 1
+verdict: team 0 won 15 to 2; players [{"player":0,"team":0,"tokenId":1795},{"player":1,"team":1,"tokenId":408}]
+the referee signs: team 0 won
+host (team 0): 10000 -> 10022.5 $CHOG (+22.5)
+guest (team 1): 10000 -> 9975 $CHOG (-25)
+burned 2.5 $CHOG; left in the contract 0; state of the match 2 (2 settled, 3 refunded)
+
+2. The guest stakes on the team it does not play in (wrong-team)
+----------------------------------------------------------------
+host staked on team 0
+guest staked on team 0
+locked at 2026-10-11T12:48:05.922Z: 0x709979 on team 0, 0x3c44cd on team 0
+verdict: team 0 won 15 to 2; players [{"player":0,"team":0,"tokenId":1795},{"player":1,"team":1,"tokenId":408}]
+the referee calls the match off: a staker did not play in the team staked on
+host (team 0): 10000 -> 10000 $CHOG (+0)
+guest (team 1): 10000 -> 10000 $CHOG (+0)
+burned 0 $CHOG; left in the contract 0; state of the match 3 (2 settled, 3 refunded)
+
+3. Nobody locks the stakes before the match begins (no-lock)
+------------------------------------------------------------
+host staked on team 0
+guest staked on team 1
+nobody locks the stakes
+verdict: team 0 won 15 to 2; players [{"player":0,"team":0,"tokenId":1795},{"player":1,"team":1,"tokenId":408}]
+the referee calls the match off: the stakes were never locked
+host (team 0): 10000 -> 10000 $CHOG (+0)
+guest (team 1): 10000 -> 10000 $CHOG (+0)
+burned 0 $CHOG; left in the contract 0; state of the match 3 (2 settled, 3 refunded)
+
+4. The guest keeps its ticket to stake once it sees how the match goes (late-stake)
+-----------------------------------------------------------------------------------
+host staked on team 0
+guest keeps its ticket for later
+the stakes cannot be locked for 136 s, while guest's ticket can still be used
+verdict: team 0 won 15 to 2; players [{"player":0,"team":0,"tokenId":1795},{"player":1,"team":1,"tokenId":408}]
+the referee calls the match off: the stakes were never locked
+guest tries its kept ticket after the end: refused by the contract
+host (team 0): 10000 -> 10000 $CHOG (+0)
+guest (team 1): 10000 -> 10000 $CHOG (+0)
+burned 0 $CHOG; left in the contract 0; state of the match 3 (2 settled, 3 refunded)
+
+Replay alone
+------------
+python3 tools/quantum/headless.py verify <record> <build folder>/quantum-db.json <report.json>
+First record of the day (one page and bots, 3239 ticks): "team 1 won at tick 3235, 0 to 11
+(3239 ticks replayed in 0,78 s)", the winner the game had announced.

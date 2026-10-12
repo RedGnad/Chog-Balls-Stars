@@ -1,0 +1,7 @@
+{
+  "name": "xyz.chog.heroes",
+  "version": "0.1.0",
+  "displayName": "Chog Hero Catalog",
+  "description": "Shared Genesis metadata validation and hero resolution.",
+  "unity": "2021.3"
+}

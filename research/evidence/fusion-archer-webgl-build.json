@@ -1,0 +1,13 @@
+{
+    "recordedAtUtc": "2026-10-08T09:50:42.7605620Z",
+    "unityVersion": "6000.6.4f1",
+    "result": "Succeeded",
+    "buildBytes": "12944041",
+    "unitySummaryBytes": "20594",
+    "files": 17,
+    "scenes": [
+        "Assets/Chog/Scenes/Boot.unity",
+        "Assets/Chog/Scenes/Arena.unity"
+    ],
+    "browserTested": false
+}

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40723456e2f32aa4bb3bfc7b8d04027f, type: 3}
+  m_Name: SpellcasterSpecialSkillData
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/SpellcasterSpecialSkillData
+    Guid:
+      Value: 2665294903803164896
+  SFX:
+    Clip: {fileID: 8300000, guid: f0fa5077ee09ebd47a63a57c3dae5bf1, type: 3}
+    Volume: 1
+  SkillPrototype:
+    Id:
+      Value: 3752973532124986787
+  AttackPrototype:
+    Id:
+      Value: 2198999402523227066
+  HasTTL: 1
+  ActionInterval:
+    RawValue: 13107
+  ActionAmount: 5
+  RotationLockDuration:
+    RawValue: 65536
+  MovementLockDuration:
+    RawValue: 0
+  AutoAimCheckSight: 0
+  Cost:
+    RawValue: 65536
+  CostType: 4
+  AutoAimRadius:
+    RawValue: 655360
+  MaxDistance:
+    RawValue: 524288
+  Radius:
+    RawValue: 111411

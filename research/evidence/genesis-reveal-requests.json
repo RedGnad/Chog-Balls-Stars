@@ -1,0 +1,44 @@
+[
+  {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "eth_blockNumber",
+    "params": []
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
+        "data": "0x51830227"
+      },
+      "latest"
+    ]
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
+        "data": "0x6c0360eb"
+      },
+      "latest"
+    ]
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 4,
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
+        "data": "0x18160ddd"
+      },
+      "latest"
+    ]
+  }
+]

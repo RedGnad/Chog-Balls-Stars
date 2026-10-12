@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7a70640b8531e345aa700d5310b58d9, type: 3}
+  m_Name: KnightSpecialSkillData
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/KnightSpecialSkillData
+    Guid:
+      Value: 1533089614079228229
+  SFX:
+    Clip: {fileID: 8300000, guid: 4dbf3cf91c2d0ea43b68a4ca03cf5d85, type: 3}
+    Volume: 1
+  SkillPrototype:
+    Id:
+      Value: 1217988919021384834
+  AttackPrototype:
+    Id:
+      Value: 1479139178940532275
+  HasTTL: 1
+  ActionInterval:
+    RawValue: 0
+  ActionAmount: 1
+  RotationLockDuration:
+    RawValue: 45875
+  MovementLockDuration:
+    RawValue: 0
+  AutoAimCheckSight: 1
+  Cost:
+    RawValue: 65536
+  CostType: 4
+  AutoAimRadius:
+    RawValue: 655360

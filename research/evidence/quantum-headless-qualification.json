@@ -1,0 +1,52 @@
+{
+  "client_date": "2026-10-08",
+  "recorded_utc": "2026-10-07T23:36:54.4852540Z",
+  "sdk_download": {
+    "version": "8.0.425",
+    "name": "dotnet-sdk-osx-arm64.tar.gz",
+    "rid": "osx-arm64",
+    "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.425/dotnet-sdk-8.0.425-osx-arm64.tar.gz",
+    "hash": "d42156be70b489236479a415536013a89a9fd6eaca57d5716a7017612fcc65bdb459068973d7cffd6fe710f2799af8bee95b2046ba032762d47df176f5c4a7d6"
+  },
+  "catalog_tests": {
+    "passed": 27,
+    "failed": 0
+  },
+  "quantum_integration_tests": {
+    "clientDate": "2026-10-08",
+    "recordedAtUtc": "2026-10-07T23:36:54.4852540Z",
+    "sdk": "8.0.31",
+    "quantumAssembly": "Quantum.Engine, Version=3.0.9.1932, Culture=neutral, PublicKeyToken=null",
+    "passed": 14,
+    "failed": 0,
+    "tests": [
+      "PASS canonical NFT identity is preserved while selecting a Quantum prototype",
+      "PASS real Common and Uncommon profiles select different signature asset references",
+      "PASS unimplemented Legendary profile has no fallback to a Common",
+      "PASS a missing family cannot borrow a different signature",
+      "PASS same labels with a different catalog hash cannot bind",
+      "PASS same hash with a different ruleset version cannot bind",
+      "PASS missing skill references reject the loadout before entering a match",
+      "PASS duplicate matching loadouts reject an ambiguous catalog",
+      "PASS matching admission fields and match catalog pass consistency validation",
+      "PASS a stale match catalog rejects an otherwise valid player",
+      "PASS swapping the player loadout reference is rejected",
+      "PASS missing metadata fingerprint is rejected",
+      "PASS binding another NFT cannot mutate an already selected player",
+      "PASS Genesis capabilities are applied independently in a real Quantum Frame"
+    ],
+    "limitations": [
+      "Loadout IDs in this harness are test assets, not Unity-authored gameplay variants.",
+      "No Unity import, full cast/damage sequence, network session or WebGL build exercised.",
+      "Consistency checks do not authenticate a wallet or establish NFT ownership."
+    ]
+  },
+  "total_passed": 41,
+  "command": "python3 tools/quantum/headless.py test",
+  "build_log": ".artifacts/quantum-dotnet/integration-build.log",
+  "limitations": [
+    "Loadout IDs in this harness are test assets, not Unity-authored gameplay variants.",
+    "No Unity import, full cast/damage sequence, network session or WebGL build exercised.",
+    "Consistency checks do not authenticate a wallet or establish NFT ownership."
+  ]
+}

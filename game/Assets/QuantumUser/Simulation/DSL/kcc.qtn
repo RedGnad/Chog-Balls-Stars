@@ -1,0 +1,6 @@
+﻿component KCC {
+	asset_ref<KCCSettings> Settings;
+	FP MaxSpeed;
+	FP Acceleration;
+	FPVector2 Velocity;
+}

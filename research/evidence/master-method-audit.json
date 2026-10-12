@@ -1,0 +1,120 @@
+{
+  "consulted_date_client": "2026-10-07",
+  "user_scope": "Autonomous product with complete architecture; FPS was an example, not a selected genre.",
+  "source_manifest": [
+    {
+      "path": "/Users/red.g/CascadeProjects/Master/CLAUDE.md",
+      "sha256": "1c66dc579045e45f41062bf09d8612e779339c11af9d3c3c7dda82ca20463bab",
+      "access": "full read"
+    },
+    {
+      "path": "/Users/red.g/CascadeProjects/Master/procedure.md",
+      "sha256": "e47273cb64566deb76385cfe2add5a31e7a526751affdf3dd862fa37eddd6d71",
+      "access": "full read"
+    },
+    {
+      "path": "/Users/red.g/CascadeProjects/Master/playbook.md",
+      "sha256": "dbb2eebdc98d76a93fcce0041b5e7f9fe22a217c6cc36ba1e92d6ffb0a04db8e",
+      "access": "full read"
+    },
+    {
+      "path": "/Users/red.g/CascadeProjects/Master/research-methods.md",
+      "sha256": "ca3e34d407bfe001fff5435b80f0e570c7d5ceebff206c6030df2c90d00e0dd3",
+      "access": "selected sections"
+    },
+    {
+      "path": "/Users/red.g/CascadeProjects/Master/.claude/stance.md",
+      "sha256": "013468677c97d6f76720ca5a9ddc9244a01f34739a7e7e98df13dc5ef0042575",
+      "access": "full read"
+    },
+    {
+      "path": "/Users/red.g/CascadeProjects/Master/archive/engine-v2-retired/RETIRED.md",
+      "sha256": "2c0994b3cef232226316e5fb95b65729efb6cd96fd87f0f6e50efc223219d247",
+      "access": "full read"
+    },
+    {
+      "path": "/Users/red.g/CascadeProjects/Master/data/lane-crowding-vs-novelty-2026-09-06.md",
+      "sha256": "121d5f6322f3aeb9e7a3d96ee606e5d2087f791802a64cb0fc52f8860a8dad66",
+      "access": "full read"
+    },
+    {
+      "path": "/Users/red.g/CascadeProjects/Master/data/monad-gaming-platform-research-2026-07-30.md",
+      "sha256": "4e3920ba162e0656d25d85e8e5e7a0c53d525b699862ecf3e856694e9ad8c6ac",
+      "access": "full read"
+    },
+    {
+      "path": "/Users/red.g/CascadeProjects/Master/case-log.md",
+      "sha256": "d1fa702660ba0546cdf259d4889e5ddef20f5aa40908bdd54c77b2b5632059b8",
+      "access": "selected sections"
+    },
+    {
+      "path": "/Users/red.g/CascadeProjects/Master/data/dorahacks-field.jsonl",
+      "sha256": "96859cc43fb7e11d46da8fb46aaa4f5bbb384515414e279c6030157d73934ece",
+      "access": "full read"
+    }
+  ],
+  "engine_v2_status": {
+    "retired_date": "2026-08-22",
+    "source": "/Users/red.g/CascadeProjects/Master/archive/engine-v2-retired/RETIRED.md",
+    "replacement": "/Users/red.g/CascadeProjects/Master/procedure.md",
+    "older_documents_still_reference_retired_skill": true
+  },
+  "reproduced_measurements": {
+    "projects": 7131,
+    "awarded_projects": 400,
+    "events": 9,
+    "artifacts_definition": "Truthiness of declared github_url, demo_url, demo_video_url; links not revalidated.",
+    "declared_artifact_buckets": {
+      "0": {
+        "projects": 1196,
+        "awarded": 4,
+        "rate_percent": 0.33444816053511706
+      },
+      "1": {
+        "projects": 1474,
+        "awarded": 25,
+        "rate_percent": 1.6960651289009498
+      },
+      "2": {
+        "projects": 1797,
+        "awarded": 70,
+        "rate_percent": 3.895381190873678
+      },
+      "3": {
+        "projects": 2664,
+        "awarded": 301,
+        "rate_percent": 11.2987987987988
+      }
+    }
+  },
+  "not_reproduced": [
+    "TF-IDF similarity quartiles from the 6 September study.",
+    "Causal explanation of historic wins or losses.",
+    "Historic external ETHGlobal study."
+  ],
+  "public_chog_project_gallery_read": {
+    "method": "Same projects endpoint and anonymous public client key used by the website; selected title, description, app_link, status, created_at only.",
+    "http_status": 200,
+    "content_range": "*/0",
+    "returned_rows": 0,
+    "interpretation": "No rows visible to anonymous reader. Not a census of all entrants or proof of zero competition.",
+    "response_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "photon_primary_sources": [
+    {
+      "url": "https://doc.photonengine.com/photon/current/pricing",
+      "finding": "Free 100 CCU Fusion/Quantum plan, commercial use allowed, one application per customer; total across rooms and regions."
+    },
+    {
+      "url": "https://doc.photonengine.com/fusion/v2/concepts-and-patterns/dedicated-server-overview",
+      "finding": "Fusion Server Mode requires separate dedicated game-session hosting; Photon does not provide orchestration of those game-session instances."
+    }
+  ],
+  "limits": [
+    "Historic awarded flag measures any recorded prize, not first place.",
+    "The corpus events are not Chogathon.",
+    "Artifact association is not a causal effect.",
+    "Local narratives mix factual outcomes, user reports and hypotheses.",
+    "No product or architecture selected; no deployment or account access."
+  ]
+}

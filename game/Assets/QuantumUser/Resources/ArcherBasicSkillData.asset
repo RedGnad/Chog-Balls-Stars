@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2894768dd200a26499a0bb6e1771456b, type: 3}
+  m_Name: ArcherBasicSkillData
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/ArcherBasicSkillData
+    Guid:
+      Value: 188361654829394838
+  SFX:
+    Clip: {fileID: 8300000, guid: 08d4a8f6244910f4dab0c26558bdfae0, type: 3}
+    Volume: 0.3
+  SkillPrototype:
+    Id:
+      Value: 1214909417581777367
+  AttackPrototype:
+    Id:
+      Value: 535788465813011857
+  HasTTL: 1
+  ActionInterval:
+    RawValue: 4915
+  ActionAmount: 7
+  RotationLockDuration:
+    RawValue: 65536
+  MovementLockDuration:
+    RawValue: 0
+  AutoAimCheckSight: 1
+  Cost:
+    RawValue: 65536
+  CostType: 2
+  AutoAimRadius:
+    RawValue: 655360

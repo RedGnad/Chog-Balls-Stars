@@ -1,0 +1,43 @@
+# Builds the image a host runs (Dockerfile) on a Linux machine and starts it once. The build
+# itself replays the recorded matches with the image's own .NET (tools/release/check_judge.sh),
+# so a judge that does not work on Linux stops here and never reaches a host.
+name: release image
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Tests of the game services
+        run: |
+          npm ci --prefix server
+          npm --prefix server test
+
+      - name: Build the image, which replays the recorded matches
+        run: docker build --progress=plain -t chog-genesis-game .
+
+      - name: Start it and ask what a browser and Photon would ask
+        run: |
+          docker run -d --name game -p 10000:10000 -e PUBLIC_ORIGIN=http://127.0.0.1:10000 chog-genesis-game
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fs http://127.0.0.1:10000/api/health; then break; fi
+            sleep 2
+          done
+          echo
+          curl -fs -o /dev/null http://127.0.0.1:10000/
+          curl -fs -o /dev/null http://127.0.0.1:10000/genesis-art/256/1795.jpg
+          curl -fs -o /dev/null http://127.0.0.1:10000/hero/
+          sh tools/release/check_public.sh http://127.0.0.1:10000
+          docker logs game
+          docker stats --no-stream game

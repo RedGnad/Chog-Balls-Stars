@@ -1,0 +1,47 @@
+[
+  {
+    "repository": "https://github.com/RedGnad/Rob-a-Base",
+    "reviewed_commit": "f57488b142fe4515df8a37efd137f45caabe6d5a",
+    "file": "src/server/theft.ts",
+    "permalink": "https://github.com/RedGnad/Rob-a-Base/blob/f57488b142fe4515df8a37efd137f45caabe6d5a/src/server/theft.ts",
+    "file_sha256": "8080288b2b3f4489a1b902a5ce99d1657b264cdf8a7fd7a37f8847ebcca1f2cb",
+    "recursive_tree_truncated": false,
+    "validation_scope": "Read documentation and selected source; no build, deployment or user metric verification."
+  },
+  {
+    "repository": "https://github.com/RedGnad/chogtanks-dev",
+    "reviewed_commit": "d22b7007d9e7406961202d46e0f1de2a243cc10a",
+    "file": "Assets/Scripts/ChogTanksNFTManager.cs",
+    "permalink": "https://github.com/RedGnad/chogtanks-dev/blob/d22b7007d9e7406961202d46e0f1de2a243cc10a/Assets/Scripts/ChogTanksNFTManager.cs",
+    "file_sha256": "e7279389d9b082b51b11a11e86761443b181242a60367e3c701fcce1592a19df",
+    "recursive_tree_truncated": true,
+    "validation_scope": "Read documentation and selected source; no build, deployment or user metric verification."
+  },
+  {
+    "repository": "https://github.com/RedGnad/Viky-index",
+    "reviewed_commit": "17515df656eec80576f3c1cf8b1a285de0bee3d5",
+    "file": "src/EventHandlers.ts",
+    "permalink": "https://github.com/RedGnad/Viky-index/blob/17515df656eec80576f3c1cf8b1a285de0bee3d5/src/EventHandlers.ts",
+    "file_sha256": "8d58276ceb59916109ce8fc8f7200ee484d9abd63f3c9a46d10fea703c81292f",
+    "recursive_tree_truncated": false,
+    "validation_scope": "Read documentation and selected source; no build, deployment or user metric verification."
+  },
+  {
+    "repository": "https://github.com/RedGnad/Axion",
+    "reviewed_commit": "63e6305d9da6406e90717651816f7feffcf57811",
+    "file": "src/arena/scorecard.ts",
+    "permalink": "https://github.com/RedGnad/Axion/blob/63e6305d9da6406e90717651816f7feffcf57811/src/arena/scorecard.ts",
+    "file_sha256": "d43dcc78e4de751e2ead620c060ac9f592aa47a652e32133dffe09079c01cb71",
+    "recursive_tree_truncated": false,
+    "validation_scope": "Read documentation and selected source; no build, deployment or user metric verification."
+  },
+  {
+    "repository": "https://github.com/RedGnad/Sentri",
+    "reviewed_commit": "7523dded1e5b2f7e31e898c0527ef0a5edb6dc30",
+    "file": "contracts/src/AgentINFTSignerVerifier.sol",
+    "permalink": "https://github.com/RedGnad/Sentri/blob/7523dded1e5b2f7e31e898c0527ef0a5edb6dc30/contracts/src/AgentINFTSignerVerifier.sol",
+    "file_sha256": "d464fc787ed2da691eaa4c8da0af995c16cd44594dbfcf719edc832b3e8d5a74",
+    "recursive_tree_truncated": false,
+    "validation_scope": "Read documentation and selected source; no build, deployment or user metric verification."
+  }
+]

@@ -1,0 +1,37 @@
+> Historique de recherche avant le plan de développement du 7 octobre 2026.
+> Le périmètre actif est désormais dans [le plan](../docs/PLAN.md). Les constats datés ne sont pas actualisés ici.
+
+**Recherche pour Chogathon 2026 — révision du 7 octobre 2026**
+
+**Format désormais confirmé : un MOBA multijoueur en vue du dessus, en 3D ou 3D isométrique, avec une préférence pour la PWA mobile.** Unity est envisagé explicitement par l'utilisateur. Les Genesis doivent devenir des personnages dont les classes ou capacités dépendent des traits ; $CHOG doit servir de monnaie payante. Le mécanisme distinctif, le template et la topologie réseau restent à sélectionner. La recommandation précédente de jeu solo ne constitue plus le périmètre.
+
+Relay, Heist, Studio, Centipede et CHOG TV ont été écartés après discussion : les propositions n'établissaient pas une mécanique assez forte ni une architecture complète justifiant leur ambition. La proposition ultérieure de FPS avec arènes et portails a également été retirée : ancrage sur l'exemple donné par l'utilisateur, gameplay confus et coût de production insuffisamment considéré.
+
+Le périmètre confirmé est un **jeu mobile autonome avec une architecture complète, de préférence distribué en PWA**. Le format MOBA est fixé ; le mode précis, le roster et la mécanique distinctive restent à définir. Le choix actuel est de se démarquer par un jeu terminé et soigné, avec une mécanique distinctive. La cible est la communauté degen Chog : amusement immédiat, surprises et situations mémorables. L'angle de recherche demandé est l'utilisation de mécanismes d'anticipation, de hasard et de risque dans le gameplay, avec une esthétique propre au jeu. Le FPS évoqué était un exemple de base éprouvée ; il ne constitue pas un choix de genre ou de stack.
+
+La **facilité de création intervient dans la sélection** : sensations à régler, assets et contenu à produire, synchronisation, distribution et intégration NFT. Une description courte ou un moteur disponible ne prouvent pas un faible coût. Le brief demande que retirer le NFT change l'expérience ; il ne demande pas de démontrer qu'une base de données ne pourrait pas reproduire son fonctionnement. Les références de production consultées sont consignées dans [ce relevé factuel](evidence/production-reference-facts.json), sans estimation de nos délais ni inférence de succès Chogathon.
+
+**Correction après retour utilisateur sur $CHOG :** RUGPULL et FINAL BOSS restent des pistes exploratoires. La priorité proposée pour RUGPULL est retirée : elle comparait le coût des jeux avant de préciser le rôle du token. La prochaine comparaison doit inclure le payeur, sa raison de payer, le destinataire des fonds, l'effet sur le jeu, la validation des résultats et le dénouement des échecs. Le bonus du concours est facultatif, mais l'utilisateur demande une intégration réfléchie dès la sélection. Les [lectures publiques du token](evidence/chog-erc20-facts.json) ne sont ni un audit ni une validation de demande.
+
+**Piste antérieure proposée par l'utilisateur : un jeu de type Clash of Clans.** Cette famille reste une référence dans le brainstorming mobile. La suppression des duels simultanés dans [Builder Base 2.0](https://supercell.com/en/games/clashofclans/blog/news/attacking-and-defending-in-builder-base-2-0/) fournit un précédent d'architecture ; [Heroes of Mavia](https://docs.mavia.com/) fournit un précédent direct pour l'association bases/NFT/crypto. Le genre n'est pas sélectionné.
+
+La recherche mobile du 7 octobre est conservée dans [ce relevé de sources et de mesures](evidence/mobile-game-design-facts.json). Les téléchargements annuels estimés, les seuils Android cumulés, les revenus et les utilisateurs déclarés de plateformes sont des mesures différentes. Aucun de ces chiffres n'établit à lui seul la cause du succès d'une mécanique, la demande Chog ou la rétention de notre futur jeu.
+
+Trois expériences ont été explorées avant le choix du MOBA : (1) absorption/combat où le butin forme aussi le corps et les munitions ; (2) pêche où une prise peut servir à en poursuivre une autre ; (3) défense où le butin combat jusqu'à sa mise à l'abri. Elles ne constituent plus la recommandation de format. L'absorption suivie de projection existe déjà dans Donut County : la seule présence de ce geste ne constitue pas une revendication de nouveauté.
+
+**Base existante signalée par l'utilisateur : [chogtanks-dev](https://github.com/RedGnad/chogtanks-dev).** Une copie locale a été lue à `/Users/red.g/CascadeProjects/chogtanks-dev-main-10`, sans modification. Elle référence Unity `6000.3.24f1`, Reown AppKit `1.4.1` et contient des scripts Photon PUN 2, malgré une mention Fusion dans le README. Les contrôleurs utilisent une physique 2D latérale, la gravité et la propulsion par les tirs. Le wallet, les lectures NFT et certains éléments de salons sont des candidats à l'extraction ; ils ne prouvent pas une économie de temps mesurée. Les dégâts sont actuellement décidés par le client propriétaire du projectile puis transmis par RPC. La configuration blockchain examinée vise Monad testnet et le NFT propre à CHOGTANKS ; elle doit être adaptée à Genesis et $CHOG sur Monad mainnet.
+
+Le [relevé MOBA et réutilisation](evidence/moba-feasibility-and-reuse.json) distingue code effectivement lu, fonctionnalités annoncées des templates et limites. Quantum 3 Twin Stick Shooter fournit une base top-down avec trois personnages, deux capacités chacun et des bots ; Rogue MOBA fournit davantage de règles de MOBA mais repose sur Quantum 2 et un accès Gaming Circle. Le template Fusion de HEAVYART est un shooter top-down à adapter. Aucun de ces templates n'a été téléchargé, acheté, compilé ou testé pendant cette recherche.
+
+La méthode a été reprise depuis [la procédure active de Master](/Users/red.g/CascadeProjects/Master/procedure.md) et [les corrections du journal](/Users/red.g/CascadeProjects/Master/case-log.md). Le moteur v2 est [retiré depuis le 22 août](/Users/red.g/CascadeProjects/Master/archive/engine-v2-retired/RETIRED.md). Les règles historiques restent des hypothèses à confronter au barème Chogathon, qui donne explicitement 30 % à une nouvelle interaction avec le NFT.
+
+Les données du corpus local ont été recomptées : 7 131 projets, 400 projets primés, neuf événements ; les taux d'attribution selon les liens dépôt/démo/vidéo ont été reproduits. Ce sont des associations historiques, sans prédiction de victoire Chogathon. [Relevé et provenance](evidence/master-method-audit.json).
+
+- [Deuxième exploration, écartée](reflexion.md) : conserve les propositions Centipede et TV et leurs sources ; ne constitue plus une recommandation.
+- [Premier dossier, dépassé](dossier.md) : conserve la première exploration ; Relay, Heist et Studio ne sont plus la recommandation.
+- [Bibliographie commentée](bibliographie.md) : références classiques et actuelles, méthodes, limites et accès aux textes.
+- [Protocole de la deuxième exploration](validation.md) : n'est pas un plan de développement engagé.
+- [Lecture du GitHub](github.md) : observations vérifiées et inspirations, sans sélection par compétences.
+- [Preuves et méthode](evidence/README.md) : relevés JSON, provenance et limites des vérifications.
+
+Les concepts sont des propositions à tester. Aucune rétention ou nouveauté mondiale n'est considérée comme démontrée. Aucun essai utilisateur, développement de jeu, inscription, publication, transaction ou prise de contact n'a été effectué pendant cette recherche.

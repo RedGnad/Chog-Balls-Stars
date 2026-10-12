@@ -1,0 +1,90 @@
+{
+ "trait": "Skin",
+ "method": "most over-represented colour per value, see tools/genesis-art/derive_trait_colors.py",
+ "colors": [
+  {
+   "value": "Pink",
+   "hex": "#F372AC",
+   "portraits": 557,
+   "share": 0.059
+  },
+  {
+   "value": "Origin",
+   "hex": "#5C36B1",
+   "portraits": 528,
+   "share": 0.068
+  },
+  {
+   "value": "Red",
+   "hex": "#F30D0D",
+   "portraits": 299,
+   "share": 0.05
+  },
+  {
+   "value": "Black",
+   "hex": "#5E3120",
+   "portraits": 263,
+   "share": 0.091
+  },
+  {
+   "value": "Yellow",
+   "hex": "#F2D21B",
+   "portraits": 246,
+   "chosen_by_eye_instead_of": "#EDE6D6"
+  },
+  {
+   "value": "Blue",
+   "hex": "#22B1ED",
+   "portraits": 13,
+   "share": 0.073
+  },
+  {
+   "value": "White",
+   "hex": "#F4F4F4",
+   "portraits": 11,
+   "share": 0.18
+  },
+  {
+   "value": "Green",
+   "hex": "#3FCE12",
+   "portraits": 8,
+   "share": 0.125
+  },
+  {
+   "value": "Jade",
+   "hex": "#86D4A4",
+   "portraits": 7,
+   "share": 0.095
+  },
+  {
+   "value": "Multi Colored",
+   "hex": "#6AB5F1",
+   "portraits": 7,
+   "share": 0.04
+  },
+  {
+   "value": "Purple",
+   "hex": "#9D81DD",
+   "portraits": 7,
+   "share": 0.182
+  },
+  {
+   "value": "Beige",
+   "hex": "#EDE6D6",
+   "portraits": 6,
+   "share": 0.093
+  },
+  {
+   "value": "Metal",
+   "hex": "#69708D",
+   "portraits": 4,
+   "share": 0.254
+  },
+  {
+   "value": "Grey",
+   "hex": "#989BA4",
+   "portraits": 3,
+   "share": 0.17
+  }
+ ]
+}

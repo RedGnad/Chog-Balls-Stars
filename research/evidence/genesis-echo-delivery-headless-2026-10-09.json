@@ -1,0 +1,40 @@
+{
+  "recorded_on": "2026-10-09",
+  "what": "The rarity of a Genesis changes how its special attack is delivered: an Uncommon Genesis fires it twice (echo). The hero card gets a fourth line for the rarity.",
+  "build": ".artifacts/unity/20261009T102725474Z-41a0c588c39b4a369fc5912e5e271532",
+  "method": "Headless Chrome, muted, touch emulation, through the LAN address on staging port 8084, page options token=408&charged=1&perf=1, 40 s of match after the scripted special; then the build was moved to port 8083.",
+  "collection": {
+    "direct (Common)": 1279,
+    "echo (Uncommon)": 590,
+    "return (Rare Skull)": 60,
+    "persistent-zone (Epic Radioactive)": 30,
+    "inversion (Legendary 1:1)": 10,
+    "source": "content/genesis-roster.json, counted by expression id"
+  },
+  "import": "Roster import summary of the build: '1969 heroes, 3 of 3 roles with a character, 100 signatures authored for 50 pairs of shape and effect, ruleset genesis-0.3.0'.",
+  "combat_log": {
+    "skills_fired": {
+      "GenesisNovaRawEchoSkillData": 6,
+      "GenesisWaveRawEchoSkillData": 2,
+      "GenesisFlashRawEchoSkillData": 2,
+      "GenesisWaveRawSkillData": 2,
+      "GenesisBeamChillSkillData": 2,
+      "GenesisBeamMendSkillData": 1
+    },
+    "pairs": "Every echo skill logged its actions in pairs: gaps of 0.53, 0.55, 1.00, 0.54 and 0.86 s between the two actions of one cast (the browser renders about five frames a second, which stretches some gaps). The direct skills logged one action per cast.",
+    "damage": "7 damage events of 1200, which is 60% of the 2000 of a raw nova. No 1560 event: the echo flash of the player's hero touched nobody in this run.",
+    "console": "No error. Three warnings unrelated to the game (webcam, file system sync, Content-Length)."
+  },
+  "hero_card": {
+    "seen": "Card of CHOG #1869 (token 408): 'OUTFIT : Orange Sleeveless / BRUTE', 'EYES : Modern VR / FLASH', 'AURA : none / RAW', 'RARITY : Uncommon / ECHO fires twice, half a second apart, 60% each'. Four lines fit the card.",
+    "screenshot": "research/evidence/genesis-echo-card-headless-2026-10-09.png"
+  },
+  "tests": "20 Quantum tests pass. 'a Genesis fires the signature of its Eyes and Aura...' now also checks that an Uncommon Genesis gets another special than a Common one with the same Eyes and Aura, and that a delivery without assets falls back to the direct signature. The card test expects the Rarity line.",
+  "limits": [
+    "Three deliveries are not built: return (60 Genesis), persistent-zone (30) and inversion (10) play like a direct hit, and their card says 'not built yet, plays like a direct hit'.",
+    "The 60% share is a first number, not balanced: two hits at 60% are 120% of a direct hit if both land.",
+    "That exactly two actions fire per cast is read from the skill timing code and from the paired log lines of this run; there is no simulation test that steps a skill through its lifetime.",
+    "No Uncommon Genesis has the puddle shape (echo by shape in the roster: wave 296, nova 137, flash 89, beam 68, puddle 0), so the ten echo puddle assets are authored and used by nobody.",
+    "Not measured on the phone."
+  ]
+}

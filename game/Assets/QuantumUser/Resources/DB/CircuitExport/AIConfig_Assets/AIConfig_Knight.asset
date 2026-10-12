@@ -1,0 +1,250 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 747b8dd6c22caee40a367c7f0859ffe3, type: 3}
+  m_Name: AIConfig_Knight
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/DB/CircuitExport/AIConfig_Assets/AIConfig_Knight
+    Guid:
+      Value: 4037367115238235555
+  DefaultConfig:
+    Id:
+      Value: 316556792319883918
+  KeyValuePairs:
+  - Key: AttackErrorBasic
+    Type: 4
+    Value:
+      Integer: 0
+      Boolean: 0
+      Byte: 0
+      FP:
+        RawValue: 0
+      FPVector2:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+      FPVector3:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+        Z:
+          RawValue: 0
+      String: 
+      AssetRef:
+        Id:
+          Value: 0
+  - Key: AttackErrorSpecial
+    Type: 4
+    Value:
+      Integer: 0
+      Boolean: 0
+      Byte: 0
+      FP:
+        RawValue: 0
+      FPVector2:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+      FPVector3:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+        Z:
+          RawValue: 0
+      String: 
+      AssetRef:
+        Id:
+          Value: 0
+  - Key: AttackRange
+    Type: 4
+    Value:
+      Integer: 0
+      Boolean: 0
+      Byte: 0
+      FP:
+        RawValue: 327680
+      FPVector2:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+      FPVector3:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+        Z:
+          RawValue: 0
+      String: 
+      AssetRef:
+        Id:
+          Value: 0
+  - Key: EngagesInCover
+    Type: 2
+    Value:
+      Integer: 0
+      Boolean: 0
+      Byte: 0
+      FP:
+        RawValue: 0
+      FPVector2:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+      FPVector3:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+        Z:
+          RawValue: 0
+      String: 
+      AssetRef:
+        Id:
+          Value: 0
+  - Key: IgnoreLoS
+    Type: 2
+    Value:
+      Integer: 0
+      Boolean: 0
+      Byte: 0
+      FP:
+        RawValue: 0
+      FPVector2:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+      FPVector3:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+        Z:
+          RawValue: 0
+      String: 
+      AssetRef:
+        Id:
+          Value: 0
+  - Key: MaxAttackInterval
+    Type: 4
+    Value:
+      Integer: 0
+      Boolean: 0
+      Byte: 0
+      FP:
+        RawValue: 65536
+      FPVector2:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+      FPVector3:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+        Z:
+          RawValue: 0
+      String: 
+      AssetRef:
+        Id:
+          Value: 0
+  - Key: MinAttackInterval
+    Type: 4
+    Value:
+      Integer: 0
+      Boolean: 0
+      Byte: 0
+      FP:
+        RawValue: 42598
+      FPVector2:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+      FPVector3:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+        Z:
+          RawValue: 0
+      String: 
+      AssetRef:
+        Id:
+          Value: 0
+  - Key: RunDistance
+    Type: 4
+    Value:
+      Integer: 0
+      Boolean: 0
+      Byte: 0
+      FP:
+        RawValue: 131072
+      FPVector2:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+      FPVector3:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+        Z:
+          RawValue: 0
+      String: 
+      AssetRef:
+        Id:
+          Value: 0
+  - Key: ThreatDistance
+    Type: 4
+    Value:
+      Integer: 0
+      Boolean: 0
+      Byte: 0
+      FP:
+        RawValue: 196608
+      FPVector2:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+      FPVector3:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+        Z:
+          RawValue: 0
+      String: 
+      AssetRef:
+        Id:
+          Value: 0
+  SensorsRefs:
+  - Id:
+      Value: 1558216052182201464
+  - Id:
+      Value: 1089473312867171358
+  - Id:
+      Value: 1994395833984680420
+  - Id:
+      Value: 563378210042826053
+  - Id:
+      Value: 3845123262533132745
+  DebugEnabled: 0

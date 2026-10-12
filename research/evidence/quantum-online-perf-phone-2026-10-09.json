@@ -1,0 +1,122 @@
+{
+  "date": "2026-10-09",
+  "candidate": "Quantum 3.0.9 Twin Stick Shooter sample, online menu build (WebGL), untuned session config",
+  "build": {
+    "report": ".artifacts/unity/20261009T025947057Z-912aa5a2ec38420b92878eba2aa16c8a/build-report.json",
+    "unityVersion": "6000.6.4f1",
+    "sizeBytes": 22686453,
+    "errors": 0,
+    "warnings": 38,
+    "flavour": "BuildOptions.None from Chog > Qualification > Build WebGL; Release Quantum DLLs; QUANTUM_LOGLEVEL_DEBUG defined; quality level first recorded as 3 'Good', which was wrong: a later overlay reading shows the WebGL build starts at 0 'Fastest' (see quantum-tuning-runs-phone-2026-10-09.json); target frame rate later read as -1"
+  },
+  "device": {
+    "reportedByOverlay": "1508x560, ANGLE (ARM, Mali-G52 MC2, OpenGL ES 3.2)",
+    "inference": "Mali-G52 MC2 is the GPU of MediaTek Helio G80/G85/G88 class chips; consistent with a Redmi 12C, not proof of the exact model",
+    "browser": "Chrome on Android, version not recorded",
+    "network": "home Wi-Fi, page served from the Mac at 192.168.1.85:8082"
+  },
+  "session": {
+    "mode": "online, joined with ?perf=1; the sample's frame counter read 6408 when the overlay had counted 34 s, so the phone joined a room already running for about 73 s (late join)",
+    "configInForce": "60 Hz, RollbackWindow 60, ChecksumInterval 60 (project asset at the time; the overlay did not yet print the running session config)",
+    "load": "six heroes (humans plus bots), Coin Grab; no minions or towers"
+  },
+  "overlayReadings": [
+    {
+      "screenshot": "quantum-online-perf-phone-034s.jpg",
+      "sessionSeconds": 34,
+      "frames": 1124,
+      "frameMs": {
+        "p50": 24.0,
+        "p95": 47.0,
+        "p99": 91.0,
+        "worst": 528
+      },
+      "over33msPercent": 14.9,
+      "over50msPercent": 4.4,
+      "simulationMs": {
+        "p50": 7.8,
+        "p95": 19.1,
+        "max": 76.5
+      },
+      "predicted": {
+        "average": 5.5,
+        "max": 42
+      },
+      "ping": 72,
+      "inputOffset": 0
+    },
+    {
+      "screenshot": "quantum-online-perf-phone-046s.jpg",
+      "sessionSeconds": 46,
+      "frames": 1331,
+      "frameMs": {
+        "p50": 25.0,
+        "p95": 64.0,
+        "p99": 133.0,
+        "worst": 785
+      },
+      "over33msPercent": 23.7,
+      "over50msPercent": 8.7,
+      "simulationMs": {
+        "p50": 8.2,
+        "p95": 29.0,
+        "max": 108.5
+      },
+      "predicted": {
+        "average": 5.9,
+        "max": 42
+      },
+      "ping": 91,
+      "inputOffset": 0
+    },
+    {
+      "screenshot": "quantum-online-perf-phone-116s.jpg",
+      "sessionSeconds": 116,
+      "frames": 3195,
+      "frameMs": {
+        "p50": 33.0,
+        "p95": 57.0,
+        "p99": 104.0,
+        "worst": 785
+      },
+      "over33msPercent": 46.7,
+      "over50msPercent": 8.7,
+      "simulationMs": {
+        "p50": 12.8,
+        "p95": 26.5,
+        "max": 108.5
+      },
+      "predicted": {
+        "average": 6.9,
+        "max": 42
+      },
+      "ping": 62,
+      "inputOffset": 0
+    }
+  ],
+  "derived": {
+    "averageFramesPerSecond": {
+      "first31SampledSeconds": 36.3,
+      "whole113SampledSeconds": 28.3,
+      "between46sAnd116s": 26.6
+    },
+    "note": "The overlay skips the first 3 s of a session, so sampled seconds are session seconds minus 3. Percentiles cover every sampled frame because fewer than 4096 frames were recorded."
+  },
+  "userReport": "'le jeu etait fluide'",
+  "reading": [
+    "Measured: about 28 frames per second on average over 113 s, median frame 33 ms, 5 percent of frames above 57 ms, one 785 ms stall. The audit's acceptance bar (p95 frame time at or under 33.3 ms) is not met, although the user perceives the game as fluid.",
+    "Measured: Quantum's update takes a median 12.8 ms of each frame at 116 s, with 6.9 predicted ticks re-simulated per frame on average at a ping of 60 to 90 ms.",
+    "Measured trend: median frame time rose from 24 ms to 33 ms and median simulation time from 7.8 ms to 12.8 ms between 34 s and 116 s. Cause not attributed (more active entities, thermal throttling, or longer frames carrying more ticks)."
+  ],
+  "notAttributed": [
+    "Share of the frame spent outside the simulation (rendering, scripts, browser): this overlay version did not measure main-thread busy time.",
+    "Cause of the stalls above 100 ms (candidates: first-use shader compilation, WebAssembly heap growth from 32 MB, garbage collection, view instantiation, checksum computation every 60 ticks).",
+    "Whether the frame loop was paced by requestAnimationFrame or by a timer (target frame rate not displayed)."
+  ],
+  "nextTest": "Rebuild with the extended overlay, then run solo on the phone as room creator with URL overrides: baseline, checksum=0, hz=30, fps=-1, quality=1; compare readings at the same session time.",
+  "screenshotHashes": {
+    "quantum-online-perf-phone-034s.jpg": "20a554d04aeee8f3ff0f84c2758ff4f20adb1a6c49b036ee31e7210e4c130def",
+    "quantum-online-perf-phone-046s.jpg": "b5810fe28aed7ba1ea080e51f5f1f8d5b67288d9c6c37495f15918f50841ce86",
+    "quantum-online-perf-phone-116s.jpg": "febfffb5e76178149f2ad668567a9c74e32619af743905bffbfbd557e29f8c95"
+  }
+}

@@ -1,0 +1,30 @@
+﻿component Bot
+{
+	// Defines if the entity's input will be polled from this component
+	Boolean IsActive;
+	
+	// A local copy of the input structure so we can mirror what the playable characters have
+	[HideInInspector] QuantumDemoInputTopDown Input;
+	
+	// The asset used by this Bot
+	AssetRef<HFSMRoot> HFSMRoot;
+	AssetRef<AIBlackboardInitializer> BlackboardInitializer;
+	AssetRef<AIConfigBase> AIConfig;
+	AssetRef<NavMeshAgentConfig> NavMeshAgentConfig;
+
+	// What is the current tactic that this Bot decided to use
+	ETactics CurrentTactic;
+
+	// For how many time will this bot commit to that tactic until it considers changing to something else
+	FP TacticalCommitment;
+}
+
+component EscapeRoute
+{
+	Int32 TeamId;
+}
+
+global
+{
+	FP TimeToFillWithBots;
+}

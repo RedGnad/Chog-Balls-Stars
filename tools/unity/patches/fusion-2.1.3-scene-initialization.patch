@@ -1,0 +1,13 @@
+--- a/Assets/Photon/Fusion/Runtime/NetworkSceneManagerDefault.cs
++++ b/Assets/Photon/Fusion/Runtime/NetworkSceneManagerDefault.cs
+@@ -95,6 +95,10 @@
+     /// </summary>
+     /// <param name="runner"></param>
+     public virtual void Initialize(NetworkRunner runner) {
++      // CHOG: tolerate missed SubsystemRegistration during Editor reloads.
++      if (_allOwnedScenes == null) {
++        ClearStatics();
++      }
+       Log.TraceSceneManager(runner, $"Initialize with {runner}");
+       
+ #if FUSION_ENABLE_ADDRESSABLES && !FUSION_DISABLE_ADDRESSABLES

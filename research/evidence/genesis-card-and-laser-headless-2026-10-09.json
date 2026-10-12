@@ -1,0 +1,24 @@
+{
+  "recorded_on": "2026-10-09",
+  "what": "The hero card that says what each trait of a Genesis gives, and the beam redrawn as the laser of the caster's own eyes.",
+  "build": ".artifacts/unity/20261009T092943600Z-9503815438a947348d06a72eb07203b0",
+  "method": "Headless Chrome with touch emulation through the LAN address, staging port 8084; then the build was moved to port 8083.",
+  "hero_card": {
+    "seen": "On the preparation screen the three class buttons are replaced by a card: the portrait, 'CHOG #1287', then 'OUTFIT : none' and 'BRUTE tough, fights up close', 'EYES : Anime Glass' and 'FLASH a burst right in front of you', 'AURA : Clean' and 'PURIFY drains the target's attack energy'.",
+    "screenshot": "research/evidence/genesis-hero-card-headless-2026-10-09.png (first layout; the card was then made a little taller with larger trait lines, not re-captured)",
+    "data": "content/genesis-roster.json now carries the Body, Eyes and Aura values of every Genesis (97, 59 and 23 distinct values, position 0 for an absent trait); the sentences are authored next to the numbers in the two Editor importers.",
+    "test": "Quantum test 'the hero card names each trait of a Genesis and what it gives': token 1795 (no Body, Anime Glass, Clean), the 1:1 Halo reads 'one of one', an absent trait reads 'none'. 20 Quantum tests pass."
+  },
+  "laser": {
+    "reference": "Portraits of six laser-eyed Genesis (metadata 1467, 1479, 1494, 1535, 1508, 1507): two thick straight beams, one per eye, each a dark outline, a flat colour and a lighter core; green, purple, cyan, and red-orange-yellow for the fire laser.",
+    "built": "GenesisBeam draws two beams of three line renderers each from the hero's head to the head of the attack, in the colours authored for the caster's Eyes value (four laser values), holds them 0.3 s after the attack ends and thins them out. The beam attack now travels 33 units per second for 0.34 s.",
+    "seen": "First frame of the fire laser of CHOG #1494 (token 33): two short parallel beams above the hero, red outline, orange, yellow core.",
+    "screenshot": "research/evidence/genesis-laser-fire-headless-2026-10-09.png",
+    "not_seen": "The beam at full length, and the green, purple and cyan variants: the automated browser renders about five frames a second and caught only the first frame."
+  },
+  "limits": [
+    "Only the lasers are drawn from the art so far. Flash, wave, nova and puddle still use generic effects that do not come from the Genesis eyes.",
+    "The card is only on the preparation screen and only for the local player; the phone has not shown it yet.",
+    "No console error in these runs; no performance measurement of this build on the phone yet."
+  ]
+}

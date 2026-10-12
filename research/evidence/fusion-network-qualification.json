@@ -1,0 +1,46 @@
+{
+  "recordedAtUtc": "2026-10-08T04:29:26.3591290Z",
+  "unityVersion": "6000.6.4f1",
+  "sdk": "Fusion 2.1.3 build 2390",
+  "result": "Passed",
+  "error": "",
+  "room": "chog-qual-da25d5e62c60",
+  "scenario": "One GameMode.Server and two independent GameMode.Client runners in one headless Unity Editor process; real Photon session, separate physics scenes; not a browser/phone test.",
+  "passedChecks": [
+    "Real Photon room: dedicated server plus two clients, no server player slot, isolated peer physics scenes.",
+    "Server owns authoritative heroes; clients own only their own input.",
+    "Client input moves the server hero; other client converges to the same position.",
+    "Server creates projectile and applies hit; both clients receive authoritative damage.",
+    "Leaving client removes its hero on server and remaining client.",
+    "New client can join the same surviving server session after disconnect (fresh join, not authenticated resume)."
+  ],
+  "authoritativeMovementDistance": 4.0210280418396,
+  "authoritativeShots": 2,
+  "authoritativeReceivedHits": 1,
+  "log": ".artifacts/fusion/network-qualification.log",
+  "source_sha256": {
+    "game-fusion/Assets/Chog/Arena/ArenaInput.cs": "b9429b202b35fce6cf1ff5e61da18bc45c572c7a3ee25b6d00676c41e614862e",
+    "game-fusion/Assets/Chog/Arena/ArenaSession.cs": "12a23e89dea0b0b7d9fdcbe8157854a0a148221ad966f0af84c570829406c939",
+    "game-fusion/Assets/Chog/Arena/ArenaHero.cs": "42e24240f66e13d411ef16e3f8f851dd083c43d7c89ef869db3fa0ede50ce84e",
+    "game-fusion/Assets/Chog/Arena/ArenaProjectile.cs": "b40b0f5b6c5d45f0bbfcf6a22dae2c61bba8797a487400a452f4aeeae2551454",
+    "game-fusion/Assets/Chog/Arena/ArenaControls.cs": "d010d71165df71cc1561e46e11d8925d274fff333f66f82c05f6b01aa5ce1522",
+    "game-fusion/Assets/Chog/Arena/ArenaTouchStick.cs": "3b47df8e06b1e2f537ab5d77d1c829c47aec73be42039ee1b8728324d594104c",
+    "game-fusion/Assets/Chog/Arena/ArenaHud.cs": "bc90c438e4144de066298a17b1756d97e3131f46b6b4d603ccc4917a6f80f144",
+    "game-fusion/Assets/Chog/Editor/FusionNetworkQualification.cs": "1806c4dfd7ab768a35453cdb90825e8c7909de031f53a49f239d15db855e7edd",
+    "game-fusion/Assets/Photon/Fusion/Runtime/NetworkSceneManagerDefault.cs": "c73c0d026fa432b178a21df3fb94d9cfe3b0aa14afe9322921ff942157f972f1"
+  },
+  "limitations": [
+    "One headless Unity Editor process, three independent network peers; not separate device processes.",
+    "This network scenario does not test WebGL or a phone; separate WebGL offline checks were recorded later in fusion-webgl-qualification.json.",
+    "Fresh join after disconnect, not authenticated resume or NFT lease recovery.",
+    "Demo heroes only; Genesis admission, class abilities and CHOG purchases not wired.",
+    "No 100 CCU load test or proof of plan activation."
+  ],
+  "presentation_followup": {
+    "file": "game-fusion/Assets/Chog/Arena/ArenaHud.cs",
+    "sha256": "eabaf4f8c7d8ab63ee0a95bd0d101cdaf7df9a3283f18b75753f54631fe885b9",
+    "change": "Show touch pads in offline Single training as well as network Client; still hide them for dedicated Server.",
+    "scope": "source_sha256 retains hashes of the original network-tested build. Only this HUD source subsequently changed; authoritative movement/projectile/session code unchanged.",
+    "validation": "Recompiled in successful WebGL build; offline training and simultaneous move/fire observed using Chrome emulated touch. See fusion-webgl-qualification.json."
+  }
+}

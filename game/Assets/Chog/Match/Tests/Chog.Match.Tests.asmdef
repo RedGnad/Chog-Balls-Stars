@@ -1,0 +1,7 @@
+{
+  "name": "Chog.Match.Tests",
+  "references": ["Chog.Match", "Quantum.Simulation"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

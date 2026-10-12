@@ -1,0 +1,1370 @@
+# État courant et décisions
+
+**Since 12 October 2026, 01:36, the game has a public https address** through a tunnel from
+the development Mac, allowed by the user that night: the same program a host would start
+(`server/src/host.js` on the assembled `site/`, with the judge), reachable while this Mac and
+the tunnel run; the address is drawn at random at each start of the tunnel
+([docs/DEPLOY.md](DEPLOY.md), "A public address from this Mac", gives the commands and the
+limits). Seen through it: the page, the build, the portraits, the services, and one run from
+the menu into a match in the headless browser as a recruit. Not seen: a phone, a real
+wallet, Photon calling in. The user confirmed D34 and D35 that night ("je suis tes reco si
+elles sont pertinentes pour un produit qui va au market sur le long terme"), asked whether
+the game could be deployed on GitHub Pages (no: it runs nothing, see DEPLOY.md), said they
+had not understood what to do in Photon's dashboard (explained step by step in the chat, and
+offered to be done for them in their browser), found the Chog body "pas mal" but improvable,
+and asked whether the wallet on a phone is ready to test and whether Reown is still the
+reference. **Written that night, entries of 12 October below:** the wallet connection that
+stays in the phone's own browser (Reown AppKit loaded by the page on request; the user gave
+a project id, and the window lists real wallets through the public address); a tower and a
+core for each team, with the match ended by a fallen core; a body drawn after the official
+Chog (slim, pink mittens and feet); and the container for a host (Dockerfile, never built).
+**Waiting on the user:** two pastes of the secret in Photon's dashboard (both forms are
+filled and open in their browser); a try of CONNECT WALLET on their phone through the public
+address, since nothing after the pick of a wallet was ever run; their word on the body; and
+their go to create a private repository, from which Render builds.
+**Next action (dev):** see a core fall in a real match (only tests and a forced replay show
+the match ending that way; the towers' hits are counted in real matches, their laser was
+never seen on a picture), then let the bots attack and defend the structures, and tune the
+numbers by play.
+
+**Where things stood, 11 October 2026, 15:00.** The secured version asked for
+on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
+and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a
+guest with a pass, a visitor), receive its eleven webhooks, let a player into a match with a
+Genesis only when its wallet holds or rents it or its pass lends it (anything else enters as a
+recruit), keep the input of every tick as Photon's server records it, **play the match again
+outside the game and read who won from the simulation itself**, and sign that result for the
+wager contract; a player stakes $CHOG on its own team with a ticket the referee signs, the
+stakes are locked before the match begins, and any doubt calls the match off, which gives
+every stake back. **What was seen run:** a match played by two browser pages in opposite teams
+on Photon's Public Cloud was replayed outside the game (5,448 ticks in under a second, same
+winner as the game announced), and a rehearsal on a local copy of Monad ran the whole staked
+match with that record: two wallets stake 25 $CHOG each, the winner ends with +22.5, the loser
+with -25, 2.5 are burned; three ways of cheating all end with every stake given back
+([evidence](../research/evidence/staked-match-rehearsal-2026-10-11.txt)). **What is not
+there:** in that rehearsal Photon's cloud is played by a script that sends what Photon's manual
+describes; Photon itself has never called these services, because they have no public address
+and its dashboard is not set up (two things only the user can do or allow: see
+[docs/DEPLOY.md](DEPLOY.md), "Photon"). **Since 15:25 the game has its staking screens**
+(entry of 15:30): on the Team Preparation screen a signed-in player stakes $CHOG on its team,
+the stakes are locked at START, and back on the menu a strip says what became of the stake
+and offers to claim it. Seen in the headless browser with two test wallets on the local copy
+of the chain: both stake 10, the winner's menu ends on "YOUR TEAM WON: +9 $CHOG, PAID"
+(10,009 against 9,990 on the copy). No contract is deployed, so none of this shows anywhere
+but on the test bench. Decisions taken alone on 11 October: D34 and D35, confirmed by the
+user on 12 October.
+**Next action (the user):** ten minutes in Photon's dashboard with the values of
+`docs/DEPLOY.md` (the tunnel was allowed and opened on 12 October).
+Since 15:28 every Genesis hero wears a Chog body made by a Blender script (round, big
+fists, spikes on the back) in place of the sample's knight, archer or wizard: seen in a
+headless match, not on a phone.
+**Next action (dev):** a tower and a core on the current map. Looked at on 11 October,
+nothing written yet: the map (`Map1`) is one lane, team 0 spawns at y = -14 and team 1 at
+y = +16 (x = -3, 0, 3), the objective points are around the centre
+(`python3 tools/quantum/list_map_points.py <quantum-db.json> [x,y radius]` lists them and the
+colliders near a spot); an existing attack hurts anything that has `Health` and `TeamInfo`
+(`AttackData.CanAffect`), so a structure with those, `Attributes` and a collider on the
+character layer is hit by every attack as it is; `HealthSystem` assumes a character when
+health reaches zero (it drops coins, hides and respawns) and must leave structures to their
+own system; the winner is decided in `TriggerQuantumEvent` from the scores alone, and the
+judge's draw rule (`server/src/judge.js`) reads the scores too: both must learn that a
+destroyed core ends the match for the other team.
+
+**Before that, 10 October 2026, 07:45.** A player can connect the
+wallet of the browser, see the Genesis it holds (read on Monad), pick one, play a 3v3 match as
+that hero, sign in, have the career of that Genesis recorded, and lend it with a link that a
+guest opens to play it without a wallet; a player without a Genesis and without such a link
+plays a weaker recruit. A Genesis earns mastery by playing, and at mastery 2 it may play a
+second form of its attack, chosen on the menu. Three things are paid in $CHOG and **none is
+live, because no contract is deployed**: the second form bought at once, and, since 10 October,
+a holder offering a Genesis for rent at a price a day and any wallet renting one (the holder is
+paid, a share is burned, the Genesis never moves); all three were rehearsed on a local copy of
+the chain only. Every special attack and its marks on the targets are drawn from the traits
+(eyes, aura, rarity). In a match a hero is a body under the image of its Genesis: until
+10 October the image hid the whole body (the user's report from the phone, "the heroes are
+invisible"). A light web page shows any Genesis as its hero card. All of this runs on the
+development Mac only (`http://192.168.1.85:8083/`, with `node server/src/local.js` running)
+and was checked in an automated browser with a stand-in wallet. **The user played it on the
+phone on 10 October (about 30 images a second, "rather fluid"); no real wallet and no public
+address yet.** The decisions the dev agent took alone are D21 to D30 in the decision log, to
+be confirmed; D31 (the rental and its terms) and D32 (the game's page and the wallet path on
+a phone) were settled with the user on 10 October. A first census of the field (eight public repositories out of 311 applications,
+read in their code) found no other real-time game, four entries already live at a public
+address and one that burns real $CHOG
+([census](../research/reports/chogathon-field-census-2026-10-09.md)). How the game should be
+opened on a phone was researched on 10 October
+([report](../research/reports/mobile-presentation-2026-10-10.md)): stay a web page opened by a
+link, full screen on the first tap on Android, installation offered and never required, and a
+second way to connect a wallet, because the wallets' own browsers are locked to portrait.
+Since 04:15 the game is served in its own page (whole screen on its side at the first touch,
+a load that fails starts again by itself); the user saw it on the phone at 04:30: the whole
+screen is used and the bodies read.
+**Order set by the user at 06:20, raised at 07:40 (D33):** the secured version of the game
+and staking $CHOG on a match come first, then the match itself (a tower and a core), then the
+look of the heroes; the Reown project id and the deployments are the user's to do. The
+secured version needs a public address at once (Photon's servers call our services), which
+the user had put off: a tunnel from this Mac gives one in minutes, on their yes.
+**Next action (the user):** ask the Chog team for the layer files of the collection (one
+see-through picture per trait value); the Chog body model; the Reown project id.
+**Next action (dev):** the cut-out heads are in the game for the 1,277 Genesis that look
+right (entry of 07:00); next the 692 others, then the colours of the clothing on the body. `sh tools/release/check_all.sh` runs every
+check that needs no Editor.
+
+Mise à jour : 9 octobre 2026 (dev agent takeover, 02:45). **Décision de développement réexaminée : Unity + Quantum 3
+dans `game/` pour le MOBA Genesis.** [Raisonnement, coûts et travail borné](DECISION-RESEAU-REVUE.md).
+La partie locale avec bots a été construite en WebGL et lancée dans Chrome. L'utilisateur
+rapporte qu'elle fonctionne sur son Redmi 11C, « assez fluide » avec un peu de lag sur ce
+téléphone peu performant ; aucune cadence d'image n'a été mesurée. **On 9 October the user
+played the first online Quantum match between the Mac Editor and the phone (2 humans,
+4 bots, party code): fluid and playable by their report, not measured.** Result
+validation remains to do. Le candidat Fusion Server,
+précédemment validé, est conservé dans `game-fusion/` comme preuve et repli, sans nouveau
+contenu de jeu en parallèle.
+
+**Preuve du candidat Fusion antérieur :** Fusion **2.1.3 build 2390**, Unity **6000.6.4f1 arm64**,
+Mono.Cecil **1.10.2**. La première tranche Archer du sample est portée dans Fusion :
+volée de sept tirs au relâchement, projectile spécial et zone à impulsions, ressources,
+visée/aperçu, modèle animé, sons, caméra, HUD et bot d'entraînement. Le bot attend un
+premier impact puis laisse cinq secondes avant de riposter. Huit contrôles réseau passent
+via Photon avec un serveur sans joueur local et deux clients dans **un même processus Unity**
+avec physiques séparées. [Preuve Archer, captures et empreintes](../research/evidence/fusion-archer-slice.json).
+
+Les contrôles valident connexion/scènes, autorité, mouvement, dégâts répliqués,
+volée exacte sans double cast, zone spéciale, départ/despawn et nouvel arrivant.
+Ils ne démontrent pas une reprise authentifiée du héros initial, un serveur Linux déployé
+ou 100 CCU. Le build WebGL Archer réussit (~12,9 Mo) et l'entraînement fonctionne dans
+Chrome 155 avec souris/clavier ou deux contacts tactiles émulés. Les captures montrent
+volée, zone et direction de visée. Il ne s'agit pas d'un essai Redmi 11C ou d'une mesure
+de performance mobile. Multijoueur navigateur, pause/reprise et téléphone restent ouverts.
+Genesis, classes/capacités supplémentaires, objectifs MOBA, carrière et $CHOG restent à
+intégrer. Le catalogue C# est référencé par package local ; les héros sont des démos.
+
+Le retour utilisateur sur le meilleur ressenti du sample Quantum a motivé ce portage ciblé.
+La comparaison sur le même appareil et les essais joueurs restent à faire ; aucune parité
+globale au sample n'est revendiquée. [Inspection des sources](../research/evidence/quantum-to-fusion-reuse-inspection.json)
+et [frontière du portage](ARCHITECTURE.md#31-reprendre-lexpérience-du-twin-stick-shooter).
+
+Le 8 octobre, l'utilisateur a signalé « Render process gone: crashed (10) » sur
+`http://127.0.0.1:8080/`. Le serveur local répond encore **HTTP 200** et le build Archer
+se charge dans un nouveau Chrome 155 automatisé (entraînement, 62 événements, aucune
+erreur console). Ces observations ne déterminent pas la cause du crash du processus de
+rendu signalé, ni le comportement du navigateur intégré ou du Redmi 11C. Prochain
+diagnostic : ouvrir la même URL dans Chrome autonome, puis relever le contexte et les
+journaux du processus qui plante si l'erreur s'y reproduit.
+
+**Preuve du choix Quantum :** le coût du portage Fusion ne suffit pas à décider. Le sample Quantum local a maintenant produit un build WebGL de la
+scène Gameplay avec bots sous Unity 6000.6.4f1 : 22 193 639 octets, zéro erreur de build.
+Chrome headless a affiché le menu des trois héros puis une partie après Start ; aucune
+exception ni erreur console observée dans ce parcours. [Preuve et limites](../research/evidence/quantum-webgl-local-2026-10-08.json).
+Cela établit une base web jouable sur Mac et un premier essai positif sur Redmi, **pas** les performances mesurées sur Redmi, le réseau
+Quantum, les résultats authentifiés ni les licences de distribution. Quantum est la base
+de développement ; un échec mobile attribué à sa simulation impose un réexamen avant
+d'étendre le contenu. Les achats et résultats ne sont pas déclarés sécurisés par ce test.
+
+L'utilisateur accepte **100 connexions Photon simultanées pour le MVP**. L'application PUN2
+chogtanks conserve son AppId et son forfait. Aucune modification de compte/forfait ; activation
+et éligibilité du Free 100 CCU non vérifiées. [Décision et coûts](DECISION-RESEAU.md).
+
+L'AppID fourni est appliqué dans le vrai `PhotonAppSettings.asset`, version `chog-p0-fusion-1`,
+région `eu`. [`config/photon-fusion.json`](../config/photon-fusion.json) alimente l'outil
+Editor de préparation ; il n'est pas relu pendant un match. La connexion cloud a été testée.
+L'archive locale fournie par l'utilisateur a levé le blocage d'acquisition : **542 fichiers
+importés avec leurs GUID**, empreintes conservées. [Relevé SDK](../research/evidence/fusion-sdk-qualification.json).
+Un correctif initialise le registre de scènes s'il est nul au démarrage ; le cas a été
+observé après le vrai `Start` Unity en qualification sans rendu. [Patch ciblé à revoir au
+prochain SDK](../tools/unity/patches/fusion-2.1.3-scene-initialization.patch). Les 20 autres
+fichiers fournisseur modifiés sont des métadonnées d'import d'images.
+
+Lire [PLAN.md](PLAN.md), puis [l'architecture Quantum active](ARCHITECTURE-QUANTUM.md).
+Les sections d'architecture décrivent la cible ; elles ne constituent pas une preuve de livraison.
+
+## Prochaine étape
+
+L'utilisateur a créé l'**AppID Quantum 3** `625f17f2-5dc8-4bfe-a3cb-59c34ce730dc` ; il est
+renseigné dans `game/Assets/QuantumUser/Resources/PhotonServerSettings.asset`. Contrôle
+statique réussi : identifiant valide, menu et Gameplay présents dans le build, menu utilisant
+ce réglage global. Aucun autre AppID local n'a été modifié ; le forfait de la nouvelle app
+n'a pas été consulté. La compilation WebGL réseau lancée en batch le 9 octobre a été
+interrompue avant la méthode de build : le client de licence Unity n'a pas réussi à
+s'initialiser (délai de 60 puis 75 s), même après relance avec accès système.
+[Journal](../.artifacts/unity/quantum-online-appid-build.log).
+L'utilisateur rapporte que le parcours proposé dans le menu Quantum fonctionne dans
+l'éditeur (création de salon). Ce retour confirme un premier usage du menu, sans journal
+de connexion examiné ici. Le build WebGL réseau demandé ensuite a réussi sous Unity
+6000.6.4f1 : deux scènes, zéro erreur, 32 avertissements, 22 684 934 octets. Le nouveau
+build est servi sur `http://192.168.1.85:8082/` tant que l'adresse Wi-Fi et le serveur
+local restent actifs. Un Chrome isolé sur le Mac a ouvert le menu, créé un salon, affiché
+Team Preparation avec un ping, puis lancé la partie à bots. Aucune exception de jeu n'a été
+observée dans ce parcours. [Preuve et limites](../research/evidence/quantum-online-webgl-2026-10-09.json).
+
+**First two-device online match, 9 October (user report):** the Editor on the Mac created
+a party room, the phone joined it with the session code from the build on port 8082, and
+two humans plus four bots played. The user reports it fluid and playable. Quick Play did
+not pair the two clients pressed a few seconds apart; the code shows Quick Play lets each
+client pick its best region by ping while the party code carries the region, so a region
+split is the most likely cause, not attributed for lack of logs. Nothing was measured, no
+reconnection was tried (PlayerTTL is 0), and there were no minions or towers.
+[Evidence and limits](../research/evidence/quantum-online-two-devices-2026-10-09.json).
+
+**First measured phone run, 9 October 05:05:** the overlay (`game/Assets/Chog/Diagnostics/`,
+off by default, `?perf=1`) ran in the WebGL build on the user's phone, online, six heroes,
+60 Hz, untuned build. GPU string: Mali-G52 MC2, a Helio G85 class chip, consistent with a
+Redmi 12C. Over 113 sampled seconds: **about 28 frames per second on average, median frame
+33 ms, p95 57 ms, p99 104 ms, worst 785 ms; Quantum update median 12.8 ms per frame with 6.9
+predicted ticks on average.** The user finds it fluid, but the audit's bar (p95 at or under
+33.3 ms) is **not met**, with no minion or tower yet. Frame and simulation times rose during the
+run, cause not attributed.
+[Readings, screenshots and limits](../research/evidence/quantum-online-perf-phone-2026-10-09.json).
+
+**Overlay extended, 9 October 05:30 (compiled and unit-tested, not yet run on device):** it now
+shows main-thread busy time and the non-simulation share, frames under 20 ms / over 40 ms /
+over 100 ms, the running session's rate, rollback window and checksum interval, the target
+frame rate, the quality level and the managed heap. With `?perf=1`, URL parameters override
+test settings without a rebuild: `hz`, `rollback`, `checksum` (session config, effective only
+when this client creates the room), `fps` (`-1` lets the browser pace frames) and `quality`
+(Unity quality index; the WebGL build starts at 0 "Fastest", see the A/B result below). 21 sampling tests pass
+headless.
+
+**Five baseline repetitions, 9 October 05:24 to 05:36:** the user ran the five tuning URLs
+solo on the phone, but no new build had been made, so the overrides were ignored and all five
+runs used 60 Hz, checksums on and the default quality, later read as "Fastest". They form a repeatability baseline: median
+frame 36 to 41 ms (about 24 to 27 fps), p95 54 to 62 ms, Quantum update median 14 to 16 ms,
+with a drift of 10 to 15 percent across the series.
+[Readings and proof](../research/evidence/quantum-baseline-repeat-phone-2026-10-09.json).
+
+**Builds no longer need the menus, 9 October 05:40:** `Assets/Chog/Editor/BuildRequestWatcher.cs`
+makes the open Editor build WebGL when the file `.artifacts/unity/webgl-build-request` appears
+(it refreshes assets first, skips Play Mode, and writes `webgl-build-status.json`).
+`tools/unity/serve_webgl.py --latest` now follows the newest finished build without a restart.
+Verified once: the request written at 05:40 started a build at 05:41 after the Editor was
+brought to the front.
+That build (`20261009T034106742Z`, 296 s, 0 errors) was then checked end to end in headless
+Chrome on the Mac with `?perf=1&checksum=0&hz=30&fps=-1&quality=1`: the console logged the
+override request, a party match started, and the overlay read `quality 1 Fast` and
+`session 30 Hz  rollback 60  checksum 0  target fps -1`, with the sample's frame counter at
+about 29 ticks per second.
+[Screenshot](../research/evidence/perf-overlay-overrides-headless-2026-10-09.png), SHA-256 `7263c0e16a649a14...`.
+Headless Chrome renders in software, so its frame times say nothing about the phone.
+
+**First tuned run, 9 October 05:54:** with `?perf=1&checksum=0&hz=30&fps=-1&quality=1` the
+phone reads median frame 30 ms (about 32 fps against 24 to 27 untuned), Quantum update median
+8.1 ms (against 14 to 16), 2.9 predicted ticks (against 7.2 to 7.8). The simulation gain comes
+from 30 Hz. New fact: non-simulation main-thread work is a median 17.7 ms even at quality Fast,
+so this phone is now bounded by rendering and view code and a steady 30 fps is the realistic
+target. Tick-counted timings to convert before switching the project to 30 Hz: sensor
+`TickRate` values (1, 10, 30), `TICK_INTERVAL` of the AI director and the `FindCoverSpot`
+interval; everything else uses delta time.
+[Readings](../research/evidence/quantum-tuning-runs-phone-2026-10-09.json).
+
+**A/B on the phone, 9 October 05:54 to 06:00, same build, three runs:** 30 Hz with checksums
+off gives about 32 fps, median frame 30 to 31 ms, 12 to 14 percent of frames over 40 ms and a
+Quantum update of 8 ms; untuned gives 26 fps, 37 ms, 36.5 percent and 15 ms. Non-simulation
+main-thread work is 17 to 18 ms in both. Two corrections from the overlay: frames were already
+browser-paced (target frame rate -1), and the WebGL build starts at quality **0 "Fastest"**,
+not "Good" as written earlier from the project file; there is no per-platform default for
+WebGL. So no rendering setting is left to lower on this phone, a steady 30 fps is the target
+there, and stronger devices currently get a flatter picture than they could.
+
+**Applied, 9 October 06:05:** `SessionConfig.asset` is now 30 Hz with `ChecksumInterval` 0
+(rollback window left at 60 as tested). Bot timings that counted ticks go through
+`Quantum.TickIntervals` (AI director interval, tactics sensor rate, cover-spot interval), so
+bots keep the same real-time pace. Verified: the full simulation assembly compiles with
+Unity's own compiler arguments, and `python3 tools/quantum/headless.py test --dotnet
+<Unity>/Contents/Resources/Scripting/DotNetSdk/dotnet` passes 27 catalog and 15 Quantum
+tests, one of them new for the tick conversion. To check determinism while writing simulation
+code, turn checksums back on for a session with `?perf=1&checksum=60` (room creator) or in the
+asset.
+
+**30 Hz build verified, 9 October 06:14:** build `20261009T040520862Z` (0 errors) is served on
+port 8083. In headless Chrome with `?perf=1` and no override the overlay reads `session 30 Hz`,
+`checksum 0`, and a party match ran 95 s with bots scoring. A first run right after the build
+hit `ClientTimeout` while the Mac's load average was about 80 and that Chrome stalled 8.4 s;
+the rerun was clean. The user reports the game felt fluid at 30 Hz.
+[Screenshot](../research/evidence/perf-30hz-default-build-headless-2026-10-09.png).
+
+**Quality per device, 9 October 06:45 (user request):** `Assets/Chog/Presentation/` picks the
+first-run quality level by device class, "Good" on desktop and "Fast" on mobile, unless the
+sample menu already stored a level (settings screen, gear icon, Graphics Quality). Verified in
+build `20261009T042612611Z` with headless Chrome: a desktop profile reads `quality 3 Good`
+with shadows on screen, an emulated phone reads `quality 1 Fast`
+([desktop](../research/evidence/quality-default-desktop-good-2026-10-09.png),
+[phone](../research/evidence/quality-default-mobile-fast-2026-10-09.png)); 3 unit tests pass
+headless. Limit: strong phones also start at "Fast"; none has been measured.
+
+**NFT differentiation, direction given by the user on 9 October:** go. Proposal on the table:
+(1) the NFT picture is the hero sheet, one visible trait deciding one thing (Body the class,
+Eyes the signature shape, Aura its effect, Tier its delivery, Skin and Background the colours);
+(2) the living collection: the 1,969 Genesis are the only cast, bots are real Genesis with
+their own name, traits and kit, and each token keeps one public career. The user holds one
+Genesis, **token 1795 = CHOG #1287** (no Body, Eyes Anime Glass, Aura Clean, Common, Skin Red;
+[on-chain read and metadata](../research/evidence/user-genesis-1795.json)); other characters
+come from public metadata. Working assumption for the first playable: two buttons, the class
+attack and the Genesis signature in the existing special slot; a third slot later if tests ask
+for it. In progress: a scan of every token for metadata id and owner
+(`research/scripts/scan_genesis_bindings.py`) and the fetch of the remaining metadata
+(302 of 1,969 recorded at the start). Not built yet: kits from traits, bots as Genesis, careers.
+The field was first surveyed on 9 October after 17:00 Paris: see
+[the census](../research/reports/chogathon-field-census-2026-10-09.md).
+
+**Catalog extended to the known collection, 9 October 07:30:** ruleset `genesis-0.2.0`
+(schema 2) separates the signature into a shape decided by Eyes and an effect decided by Aura;
+Body alone decides the class and Head is cosmetic. Tables cover every value seen in the 552
+Genesis recorded so far (87 Body, 44 Eyes, 21 Aura entries, absent values included). Verified:
+`python3 tools/hero-catalog/run.py coverage` resolves 552 of 552 with the real resolver, none
+rejected, 160 distinct kits, classes 34/38/28 percent; 30 catalog tests and 15 Quantum tests
+pass headless. The user's CHOG #1287 resolves to brute, flash, purify, direct.
+[Catalog notes](../content/README.md),
+[coverage](../research/evidence/genesis-catalog-coverage-2026-10-09.json).
+Collection scan at block 111801894: 1,969 tokens, ids 1 to 1969, 1,011 owner addresses
+([bindings](../research/evidence/genesis-bindings-2026-10-09.json)). Metadata: 552 of 1,969; the
+public gateways rate-limit, so `research/scripts/fetch_genesis_metadata_patient.py` keeps
+completing the rest across four gateways. **Not built yet:** the signatures themselves. The
+sample's attack classes already provide the five shapes as data (projectile, moving overlap that
+hits each target once, lobbed zone, area with interval), so the next step is an attack-data
+override in `SkillData`, an Editor generator for skill and attack assets, and the loadout
+selection in a real match.
+
+**Version control (user decision, 9 October):** no repository yet; commits start on
+10 October. Until then, source snapshots are kept under `.artifacts/snapshots/`.
+
+**User feedback, 9 October (applies to every report):** the percentage table of the catalog
+was not understood and looked like simulation. Report against what a player can actually see
+and play; each block of work ends with something playable.
+
+**A Genesis enters a real match, 9 October 08:00:** with `?token=1795` in the URL, the player
+enters an online match as CHOG #1287. Implemented: roster generated by the real resolver
+(`content/genesis-roster.json`, 553 Genesis), imported into the `GenesisRoster` simulation
+asset before each requested build; `GenesisHero` component on every Genesis character; class
+locked to the one the Body trait gives; bots drawn from the roster without repeats; Genesis
+name above the character and on the selection screen. Verified in headless Chrome on the
+online build: selection screen shows only the Knight and "CHOG #1287 - Knight", the match
+labels the player "CHOG #1287" and a bot "CHOG #313"; 30 catalog tests and 18 Quantum tests
+pass. **Not verified:** the phone, two devices, and more than one bot label on screen.
+**Not built:** wallet connection and ownership check (the token id is typed by hand, anyone can
+type any id), signatures (shape, effect and expression are carried but change nothing in
+combat), Genesis art on the character. A first build silently fell back to the sample cast
+because Quantum registers new assets late; the import now verifies the registration and fails
+the build otherwise. [Evidence](../research/evidence/genesis-entry-headless-2026-10-09.json),
+[how to use](../game/README.md).
+
+**The whole collection is playable, 9 October 09:00:** metadata recorded for all 1,969 Genesis
+(through `ipfs2.seadn.io`, whose bytes match the other gateways), catalog raised to ruleset
+`genesis-0.3.0` (25 late trait values placed with their families, six more 1:1 heroes authored
+from their picture), `coverage` resolves 1,969 of 1,969 into 237 kits, roster regenerated and
+imported (build status: "1969 heroes, 3 of 3 roles with a character"). Verified in headless
+Chrome: bots numbered 1566 and 775 appear, the latter with its portrait; 30 catalog tests and
+18 Quantum tests pass. Portrait copies exist for the whole collection under
+`.artifacts/genesis-art/256/`. [Coverage](../research/evidence/genesis-catalog-coverage-2026-10-09.json).
+
+**The real Genesis image on the hero, 9 October 08:35 (first step after D18):** every Genesis
+character shows its image as a round portrait above its name, and beside its slot on the
+preparation screen. Implemented: `tools/genesis-art/fetch_portraits.py` (256 px JPEG copies of
+the IPFS originals, kept out of version control), a `/genesis-art/` route in the local server,
+`GenesisPortrait` in `Assets/Chog/Match/`. Verified in headless Chrome on the online build: the
+portrait of CHOG #1287 on both screens and a portrait on the bot CHOG #200; five Chog.Match
+tests pass outside Unity. **Not verified:** legibility on the phone (size tunable with
+`?portrait=`). **Open:** the right to redistribute the art (question for the Chog team, to be
+sent by the user), tint from Skin and Background, a Chog body instead of the sample's.
+[Evidence](../research/evidence/genesis-portrait-headless-2026-10-09.json).
+
+**Collection reads made fast, 9 October 08:15:** `research/scripts/scan_genesis_owners_multicall.py`
+reads the owner of all 1,969 Genesis in one Multicall3 call (0.68 s, 1,011 owners at block
+111821264, [result](../research/evidence/genesis-owners-multicall-2026-10-09.json)); it
+replaces the slow per-token scan for ownership checks. The metadata fetcher gained the
+`ipfs.filebase.io` gateway, whose bytes for metadata 1287 hash to the recorded fingerprint;
+794 of 1,969 metadata files were recorded when it restarted. When it completes, run
+`python3 tools/hero-catalog/run.py coverage` to list the trait values the catalog does not map
+yet, then `roster`.
+
+**Research run, 9 October:** five notes under
+`research/research_notes/Héros Genesis traits et liaison NFT/` (Monad NFT capabilities, NFT
+binding standards, hero kit design and balance, trait to visual pipeline, web3 game
+architecture) and a synthesis in `research/reports/`. They are inputs, not decisions; the
+decisions taken from them are recorded in the decision log once the user confirms them.
+
+**The special of a Genesis is the signature of its Eyes, 9 October 09:20:** five shapes, raw
+and direct. Implemented: `SkillData.AttackDataOverride` and `BallisticAttackData.PostImpactDataOverride`
+(one attack prefab serves several skills); `GenesisSweepAttackData`, an area that affects every
+target it touches once (narrow and fast is the beam, wide and slow the wave, standing in front
+the flash, standing around the caster the nova); the puddle reuses the lobbed projectile and
+ground zone with its own data; `GenesisSignatureImporter` authors the eleven data assets under
+`QuantumUser/Resources/Genesis/`; `GenesisRoster.ShapeSkills` and `GenesisCast.Tag` give each
+Genesis its special; `SkillData.Reach` keeps a bot's special for a target it can touch and
+drives the aim preview of a Genesis special; `CombatLog` writes skill and damage lines with
+`?perf=1`. Verified in two headless online matches: all five signatures fired and each
+authored damage value was dealt at least once, no class special of the sample fired, no error;
+19 Quantum tests pass. **Not verified:** a human firing one, the aim preview, the feel of each
+area, the phone. **Placeholders:** numbers (no kit budget yet) and visuals (borrowed from the
+sample's attacks, not sized to the areas).
+[Evidence](../research/evidence/genesis-signatures-headless-2026-10-09.json).
+
+**User test on the phone and decisions, 9 October 09:30:** the portrait never appeared on the
+phone and the user saw no visual difference between characters. Cause: Unity refuses plain-HTTP
+downloads except from the machine itself, so every check on `127.0.0.1` passed while the phone
+got nothing ("Insecure connection not allowed", thrown inside the loading coroutine). Fixed:
+`PlayerSettings.insecureHttpOption = AlwaysAllowed` in the qualification build, the exception
+is caught and reported, a grey disc shows while an image is missing, and the performance overlay
+prints a portrait status line. Verified through the LAN address `http://192.168.1.85:8083/`:
+six portraits requested and loaded. **Method change:** browser checks run on the LAN address.
+The user also judged the flash indistinct (it borrows the Spellcaster zone visual) and asked
+that what happens be readable on screen: signature visuals come before the Aura effects.
+
+**Each signature has its own visual, 9 October 10:05:** one generic attack prefab
+(`Resources/Genesis/GenesisAttack.prefab`) whose view, `GenesisAttackView`, shows the effect
+named by the attack data (`AttackData.Visual`, `VisualScale`); effects come from the Cartoon FX
+pack bundled with the sample (about a thousand prefabs under
+`TwinStickShooter/Third Party Assets/`) and from the sample's own VFX. Beam: light ball with a
+trail. Wave: the sample's energy pulse, enlarged. Flash: a light burst in front. Nova: a
+cartoon explosion around the hero. Puddle: unchanged. Test option `charged=1` in the page URL
+gives every character a charged special at spawn (`RuntimeConfig.StartWithFullSpecial`).
+Verified in headless Chrome on the LAN address: nova and flash seen, flash aim cone seen, no
+console error. **Not seen:** beam and wave (the automated browser is too slow to capture them).
+**Open:** effects are not tinted by team; the flash cone is longer than its area; numbers are
+placeholders. A first build shipped without the generic prefab's prototype and broke every
+signature for about four minutes; the importer now checks it.
+[Evidence](../research/evidence/genesis-phone-fix-and-visuals-2026-10-09.json).
+
+**User test, 9 October 10:20, and the Aura effects built in answer:** the portraits now show.
+Feedback: some attack visuals are weak; everything was "damage on touch"; the puddle's lobbed
+shot is not visible; all the examples given were Knights (they were: every token suggested
+was a brute); it is not readable that traits decide the character; specials did not feel
+strong. Built: fifty signatures, five shapes by ten Aura effects, generated by
+`GenesisSignatureImporter` (burn and toxin over time, chill slows, hex roots for 1.2 s, mend
+heals the caster, purify drains attack energy, rally boosts the caster's damage, haste refills
+its energy, veil removes special charge); damage raised (flash 2600 against 1600);
+`GenesisRoster.SignatureSkills` by shape and effect; each attack tinted with its Aura colour;
+event `GenesisSignatureHit` and `GenesisCombatFeedback` show a burst in that colour on each
+target and a lasting effect for burn, hex and toxin; the preparation screen prints
+"class / shape / effect" under the Genesis name. Verified in one headless online match through
+the LAN address: raw, burn and rally signatures fired with the authored numbers (the burn's
+ticks and the rally bonus on later arrows are visible in the damage log), no error; 19 Quantum
+tests pass. **Not seen:** the seven other effects, and all the on-target visuals.
+**Still open from the feedback:** the puddle's lobbed shot, the weak visuals (which ones is to
+be asked), and the real answer to "traits decide the character", which is a hero card showing
+each trait and what it gives.
+[Evidence](../research/evidence/genesis-aura-effects-headless-2026-10-09.json).
+
+**Performance regression reported by the user, 9 October 11:00:** "since the effects the game
+lags a lot", worse as the match goes on, and already soon after the start. Measured on the Mac
+(headless, software rendering, three minutes, one report a minute): simulation p50 1.6 to
+1.8 ms, main-thread work p50 about 5 ms and managed heap 30 to 33 MB, all flat; nothing grows
+on the CPU or memory side. Inference, not measured: the cost is on the phone's GPU (overdraw of
+the cartoon effects), and the worsening is thermal throttling. Done without waiting for phone
+data: `GenesisEffects` is now the single place that spawns an effect (no real-time light, no
+camera shake, at most 10 live effects, at most 30 particles per system on mobile, shorter
+fades); `fx=0` in the page URL turns all Genesis effects off; the hidden preparation screen no
+longer refreshes during the match; the performance overlay posts its minute report to the local
+server (`/perf-report`, kept in `.artifacts/perf-reports.jsonl`), so a phone run is read
+without screenshots. Verified: a report from the LAN address reached the server ("fx on, 18
+spawned, 0 skipped"), no console error, 19 Quantum tests pass. **Not measured yet:** the phone.
+Also unmeasured since it was changed: the mobile default quality "Fast" instead of "Fastest".
+The build under test is pinned on port 8083; newer builds are served on 8084.
+
+**Phone result, 9 October 11:13:** the user played the lightened build and found it fluid; the
+two reports posted by the phone read 31 and 32 fps, median frame 32 and 31 ms, p95 53 and
+48 ms, simulation 8.9 and 8.3 ms, with 44 effects shown in two minutes and none skipped. That
+is the level of the morning's 30 Hz baseline, with no decline in the second minute. Which of
+the changes fixed it is unknown; the runs without effects were not needed and not played.
+[Evidence](../research/evidence/genesis-effects-perf-phone-2026-10-09.json). From now on a
+checked build is pinned on port 8083 for the phone and the newest build is served on 8084.
+
+**Hero card and the laser drawn from the art, 9 October 11:35.** The preparation screen now
+replaces the class buttons, for a Genesis, by a card: portrait, name, then for the outfit, the
+eyes and the aura the value of the trait and what it gives (`GenesisHeroCard`,
+`GenesisRoster.CardLines`; trait values added to `content/genesis-roster.json`; sentences
+authored next to the numbers in the importers). The beam is now the laser of the caster's own
+eyes: `GenesisBeam` draws two beams, one per eye, each a dark outline, a flat colour and a
+lighter core, in the colours of the four laser values of the Eyes trait, as the collection
+draws them. Verified in headless Chrome through the LAN address: the card for CHOG #1287, the
+first frame of the fire laser of CHOG #1494, no console error; 20 Quantum tests pass.
+**Not seen:** the laser at full length and its three other colours; the card on the phone.
+[Evidence](../research/evidence/genesis-card-and-laser-headless-2026-10-09.json).
+
+**Autonomous session, started 9 October 11:55 (user instruction: "je te laisse travailler,
+j'aimerais que tu sois autonome et que tu en fasses le plus possible"; tests must be silent,
+`--mute-audio` added to the browser smoke test).** The user confirmed the build with the card
+and the laser works on the phone, and announced a Blender Chog body (four rigid parts named
+`Body`, `Head`, `armLeft`, `armRight`, no skeleton, one material; spec given in chat). The
+lane MOBA question is still unanswered: the 3v3 mode stays until the user says otherwise.
+Work order for this session, each item verified here before it is put on port 8083:
+
+1. Recognisable heroes without new models: the real Genesis face as the head of each hero,
+   body tinted with the Skin colour.
+2. Attacks drawn from the art for the next Eyes families (tears and their lobbed drop, visors
+   and glasses), as was done for the lasers (D20).
+3. The delivery of each Tier, shown on the hero card.
+4. Wallet connection through the browser's own wallet, the list of the player's Genesis, and
+   the default character for a player without one (D19). No Reown package yet: a wallet cannot
+   be operated from here, so this slice is checked with a stand-in provider and stays to be
+   tried with a real wallet by the user.
+5. A career per Genesis (matches, wins, badges) kept by the local test server, shown on the
+   card, as a stand-in for the real backend.
+6. The census of the hackathon gallery, which opens at 17:00 Paris.
+
+Progress of this session:
+
+- **Item 1 done, about 12:10.** Every Genesis hero wears its real image as its head (a round image
+  that always faces the camera, in place of the model's own head and helmet) and its body takes
+  the colour of its Skin trait. `GenesisAppearance`, `GenesisArt` (one image loader shared by
+  the screens and the heads); Skin value of every Genesis added to the roster; the 14 skin
+  colours are derived from the portraits by `tools/genesis-art/derive_trait_colors.py`
+  (`content/genesis-skin-colors.json`; 13 derived, the yellow chosen by eye). Verified in
+  headless Chrome on the LAN address: the player's hero and a bot show their faces, no console
+  error ([capture](../research/evidence/genesis-face-on-hero-headless-2026-10-09.png)). On
+  port 8083 from about 12:10 (build `20261009T100826778Z`, built 12:08 Paris). Not measured on the phone. The portrait
+  disc above the name is gone, the head replaces it.
+
+- **Item 2 done for three Eyes families, about 12:20.** After looking at the images of thirteen
+  Genesis: the flash of visors, headsets and glasses is a flat fan of light opening from the
+  hero, in the colours of that visor or pair of glasses (the two sides of the 3D glasses are
+  blue and red); crying eyes lob a pale blue tear that leaves a puddle of tears. Drawn by
+  `GenesisShape` (a few triangles and one unlit material, no particles) through
+  `AttackData.VisualKind`; colours per Eyes value in `GenesisSignatureImporter.EyeLooks`
+  (seventeen values authored: four lasers, three visors, six headsets and glasses, four
+  crying). An attack of the other team keeps its colours and is outlined in red. Verified in
+  headless Chrome: a fan fired by a bot, a puddle of tears on the ground, no console error
+  ([fan](../research/evidence/genesis-fan-headless-2026-10-09.png),
+  [tears](../research/evidence/genesis-tears-puddle-headless-2026-10-09.png)). Not seen: the
+  tear in flight, and each of the thirteen colour sets one by one. Still generic: the wave (hard
+  stares) and the nova (soft eyes), 42 Eyes values whose art shows an expression and no object;
+  they need a design idea, not a colour. On port 8083 from about 12:20 (build
+  `20261009T101601842Z`, built 12:16 Paris). The clock times first written for items 1 and 2
+  (12:20 and 12:45) were estimates and were wrong; they are corrected here from the build stamps.
+
+- **Item 3 done for the echo, 12:40.** The rarity of a Genesis now changes its special: an
+  Uncommon Genesis (590 of 1,969) fires it twice, half a second apart, each at 60% of the
+  damage. The hero card has a fourth line, "RARITY : Uncommon / ECHO fires twice, half a second
+  apart, 60% each"; a Common card reads "DIRECT one hit at full strength". One hundred
+  signatures are authored (fifty pairs of shape and effect, direct and echo);
+  `GenesisRoster.TryGetSignature(expression, shape, effect)` falls back to the direct one.
+  **Not built:** return (60 Rare Skull), persistent-zone (30 Epic Radioactive) and inversion
+  (10 Legendary 1:1) play like a direct hit and their card says "not built yet, plays like a
+  direct hit". Verified in a muted headless match on the LAN address: echo skills log their
+  actions in pairs about half a second apart, a raw echo nova deals 1200 (60% of 2000), the
+  card of token 408 shows the four lines, no console error; 20 Quantum tests pass
+  ([evidence](../research/evidence/genesis-echo-delivery-headless-2026-10-09.json),
+  [card](../research/evidence/genesis-echo-card-headless-2026-10-09.png)). The 60% share is a
+  first number: two hits that both land are 120% of a direct hit. On port 8083 since 12:36
+  (build `20261009T102725474Z`). Not measured on the phone.
+
+- **Item 4 done with a stand-in wallet, 14:00.** The main menu has a panel that takes a
+  player from the browser's wallet to a hero: CONNECT WALLET, the portraits of the Genesis the
+  address holds (read on Monad by the game services), a tap to choose, and the match starts as
+  that Genesis. No wallet, a refusal or a wallet without Genesis lead to a **recruit**: the
+  plain character of the class the player picks, with 85% of its health (D22), and a note on
+  the preparation screen saying so. Bridge `ChogWallet.jslib` (the wallet the browser provides,
+  no wallet library), state `PlayerWallet`, panel `WalletPanel`, rule `Recruit`. Verified in
+  headless Chrome on the LAN address with a stand-in for the wallet, five cases: none, refusal,
+  an address without Genesis, the real address that holds token 1795 (its one Genesis shows),
+  a real address that holds sixteen (three pages, the tapped one enters the match).
+  **Not done: a real wallet.** MetaMask, Rabby or Backpack on a phone or as an extension has
+  not been tried, and cannot be from here.
+
+- **Item 5 done on a local stand-in, 14:00.** `server/` holds the game services, in Node,
+  written as one handler a hosted function could run (D21): ownership read on chain, sign-in
+  with a wallet signature (ERC-4361 message, `personal_sign`, no transaction), a career per
+  token (matches, wins, best streak, badges First match, First win, Three in a row, Veteran),
+  a top list. With a Genesis chosen, SIGN IN TO RECORD ITS CAREER appears; after an online
+  match the game sends the result, a band says "career recorded", and the menu panel and the
+  hero card show the career. The career is kept per token and follows the Genesis when sold;
+  the services check on chain that the signed-in address holds the token before each credit.
+  Verified end to end in headless Chrome with a public test key that really signs, against a
+  test-only copy of the services where that key is answered as a holder (no real holder's key
+  exists here): sign-in, two whole matches, "credited: 2 matches, 1 win", the band at the end.
+  21 service tests, including the signature example of the web3.js documentation.
+  **Limits:** a result is what the player's own page reports, nothing replays a match (D23);
+  a smart-contract wallet cannot sign in; nothing is deployed, the careers are one JSON file on
+  this Mac. [Evidence](../research/evidence/genesis-wallet-career-headless-2026-10-09.json),
+  [services](../server/README.md).
+
+- **Beyond the work order, 14:05.**
+  - *Every special is now drawn from the art (D20).* The wave is the hero's own pair of eyes
+    on a strip in its colour, rolling forward; the nova is eight of its eyes opening in a ring.
+    Forty-one more Eyes values are drawn as the collection draws them (X for Dead, hearts,
+    lidded and angry eyes, pupils apart, clown make-up, the ski goggles of MOG and Chog Viper,
+    the pixel sunglasses of Thug). 1,074 Genesis were on generic effects before this. Seen in
+    captures for five of them; eleven rare colour variants were mapped without looking at an
+    image.
+  - *Rare and Epic have their delivery.* Return (60 Rare Skull): out at 60%, back at 80%,
+    towards where the hero then stands. Persistent zone (30 Epic Radioactive): 50%, then a zone
+    for 3 s. Checked in a headless match by ticks and damage (960 then 1280; 810 then 450 a
+    tick). Inversion (10 Legendary 1:1) is still not built. 180 signatures authored.
+  - *A web page to find one's hero* (`web/hero/`, D24): a Genesis number or a wallet address
+    gives the hero cards, with career and a top ten; about 100 KB where the game is 22 MB. On
+    port 8083 at `/hero/`. Not deployed.
+  - *The way online is prepared, not taken* ([DEPLOY](DEPLOY.md)): `server/src/host.js` serves
+    the game, the hero page, the portraits and the services from one Node process on one
+    address; `tools/release/assemble_site.py` fills `site/` from a checked build (63 MB, done
+    once with the build on port 8083); `render.yaml` describes the service for Render, the host
+    of the earlier game's server. Tried on the Mac through the LAN address, a whole
+    menu-to-match run included. A free Render instance would erase the careers at each restart
+    and sleep after 15 idle minutes (their documentation): the paid-or-not choice, the address
+    and the fate of the `?token=` entry are the user's.
+  - *Groundwork for $CHOG, nothing live* ([contracts](../contracts/README.md)): `ChogShop`,
+    a small contract where an item is bought for a Genesis token id with $CHOG and follows the
+    token, as the research proposed. 13 tests, and 2 more against the real $CHOG token and the
+    real collection on a local copy of Monad mainnet: the real token accepts the permit, takes
+    no fee and burns ([evidence](../research/evidence/chog-shop-fork-test-2026-10-09.json)).
+    The token is `0x3500...7777`; the address in the research report's Sourcify link is its
+    implementation and answers nothing. Not deployed, no transaction sent, and the game does
+    not read it: what is sold, where the $CHOG goes and who deploys are the user's to decide.
+  - *Test option* `?bots=181,70`: the bots are those Genesis, to watch chosen kits.
+  - *Corrections found on the way:* the Aura colour on the hero card was on the wrong line
+    after the fourth line was added (fixed); the README still described a portrait above the
+    name and an unanswered art-rights question (both rewritten); a dead page option
+    (`portrait=`) was removed.
+  [Evidence](../research/evidence/genesis-eyes-and-rare-deliveries-headless-2026-10-09.json).
+  Tests at this point: 30 catalog, 22 Quantum, 13 view logic, 27 services, 13 contract
+  (plus 2 on a copy of the chain).
+
+- **14:33, the ten 1:1 Genesis and two details.** Each 1:1 has its own colours for its
+  attack and its hero (Blaze, Burning Skully and Midas captured); an eye drawn on a skin of
+  nearly its own colour gets a lighter skin (hearts on red were hard to read); every label
+  writes the names of the 1:1 the same way. 16 view tests.
+
+- **14:57, no Genesis signature uses the bundled effect pack any more.** The marks on the
+  targets (ten Cartoon FX prefabs before) are now ten drawn signs in the colour of the Aura:
+  burst, flame, snowflake, star, plus, ring, arrow, bolt, cloud, bubbles; the sign pops on
+  the target and a smaller one stays beside its head while the effect lasts. Reason, beyond
+  D20: the project's own licence audit lists the Cartoon FX folders among what must be
+  acquired or replaced before a public build. The pack is still used by the sample's basic
+  attacks, and the audit's list (Photon animations, UI images, effect prefabs, one sound) is
+  untouched: **a public build is still not clear of it.** New page option `?lookbook=1`: one
+  screen with every drawing (ten signs, 47 pairs of eyes), captured
+  ([lookbook](../research/evidence/genesis-lookbook-headless-2026-10-09.png)); the signs were
+  seen there, not yet on a target in a match capture. A headless match with the new marks
+  ran without error.
+
+- **15:08, a phone browser without a wallet gets a way in.** On an HTTPS page opened on a
+  phone that has no wallet, the menu panel shows OPEN IN METAMASK, which leaves for
+  `https://link.metamask.io/dapp/<address of the game>`, the link MetaMask documents for
+  opening an address in the browser of its app; the hero page has the same link. Tried on a
+  throwaway local HTTPS host with a phone user agent: the button shows
+  ([capture](../research/evidence/genesis-open-in-metamask-headless-2026-10-09.png)), the tap
+  leaves for the link, and MetaMask answers with the Android intent that opens its app, which
+  the test browser cannot follow. **Not tried on a phone**, and only once the game is online
+  over HTTPS can it be. No such link was found documented for Rabby or Backpack: their users
+  still open the address by hand in the wallet's browser.
+
+- **15:21, a read-through of the day's code, three fixes.** A result whose sending fails
+  because the services or the chain read fail is sent again (three attempts, six seconds
+  apart; the services credit a match once). A wallet with more than 64 Genesis (one holder has
+  68) gets the career of its chosen Genesis read by itself. Leaving a session with DISCONNECT
+  brings back the menu with the wallet panel intact (seen in a capture). The whole signed path
+  ran again on this build: a third match credited. 18 view tests.
+
+- **15:30, two things a player reads in the match.** Under the special stick, a label names
+  the special of the Genesis ("FLASH" over "PURIFY" in the Aura's colour). The end screen says
+  "Victory!" or "Defeat" for the player's own team, where the sample said "Left Team wins!".
+  Both seen at the end of a whole headless match
+  ([capture](../research/evidence/genesis-end-screen-and-special-label-headless-2026-10-09.png)).
+
+- **15:37, a player who comes back finds everything.** The chosen Genesis and the sign-in are
+  now written to the browser's storage at once, not at a quit that a web page never has.
+  Checked with a page reload in the same browser: the wallet is recognised without a tap, the
+  third Genesis is still the chosen one and the career line shows, so the session held
+  ([capture](../research/evidence/genesis-wallet-after-reload-headless-2026-10-09.png)).
+
+- **15:50, the first screen no longer says "photon Quantum".** The menu shows "CHOG GENESIS"
+  and "3v3 arena. Your Genesis is your hero." where the sample showed the logo of its engine,
+  and the large emblem is hidden (`MenuTitle`, D25;
+  [capture](../research/evidence/genesis-menu-title-headless-2026-10-09.png)). The menu is
+  still the sample's, with its two buttons (its SELECT SCENE entry is hidden: the game has one
+  arena), and the logo images are still in the build: this is a first impression, not the
+  replacement of Photon's interface that the licence audit asks for before distribution.
+  Two headless runs, at 15:59 and 16:03, ended on a Photon "ClientTimeout" pop-up while
+  joining the room. Eight short matches run right after, alternating this build and the
+  previous one, all played: it came with the moment, not with the build. The cause on
+  Photon's or the network's side was not looked for.
+
+- **16:18, the page is named after the game.** The browser tab and the line under the game
+  read "Chog Genesis" where they read "quantum.unity" (the product name, set by the build
+  script, same working title as the menu, D25). It moves what a browser keeps for the game,
+  so settings chosen on the phone with earlier builds are asked again once.
+
+- **16:32, a visitor without a Genesis has somewhere to go.** On the menu, when the browser has
+  no wallet or the wallet holds no Genesis, a "SEE EVERY HERO" button leaves the game for the
+  hero page next to it (`PlayerWallet.OpenHeroPage`, `GameServices.HeroPageUrl`). It is hidden
+  for a holder. Tapped in a headless browser through the LAN address: the page lands on
+  `/hero/`; the wallet check was run again with a holder and with a wallet that holds nothing
+  ([capture](../research/evidence/genesis-menu-see-every-hero-headless-2026-10-09.png)).
+  One run recorded the career read as cancelled by the browser while the services logged it
+  answered (200); two further runs did not show it. Not looked into further.
+
+- **16:49, a beam starts at the eyes, and the return is seen coming back.** Filming the special
+  frame by frame (new `film` mode of `tools/unity/checks/browser_check.sh`; a screenshot takes
+  several hundred milliseconds in the headless browser and missed everything that moves) showed
+  that a beam was drawn from where its attack stood when the view woke up, not from where it
+  was created: a few ticks late, so the laser began ahead of the hero (most of the way in the
+  slow headless browser, an estimated one to three units on a phone, not measured there).
+  `GenesisAttackView.StartOf` now takes the creation point from the simulation. Same film after
+  the fix, return delivery (CHOG #1647): the beam leaves the eyes, reaches the wall, and a
+  second one comes back from the far end to the hero
+  ([eight frames](../research/evidence/genesis-return-beam-film-headless-2026-10-09.jpg)); a
+  direct beam (CHOG #1467) also starts at the eyes. Also learnt: aimed straight up from the
+  spawn point a beam is stopped by a crate after about one unit, while its return still comes
+  back from the full distance, over the wall. That is the rule as written (the way back ignores
+  walls), and it may be the wrong rule: to decide when balancing.
+  The same film on a Genesis that leaves a zone (CHOG #1813, wave, veil): the eyes travel in the
+  hero's colours, and where they end a disc in the Aura's grey stays on the ground for about
+  three seconds ([twelve frames](../research/evidence/genesis-zone-film-headless-2026-10-09.jpg)).
+  A return on a shape that does not travel (CHOG #1819, nova, mend) opens its ring of eyes
+  twice around the hero
+  ([twelve frames](../research/evidence/genesis-standing-return-film-headless-2026-10-09.jpg)).
+  The return leg and the zone's colour were the two visuals of the rare deliveries not yet seen;
+  both are now seen in the headless browser, not on a phone. The drawn sign on a hero that is
+  hit is also seen in a live match: walking to the fight first (the check tool can now push the
+  move stick with a finger), a green star, the sign of hex, follows an enemy rooted by an ally
+  bot ([frame](../research/evidence/genesis-sign-on-target-film-headless-2026-10-09.jpg)). The
+  larger sign that pops on the body at the moment of the hit was not isolated in a frame.
+
+- **Item 6 done, 17:15: first census of the field.** The site's gallery is empty and, in the
+  current version of the page, cannot be filled: adding a project is refused once sign-up is
+  closed. The page counts 311 applications and has no form yet for the final deliverables.
+  Eight public repositories were found on GitHub and read in their code: none is a real-time or
+  multiplayer game; one (chog-mischief) already ships "traits decide powers" and "history kept
+  per token", live, with a guest path; one (ryoko-chog) burns real $CHOG on mainnet; four
+  answer at a public address. Eight out of 311 is a sample, to run again
+  ([census](../research/reports/chogathon-field-census-2026-10-09.md)).
+
+- **17:20, the working loop is in the repository.** The scripts this session used from a
+  temporary folder (compile an assembly outside Unity, run the view tests, ask the Editor for a
+  build, snapshot the sources, prune builds) are now in `tools/dev/`
+  ([how to use them](../tools/dev/README.md)); a reboot would have lost them.
+  `sh tools/release/check_all.sh` now also runs the 18 view tests.
+
+- **Disk space.** Between 0.6 and 2.4 GB free around 17:15 (it moves with the memory the
+  system swaps to disk). At 20:15 the user asked the dev agent to free space itself: 17 GB of
+  state folders left under `~/.foundry/anvil/tmp` by local chain processes that had ended
+  (1 to 3 October) were removed, nothing else was touched; 21 GB free afterwards. Other
+  regenerable caches seen and left alone: Playwright browsers 2.3 GB, Homebrew downloads
+  1.7 GB, the npm cache 2 GB, the pnpm store 3.1 GB.
+
+- **20:40, a holder lends a Genesis with a link, and a guest plays it without a wallet (D26).**
+  On the menu a signed-in holder taps LEND IT: the panel shows a link, SHARE THE LINK hands it
+  to the phone's share sheet or copies it, STOP LENDING kills the links handed out so far.
+  Whoever opens the link sees "YOU ARE A GUEST", the lent Genesis, who lent it and for how many
+  days, plays it as its holder would, and the match goes to the career of the Genesis (counted
+  as a guest's). A link lasts thirty days at most and dies when the holder stops lending or the
+  Genesis leaves the wallet. The test options `?token=`, `?charged=` and `?bots=` are now
+  ignored on a public address and keep working on this computer and the local network.
+  Checked in two separate headless browsers through the LAN address, with the services in test
+  mode (a public test key answered as a holder): the holder signs in, lends and copies the
+  link; a guest without a wallet opens it, plays a whole match and the career is credited
+  ("4 matches, 1 win", one of them by a guest); a loan stopped while a guest was in a match
+  refuses that guest's result; a dead link says why on the menu; through a public name that
+  points at this computer, `?token=1795` enters as a recruit
+  ([six captures](../research/evidence/genesis-lending-headless-2026-10-09.jpg)). Tests: 35 for
+  the services (six for lending), 26 for the view code. Also: the ownership check before a
+  credit or for a lent Genesis now reads that one token (about 150 ms on Monad mainnet, read
+  live) and no longer the whole collection. **Not tried:** a real wallet, the share sheet of a
+  real phone, two guests at once. **Limits:** a link is a bearer link, whoever gets it plays;
+  the match still trusts what each game declares.
+
+- **10 October 00:55, mastery, and a second form of each attack to unlock (D27).** A Genesis
+  earns mastery by playing (one point a match, one more a win; level 2 at 3 points). The menu,
+  the hero card and the band at the end of a match show it ("Mastery 2  5/8"), and so does the
+  hero page. At mastery 2 the Genesis may play the second form of its attack: broad beam, long
+  stare, wide flash, tight nova, wide puddle (the table is in the game notes). A button on the
+  menu switches the form, and says "SECOND FORM AT MASTERY 2" before that; the card names the
+  form played. 180 more signatures are generated; the download grew by 32 KB. Checked: 23
+  simulation tests and 29 view tests; in the headless browser, the broad beam, the wide flash
+  and the tight nova filmed next to their first forms
+  ([films](../research/evidence/genesis-second-forms-film-headless-2026-10-10.jpg)), the menu
+  button locked for a Genesis at mastery 1 and switching for one at mastery 2, the card and
+  the end band ([captures](../research/evidence/genesis-mastery-and-form-menu-headless-2026-10-10.jpg)).
+  **Not seen:** the long stare and the wide puddle in a film (the puddle lands after the film
+  ended; their generated numbers were read in the assets). **Not played by a person:** whether
+  the two forms of a shape feel different and fair is unknown.
+
+- **Found while filming, not fixed: attacks that are only predicted are drawn.** With the
+  check tool the special sometimes showed a stray fan in a wrong direction before the real one.
+  The combat log now says who starts an attack and whether that start was confirmed or undone
+  (`CombatLog`, `tools/unity/checks/summarise_log.py`): in one held press of five seconds, six
+  starts were predicted and undone and one, at the release, confirmed. They are predictions the
+  game corrects, not attacks: nothing is spent and nobody is hit. They are frequent in the
+  headless browser, which draws about twelve images a second and sends its inputs late; how
+  often a phone shows one is unknown. It existed before today (the first log of this session
+  already showed one use written at several ticks). To look at with the phone in hand before
+  changing anything: drawing a signature only once its start is confirmed would hide them and
+  delay every signature by the same few frames.
+
+- **10 October 01:25, bodies are moved by code, and the Chog body has its place (D28).** The
+  three class models no longer play the sample's animation clips: `ChogBodyAnimator` moves any
+  body made of a `Body`, a head and two arms (run, attack, win, lose). A model saved as
+  `ChogBody` in a Resources folder becomes the body of every Genesis hero, with its image as
+  the head and its Skin colour; the game notes say what the model must respect (four parts,
+  their names, orientation, origins at the shoulders). `?bodies=1` shows every body in every
+  state ([capture](../research/evidence/chog-body-viewer-headless-2026-10-10.png)), and
+  `?body=standin` tries the place with a stand-in of four plain parts. Checked: 34 view tests
+  (the pose is a plain function), the viewer in the headless browser, a match with the
+  stand-in and one without, no error. **Not seen:** the bodies moving in a match, where the
+  image of the Genesis covers most of them from above. The animation clips and their
+  controller are no longer played, but they are still in the project and in the build: the
+  character prefabs still point at them. Taking them out is an Editor change to those prefabs,
+  not done.
+
+- **10 October 02:05, the second form can be bought with $CHOG, on a copy of the chain only
+  (D29).** With a deployed shop contract known to the services, the form button reads
+  "MASTERY 2, OR NOW FOR 500 $CHOG" for a connected holder; a tap asks the wallet to be on
+  Monad, to let the shop take the price, then to buy for that Genesis. The purchase is kept by
+  the contract for the token id, so it follows the Genesis. The services only read the chain
+  (price, who owns the item; five new tests, 41 in all), the game has 39 view tests. Rehearsed
+  end to end on a local copy of Monad mainnet (`tools/contracts/rehearse_shop.sh`): shop
+  deployed on the copy, the game in a headless browser with a stand-in wallet that forwards
+  its transactions to the copy, purchase at 500 then at 750 $CHOG, the form unlocked, the
+  buyer's balance down by exactly the price, half of it in the treasury (the burn of the other
+  half is what the contract's own test on a copy checks); a wallet without $CHOG is told
+  before signing; with no shop set up the game offers nothing
+  ([screens](../research/evidence/genesis-chog-purchase-on-fork-headless-2026-10-10.jpg)).
+  **Nothing is deployed and no transaction was sent to the real chain. Never tried with a real
+  wallet,** which shows two confirmations the stand-in accepts at once. To go live: decide the
+  price, where the $CHOG goes and who owns the contract, deploy it, set `SHOP_ADDRESS`
+  ([contract notes](../contracts/README.md)).
+
+- **10 October 02:30, the phone can report the predicted attacks by itself.** With `perf=1`
+  the overlay, and the report a phone posts every minute, carry one more line: "own attacks
+  confirmed N undone M", the attack starts of the player's own hero that the verified match
+  kept or corrected (`CombatLog`). A match on the phone with `perf=1` therefore tells how often
+  an attack is drawn and then undone there, without anyone having to watch for it. Seen in a
+  report posted by the headless browser. Also established from the system's power log: the
+  Mac stopped from 21:04 to 00:34 on 9 October because it ran on battery down to 1% ("Low
+  Power Sleep"), not because of an idle timer; on the charger its sleep timer is already off.
+
+- **10 October 02:46, first numbers from the user's phone.** The user played the build of
+  02:30 with `perf=1` on the Redmi (Android 10, Chrome 126, Mali-G52, canvas 1508 x 560) and
+  found it "rather fluid". Two reports reached `.artifacts/perf-reports.jsonl`: median image
+  31 ms (about 30 a second), the slowest 5% above 48 ms, simulation 8 ms at the median;
+  **own attacks confirmed 42, undone 4**. So about one attack start in eleven is drawn and
+  then corrected on that phone. In a headless control match the undone start was the same
+  attack started one tick later (tick 681 cancelled, 682 confirmed), which draws two nearly
+  identical shapes; nothing was changed. The cheaper fix than delaying every signature is to
+  remove the drawing of a start once it is known undone: not done.
+
+- **10 October 03:05, heroes have a visible body again (D30).** The user's report from the
+  same test: "the heroes are invisible". Cause: not a missing model. The image of the Genesis,
+  1.7 units wide on the head, covered the whole body from a camera that looks down at 73
+  degrees, since 9 October; the entry of 01:25 above even noted that the bodies were "not
+  seen" and left it there. Now the image is 1.2 wide and raised up the screen, the body is
+  drawn 1.55 times larger, and the name, the health and the coins move up with the image
+  (`GenesisLook`, `CharacterUIFollow`). Six layouts were compared in headless matches through
+  the test option `?look=`
+  ([before and after](../research/evidence/genesis-body-under-head-headless-2026-10-10.png)).
+  41 view tests then. **Not seen on the phone yet**, and the body is still the class model of
+  the sample in one flat colour.
+
+- **10 October 03:10, how the game should be opened on a phone: researched, nothing built.**
+  [Report](../research/reports/mobile-presentation-2026-10-10.md), three research passes, its
+  ten deciding facts read again on their primary pages
+  (`research/scripts/check_mobile_facts.sh`). Stay a web page opened by a link: the App Store
+  forbids NFT ownership that unlocks functions, Telegram allows TON wallets only, World App
+  one chain, Farcaster shows a vertical window. On Android one tap gives full screen and a
+  landscape lock without installing anything; on the user's screenshot the browser bars take
+  about 29% of the screen. On iPhone a page cannot go full screen: only the Home Screen
+  install removes Safari's bars. The weak spot is the wallet: a phone browser has none, and
+  the browsers inside MetaMask and Rabby are locked to portrait (read in their Android
+  manifests), so the present "open in MetaMask" path would show a landscape game upright.
+  Recommended, in order: our own game page (block 1), a 5-minute test by the user inside
+  MetaMask's browser, then one connection that stays in the normal browser (Reown AppKit
+  first, loaded only when the page has no wallet).
+
+- **10 October 03:30, a Genesis can be rented for $CHOG, on a copy of the chain only (D31).**
+  Asked by the user ("ok on veut ca"). New contract `contracts/src/ChogRental.sol` (no owner,
+  not upgradeable, 18 tests): a holder offers a Genesis at a price a day, any wallet pays for
+  1 to 30 days, the payment goes to the holder less a share burned, the Genesis never moves,
+  several players can rent it at once, paid days survive a sale. The services read the offers
+  and what an address rents (`server/src/rental.js`, three public routes, 7 tests) and credit
+  a renter's match to the Genesis (`rentedMatches`). On the menu a holder gets RENT IT OUT
+  (price steps, change, take back) and any connected wallet RENT A HERO (the offers, 1, 3 or
+  7 days, pay); a rented Genesis is then picked and played like one's own. Rehearsed on a
+  local copy of Monad mainnet with the real $CHOG token and collection and a stand-in wallet
+  that sends real transactions to the copy
+  ([screens](../research/evidence/genesis-rental-on-fork-headless-2026-10-10.jpg)): the holder
+  of token 1795 offered it at 10 $CHOG a day; the same wallet rented token 3 for three days,
+  paid exactly 30, its holder received 27 and 3 were burned; the rented Genesis was chosen,
+  marked "RENTED 2 d 23 h", played a whole match after a sign-in, and its career was
+  credited ("1 match, 0 wins", `rentedMatches` 1). Gas measured on the copy
+  (`tools/contracts/measure_rental_gas.sh`). 46 view tests, 48 services tests, 31 contract
+  tests. Along the way the payment steps shared with the purchase moved to
+  `MonadTransactions`, and a latent fault was removed: a wallet answering stopped every call
+  in flight, the read of the shop included. **Not done: a real wallet, the real chain, a
+  phone.** Not deployed, so neither button shows today. The free link loan is unchanged.
+
+- **10 October 04:20, the game has its own page, and a failed load recovers (D32).** After
+  the report of 03:35 the user answered: the rental terms are accepted (D31), the page is
+  approved, and the wallet recommendation of the report is followed. The user also met
+  "unable to load file build/webgl.framework.js.gz" when reloading the phone. The log of the
+  test server shows that load: the phone asked for the page, the loader and the data, and
+  never asked for the framework file, which the server does serve; the cause on the phone's
+  side is not known (the first load, 78 seconds earlier, had worked). Three changes: the test
+  server accepts 64 waiting connections instead of 5; the engine's page is replaced by ours
+  (`game/Assets/WebGLTemplates/Chog/`), which asks for the whole screen on its side at the
+  first touch on a phone, shows the game's title and icon, carries an install manifest, and
+  opens itself again when a file does not arrive (the engine's loader only reports such a
+  failure and stops); the test server can drop one request on purpose
+  (`--drop-first framework.js`) and with it the same error was reproduced, then seen to
+  recover by itself. Checked in the headless browser through the LAN address: a match, the
+  wallet stand-in, the loading screen, the notice when the phone is held upright. **Not
+  seen on the phone**, where it matters: the bars, and whether the browser the user's links
+  open in accepts the whole screen.
+
+- **10 October 06:10, the page and the bodies seen on the phone; a solid capsule fixed.** The
+  user played the build of 04:15 on the Redmi, in Chrome 126 (the test server now logs the
+  browser). **The whole screen works there:** the reports give a picture of 1650 x 720 where
+  it was 1508 x 560, about 40% more points, at the same pace (median image 33 ms, the slowest
+  5% above 51 ms, worst 232 ms where it was 1233); own attacks confirmed 38, undone 1. The
+  user: "much better", and the heroes "are well visible now". They also saw "a big capsule"
+  on heroes at times. Cause: the sample shows a see-through capsule around a hero for the
+  five seconds after it comes back, when it cannot be hurt, and the Skin colour was applied
+  to every mesh under a character, that capsule included, which made it solid. The colour
+  now goes to the hero's model only (`GenesisAppearance.ModelOf`). Seen in a headless match
+  where heroes came back
+  ([close-up](../research/evidence/genesis-immunity-see-through-headless-2026-10-10.png),
+  `browser_check.sh respawn`). Not seen on the phone yet.
+
+- **10 October 06:40, heroes that look like their Genesis: a direction proposed, a first trial.**
+  The user set the order (the public address, the contracts and the video later; the Reown id
+  and the deployments are theirs) and asked what comes next for "each hero recognisable",
+  "knowing that we want to be ambitious". Counted from the recorded metadata
+  (`tools/genesis-art/trait_census.py`): 280 visual trait values (96 Body, which is the
+  clothing, 66 Head, 58 Eyes, 22 Aura, 15 Mouth, 14 Skin, 9 Accessory), drawn as a bust in
+  three-quarter view; 1,309 Genesis look right, 650 look left, 10 have no side. Proposed, not
+  yet accepted: do not model the collection in 3D; make the drawing itself the character. In
+  order: (A) the head is the real drawing cut out of its background, in place of the round
+  picture; (B) the user's Chog body in place of the sample's models; (C) the body takes the
+  colours of the Genesis's clothing, computed from its picture; (D) the hero reacts with its own
+  traits (eyes that light up when it attacks, another mouth when it wins or loses), which needs
+  the collection's layer files; (E) the class readable at a glance. **Trial of (A) without the
+  layer files** (`tools/genesis-art/cut_out.py`, numpy in a private environment under
+  `.artifacts/tools-venv`): the background of each group of Genesis laid out alike is rebuilt
+  from the collection (the colour most pictures agree on, point by point,
+  [rebuilt layers](../research/evidence/genesis-rebuilt-backgrounds-2026-10-10.png)) and each
+  Genesis is cut by difference. Among the Genesis that look left, about 3 of 16 drawn at random are cut cleanly
+  ([sheet](../research/evidence/genesis-cut-out-trial-looking-left-2026-10-10.png)): there the
+  background shows behind the hat in a minority of pictures only, so "what most pictures agree
+  on" is a hat, not the background. Skulls (60), Radioactive (30) and the ten 1:1 have their
+  own layouts. Counted by eye on small samples: an order of size, not a measure.
+
+- **10 October 07:00, the Genesis that look right have a cut-out head in the game (step A,
+  two thirds of the collection).** For the 1,309 Genesis that look right the method works:
+  the background is one flat colour behind a zigzag of spikes, with the Aura as a band along
+  it. Two things had to be added after a first version went into the game: a second pass
+  that removes the same flat colour where the rebuilt layer knew nothing, and a rule that a
+  point whose rebuilt colour is the same for most backgrounds of the group is the character
+  (its face), never background. **That second one was found by looking at the game, not at
+  the sheet:** the first sheet showed the cuts on a light ground, on which a pale face that
+  had been cut away looked intact; in the match the crate behind the hero showed through its
+  face. The sheets now use squares of two loud colours. On 46 Genesis drawn at random among
+  those that look right (two draws), every one of the usual kind is cut cleanly
+  ([sheet](../research/evidence/genesis-cut-out-trial-looking-right-2026-10-10.png)); the
+  Skulls and two astronaut helmets are not, and are left out by rule. `cut_out.py all` writes
+  what to keep of each trusted portrait (`.artifacts/genesis-art/cut/`, 5 MB for **1,277
+  Genesis, 65% of the collection**) and their list; `GenesisArt` reads the list once and
+  shows a Genesis that has a cut without its background, inside the same round frame, in a
+  match and on the menu; the other 692 keep their whole round picture. Seen in a headless
+  match
+  ([close-up](../research/evidence/genesis-cut-out-heads-in-match-headless-2026-10-10.png)).
+  48 view tests. `assemble_site.py` carries the cuts into `site/`. **Not seen on the
+  phone.** Next for the 692 others: the most frequent colour among those that vary least and
+  a vote by outlined region, in place of the median; or the layer files, if the Chog team
+  gives them, which make every cut exact and step (D) possible.
+
+- **11 October 14:25 to 15:00, the secured match and the stakes, up to Photon's own calls
+  (D33, D34, D35).** Four pieces, each run:
+  1. **A match is played again outside the game.** A page opened with `?record=1` on a
+     private address sends the engine's record of its match when it ends
+     (`MatchRecorder`, kept by the test server under `.artifacts/replays/`). Each build now
+     writes the simulation's assets beside itself (`quantum-db.json`; the engine's own export
+     throws on this Unity version, which writes object ids on 64 bits, so
+     `QualificationBuild` writes the same file itself). `python3 tools/quantum/headless.py
+     verify <record> <quantum-db.json> <report.json>` replays the record with the real
+     simulation and writes who won, the score, when the selection of characters ended and who
+     played in which team with which Genesis. Seen: a match of one page and bots, 3,239
+     ticks in 0.78 s, team 1 by 0 to 11, the winner the game had announced; a match of two
+     pages in opposite teams, 5,448 ticks, team 0 by 15 to 2, also as announced. Three rules
+     of the sample's game manager live beside the simulation folder and are compiled into the
+     replay's simulation (`Assets/QuantumUser/*.cs`).
+  2. **The services answer Photon** (`server/src/photon.js`, `matches.js`, `judge.js`):
+     custom authentication (`GET /api/photon/auth`, guarded by a key only the dashboard
+     sends), the eleven webhooks under `/api/photon/hook/` (guarded by the `X-SecretKey`
+     header), the admission rule at `player/add`, the record kept as received, the judge
+     started when the last slice arrives. A room gets a name of its own at `game/create`,
+     since a room name can be used again and the stakes are held under that name.
+  3. **The stakes** (`server/src/wager.js`, `referee.js`, `contracts/src/ChogWager.sol`):
+     `GET /api/wager`, `GET /api/wager/mine`, `POST /api/wager/ticket`, `POST
+     /api/wager/lock`, `GET /api/wager/result`. The rules are D34.
+  4. **A rehearsal of all of it** on a local copy of Monad
+     (`sh tools/contracts/rehearse_secure_match.sh <record> <build folder> [cheat]`), with
+     the record of the two-page match: honest match paid (+22.5, -25, 2.5 burned of 25 a
+     head), and three cheats called off with every stake given back (a stake on the other
+     team, no lock, a ticket kept for later, which the contract then refuses)
+     ([evidence](../research/evidence/staked-match-rehearsal-2026-10-11.txt)).
+  Tests: 67 for the services (19 new), 23 simulation, 48 view, 54 contracts, all passing.
+  **Limits, plainly.** Photon has never called these services: its part is played by the
+  rehearsal script from the manual read on 11 October (webhooks and custom authentication
+  pages), so the exact shape of Photon's requests, the room name given back at `game/create`
+  and the order of its calls are unverified until the dashboard is set up against a public
+  address. The game connects with the wallet's session only once the services say so
+  (`PhotonIdentity`, `GET /api/photon`): compiled, never run against Photon. The game has no
+  staking screen. The configs of a match are still the ones the first page sends: the
+  judge reports the test options (`testOptions`) but nothing refuses a match played with
+  another map or other bots yet. A hosted service needs .NET 8 beside Node for the judge:
+  `render.yaml` has none, so only this Mac can judge today. One player leaving does not stop
+  a match; if every remaining player leaves before the end the match is void and stakes
+  come back.
+  **Found on the way.** The Editor would not start on 9 and 11 October "for lack of a
+  licence": a licensing helper left behind by an earlier Editor (parent process 1) held the
+  lock, and every new one gave up; stopping that helper fixed it. `typecheck.py --use
+  Chog.Diagnostics` hides a missing assembly reference: `MatchRecorder` passed it and failed
+  in the Editor.
+
+- **11 October 15:30, the staking screens in the game, and a Chog body.**
+  **Staking.** `GenesisWager` (the ticket, the three wallet steps, the lock, the claim),
+  `WagerPanel` on the Team Preparation screen, `WagerResult` on the menu, two hooks in the
+  sample's `CharacterSelectionUI` (show the panel; lock before the start command). The rule
+  for the lock changed on the way: any wallet of the match may ask for it, since it is the
+  page of the player who presses START that asks. Seen in the headless browser, on the
+  bench (`tools/contracts/wager_bench.sh`: local copy of Monad, the wager, services with the
+  judge; Photon's part by `server/rehearsal/photon_standin.mjs`):
+  one wallet alone stakes 10, plays, and gets "NOBODY STAKED ON THE OTHER TEAM: YOUR STAKE OF
+  10 $CHOG WAS GIVEN BACK" after tapping GET IT BACK
+  ([before](../research/evidence/wager-screen-before-stake-headless-2026-10-11.png),
+  [staked](../research/evidence/wager-screen-staked-headless-2026-10-11.png),
+  [given back](../research/evidence/wager-menu-stake-given-back-headless-2026-10-11.png));
+  two wallets in opposite teams stake 10 each ("2 STAKED TO WIN +9",
+  [capture](../research/evidence/wager-screen-two-stakers-headless-2026-10-11.png)), the
+  match is played and judged (team 0 by 12 to 0), the winner taps CLAIM and reads "YOUR TEAM
+  WON: +9 $CHOG, PAID"
+  ([capture](../research/evidence/wager-menu-winner-paid-headless-2026-10-11.png)), the loser
+  reads "YOUR TEAM LOST" ([capture](../research/evidence/wager-menu-loser-headless-2026-10-11.png));
+  on the copy the winner holds 10,009 $CHOG and the loser 9,990. 64 view tests (16 new: the
+  three calls are encoded as `cast` encodes them), 67 service tests.
+  **Limits.** Test wallets and a local copy only; never a real wallet, a phone or Photon's
+  own calls. In these runs the stand-in tells the services who is in the match before the
+  page joins and sends the record after the match, so the timing rule of D34 (locked before
+  play begins) is only exercised by the tests and the rehearsal, not by these runs. The
+  screens of `Assets/Chog/Screens` have no unit tests, only these runs.
+  **The Chog body.** A background agent rewrote `tools/blender/make_chog_body.py`: a round
+  body, big fists and shoes, eight spikes on the back, 1,900 triangles in the four rigid
+  parts the game expects, checked on the exported file
+  (`tools/blender/check_chog_body.py`;
+  [renders](../research/evidence/chog-body-blender-renders-2026-10-11.png)). The file is in
+  `game/Assets/Chog/Resources/ChogBody.fbx` since 15:28, so every Genesis hero wears it in
+  place of the sample's class model, in its Skin colour. Seen in the body viewer of the build
+  `20261011T132831340Z` (facing the right way, the five poses,
+  [capture](../research/evidence/chog-body-viewer-headless-2026-10-11.png)) and on a hero in
+  a headless match ([close-up](../research/evidence/chog-body-in-match-headless-2026-10-11.png)).
+  **Not seen on a phone.** Open: the clothing colours on the body, the bush transparency a
+  class model had, the body's width against walls (about 1.9 units with the hands).
+
+- **12 October 01:30 to 02:15, a public address, the wallet from a phone's own browser, the
+  container, and what the user said that night.**
+  *The public address.* The user allowed the tunnel. `ngrok http 8087` in front of
+  `tools/release/serve_public.sh` (the host program on the assembled `site/`), checked with
+  `tools/release/check_public.sh` and one run from the menu into a match in the headless
+  browser ([capture](../research/evidence/public-address-match-as-recruit-headless-2026-10-12.png)).
+  The test server cannot stand there: it drops Photon's secret header and cuts bodies at
+  100 KB. A first check downloaded the build unpacked and spent 140 MB of the tunnel's
+  monthly gigabyte; the check now asks for headers only.
+  *The wallet (D32, block 4).* A page without a wallet now offers CONNECT WALLET when the
+  services give a Reown project id (`GET /api/wallet`): the page loads Reown AppKit from
+  jsDelivr at a fixed version on request, opens its window over the game, and hands the game
+  the connected app as the same kind of wallet object it already speaks to
+  (`TemplateData/wallet-connector.js`, `ChogWallet.jslib`, `PlayerWallet.ThroughApp`; see
+  `game/README.md`). The user gave a project id (their earlier project "Chog Zombies",
+  "je crois"); it is kept in the data folders, never in the repository. Seen in the headless
+  browser, on the local address and through the public one: the menu offers the connection
+  ([capture](../research/evidence/wallet-connect-offered-without-browser-wallet-headless-2026-10-12.png)),
+  the window opens and lists wallets (MetaMask, Trust, Binance, a search of "90+";
+  [capture](../research/evidence/wallet-window-public-address-headless-2026-10-12.png)), a
+  tap beside it closes it and the game goes back to waiting. **Not seen: any wallet app
+  answering**, so nothing after the pick is verified: the approval, the way back to the
+  browser, a signature, a transaction. Reown answers 403 to its own usage report from these
+  addresses, which may mean the project lists its allowed domains: to be looked at in its
+  dashboard. Found on the way: Unity's loader answers any error of the page, even of another
+  script, with a dialog that freezes the game; the page now writes those to the console
+  (`errorHandler` in `index.html`) and keeps the dialog for errors of the game itself.
+  *Photon.* The user asked the dev agent to fill the dashboard in their browser ("fait le").
+  Done for the Quantum application "Chog Arena" except the secret, which the browser rules
+  of the agent forbid it to type: two forms are filled and left open (the authentication
+  provider with its address and the pair `key`; the plugin with sixteen settings, see
+  DEPLOY.md), the secret is in the user's clipboard, and the user pastes it twice and saves.
+  **Not saved when this was written.**
+  *The container.* The user accepts Render's free plan kept awake by a ping. Written:
+  `Dockerfile` (Node 22 and the .NET 8 runtime; building it replays the recorded matches of
+  `tests/fixtures/replays/` and fails on a wrong winner), `.dockerignore`, `render.yaml`
+  (free plan, no disk: careers and records are lost when the container is replaced; the paid
+  variant is in a comment), `.github/workflows/release-image.yml` (builds and starts the
+  image on GitHub's machines). `assemble_site.py` now puts the judge and its tables in
+  `site/judge/` and `host.js` finds them there. **The image has never been built**: no
+  container engine runs on this Mac. Waiting for the user's word to create a private
+  repository.
+  *The body.* Asked by the user: the model must look like the real Chog. The official
+  pictures (addresses in `tools/blender/README.md`) show the spikes on the head, a slim plain
+  body and big pink hands and feet: the present body (a belly, spikes on the back) is wrong
+  on all three. Variants that follow the pictures are being drawn; nothing new is in the game.
+  68 service tests, 64 view tests.
+
+- **12 October 02:15 to 02:45, a tower and a core for each team, and a body that looks like a
+  Chog.**
+  *The tower and the core* (the next dev action since 10 October; rules, places and limits in
+  `game/README.md`, "A tower and a core for each team"). Each team defends a core in front of
+  its spawn points and a tower 4 units further out. A tower takes 500 health a second from the
+  nearest enemy hero within 5 units; a core that is destroyed ends the match at once for the
+  other team, whatever the coins; the coins still decide a match in which no core falls.
+  Nothing of the sample's assets was changed: the structures are made in code when the match
+  begins, every existing attack hurts them, and the machine that runs the match ends it
+  because the clock it reads says so once a core fell. The judge follows (`coreLostBy` in the
+  replay's report; an even score is then no draw). On the screen the tower is a totem with a
+  Chog's head that shoots with the laser of its eyes, the core a heart in a crown of spikes,
+  each on a base in the colour of its side under a bar of its health.
+  Checked: 28 simulation tests (five new), 68 service tests, a replay in which a core is made
+  to fall (`--test-core-falls`: the match ends that second for the other team, both ways),
+  the structures seen standing in a headless match
+  ([close-up](../research/evidence/structures-and-body-b-close-up-headless-2026-10-12.png)),
+  and whole matches recorded with them that the judge replays with the winner the game
+  announced. In the first of those the towers hit 43 times (31 by one, 12 by the other;
+  matches before had no hit of exactly 500) and the score was 17 to 0: the bots walked under
+  the towers. A bot now keeps out of the reach of an enemy tower (`Structures.KeepAway`); in
+  the next recorded match the towers hit 4 and 3 times (score 0 to 11, by coins). A line on
+  the screen says when a structure falls ("ENEMY TOWER DESTROYED", "YOUR CORE FELL").
+  **Not seen: the laser of a tower on a picture, a structure destroyed by play, that line, a
+  match ended by a core.** The bots neither attack nor defend a structure. The numbers are
+  first guesses. The records of 11 October no longer reach an end under the new rules: the
+  fixture of the judge was recorded again (`tests/fixtures/replays/`).
+  *The body.* Variant B of the three drawn after the official pictures (the comparison sheet
+  is `research/evidence/chog-body-variants-blender-2026-10-12.png`; recommended to the user,
+  who had not answered when it went in): a slim body in the Skin colour, big pink mittens
+  and feet, a dark outline, no spikes. The game now colours each material of a part by its
+  name. Seen on a hero in a headless match (the same close-up): a red body with pink mittens
+  under the picture; and in the body viewer, its five poses with the new shoulders
+  ([capture](../research/evidence/chog-body-b-viewer-poses-headless-2026-10-12.png)). Not
+  seen on a phone. 67 view tests.
+  The public address serves the build with all of this
+  (`20261012T005009618Z-67649349660c4ffc9995937ba8b0cb9f`) since 02:54.
+
+- **Running on the Mac since 12 October 02:10.** The public address is the tunnel
+  (`ngrok http 8087`, a background task of the dev agent's session) in front of
+  `serve_public.sh` on port 8087, data in `.artifacts/services-public/`; it ends with that
+  session or this Mac. Port 8084 follows the newest build (the wallet connector, the Chog
+  body, the staking screens, which stay hidden there because its services, port 8090, have no
+  wager; port 8090 has no Reown id either, so 8084 offers no connector). The connector test
+  bench (port 8086 in front of services on port 8092, data in
+  `.artifacts/services-connector-test/`) was stopped after its runs; the connector is tried
+  on the public address. Port 8083 still serves the build of 10 October below. The Unity Editor is
+  open on `game/` (opened by the dev agent; builds are asked from it). The staking bench
+  (port 8085 in front of services on port 8091, with a wager on a local copy of Monad) was
+  stopped after its runs: it is started again with `tools/contracts/wager_bench.sh`, and
+  must stay a test bench, since its wager only exists on the copy.
+
+- **On port 8083 since 07:00, 10 October:** build `20261010T044401171Z`, with the cut-out
+  heads, the game's own page, the visible bodies, the see-through capsule and the rental
+  screens, which stay hidden while no contract is set up (`site/` was last assembled from the
+  build of 02:30).
+  Game `http://192.168.1.85:8083/` (test entry `?token=1795&charged=1`, add `&perf=1` for
+  reports), hero page `http://192.168.1.85:8083/hero/`. The local services
+  (`node server/src/local.js`, port 8090) must be running for the wallet, the careers and the
+  wallet lookup of the page. Port 8084 follows the newest build.
+
+Not doable without the user: a public deployment (needs their hosting account and a place to
+keep the careers), a real wallet test, and anything seen on the phone.
+**Next action:** see "Where things stand" at the top. Earlier wording kept for reference: the Aura effect on the signature,
+largest share first (`raw` is already half
+the collection, then burn, chill and hex), with one colour and one keyword per effect and the
+caps on control agreed in D18; then the delivery of each Tier with its price. Before tuning any
+number, write the kit budget rule. In parallel, for the user: the art-permission question to
+the Chog team and the legibility of portraits on the phone. After the effects: the wallet with
+Reown, so the Genesis is chosen from those the player owns instead of typed in the URL.
+Open performance items, by expected value: the 17 ms of non-simulation work (draw submission,
+view scripts, UI), not yet broken down.
+
+**Housekeeping found on 9 October:** the hackathon site extended sign-up to 72 h, so the
+derived end is **23 October 17:00 Paris**, not 22 October
+([site re-read](../research/evidence/chogathon-site-facts-2026-10-09.json)); the user confirms
+the team is registered. The submission asks for a shared repository and the pre-existing work
+used; the project is not under version control yet. The previous agent binary-patched the
+Bot SDK editor DLL for Unity 6000.6 (`OnOpenAsset` int overload removed, replaced by
+`CircuitWindowUnityCallbacks.cs`; tool `tools/unity/PatchCircuitOnOpenAsset.cs`; original in
+`.artifacts/unity/vendor-backups/`); editor-only, not in builds. Unity left a crash-recovery
+scene in `game/Assets/_Recovery/` at 01:58; it is now git-ignored and must not ship.
+
+Le projet Fusion reste disponible pour comparer le ressenti et tester un repli si le
+profilage mobile Quantum le justifie ; ses huit contrôles réseau Editor ne prouvent pas
+un serveur de production ni un client navigateur multijoueur. [Procédure Fusion](../game-fusion/README.md).
+
+## Historique conservé : installation et qualification initiale Quantum
+
+Les sections suivantes décrivent les preuves du candidat Quantum précédent.
+L'utilisateur a testé la scène Gameplay et confirme son bon fonctionnement. Le journal
+montre deux démarrages en mode Local ; aucun résultat par capacité ou fin de match mesuré
+n'est revendiqué. Ce test précède l'adaptation tactile ci-dessous.
+
+Les contrôles tactiles ne dépendent plus du symbole Android/WebGL : visibilité selon le
+périphérique, lecture des boutons/sticks, conservation de la visée lors du relâchement,
+protection du doigt propriétaire et remise à zéro lors d'une pause/perte de focus.
+`Chog.Controls` isole la lecture des inputs et la capture des pointeurs ; la simulation
+reste inchangée. Les quatre assemblages concernés compilent avec les références réelles
+de Unity. **Neuf tests EditMode ont passé dans Unity 6000.6.4f1**, le 8 octobre à
+01:31:25 UTC, avec le vrai Input System et son fixture officiel. La demande automatique
+a été consommée ; résultat dans `.artifacts/unity/latest-controls-tests.json` et XML détaillé.
+Ces tests vérifient la lecture des inputs et la capture des pointeurs, pas la livraison
+des événements UI ni l'ergonomie sur un téléphone réel.
+
+Le menu **Chog → Qualification → Build Local WebGL (Bots)** construit la seule scène
+Gameplay sans modifier la liste des scènes réseau ni demander d'AppId. Le build a
+maintenant réussi et le match local a démarré dans Chrome (preuve plus haut). Le parcours
+en ligne Quantum avec `QuantumSampleMenu.unity` a désormais un AppID Quantum 3 distinct ;
+sa connexion n'a pas encore été exécutée. Téléphone déclaré : **Redmi 11C** ; navigateur,
+RAM et version Android non confirmés.
+Le ZIP demandé a été fourni et extrait : Quantum 3.0.9, Unity d'origine 2021.3.45f2.
+Les 6 656 fichiers avaient été vérifiés à l'extraction. La migration et l'intégration
+Genesis ont depuis modifié certains fichiers ; le ZIP et ses empreintes restent la référence.
+La procédure et les points d'intégration sont dans [game/README.md](../game/README.md).
+
+Après les échecs `ENOENT` de l'ancienne installation, l'utilisateur a installé et ouvert
+**6000.6.4f1 arm64, sans Rosetta**, avec WebGL présent dans `PlaybackEngines/WebGLSupport`
+à la racine de cette installation. Le premier import est entré en Safe Mode. Les compteurs
+du script de build, les anciens IDs Unity et des API Editor du sample ont été corrigés.
+Unity IAP, sans référence dans le code ou les scènes, a été retiré du manifest.
+Advertisement Legacy (`com.unity.ads` 4.19.0), également inutilisé, a été retiré du manifest
+et du lock résolu par Unity. Son script Editor demandait automatiquement MDR à chaque
+rechargement, ce qui explique les fenêtres « Mobile Dependency Resolver required » et
+« Missing signature ». Aucune installation MDR n'est nécessaire pour le jeu actuel.
+
+Les compilations Unity de Chog.Editor, Photon.Realtime, Chog.Heroes, Chog.Genesis et
+Quantum.Unity ont réussi pendant la session. Le dernier Quantum.Unity.Editor corrigé et
+trois assemblages dépendants compilent également avec le compilateur et les références
+réels de cet éditeur, en sortie isolée. **Unity a ensuite recompilé Quantum.Unity.Editor,
+Assembly-CSharp et Assembly-CSharp-Editor avec succès** ; aucun nouvel échec C# après les
+corrections dans le journal live. L'utilisateur confirme ensuite un redémarrage sans erreur ;
+le nouveau journal montre le mode Default. Le blocage de compilation et de Safe Mode est levé.
+Pas de stubs Unity ni de masquage des erreurs obsolètes.
+[Relevé de compilation](../research/evidence/unity-6000.6-qualification.json).
+
+Diagnostic de stockage du 8 octobre, effectué en lecture seule : environ 13,3 Go libres
+avant nettoyage. Applications : 8,8 Go ; dossier utilisateur Library : 52,8 Go, dont
+18,9 Go de caches ; projets CascadeProjects : 42,7 Go. Foundry/anvil/tmp (18,4 Go) et
+Colima (11,5 Go) ont été mesurés mais exclus du nettoyage proposé. Certains chemins
+protégés sont inaccessibles ; les sommes de `du` ne constituent pas une comptabilité APFS
+exhaustive. Aucun document, source ou asset supprimé ; aucune installation Unity lancée par l'agent.
+
+L'utilisateur a autorisé le nettoyage de cinq caches précis totalisant environ 10,8 Go mesurés :
+les deux caches Bee de l'ancien chogtanks, le cache npm `_cacache`, le cache `go-build`
+et le cache de compilation Go de Homebrew. Sources, assets, dépendances installées,
+données Colima/Anvil et sauvegardes exclus. Plan et diagnostic locaux :
+`.artifacts/storage/cleanup-plan.json` et `.artifacts/storage/diagnostic.json`.
+Les cinq caches ont été supprimés après cet accord. Gain d'espace libre observé :
+**9,77 Go**, soit **23,07 Go libres** après nettoyage. Les dossiers Assets, Packages et
+ProjectSettings de l'ancien projet sont présents ; Anvil et Colima conservés.
+Résultat détaillé : `.artifacts/storage/cleanup-result.json`. Le script affiche seulement
+le plan par défaut ; son exécution explicite a été limitée aux cinq chemins autorisés.
+Après installation de l'éditeur et des modules : environ 2,1 Go libres au relevé suivant,
+puis des relevés fluctuants entre 0,55 et 2,65 Go pendant l'import.
+Un échec temporaire `no space left on device` a été observé ; prévoir davantage de marge
+avant un build WebGL. Aucun nettoyage supplémentaire hors des cinq caches n'a été effectué.
+
+Diagnostic complémentaire en lecture seule : le dossier utilisateur mesure environ 151,3 Go,
+dont 49,8 Go dans Library et **101,4 Go hors Library**. Le dossier Documents ne représente
+que 0,45 Go ; projets 38,7 Go, états Anvil 18,4 Go et Colima 11,5 Go expliquent une grande
+partie du volume hors Library. Un disque virtuel Colima déclare 107,4 Go logiques mais
+n'alloue que 10,4 Go. Le classement macOS « Documents » n'est pas réconcilié fichier par fichier.
+Certains fichiers protégés restent inaccessibles. Relevé :
+`.artifacts/storage/visibility-diagnostic.json`. Aucune suppression supplémentaire.
+
+La migration Unity du sample est désormais la base de travail. La suite vise deux clients
+Quantum dont un téléphone, trois actions, deux profils Genesis visibles, puis les objectifs
+MOBA. Le catalogue et la carrière gardent l'identité canonique ; l'admission et le résultat
+doivent être vérifiés par backend/webhook et, si nécessaire, rejeu avant crédit définitif.
+
+## Avancement réel
+
+| Élément | État | Preuve / reste à faire |
+| --- | --- | --- |
+| Direction produit | Confirmée par l'utilisateur | MOBA multijoueur, 3D/isométrique, préférence PWA, NFT et rareté centraux, $CHOG payant, prototype vite puis enrichissement. |
+| Choix réseau | Réexaminé le 8 octobre ; Quantum 3 retenu pour le développement | Sample local WebGL et premier essai Redmi fonctionnels. Fusion Server reste une preuve et un repli ; aucun gain de FPS Fusion établi. Plafond de 100 connexions Photon accepté pour le MVP. [Décision sourcée](DECISION-RESEAU-REVUE.md). Online match Mac + phone fluid per user on 9 Oct, unmeasured. |
+| AppID / SDK Fusion | Configurés et exécutés | AppID appliqué, SDK 2.1.3 build 2390 importé ; compilation et connexion Photon passent. [Qualification SDK](../research/evidence/fusion-sdk-qualification.json). Aucun forfait modifié. |
+| Arène Fusion | Tranche Archer livrée ; huit contrôles réseau passés | Serveur + deux clients dans un même processus Unity, physiques séparées ; autorité, mouvement, volée, zone, dégâts, départ et nouvel arrivant. Entraînement avec bot, souris et tactile émulé dans Chrome. [Preuve](../research/evidence/fusion-archer-slice.json). Respawn vu sur deux clients, multijoueur navigateur et appareil réel restent à qualifier. |
+| Lecture CHOGTANKS | Effectuée, statique | [Relevé](../research/evidence/moba-feasibility-and-reuse.json) ; aucune migration réalisée. |
+| Contrats Genesis et CHOG | Lectures publiques effectuées | [Preuves](../research/evidence/README.md) ; aucune transaction ni audit complet. |
+| Métadonnées Genesis | 302 fichiers récupérés et analysés sur 1 969 attendus | [Recensement partiel](../research/evidence/genesis-trait-census.json), cinq tiers ; tous les metadataId 1 à 300 récupérés. Reprise limitée terminée, zéro échec sur les 62 nouvelles entrées. |
+| Plan gameplay / progression / architecture | Proposition écrite | [Plan](PLAN.md) et [architecture active](ARCHITECTURE-QUANTUM.md) ; comportements à tester. |
+| Sample Quantum | Build local WebGL et partie Chrome réussis ; Redmi essayé qualitativement | SDK 3.0.9.1932, Unity 6000.6.4f1. L'utilisateur rapporte un jeu assez fluide sur Redmi 11C, avec quelques saccades. [Preuve](../research/evidence/quantum-webgl-local-2026-10-08.json). FPS et replay pas mesurés. Online party match Mac + phone played on 9 Oct, fluid per user. [Evidence](../research/evidence/quantum-online-two-devices-2026-10-09.json). |
+| Résolution et intégration des héros C# | Implémentées et exécutées hors gameplay | 3 fixtures réelles, 27 tests catalogue et 14 tests d'intégration Quantum passés sous .NET 8, dont application des références dans un vrai Frame. [Résultats](../research/evidence/quantum-headless-qualification.json). Binder encore non appelé par le lobby ; aucun cast/dégât ou achat exécuté. |
+| Bindings NFT de prototype | Relus sur Monad au bloc 111362105 | Tokens 512 → metadata 4, 561 → 53, 973 → 465. [Réponses RPC](../research/evidence/prototype-genesis-bindings.json). |
+| Unity + build mobile web | Quantum local Chrome/Redmi qualitatif ; Fusion Chrome émulé | Quantum WebGL/IL2CPP gzip ~22,2 Mo ; partie locale à bots. Fusion Archer ~12,9 Mo, sans essai Redmi. Aucune mesure comparable de temps d'image. |
+| Contrôles web tactiles | Deux capacités essayées dans Chrome émulé | Deux joysticks simultanés, volée au relâchement, aperçu puis impact de la zone dans la direction visée. [Captures](../research/evidence/fusion-archer-slice.json). Aucun essai téléphone réel. |
+| Écarts sample → MOBA/PWA | Identifiés ; adaptation tactile engagée | Deux slots seulement ; objectifs Coin Grab et commandes debug à adapter. [Points d'intégration](../game/README.md). |
+| P0 / P1 à P6 | P0 Quantum partiel ; tranche Fusion archivée comme preuve | Quantum fonctionne localement sur Chrome et selon l'utilisateur sur Redmi ; two online clients (Mac + phone) played on 9 Oct; no MOBA/Genesis match, measured FPS, purchase or verified result. |
+
+Preuves : [qualification C# et premier diagnostic P0](../research/evidence/p0-qualification.json),
+[profils réellement résolus](../research/evidence/prototype-resolved-heroes.json) et
+[inspection du sample reçu ensuite](../research/evidence/quantum-sample-inspection.json).
+Le SDK .NET 8.0.425 local et le SDK Quantum officiel ont servi aux 41 tests conservés dans
+[ce relevé](../research/evidence/quantum-headless-qualification.json). Ces tests SDK ne valident
+pas un replay complet ou un match réseau ; le build WebGL est prouvé séparément ci-dessus.
+Le premier réseau Fusion est documenté séparément ; son téléphone n'a pas été essayé.
+
+## Journal des décisions
+
+| ID | Statut | Décision et raison | Revoir quand |
+| --- | --- | --- | --- |
+| D01 | Confirmé utilisateur | Produit autonome MOBA en vue haute 3D ; PWA préférée ; placeholders d'abord. | Nouvelle instruction utilisateur ou limite mobile mesurée. |
+| D02 | Recommandé | Première livraison 3v3, une voie, trois archétypes, attaque + deux capacités. | Première partie entière et essais tactiles. |
+| D03 | Recommandé | Traits résolus par un catalogue versionné ; règles dédiées aux absences et 1:1. | Inventaire complet et tests de lisibilité/équilibrage. |
+| D04 | Recommandé | Tier = expression mécanique de la signature ; commun viable ; variantes avec contreparties. | Tests comparatifs ; aucun équilibre supposé acquis. |
+| D05 | Recommandé | Carrière et spécialisations accompagnent le NFT ; préférences/rang suivent le joueur. | Avant finalisation des règles de transfert et du commerce. |
+| D06 | Historique, remplacé le 8 octobre | Fusion 2 Server avait été validé ; [motifs d'origine](DECISION-RESEAU.md). Aucun avantage mobile n'avait été mesuré. | Conservé comme référence technique. |
+| D07 | Révisé avec D14 | Backend C# et résolution partagée ; admission Quantum contrôlée, résultats comparés puis rejoués si litigieux avant progression, écriture idempotente. | Premier webhook, replay et reprise après panne. |
+| D08 | Recommandé | Achat $CHOG de spécialisations connues, attachées au Genesis ; base jouable sans achat. | Essais des spécialisations et fixation des paramètres de vente. |
+| D09 | Recommandé | Construire une partie complète tôt, puis enrichir ; réserver la fin à la livraison. | Mesures P0, fin de chaque jalon et échéance confirmée. |
+| D10 | Mis en œuvre | Bibliothèque C# pure limitée à 3 fixtures ; package UPM partagé, binder et loadout Quantum intégrés. 41 tests .NET passent avec le SDK officiel ; le lobby et les vrais assets de signature restent à brancher. | Premier combat et build IL2CPP ; extension du catalogue. |
+| D11 | Intégration Fusion historique vérifiée | Unity 6000.6.4f1 arm64 + Fusion 2.1.3 build 2390 + Cecil 1.10.2 ; compilation et réseau Editor passent. Patch ciblé conservé. | Revoir seulement si Fusion redevient actif. |
+| D12 | Confirmé utilisateur | 100 connexions Photon simultanées acceptables au MVP ; vérifier l'éligibilité de l'offre gratuite Quantum/Fusion pour l'AppId Quantum. Préserver PUN2 chogtanks. Aucun forfait activé par l'agent. | Éligibilité du compte et mesures de charge avant lancement. |
+| D13 | Tranche Fusion historique implémentée | Archer, deux capacités, visée, caméra, feedback et bot qualifiés ; Tanknarok reste documentaire. [Périmètre antérieur](ARCHITECTURE.md#31-reprendre-lexpérience-du-twin-stick-shooter). | Repli si mesure mobile le justifie. |
+| D14 | Décision active du 8 octobre | Quantum 3 dans `game/` ; sample WebGL joué dans Chrome et déclaré fonctionnel sur Redmi 11C. Pas de développement parallèle Fusion ; profils et résultats à valider par backend/webhooks/replay. [Réexamen](DECISION-RESEAU-REVUE.md). | Charge 3v3 représentative ou nouvelle exigence d'autorité/secret. |
+| D15 | Audit 2026-10-09 | Independent audit keeps Quantum 3 on the Public Cloud, conditional on gate B0 (online representative load measured on the phone); result path = client results compared, replay stream archived, re-simulation for disputes. [Audit](PHOTON-ARCHITECTURE-AUDIT.md). | B0 fails after tuning, or a secret-information or money-per-match requirement appears (audit section 9). |
+| D16 | Revised by the dev agent, 9 Oct 05:30 | The gate was relaxed on a qualitative report, then the first measured run showed about 28 fps and p95 57 ms at six heroes, 60 Hz: the bar is not met. Tuning comes first: one build with URL overrides compares checksum off, 30 Hz, browser-paced frames and a cheaper quality level; the best settings are applied before minions and towers. [Readings](../research/evidence/quantum-online-perf-phone-2026-10-09.json). | Tuned run still above 33 ms p95 with simulation dominant: native Android build, then audit section 9. |
+| D17 | Applied by the dev agent, 9 Oct 06:05 | Simulation runs at 30 Hz with checksums off: on the phone the A/B gives about 32 fps against 26 and a Quantum update of 8 ms against 15, beyond the measured noise. Tick-counted bot timings are converted so behaviour keeps its real-time pace. [A/B](../research/evidence/quantum-tuning-runs-phone-2026-10-09.json). | Controls feel sluggish at 30 Hz in user tests, or a 60 Hz feel is wanted on strong devices (then test 30 Hz simulation with input delay tuning before going back). |
+| D18 | User, 9 Oct 08:16: "je valide les directions que tu a donné" | The directions summarised to the user from the research are accepted: more than three readable roles, a price for each delivery so rarity is not power, strict caps on stun and invisibility, no Aura as a real kit, the real Genesis image on a shared body, wallet sign-in proven to a server, career keyed by token id, $CHOG purchases recorded per token. The user's own idea for binding is non-speculative badges, possibly with powers; they are unsure it is worth it. Dev agent's reading (not the user's words): badges are the non-transferable form of the career and come after the wallet step. The twelve detailed proposals of the [report](../research/reports/Héros%20Genesis%20traits%20et%20liaison%20NFT.md) were not reviewed one by one by the user; "who can play" (decision 7) and whether a lane MOBA replaces the sample's 3v3 mode are still theirs to settle. | A proposal fails its flip test in the report, or the organisers answer the art-permission and judge-access questions differently. |
+| D19 | User, 9 Oct 09:30 | (1) Art: "on a tous les droits, on fait ce qu'on veut", so the Genesis images may be displayed, copied and cropped; no message to the Chog team is needed. (2) Who can play: holders play their Genesis normally; a non-holder can still play, with a default character that is somewhat weaker. This replaces the report's proposal 7 (anyone plays any Genesis) and its "full budget baseline": the weaker default is the user's choice. (3) Tone: the game will later lean adult and provocative; gameplay first for now. (4) What happens in a fight must be readable on screen: distinct visuals for attacks and effects come before more mechanics. Not answered yet: lane MOBA or the sample's 3v3 mode. | The organisers publish a rule on art or on holder-only access that contradicts this. |
+| D20 | User, 9 Oct 11:25 | The differentiation of the project is that, in the end, every effect, every item and every attack represents a Chog trait or characteristic. The bundled effect pack is scaffolding: visuals have to be created from what the Genesis art shows. The user's example: the laser attack did not look like the lasers drawn on the Genesis. Applied first to the lasers (two beams from the eyes, in the colours of the Eyes value). Dev agent's reading: for each trait family, look at the real images first, then build the attack; a generic effect is a placeholder to be named as such. | A trait family cannot be drawn recognisably at game size on the phone; then it keeps a generic effect and its link to the trait is carried by colour and by the hero card. |
+| D21 | Dev agent, 9 Oct 13:00, **to be confirmed by the user** | The game services are written in Node as one handler on the web-standard Request and Response (`server/src/api.js`), with storage and secret passed in, so the same code can sit behind a hosted function. Locally it runs behind Node's HTTP server and keeps careers in a file. Reason: the earlier game's backend was Node, a hosted function is the cheapest way to a public address, and no hosting account was known when the code was written. The architecture document's "services" layer is unchanged. | The user names the hosting; a platform cannot run this handler as it is. |
+| D22 | Dev agent, 9 Oct 13:00, **to be confirmed by the user** | A recruit (a player without a Genesis, D19) has 85% of the health of the class and its plain special; nothing else differs. Reason: "a little weaker" had to become a number, and a single visible number is easier to explain and to tune than several. | Playtests show a recruit is hopeless or indistinguishable; the user wants another handicap. |
+| D23 | Dev agent, 9 Oct 13:30, **to be confirmed by the user** | A career is credited from the result the player's own page reports, once per match and per Genesis, from the signed-in address that holds the token on chain at that moment. This is weaker than the architecture's rule ("never a victory declared by a single page") and is recorded as such: `confirmed` counts results another signed-in player of the same match reported identically, and nothing replays a match. Reason: it gives the retention loop now, on honest labels, and keeps the place for verification. | Before any reward, ranking with stakes or $CHOG use depends on a career: results must then be verified. |
+| D25 | Dev agent, 9 Oct 15:50, **to be confirmed by the user** | The menu carries a working title, "CHOG GENESIS", and one line, "3v3 arena. Your Genesis is your hero.", in place of the engine's logo. Reason: the game has no name, and the first screen of a judge should not be the logo of a sample. It is the name of the collection, not a brand choice. | The user names the game; the menu is rebuilt as the game's own. |
+| D24 | Dev agent, 9 Oct 14:00, **to be confirmed by the user** | A light web page (`web/hero/`) lets a holder look up any Genesis as its hero card and share it, outside the game. Reason: distribution among the about one thousand holders is the cheapest lever, and the game is a 22 MB download. It shows the same card as the game from generated data and decides nothing. | The user prefers one surface only, or wants the page inside the game's own site design. |
+| D35 | Dev agent, 11 Oct; accepted by the user on 12 Oct ("je suis tes reco si elles sont pertinentes pour un produit qui va au market sur le long terme") | A player whose page declares a Genesis it has no right to is not refused: it enters the match as a recruit (the webhook answers with its data put right). Reason: a refusal leaves the page inside a match with no character and no message, and the same case happens honestly (a Genesis sold or a rental that ran out during a session). The same answer clears a loadout named directly and a character left to the machine, and gives the second form only to a Genesis that has it. | A screen that tells the player why it plays a recruit; the first real webhook. |
+| D34 | Dev agent, 11 Oct; accepted by the user on 12 Oct on the same words as D35. Told to the user as still to settle before real amounts: where the referee's key lives (it signs every result; today a file), the share burned and a ceiling on a stake (theirs to choose), and a legal review (staking money on the outcome of a game is regulated in many countries) | How a match is staked on. (1) A wallet the webhooks let into a match asks the referee for a ticket and stakes on the contract; the first ticket fixes the stake of the match; a ticket lasts 120 seconds. (2) Before the match begins the stakes are locked: the game asks for it when its player presses START, and any wallet of the match may ask; the lock waits until every ticket handed out was used or has run out, so nobody can stake once play has begun. (3) The team is the one the player's page declares; it is checked afterwards against the replayed match. (4) The result is the verdict of the replay; an even score is a draw, which the game itself gives to the second team. (5) The match is called off, and every stake given back, whenever something cannot be trusted: never locked, locked after the selection of characters ended, a stake that is not in the book, a staker who did not play or played in the other team, a Genesis other than the one admitted, a record that is not whole or does not reach the end. (6) The referee decides once for a match and never signs two decisions. Reason for refunding rather than punishing: a doubt must never pay anyone, and the contract already gives every stake back after an hour without a result. Known holes: the configs of a match are those of the first page; a team that is losing cannot call the match off alone, but all remaining players leaving together can. | Photon's first real calls; the staking screen; the user's view on the stake sizes and the burned share (a tenth in the rehearsal). |
+| D33 | User, 10 Oct 07:40 ("aller vers la version du jeu sécurisée pour eviter le cheat et pourvoir lancer le pari est bien meilleur ROI que le cosmetique", "je retire ce cadrage", "Ton calendrier est trop laxiste") | (1) Staking $CHOG on a match is in scope; the line "no wagering and no token rewards per match" in the scope of the audit of 9 October is withdrawn. (2) The secured version of the game comes before cosmetics: who plays which Genesis and who won must not depend on what a player's page declares. The path is the one the audit verified on Photon's documentation: custom authentication, the AddPlayer and GameConfigs webhooks, the input history streamed by Photon's server, and a re-simulation of the match outside Unity that gives the result; a stake is paid out on that result only. (3) The project is a show of force: ambition is wanted wherever it serves fun and wow, without over-engineering; the calendar of the previous point was judged too slow, the user works on it full time. (4) Otherwise the recommendations of the 07:20 point are followed: a tower and a core on the present map first, a Chog body tried by script, a home screen. The user announced attacks for adults to come, not specified yet. |
+| D32 | User, 10 Oct 04:00 ("je valide", "faisons au mieux je suis ta reco") | The game stays a web page opened by a link, with its own page: the whole screen on its side at the first touch, installation offered and never required, no native app. For the wallet on a phone, a connection that stays in the normal browser is to be added (Reown AppKit first, loaded only when the page has no wallet), per the [report](../research/reports/mobile-presentation-2026-10-10.md). The page is built; the connection is not, and needs a Reown project id and a public https address. |
+| D31 | User, 10 Oct ("ok on veut ca, les juges sont sensé avoir un wallet et du $chog"); terms proposed by the dev agent and **accepted by the user on 10 Oct, 04:00 ("ok")** | A Genesis can be rented for $CHOG through a contract (`ChogRental`). Asked by the user: the renter pays, the holder is paid. The terms, still changeable before a deployment: the holder sets a price a day; the payment goes straight to the holder less a share burned, fixed at deployment (a tenth in the rehearsal); the Genesis never moves and the holder keeps playing; several players may rent the same Genesis at once; 1 to 30 days, more days added after those paid; paid days survive the offer being taken back and the Genesis being sold; a renter's matches count for the career of the Genesis; the free link loan (D26) stays beside it; the contract has no owner. Not deployed. |
+| D30 | Dev agent, 10 Oct 03:05, **to be confirmed by the user on the phone** | A hero is drawn as a body under the image of its Genesis: image 1.2 units wide, raised 0.55 up the screen, body 1.55 times the size of the model, name and bars raised with the image. Reason: the user reported invisible heroes; the image, 1.7 wide, hid the whole body from the game's camera. Values picked from six headless captures, changeable with `?look=` on a private address. |
+| D29 | Dev agent, 10 Oct 02:05, **to be confirmed by the user** | The first thing sold for $CHOG is the second form of a Genesis's attack, at once instead of at mastery 2, through the shop contract written on 9 October (item 1, `approve` then `buy`, recorded per token id). Reason: it is the plan's first paid use (section 5: a permanent specialisation bought for a Genesis, also reachable by mastery, never strength), it uses $CHOG in a way that belongs to the NFT, and it needs no new contract. Built so that nothing shows until a shop address is set. The price, the treasury, the burned share and the deployment are the user's. | The user wants something else sold (a cosmetic), wants the purchase in one signature (permit), or wants no purchase at all; the token's rules change. |
+| D28 | Dev agent, 10 Oct 01:25, **to be confirmed by the user** | Bodies are moved by code (`ChogBodyAnimator`) and not by animation clips, for the class models now and for the Chog body the user announced (four rigid parts, no skeleton). Reason: the user's model has no skeleton, so something has to move it; the same code removes the game's need for the sample's eleven clips and controller, which the licence audit lists among what cannot ship. The Chog body is taken from `Resources/ChogBody` when it exists; until then the class models stay. | The user's model comes with a skeleton and its own clips; the moves read badly on the phone. |
+| D27 | Dev agent, 10 Oct 00:55, **to be confirmed by the user** | A Genesis earns mastery by playing (one point a match, one more a win; level 2 at 3 points, then 8, 15, 25, 40), and at mastery 2 it may play a second form of its attack, chosen on the menu: wider or longer at the price of damage or reach, never plainly better. This is the plan's "mastery opens a specialisation" (section 5) and the user's own idea of non-speculative badges that may carry powers (D18), built on the career so it follows the Genesis to a new holder or a guest. It is also the place where a $CHOG purchase can later unlock the same form at once; nothing is sold today. Mastery comes from the same self-reported results as the career (D23): a holder can cheat it for their own Genesis, which gains a side-grade. | Playtests show one form is plainly better; the user wants forms earned otherwise, sold only, or not at all; results become verified and the thresholds need another scale. |
+| D26 | Dev agent, 9 Oct 20:30, **to be confirmed by the user** | (1) A holder can lend a Genesis with a link: whoever opens it plays that Genesis without a wallet, for thirty days at most, until the holder stops lending or the Genesis leaves the wallet; the guest's matches count for the career of the Genesis. This is extension E6 of the plan, taken now because it answers three things at once: a judge or a friend without a Genesis can play one (the census found a rival with a guest path and none for us), every holder gets a reason to pass a link on, and D19 stays whole (only holders decide who plays a Genesis; everyone else is a recruit). A link is a bearer link: several guests may use it at once. Nothing is signed for a loan; the signed sign-in proves the holder. (2) The test options `?token=`, `?charged=` and `?bots=` only work in the Editor and on a private address; on a public address they are ignored, as the plan requires ("no mock of ownership stays usable in the public version"). | The user wants lending limited (one guest at a time, a named wallet, a shorter life), signed by the wallet each time, or not at all; the organisers give judges Genesis of their own. |
+
+## Points ouverts concrets
+
+| Sujet | Comment le résoudre | Bloque |
+| --- | --- | --- |
+| Multijoueur Quantum | AppID Quantum 3 set; party-code match Mac Editor + phone played on 9 Oct, fluid per user, unmeasured. Quick Play did not pair two clients (likely region split). Reconnection impossible while PlayerTTL is 0. [Evidence](../research/evidence/quantum-online-two-devices-2026-10-09.json). | Reconnection and pinned-region matchmaking before public tests. |
+| Marge disque | Espace libre fluctuant : jusqu'à 0,3 Go pendant le premier build Archer, puis ~26 Go après changement de l'état du Mac. Un SDK .NET temporaire de nos artefacts a été supprimé ; aucun fichier utilisateur n'a été touché. Mesurer avant les prochains builds/modules. | Installation du module Linux et futurs builds. |
+| Vérification des résultats Quantum | Implémenter admission par webhook, GameResult, comparaison et rejeu des litiges ; aucun résultat client seul ne crédite la carrière. | Carrière publique fiable. |
+| Téléphones de référence | Phone GPU Mali-G52 MC2 (Helio G85 class, consistent with Redmi 12C). At 30 Hz: about 32 fps, median frame 30 to 31 ms, six heroes, lowest quality level; non-simulation work 17 to 18 ms is the limit. [A/B](../research/evidence/quantum-tuning-runs-phone-2026-10-09.json). iOS and a mid-range phone not measured. | Budget check as minions and towers land. |
+| Droits des animations du prototype | Meshes KayKit et sons ont une source CC0 identifiée. Les cinq `.anim` et le contrôleur copiés du sample Quantum restent à remplacer par des exports KayKit directs et un contrôleur original, ou à couvrir par licence individuelle. [Provenance](../research/evidence/fusion-archer-slice.json). | Distribution publique du build. |
+| Mapping exhaustif des vrais traits | Inventaire, table créative explicite et validation de couverture. | Ouverture du catalogue à tous les Genesis. |
+| Visuels des 1:1 | Examen individuel lors de l'attribution de leurs signatures ; placeholders possibles d'abord. | Personnalisation fidèle de chaque 1:1, pas le premier combat. |
+| Prix, treasury, hébergement et domaine | Choix avant transactions ou publication ; préparer les configurations auparavant. | Achat réel et déploiement public. |
+| Calendrier officiel | Sign-up extended to 72 h; derived end 23 Oct 2026 17:00 Paris from the site's client code, re-read 9 Oct. Team registered (user). Deliverables include a shared repository and declared pre-existing work. [Site re-read](../research/evidence/chogathon-site-facts-2026-10-09.json). | Exact freeze; repository and licence declaration before submission. |
+
+## Règle de mise à jour
+
+Au début d'une session : lire l'état courant, reprendre la prochaine tâche et les décisions
+applicables. À la fin : noter changements, tests réellement exécutés, preuves et prochaine
+action. Si une décision change, modifier le document actif et la ligne D correspondante ;
+ne pas laisser deux recommandations contradictoires avec le même statut.
+
+Une tâche terminée mentionnera le build/commit, le scénario testé, l'appareil si pertinent,
+le résultat et les limites. Une dette temporaire mentionnera son effet et le jalon qui doit
+la solder. Aucun résultat ne sera ajouté rétroactivement parce qu'il semblait probable.

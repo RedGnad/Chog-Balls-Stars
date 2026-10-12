@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-09",
+  "candidate": "Quantum 3.0.9 Twin Stick Shooter, WebGL network menu",
+  "appIdConfigured": "625f17f2-5dc8-4bfe-a3cb-59c34ce730dc",
+  "build": {
+    "result": "Succeeded",
+    "unityVersion": "6000.6.4f1",
+    "scenes": [
+      "Assets/Photon/QuantumMenu/QuantumSampleMenu.unity",
+      "Assets/QuantumUser/Scenes/Gameplay.unity"
+    ],
+    "sizeBytes": 22684934,
+    "errors": 0,
+    "warnings": 32,
+    "report": ".artifacts/unity/20261008T224117377Z-9c1d11f4fbf8458eb714e7f05e334a8b/build-report.json"
+  },
+  "server": {
+    "localUrl": "http://127.0.0.1:8082/",
+    "lanUrlAtTestTime": "http://192.168.1.85:8082/",
+    "htmlStatus": 200,
+    "wasmStatus": 200,
+    "wasmContentType": "application/wasm",
+    "wasmContentEncoding": "gzip"
+  },
+  "browser": {
+    "environment": "Headless Chrome with SwiftShader on Mac; not target mobile hardware",
+    "observed": "Quantum main menu loaded; Party Menu opened; Create entered Team Preparation with a ping value; Start entered the arena with bots and an advancing frame counter. The upper-right gear opened the Session panel with a party code and Connected Players 1/6 both in Team Preparation before Start and during gameplay.",
+    "screenshots": [
+      ".artifacts/unity/quantum-online-party/browser-after-click.png",
+      ".artifacts/unity/quantum-online-create/browser-after-second-click.png",
+      ".artifacts/unity/quantum-online-match/browser-after-third-click.png",
+      ".artifacts/unity/quantum-online-session-code/browser-after-fourth-click.png",
+      ".artifacts/unity/quantum-online-code-before-start/browser-after-third-click.png"
+    ],
+    "eventLog": ".artifacts/unity/quantum-online-match/browser-smoke-events.json",
+    "runtimeExceptionsObserved": 0,
+    "warningsObserved": "Unity WebGL persistentDataPath deprecation warning and SwiftShader ReadPixels GPU stall messages; no gameplay exception observed."
+  },
+  "limits": [
+    "Only one browser client was connected; no second human client or shared-state observation yet.",
+    "The user reported a successful Unity Editor party flow, but the exact screen sequence and logs were not independently captured.",
+    "No real-phone WebGL network run or frame-time/CPU/memory measurement yet.",
+    "The game shown is the sample Coin Grab arena, not the planned Genesis MOBA.",
+    "No wallet ownership, Quantum webhook, game-result replay or $CHOG purchase was tested."
+  ]
+}

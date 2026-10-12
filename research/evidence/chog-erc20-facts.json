@@ -1,0 +1,50 @@
+{
+  "consulted_date": "2026-10-07",
+  "official_address_source": "https://www.chog.xyz/",
+  "contract": "0x350035555E10d9AfAF1566AaebfCeD5BA6C27777",
+  "rpc": "https://rpc.monad.xyz",
+  "chain_id": 143,
+  "observed_block": 111260495,
+  "read_consistency": "Batched latest reads, not all pinned to a single block.",
+  "name": "Chog",
+  "symbol": "CHOG",
+  "decimals": 18,
+  "total_supply_raw": "1000000000000000000000000000",
+  "total_supply_tokens": "1000000000",
+  "runtime_bytecode": "0x363d3d373d3d3d363d737f64ccfeb3e3afd7691ea0ef404e947786cefae85af43d82803e903d91602b57fd5bf3",
+  "runtime_observation": "45-byte minimal delegate proxy with embedded implementation address.",
+  "implementation": "0x7f64ccfeb3e3afd7691ea0ef404e947786cefae8",
+  "source_status": "Neither retrieved Monadscan page displayed verified source code; both prompted Verify and Publish.",
+  "explorer_pages": [
+    {
+      "url": "https://monadscan.com/address/0x350035555E10d9AfAF1566AaebfCeD5BA6C27777#code",
+      "sha256": "b2fe9f978aa719b857f2c3bfa982e8801eee462a8117856e6fc6c6c5bc14fa5a"
+    },
+    {
+      "url": "https://monadscan.com/address/0x7f64ccfeb3e3afd7691ea0ef404e947786cefae8#code",
+      "sha256": "2ed39623c922bb0587c9ccb6c9fb658c999d4b1d9dfd7b87ec40f0788769a361"
+    }
+  ],
+  "limitations": [
+    "Read-only inspection; no token transfer, approval or transaction was submitted.",
+    "No security audit, transfer-tax test, permit-flow test or application escrow test performed.",
+    "On-chain supply is not a measure of active users, demand or willingness to pay."
+  ],
+  "integration_reference": {
+    "url": "https://news.yuga.com/dookey-dash-toad-mode",
+    "date": "2023-02",
+    "observations": [
+      "Sewer Pass was required for participation.",
+      "Optional Powershart Packs were priced at 2 APE for ten minutes.",
+      "Benefits included a shorter dash cooldown, a scoring bonus and increased rarity of pickups."
+    ],
+    "limits": "Historical primary description, not causal evidence that paid boosts improve enjoyment or retention."
+  },
+  "anti_cheat_reference": {
+    "url": "https://news.yuga.com/prepare-for-the-jtm-mint",
+    "observations": [
+      "Yuga announced removal of cheating scores and a validation period before final results."
+    ],
+    "limits": "Documents a real operational burden; does not quantify the burden for our proposed game."
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "client_date": "2026-10-08",
+  "recorded_utc": "2026-10-08T00:57:24.805868+00:00",
+  "editor": {
+    "version": "6000.6.4f1",
+    "architecture": "arm64",
+    "rosetta": false,
+    "webgl_module_present": true
+  },
+  "initial_errors": [
+    "QualificationBuild : int counters assigned to uint fields",
+    "Photon Realtime : Object.GetInstanceID obsolete as error",
+    "Quantum runtime/editor : old instance IDs, serialized object references, SceneHandle conversions and asset creation API"
+  ],
+  "corrections": [
+    "Build evidence counters match BuildSummary int types",
+    "Realtime worker compares object identity directly",
+    "New EntityId APIs behind Unity version guards; raw 64-bit reference IDs preserved without truncation",
+    "Scene handle hashing and diagnostics avoid deprecated integer conversion",
+    "Legacy FX pool uses EntityId keys on Unity 6.3+",
+    "Unused Unity IAP package removed after source and scene reference search",
+    "Unused Advertisement Legacy removed after source/API and serialized GUID reference searches; this package triggered the MDR import dialogs"
+  ],
+  "verification": {
+    "method": "Installed Unity Roslyn compiler with Unity-generated response files and real Unity/Photon references; isolated output in .artifacts, no API stubs",
+    "isolated_compilers": [
+      {
+        "assembly": "Quantum.Unity.Editor",
+        "exit_code": 0,
+        "errors": [],
+        "log": ".artifacts/unity/compile-check/compiler.log"
+      },
+      {
+        "assembly": "Assembly-CSharp",
+        "exit_code": 0,
+        "errors": []
+      },
+      {
+        "assembly": "Quantum.Menu.Editor",
+        "exit_code": 0,
+        "errors": []
+      },
+      {
+        "assembly": "Assembly-CSharp-Editor",
+        "exit_code": 0,
+        "errors": []
+      }
+    ],
+    "earlier_unity_compilers": "Chog.Editor, Photon.Realtime, Chog.Heroes, Chog.Genesis and Quantum.Unity have compiled successfully in Unity during this session",
+    "editor_reload": "User confirms Unity restarted without errors. Current startup log shows Default mode and no C# compilation error. First gameplay session still pending.",
+    "live_unity_compilers_after_fixes": [
+      {
+        "assembly": "Photon.Realtime",
+        "exit_code": 0
+      },
+      {
+        "assembly": "Quantum.Unity",
+        "exit_code": 0
+      },
+      {
+        "assembly": "Quantum.Unity.Editor",
+        "exit_code": 0
+      },
+      {
+        "assembly": "Assembly-CSharp",
+        "exit_code": 0
+      },
+      {
+        "assembly": "Assembly-CSharp-Editor",
+        "exit_code": 0
+      }
+    ],
+    "editor_restart": {
+      "user_confirmed_without_errors": true,
+      "default_mode_observed": true,
+      "current_log_compile_error_line_numbers": []
+    }
+  },
+  "source_sha256": {
+    "game/Assets/Chog/Editor/QualificationBuild.cs": "546da2caf6eab8b5065c7db0dce22d34d22e8242576110585a9b79a388a0ea8f",
+    "game/Assets/Photon/PhotonRealtime/Code/EventBetter.cs": "854df69328c8315fe04390dbbeafbc0e647e86d48b7ce067aa445a486b6da21f",
+    "game/Assets/Photon/Quantum/Runtime/QuantumUnityRuntime.cs": "14994208465b715897122fe343b000cd9ec159fc95fb8c00c939b352e121f52c",
+    "game/Assets/Photon/Quantum/Editor/QuantumUnityEditor.cs": "5dcdb3333ba04ea837672560203dc7b195f9bf7b8158bdda5502ff7136ef70cf",
+    "game/Assets/TwinStickShooter/Scripts/GameView/AttackColorSetter.cs": "c922203f2a9267063df63aee5f807c86112457cd7c31d68c00b13258ba2b3689",
+    "game/Assets/TwinStickShooter/Third Party Assets/JMO Assets/Cartoon FX (legacy)/Spawn System/CFX_SpawnSystem.cs": "d81c8b87aedd85d1741dd39d2f8fa7e984c1dd5def880f1d6201bf0105e48099",
+    "game/Packages/manifest.json": "d05b2eed683ef61bc78f3c356b1b4e5167627472d951b87a1d21f20d9ee151af",
+    "game/Packages/packages-lock.json": "adfca6dbde226b1dd1a28405dd0cb3d13689102280bb6e5e11b75b4f41c369c6"
+  },
+  "references": [
+    "https://docs.unity3d.com/6000.6/Documentation/ScriptReference/Object.GetEntityId.html",
+    "https://docs.unity3d.com/6000.6/Documentation/ScriptReference/EntityId.html",
+    "https://docs.unity3d.com/6000.6/Documentation/Manual/script-serialization-analyzer.html",
+    "https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Build.Reporting.BuildSummary-totalErrors.html"
+  ],
+  "storage_free_bytes": 7032946688,
+  "limitations": [
+    "Local sample gameplay reported working by the user. No WebGL build, network session, phone test, measured match outcome or complete replay verified.",
+    "Unity updated packages and one FX inspector during migration; original ZIP and baseline remain the provenance reference.",
+    "Vendor merged SDK files contain small compatibility patches to recheck on SDK upgrade."
+  ],
+  "unused_advertising_package": {
+    "package": "com.unity.ads",
+    "display_name": "Advertisement Legacy",
+    "removed_version": "4.19.0",
+    "cause": "MobileDependencyResolverInstallerUnity.InstallPlayServicesResolverIfNeeded is called through InitializeOnLoadMethod and prompts to import MDR when the resolver is absent.",
+    "installer_path": "game/Library/PackageCache/com.unity.ads@dbd68e7e78e9/Editor/Source/MobileDependencyResolverUnity.cs",
+    "installer_sha256": null,
+    "download_url_from_installer": "https://s3.amazonaws.com/ssa.public/MDR/1.2.185/mobile-dependency-resolver.unitypackage",
+    "temporary_package_path": "game/Temp/MDR.unitypackage",
+    "typed_api_references_in_project": 0,
+    "package_script_binary_guids_checked": 100,
+    "serialized_project_files_checked": 1252,
+    "serialized_guid_references": 0,
+    "other_packages_depending_on_ads": 0,
+    "manifest_contains_ads": false,
+    "unity_resolved_lock_contains_ads": false,
+    "action_for_pending_dialog": "Ignore - Do not ask again during this session"
+  },
+  "first_local_play_preparation": {
+    "scene": "game/Assets/QuantumUser/Scenes/Gameplay.unity",
+    "scene_sha256": "30800d34333a1a1342768fe03cc6c3ef9f9b34f8cd80255f77947a065c44efde",
+    "runner": "QuantumRunnerLocalDebug",
+    "runner_source": "game/Assets/Photon/Quantum/Runtime/QuantumRunnerLocalDebug.cs",
+    "mode": "DeterministicGameMode.Local",
+    "runner_component_guid": "ba1cef2e59fba6443b0b8a032263be28",
+    "fill_with_bots_in_scene": true,
+    "require_single_loaded_scene": true,
+    "photon_app_id_required_for_local_mode": false,
+    "gameplay_executed": true,
+    "basis": "Static source and serialized scene inspection",
+    "validation": {
+      "source": "User confirmation after the documented Gameplay scene test",
+      "client_date": "2026-10-08",
+      "user_report": "ok je viens de tester ca fonctionne bien",
+      "scope": "Local Unity sample play; no per-feature measurement or complete match outcome specified",
+      "before_touch_control_changes": true
+    }
+  },
+  "photon_app_id_quantum_configured": false,
+  "followup_controls_qualification": "research/evidence/web-touch-controls-qualification.json",
+  "followup_controls_test_execution": {
+    "summary_path": ".artifacts/unity/latest-controls-tests.json",
+    "recorded_at_utc": "2026-10-08T01:31:25.8488220Z",
+    "passed": 9,
+    "failed": 0,
+    "scope": "EditMode input reader and pointer ownership tests; not browser gameplay or physical multitouch"
+  }
+}

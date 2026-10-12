@@ -1,0 +1,61 @@
+﻿enum EMemoryType : Byte
+{
+	None = 1,
+	EnemyInsivible = 2,
+	HideSpot = 3,
+	AreaAvoidance = 4,
+	LineAvoidance = 5,
+}
+
+enum EHealthStatus : Byte
+{
+	None,
+	Low,
+	Medium,
+	High
+}
+
+component AIMemory
+{
+	list<AIMemoryEntry> MemoryEntries;
+
+	EHealthStatus HealthStatus;
+	EntityRef ClosestCoin;
+}
+
+struct AIMemoryEntry
+{
+	EMemoryType Type;
+	MemoryData Data;
+	QBoolean IsInfinite;
+	Int32 AvailableTick;
+	Int32 UnavailableTick;
+}
+
+union MemoryData
+{
+	MemoryDataEnemyInvisible EnemyInvisible;
+
+	MemoryDataAreaAvoidance AreaAvoidance;
+	MemoryDataLineAvoidance LineAvoidance;
+}
+
+struct MemoryDataEnemyInvisible
+{
+	EntityRef Enemy;
+	FPVector2 DisappearPosition;
+	FPVector2 NearbyHideSpot;
+}
+
+struct MemoryDataAreaAvoidance
+{
+	FP Weight;
+	EntityRef Entity;
+	FP RunDistance;
+}
+
+struct MemoryDataLineAvoidance
+{
+	FP Weight;
+	EntityRef Entity;
+}

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cbd3463c8038d449931ce3d7a60269, type: 3}
+  m_Name: BaseKCC
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/BaseKCC
+    Guid:
+      Value: 2999427438683022857
+  Radius:
+    RawValue: 32768
+  MaxContacts: 3
+  AllowedPenetration:
+    RawValue: 655
+  CorrectionSpeed:
+    RawValue: 32768
+  BaseSpeed:
+    RawValue: 65536
+  Acceleration:
+    RawValue: 983040
+  Debug: 0
+  Brake:
+    RawValue: 655360

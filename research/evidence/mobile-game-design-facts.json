@@ -1,0 +1,198 @@
+{
+  "observed_on": "2026-10-07",
+  "scope": "Recherche documentaire mobile/PWA. Aucun jeu exécuté, aucune expérience utilisateur mesurée. Sources sélectionnées : pas de recensement exhaustif ni de méta-analyse.",
+  "sources": [
+    {
+      "id": "appmagic-2026",
+      "url": "https://appmagic.rocks/files/view/upload/Reports/EN_MobileMarkeLandscape2026.pdf",
+      "access": "PDF, méthode p. 7 et classement p. 33 (pages imprimées).",
+      "period": "2025",
+      "facts": {
+        "estimated_downloads": {
+          "Block_Blast": 368000000,
+          "Hole_io": 121000000
+        },
+        "estimated_IAP_USD": {
+          "Coin_Master": 651000000
+        }
+      },
+      "limits": "Estimations issues des classements App Store/Google Play ; autres distributions exclues, Android Chine exclu. Les revenus publicitaires et achats hors stores ne sont pas représentés par ces montants IAP. Ces mesures ne prouvent pas le rôle causal d'une mécanique."
+    },
+    {
+      "id": "sensor-tower-h1-2026",
+      "url": "https://sensortower.com/blog/h1-2026-digital-gaming-market-index",
+      "published": "July 2026",
+      "access": "Article public du fournisseur ; rapport complet non consulté.",
+      "period": "H1 2026 vs H1 2025",
+      "facts": {
+        "hybridcasual_IAP_USD": 2400000000,
+        "hybridcasual_IAP_YoY_percent": 23
+      },
+      "limits": "Estimation et classification du fournisseur. Pas une mesure de rentabilité ou de demande pour un petit jeu PWA."
+    },
+    {
+      "id": "lucky-defense",
+      "url": "https://play.google.com/store/apps/details?id=com.percent.aos.luckydefense",
+      "access": "Fiche éditeur Google Play.",
+      "facts": {
+        "android_cumulative_download_threshold": 5000000,
+        "described_mechanics": [
+          "Invocation aléatoire",
+          "Fusion",
+          "Tower defense"
+        ]
+      },
+      "limits": "Seuil cumulatif Android ; ni utilisateurs actifs, ni rétention. Gameplay décrit par l'éditeur, pas testé."
+    },
+    {
+      "id": "dice-dreams",
+      "url": "https://play.google.com/store/apps/details?hl=en-AU&id=com.superplaystudios.dicedreams",
+      "access": "Fiche éditeur Google Play.",
+      "facts": {
+        "android_cumulative_download_threshold": 50000000,
+        "described_mechanics": [
+          "Dés",
+          "Construction de royaume",
+          "Attaque et vol entre joueurs"
+        ]
+      },
+      "limits": "Seuil cumulatif Android ; ni utilisateurs actifs, ni rétention. Gameplay décrit par l'éditeur, pas testé."
+    },
+    {
+      "id": "all-in-hole",
+      "url": "https://play.google.com/store/apps/details?hl=en-US&id=com.homagames.studio.allinhole",
+      "access": "Fiche éditeur Google Play.",
+      "facts": {
+        "android_cumulative_download_threshold": 10000000,
+        "described_mechanics": [
+          "Déplacer un trou",
+          "Absorber des objets",
+          "Grossir",
+          "Objectifs de collecte"
+        ]
+      },
+      "limits": "Seuil cumulatif Android. La fiche annonce un rythme de production de niveaux élevé ; aucun coût de production interne vérifié."
+    },
+    {
+      "id": "fishercat",
+      "url": "https://play.google.com/store/apps/details?hl=fr&id=com.loadcomplete.fishercat",
+      "access": "Fiche éditeur Google Play.",
+      "facts": {
+        "android_cumulative_download_threshold": 5000000,
+        "described_mechanics": [
+          "Viser au harpon",
+          "Poissons mobiles",
+          "Collection",
+          "Équipement"
+        ]
+      },
+      "limits": "Seuil cumulatif Android ; ne prouve pas qu'une variante de pêche intéressera Chog."
+    },
+    {
+      "id": "donut-county",
+      "url": "https://play.google.com/store/apps/details?hl=en-US&id=com.annapurnainteractive.DonutCounty",
+      "access": "Fiche éditeur Google Play.",
+      "facts": {
+        "described_mechanics": [
+          "Avaler des objets pour grossir",
+          "Combiner des objets",
+          "Catapulter des objets hors du trou"
+        ]
+      },
+      "limits": "Antériorité directe pour absorption/projection. La variante proposée autour du butin/corps/armement n'a pas fait l'objet d'un recensement exhaustif des précédents."
+    },
+    {
+      "id": "cat-goes-fishing",
+      "url": "https://store.steampowered.com/app/343780/",
+      "access": "Fiche développeur Steam.",
+      "facts": {
+        "release_date": "2015-01-19",
+        "described_mechanics": [
+          "Comportements différents des poissons",
+          "Amélioration des cannes",
+          "Collection",
+          "Exploration"
+        ]
+      },
+      "limits": "La fiche ne documente pas elle-même l'ensemble des règles d'appât. Ne permet pas de revendiquer une mécanique de pêche inédite."
+    },
+    {
+      "id": "shen-fishbach-hsee-2015",
+      "url": "https://luxi-shen-4unh.squarespace.com/s/2015_ShenFishbachHsee_Uncertainty_GoalPersuit_JCR.pdf",
+      "doi": "10.1086/679418",
+      "access": "PDF complet accessible ; résumé et passages de méthode/résultats consultés.",
+      "facts": {
+        "main_studies": 4,
+        "result": "Une récompense incertaine peut augmenter l'investissement pendant sa poursuite lorsque l'attention porte sur le processus, avec des conditions et limites."
+      },
+      "limits": "Expériences de psychologie de la consommation, pas des tests de jeux mobiles ou de joueurs Chog. Ne permet pas d'estimer notre rétention. Ce n'est pas une méta-analyse."
+    },
+    {
+      "id": "costikyan-uncertainty-2013",
+      "url": "https://mitpress.mit.edu/9780262313599/uncertainty-in-games/",
+      "access": "Présentation de l'éditeur ; livre complet non consulté.",
+      "facts": {
+        "framework": "L'incertitude dans les jeux dépasse le tirage aléatoire et peut provenir notamment de la performance ou de l'anticipation."
+      },
+      "limits": "Cadre de conception, pas preuve quantitative de rétention."
+    },
+    {
+      "id": "clash-treasure-hunt-2024",
+      "url": "https://supercell.com/en/games/clashofclans/blog/news/intro/",
+      "published": "2024-09-10",
+      "access": "Annonce officielle Supercell.",
+      "facts": {
+        "described_mechanics": [
+          "Coffres gagnés pendant les attaques",
+          "Révélation de rareté en plusieurs coups"
+        ]
+      },
+      "limits": "Annonce d'un événement historique. Ne décrit pas toutes les règles de Clash en 2026."
+    },
+    {
+      "id": "gamee-2026",
+      "url": "https://www.animocabrands.com/announcement/alphaton-capital-acquires-controlling-interest-in-gamee-adding-119-million-users-to-its-telegram-ecosystem-portfolio",
+      "published": "2026-03-19",
+      "access": "Communiqué primaire Animoca/AlphaTON.",
+      "facts": {
+        "reported_registered_users_all_platforms": 119000000,
+        "reported_Telegram_users": 61000000,
+        "reported_lifetime_gameplay_sessions": 10000000000
+      },
+      "limits": "Chiffres déclarés de plateforme ; aucune fenêtre DAU/MAU précisée. Ni performance d'un jeu particulier, ni preuve de rétention sans incitations."
+    },
+    {
+      "id": "telegram-blockchain-guidelines",
+      "url": "https://core.telegram.org/bots/blockchain-guidelines",
+      "access": "Documentation officielle Telegram.",
+      "facts": {
+        "policy": "Les Mini Apps intégrant la blockchain doivent utiliser TON et TON Connect. Les bots ordinaires sans composant Mini App ont une exemption décrite."
+      },
+      "limits": "Une PWA externe n'est pas une Mini App Telegram. Ne présume pas la compatibilité wallet dans le navigateur intégré."
+    },
+    {
+      "id": "phaser",
+      "url": "https://docs.phaser.io/phaser/getting-started/what-is-phaser",
+      "access": "Documentation officielle.",
+      "facts": {
+        "capabilities": [
+          "Jeux web 2D",
+          "Navigateurs mobiles et desktop",
+          "JavaScript/TypeScript",
+          "Rendu WebGL/Canvas"
+        ]
+      },
+      "limits": "Capacités du moteur ; aucun prototype, test de performance mobile ou stack final arrêté."
+    }
+  ],
+  "proposed_tests_not_results": [
+    {
+      "hypothesis": "Dans l'expérience d'absorption, le conflit entre garder le butin et l'utiliser pour se défendre provoque une décision compréhensible pendant l'action.",
+      "probe": "Essais courts auprès de détenteurs accessibles ; observer compréhension sans explication, utilisation de l'expulsion et relance volontaire. Aucun seuil de succès prétendument scientifique."
+    },
+    {
+      "hypothesis": "Des modules connus payés en CHOG et attachés au Genesis ont une valeur d'usage.",
+      "probe": "Montrer les comportements fonctionnels et demander lequel serait équipé ; une préférence déclarée ne vaut pas achat réel."
+    }
+  ]
+}

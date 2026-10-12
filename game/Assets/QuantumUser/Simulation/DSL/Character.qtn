@@ -1,0 +1,19 @@
+﻿component Character
+{
+    asset_ref<CharacterInfo> Info;
+}
+
+component CharacterAttacks 
+{
+	asset_ref<SkillData> BasicSkillData;
+	asset_ref<SkillData> SpecialSkillData;
+}
+
+event CharacterDefeated{EntityRef character;}
+event CharacterRespawned{EntityRef character;}
+event CharacterDamaged{EntityRef target; FP damage;}
+event CharacterHealed{EntityRef character;}
+
+signal OnCharacterDefeated(EntityRef character);
+signal OnSetCharacterImmune(EntityRef character, FP time);
+signal OnCharacterDamage(EntityRef character);

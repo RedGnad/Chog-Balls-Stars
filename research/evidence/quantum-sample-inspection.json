@@ -1,0 +1,126 @@
+{
+  "recorded_at": "2026-10-07T16:14:06.336501+00:00",
+  "scope": "Static inspection of the supplied archive after verified extraction; no Unity execution.",
+  "versions": {
+    "unity_archive": "2021.3.45f2",
+    "quantum": "3.0.9",
+    "quantum_build": 1932,
+    "runner_target": "net8.0",
+    "simulation_target": "netstandard2.1",
+    "recommended_unity_target": "Unity 6; exact version to qualify"
+  },
+  "environment": {
+    "checked_unity_executable": "/Applications/Unity/Hub/Editor/6000.3.24f1/Unity.app/Contents/MacOS/Unity",
+    "editor_exists": false,
+    "webgl_module_checked": "/Applications/Unity/Hub/Editor/6000.3.24f1/PlaybackEngines/WebGLSupport",
+    "webgl_module_exists": false,
+    "dotnet_path": null,
+    "free_disk_bytes_at_check": 2785062912,
+    "photon_quantum_app_id_configured": false
+  },
+  "findings": [
+    {
+      "fact": "WebGL disables mobile buttons and reads MouseFire/MouseSpecial; touch branch compiled for Android only.",
+      "source_paths": [
+        "Assets/TwinStickShooter/Scripts/TopDownInput.cs",
+        "Assets/TwinStickShooter/Scripts/UI/MobileButtonsManager.cs"
+      ],
+      "consequence": "Adapt controls for mobile browsers before treating the sample as a mobile PWA."
+    },
+    {
+      "fact": "CharacterAttacks has two skill references, BasicSkillData and SpecialSkillData. Actions trigger on release.",
+      "source_paths": [
+        "Assets/QuantumUser/Simulation/DSL/Character.qtn",
+        "Assets/QuantumUser/Simulation/System/CharacterSkillCreationSystem.cs"
+      ],
+      "consequence": "Base attack plus two abilities requires third input/slot, DSL regeneration, execution, HUD and bot changes."
+    },
+    {
+      "fact": "PlayerAvatar prototype feeds player creation; development commands can select arbitrary prototypes and request teleport/spawn.",
+      "source_paths": [
+        "Assets/QuantumUser/Simulation/RuntimePlayer.User.cs",
+        "Assets/QuantumUser/Simulation/System/PlayerJoiningSystem.cs",
+        "Assets/QuantumUser/Simulation/System/CharacterSelectionSystem.cs",
+        "Assets/QuantumUser/Simulation/System/CommandsSystem.cs"
+      ],
+      "consequence": "Use approved hero loadout on admission and remove public access to debug commands before public PvP."
+    },
+    {
+      "fact": "Systems are configured in TSS-SystemsConfig.asset; player slots and bot filling assume two teams of three.",
+      "source_paths": [
+        "Assets/QuantumUser/Simulation/AI/AISetupHelper.cs",
+        "Assets/QuantumUser/Resources/TSS-SystemsConfig.asset"
+      ],
+      "consequence": "Reuse combat and team primitives; verify team capacity/reconnection and implement MOBA objectives."
+    },
+    {
+      "fact": "Runner template targets .NET 8 and simulation targets .NET Standard 2.1.",
+      "source_paths": [
+        "Assets/Photon/Quantum/Editor/Dotnet/Quantum.Runner.Dotnet.csproj.txt",
+        "Assets/Photon/Quantum/Editor/Dotnet/Quantum.Simulation.Dotnet.csproj.txt",
+        "Assets/Photon/Quantum/Editor/Dotnet/QuantumConsoleRunner.cs"
+      ],
+      "consequence": "Export DB/LUT/simulation through Unity; compile runner with a compatible SDK and replay an actual recording."
+    }
+  ],
+  "graphics_pipeline_setting": "  m_CustomRenderPipeline: {fileID: 0}",
+  "file_hashes": {
+    "ProjectSettings/ProjectVersion.txt": "1003aa1f846cc778ae961e280b10fd8bf0f3911067927a76dd06bf39616f8076",
+    "ProjectSettings/EditorBuildSettings.asset": "7fceb4046b1ba6659466b975121470534afadc232551e3c6561a1d6927429957",
+    "ProjectSettings/GraphicsSettings.asset": "57b8bc15e4d6ab1769f80f15b72175e14f019d8569acb8836281178c99a07063",
+    "Packages/manifest.json": "2f9bc2c80bd1d3d5b950292c91398987c47fa1c82bce868f23bc2af297ad3db7",
+    "Assets/Photon/Quantum/CHANGELOG.md": "c5701c5ac32a773261565d5bd4547845c853325444507124ad65a4656f09a9f0",
+    "Assets/QuantumUser/Simulation/RuntimePlayer.User.cs": "19675009bb33a5722c25d439de521713136d5a1c06b740ad0c5248691e529435",
+    "Assets/QuantumUser/Simulation/System/PlayerJoiningSystem.cs": "60b66e83ec3005b521f6d1acac33196a556e2ecc6eea429f2cdb38b3ecccebf1",
+    "Assets/QuantumUser/Simulation/System/CharacterSelectionSystem.cs": "1ac47e01b34243157ad51fc69b61c19c23505c574016ef49a9560580dd788543",
+    "Assets/QuantumUser/Simulation/System/CommandsSystem.cs": "123863587c17118111db6a1e0e946da1f0feff49268778a1cc6761d5ffecde9d",
+    "Assets/QuantumUser/Simulation/DSL/Character.qtn": "e702763a9b239037381ce6a58d4cb8fbbc8a5308d37279561cf22d8985da375e",
+    "Assets/QuantumUser/Simulation/System/CharacterSkillCreationSystem.cs": "961eb4ebdbcda4581da2f3f8dfa2d83f0932a9127c1413b9a8f488a6626b0dd8",
+    "Assets/QuantumUser/Simulation/AssetDefinition/SkillData.cs": "9e7406d7efa72a853dd8f79eabf1fbafbb5f72723c73432df1a2e89ff359121d",
+    "Assets/QuantumUser/Simulation/AssetDefinition/AttackData.cs": "2ba7d49faaa71b26d4e0c0772c56f19ee1e4ae731e7d505598baed1c0b896879",
+    "Assets/TwinStickShooter/Scripts/TopDownInput.cs": "f2f2f37081fa3b925be20c3dcc683df68627aac162fd59d68793bc1f5e2bd36a",
+    "Assets/TwinStickShooter/Scripts/UI/MobileButtonsManager.cs": "b17b1106af54292c4101e9e20c97c296f25d534a239f995c19a05d3fdc050e9d",
+    "Assets/QuantumUser/Simulation/AI/AISetupHelper.cs": "e20f013d14efadeefe62266fceadeb0b4e7f69db9f591fa17dbdf3d7d24b6b56",
+    "Assets/QuantumUser/Resources/TSS-SystemsConfig.asset": "e63af27672b1c84068ae4351d13dfc1c377e66f5b1b9a8d465139d112050f879",
+    "Assets/Photon/Quantum/Editor/Dotnet/Quantum.Runner.Dotnet.csproj.txt": "7ff19056c8258d707beb2d7d77e55d82f27f8bbd4c5b2b30adce6a1ca665af54",
+    "Assets/Photon/Quantum/Editor/Dotnet/Quantum.Simulation.Dotnet.csproj.txt": "7c2a5c7ccf99af7237691e52d8f17cd5cf17cc0b1b527f019b2de0bb41ca7a04",
+    "Assets/Photon/Quantum/Editor/Dotnet/QuantumConsoleRunner.cs": "030cfaf64ce764a34273ad9e71adb15fd8633e4ec09f2cbc3d1ce17d7ff31aff",
+    "License.txt": "040e21d8be8679a07a7fe8835249de9cade7e55a659488c0fc9f6ac95df7f2b0"
+  },
+  "web_sources": [
+    {
+      "url": "https://doc.photonengine.com/quantum/v3/game-samples/twin-stick-shooter",
+      "observation": "Official page lists sample 3.0.9; its Unity 2021.3.30f1 statement differs from archive ProjectVersion 2021.3.45f2."
+    },
+    {
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/webgl-browsercompatibility.html",
+      "observation": "Unity 6 manual documents support for mobile Safari/Chrome and PWA templates; does not establish sample performance."
+    },
+    {
+      "url": "https://docs.reown.com/appkit/unity/core/installation",
+      "observation": "Prerequisites list Unity >=2022.3, minimal stripping or lower, Gamma."
+    },
+    {
+      "url": "https://docs.unity3d.com/2021.3/Documentation/ScriptReference/BuildPipeline.BuildPlayer.html",
+      "observation": "BuildPlayer takes BuildPlayerOptions and returns BuildReport; used by added Editor-only instrumentation."
+    }
+  ],
+  "validation": {
+    "archive_crc": true,
+    "baseline_hashes_matched": 6656,
+    "baseline_files_changed": 0,
+    "new_editor_files_including_meta": 6,
+    "build_script_unity_compiled": false,
+    "webgl_built": false,
+    "multiplayer_tested": false,
+    "replay_executed": false,
+    "new_metadata_guids_unique": true,
+    "active_document_local_links_exist": true
+  },
+  "next": "Locate a working Unity editor + WebGL, compile the sample before gameplay modifications, configure Quantum AppId, then mobile controls and two-client session.",
+  "added_tooling_hashes": {
+    "tools/unity/verify_sample.py": "58b385a49b445d7784610fef072557aa70a5a316eb54cda14cbec5768e7b3628",
+    "game/Assets/Chog/Editor/Chog.Editor.asmdef": "272a885b261e46cde421ee82f5f1d1288cd6e166a49be4c01d40cad316c79c49",
+    "game/Assets/Chog/Editor/QualificationBuild.cs": "65a028ce0c0ed785d5293b97de1aa4d1eca7c1eb75779ffd0f0173c5db0314ce"
+  }
+}

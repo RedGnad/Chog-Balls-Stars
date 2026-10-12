@@ -1,0 +1,10 @@
+{
+ "assembledAtUtc": "2026-10-12T00:53:36+00:00",
+ "build": "20261012T005009618Z-67649349660c4ffc9995937ba8b0cb9f",
+ "rulesetVersion": "genesis-0.3.0",
+ "catalogHash": "e9d98fbfd883e08a97d8a45da08108777169a56e738f8788ceb355cdef5c191a",
+ "portraits": 1969,
+ "cuts": 1277,
+ "simulationAssets": true,
+ "judge": true
+}

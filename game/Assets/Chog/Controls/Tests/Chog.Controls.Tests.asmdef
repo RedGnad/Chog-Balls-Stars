@@ -1,0 +1,9 @@
+{
+  "name": "Chog.Controls.Tests",
+  "references": [
+    "Chog.Controls", "Unity.InputSystem", "Unity.InputSystem.TestFramework"
+  ],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

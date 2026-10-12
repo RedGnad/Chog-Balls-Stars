@@ -1,0 +1,204 @@
+{
+  "consulted_date_client": "2026-10-08",
+  "recorded_utc": "2026-10-08T01:53:57.971681+00:00",
+  "decision": {
+    "sdk": "Photon Fusion 2",
+    "topology": "Dedicated Server",
+    "status": "architecture explicitly approved by user; Fusion 2.1.3 build 2390 integrated; Editor C# compilation and six cloud Photon network checks passed in headless Unity Editor",
+    "user_approved_date": "2026-10-08",
+    "mvp_photon_ccu_cap_accepted_by_user": 100,
+    "existing_pun2_app": "chogtanks must remain live for several more months with its separate AppId and plan",
+    "account_eligibility_verified": false,
+    "free_100_ccu_activated": false,
+    "supersedes": "Quantum 3 candidate, D06",
+    "basis": "Documented distribution of simulation work and authority; mobile-first with Genesis career and CHOG purchases",
+    "not_a_benchmark": true
+  },
+  "sources": [
+    {
+      "url": "https://doc.photonengine.com/fusion/v2/manual/advanced/time-synchronization",
+      "facts": [
+        "Client prediction can be limited to a small set such as the local avatar; other objects can be rendered by snapshot interpolation.",
+        "Fusion clients still have rollback/resimulation cost for predicted objects."
+      ]
+    },
+    {
+      "url": "https://doc.photonengine.com/quantum/v3/video-tutorials/prediction-culling",
+      "facts": [
+        "AI, navigation and projectiles can add resimulation cost.",
+        "Culling affects predicted execution; culled entities are still processed on verified frames."
+      ],
+      "limit": "No absolute mobile FPS comparison."
+    },
+    {
+      "url": "https://doc.photonengine.com/fusion/v2/fusion-choose",
+      "facts": [
+        "Shared recommended for mobile and strongly recommended for WebGL.",
+        "Shared peers have state authority; competitive state validation requires additional precautions.",
+        "Host/Server WebGL modes disabled by default; explicit configuration required."
+      ],
+      "tradeoff_accepted": "Selected Server for trusted combat/career; browser is a client, Linux Unity instance is the server. WebGL transport/latency must be measured."
+    },
+    {
+      "url": "https://doc.photonengine.com/fusion/v2/concepts-and-patterns/dedicated-server-overview",
+      "facts": [
+        "Server Mode requires a hosted headless game instance.",
+        "Photon Public Cloud sufficient; Photon Enterprise not required for the dedicated game instance."
+      ]
+    },
+    {
+      "url": "https://doc.photonengine.com/quantum/v3/manual/cheat-protection",
+      "facts": [
+        "Deterministic clients do not automatically provide trusted final results.",
+        "Replay resimulation is a possible verification mechanism; client-controlled configs require checks."
+      ]
+    },
+    {
+      "url": "https://www.photonengine.com/fusion/pricing",
+      "facts": [
+        "Published launch and Public/Premium prices captured below."
+      ]
+    },
+    {
+      "url": "https://www.photonengine.com/quantum/pricing",
+      "facts": [
+        "Same published prices as Fusion for captured tiers."
+      ]
+    },
+    {
+      "url": "https://doc.photonengine.com/photon/current/pricing",
+      "facts": [
+        "CCU billing uses sum of monthly regional peaks; not NFT count or MAU.",
+        "20 CCU development/noncommercial; 100 CCU launch one Fusion OR Quantum app per customer.",
+        "100 CCU hard cap; 500+ plans have conditional burst.",
+        "Opened FAQ describes one-time 100 CCU addon on free 100 CCU for 12 months."
+      ],
+      "limit": "Search extract and opened text differ on addon wording; verify the actual dashboard offer before purchasing. Dedicated server peer CCU accounting was not established."
+    },
+    {
+      "url": "https://www.photonengine.com/pun/pricing",
+      "facts": [
+        "PUN has its own plans: free 20 CCU development and paid one-time 100 CCU launch."
+      ],
+      "inference_with_pricing_faq": "The existing PUN2 application does not consume the one free Fusion-or-Quantum 100 CCU entitlement. Account eligibility itself was not inspected."
+    },
+    {
+      "url": "https://doc.photonengine.com/fusion/v2/getting-started/appid-instructions",
+      "facts": [
+        "Dashboard: YOUR > APPS > Development > CREATE A NEW APP; Photon SDK Fusion; SDK Version Fusion 2."
+      ]
+    },
+    {
+      "url": "https://doc.photonengine.com/fusion/v2/getting-started/sdk-download",
+      "facts": [
+        "Stable Fusion SDK 2.1.3 build 2390 released 2026-09-17.",
+        "Listed Unity requirements: 2021.3.45, 2022.3.45, 6.0.x and 6.3.x."
+      ],
+      "limit": "6000.6.4f1 is outside the listed versions. Local Editor C# compilation, network scenario and WebGL build/offline browser controls passed with one scene initialization patch. Not a vendor platform certification or a phone benchmark. See implementation_evidence."
+    },
+    {
+      "url": "https://docs.hetzner.com/general/infrastructure-and-availability/price-adjustment/",
+      "facts": [
+        "Europe new CX33 8.49 EUR/month and CCX13 42.99 EUR/month, excluding IPv4 and VAT."
+      ],
+      "limit": "Published machine price only; current stock and matches per machine not established."
+    },
+    {
+      "url": "https://docs.hetzner.com/cloud/servers/faq/",
+      "facts": [
+        "CX resources shared; CCX dedicated CPU resources."
+      ]
+    }
+  ],
+  "photon_pricing": {
+    "currency": "USD",
+    "excludes": [
+      "taxes",
+      "traffic overage",
+      "game compute",
+      "backend and DB",
+      "CDN",
+      "RPC",
+      "storage"
+    ],
+    "identical_products": [
+      "Fusion",
+      "Quantum"
+    ],
+    "tiers": [
+      {
+        "ccu": 20,
+        "price": 0,
+        "term": "development/noncommercial",
+        "traffic_gb_month": 60
+      },
+      {
+        "ccu": 100,
+        "price": 0,
+        "term": "launch one app/customer",
+        "traffic_gb_month": 300
+      },
+      {
+        "ccu": 500,
+        "price": 125,
+        "term": "month",
+        "traffic_gb_month": 1500
+      },
+      {
+        "ccu": 1000,
+        "price": 250,
+        "term": "month",
+        "traffic_gb_month": 3000
+      },
+      {
+        "ccu": 2000,
+        "price": 500,
+        "term": "month",
+        "traffic_gb_month": 6000
+      }
+    ],
+    "premium": {
+      "usd_per_billed_peak_ccu": 0.5,
+      "minimum_month_usd": 1000,
+      "illustration_billed_ccu": 3000,
+      "illustration_month_usd": 1500.0,
+      "illustration_not_observed_usage": true
+    },
+    "one_time_addon": {
+      "ccu": 100,
+      "usd": 95,
+      "duration_months": 12,
+      "possible_total_with_free": 200,
+      "dashboard_confirmation_required": true
+    }
+  },
+  "genesis_population": {
+    "observed_supply": 1969,
+    "observation_date": "2026-10-07",
+    "source": "research/evidence/genesis-mutability-facts.json",
+    "not_unique_holders_or_players": true,
+    "concurrency_forecast": null
+  },
+  "implementation_preserved": {
+    "pure_catalog": "shared/Chog.Heroes; noEngineReferences true, no Photon refs; 27 previous tests",
+    "controls": "Chog.Controls; only Unity.InputSystem reference; 9 previous tests",
+    "must_replace": "Quantum binder/assets/systems and 14 SDK integration tests",
+    "current_project": "game/ preserved as Quantum reference; game-fusion/ exists with Server/Client arena and local pure catalog. WebGL build succeeded; offline training, keyboard/mouse and emulated dual-touch tested in Chrome; phone and WebGL multiplayer not tested.",
+    "controls_transferred": "PointerCapture and Chog.Controls assembly; arena input and HUD use Input System. Previous nine tests are not new touch UI delivery proof."
+  },
+  "unmeasured": [
+    "FPS and memory on Redmi 11C",
+    "same-scene cross-SDK benchmark",
+    "server matches per machine at target tick",
+    "WebGL client-server latency and bandwidth",
+    "dedicated server peer billing overhead",
+    "launch concurrency",
+    "total production monthly cost"
+  ],
+  "decision_document": "docs/DECISION-RESEAU.md",
+  "implementation_evidence": [
+    "research/evidence/fusion-sdk-qualification.json",
+    "research/evidence/fusion-network-qualification.json",
+    "research/evidence/fusion-webgl-qualification.json"
+  ]
+}

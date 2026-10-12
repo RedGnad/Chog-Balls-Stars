@@ -1,0 +1,32 @@
+{
+  "consulted_date_client": "2026-10-06",
+  "url": "https://chogathon.chog.xyz/",
+  "response_sha256": "c6a2be47abd80352369bfef6ba52ef62ca7c47bdabe3e66f1e03feb9b0cfc7ea",
+  "page_title": "Chogathon 2026 | Hackathon",
+  "judging_weights_percent": {
+    "novelty": 30,
+    "fun": 20,
+    "retention": 20,
+    "clarity": 15,
+    "execution": 15
+  },
+  "qualification_gate": "Chog NFT must be essential",
+  "optional_token_bonus": "Meaningful CHOG integration; weight not specified",
+  "build_days": 14,
+  "judging_days": 7,
+  "planned_prize_pool_usd": 15000,
+  "possible_reduced_prize_pool_usd": 10000,
+  "planned_first_prize_usd": 4500,
+  "team_max_members_in_registration_ui": 5,
+  "demo_video_max_minutes": 3,
+  "signup_end_utc_from_client_code": "2026-10-08T15:00:00Z",
+  "signup_end_paris": "2026-10-08T17:00:00+02:00",
+  "hack_end_utc_derived_from_client_code": "2026-10-22T15:00:00Z",
+  "hack_end_paris_derived": "2026-10-22T17:00:00+02:00",
+  "calendar_confirmation_status": "Client code only, not corroborated by organizer announcement",
+  "countdown_code_excerpt": "const SIGNUP_END = Date.parse(\"2026-10-06T15:00:00Z\") + 48 * 36e5; const HACK_END = SIGNUP_END + 14 * 864e5;",
+  "static_app_counter": 488,
+  "static_project_seed_count": 5,
+  "competition_census_status": "Not verified; hardcoded seed data and counter are not a census",
+  "source_access": "Direct public HTTPS read via curl; web reader failed"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "chog-game-services",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Game services of the Chog Genesis game: ownership read on Monad, sign-in, career per Genesis.",
+  "type": "module",
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "scripts": {
+    "start": "node src/host.js",
+    "services": "node src/local.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@noble/curves": "2.4.0",
+    "@noble/hashes": "2.4.0"
+  }
+}
