@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, test } from 'node:test';
 import { createApi } from '../src/api.js';
-import { careerFile, createHttpServer, reownProjectId, sessionSecret } from '../src/node.js';
+import { careerFile, createHttpServer, reownProjectId, servedBuild, sessionSecret } from '../src/node.js';
 import { createStatic, describeFile } from '../src/static.js';
 
 let folder;
@@ -154,4 +154,18 @@ test('the wallet connector is offered only with a well-formed Reown project id, 
   const ask = api => api(new Request('https://game.example/api/wallet')).then(response => response.json());
   assert.deepEqual(await ask(createApi({ reownProjectId: id.toLowerCase() })), { reownProjectId: id.toLowerCase() });
   assert.deepEqual(await ask(createApi({})), { reownProjectId: '' });
+});
+
+test('the build a site folder serves is read from its release notes, each time it is asked', async () => {
+  const site = join(folder, 'assembled');
+  await mkdir(site, { recursive: true });
+  assert.equal(await servedBuild(site), '', 'a folder that was not assembled names no build');
+  await writeFile(join(site, 'RELEASE.json'), JSON.stringify({ build: '20261012T035911141Z-ab1f01713ea74c0794d0d574a5cbe3d6' }));
+  assert.equal(await servedBuild(site), '20261012T035911141Z', 'the stamp, which is what the build tells Photon');
+  await writeFile(join(site, 'RELEASE.json'), JSON.stringify({ build: '20261013T101500000Z-0123' }));
+  assert.equal(await servedBuild(site), '20261013T101500000Z', 'a folder assembled again is read again');
+  await writeFile(join(site, 'RELEASE.json'), JSON.stringify({ build: 'webgl' }));
+  assert.equal(await servedBuild(site), '', 'a name that is not a stamp is no build');
+  await writeFile(join(site, 'RELEASE.json'), 'not json');
+  assert.equal(await servedBuild(site), '');
 });

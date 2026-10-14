@@ -119,6 +119,21 @@ export async function reownProjectId(dataFolder, given) {
   return '';
 }
 
+/**
+ * The build of the game a site folder serves: the stamp at the start of "build" in its
+ * RELEASE.json (tools/release/assemble_site.py), which is also the version that build gives
+ * Photon. None for a folder that was not assembled: nothing is then compared with it.
+ */
+export async function servedBuild(siteFolder) {
+  try {
+    const { build } = JSON.parse(await readFile(join(siteFolder, 'RELEASE.json'), 'utf8'));
+    const stamp = typeof build === 'string' ? build.split('-')[0] : '';
+    return /^\d{8}T\d{9}Z$/.test(stamp) ? stamp : '';
+  } catch {
+    return '';
+  }
+}
+
 async function keptSecret(dataFolder, name, given) {
   if (given) return given;
   await mkdir(dataFolder, { recursive: true });

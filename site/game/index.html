@@ -143,7 +143,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "Chog Genesis",
-        productVersion: "1.0",
+        productVersion: "20261012T041344613Z",
         // What the engine has to say while it loads: a problem starts the page again,
         // anything else goes to the console.
         showBanner: function (message, type) {
@@ -194,11 +194,47 @@
         }).catch(failed);
       }
 
-      var script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = start;
-      script.onerror = function () { failed("Unable to load file " + loaderUrl); };
-      document.body.appendChild(script);
+      function load() {
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = start;
+        script.onerror = function () { failed("Unable to load file " + loaderUrl); };
+        document.body.appendChild(script);
+      }
+
+      // A browser can show a copy of this page it kept while a newer build is served. The
+      // game services refuse a room opened by another build than theirs (their judge only
+      // replays right what was played with its own simulation), so before anything is loaded
+      // the page asks them which build is served and, when it is not its own, loads itself
+      // again, once for each build. No answer within three seconds, or no services at this
+      // address (a test server), and the game is loaded as it is.
+      function whenFresh(go) {
+        var mine = config.productVersion;
+        var gone = false;
+        function once() { if (!gone) { gone = true; clearTimeout(timer); go(); } }
+        var timer = setTimeout(once, 3000);
+        fetch("api/photon", { cache: "no-store" }).then(function (response) {
+          return response.ok ? response.json() : null;
+        }).then(function (answer) {
+          var served = answer && answer.build;
+          if (gone || !served || served === mine) return once();
+          var key = "chog.page.loadedAgainFor";
+          var before = null;
+          try { before = sessionStorage.getItem(key); } catch (error) { }
+          if (before === served) {
+            console.warn("CHOG_PAGE still the build " + mine + " after loading again, and " + served + " is served");
+            return once();
+          }
+          try { sessionStorage.setItem(key, served); } catch (error) { }
+          console.warn("CHOG_PAGE this page is the build " + mine + " and " + served + " is served: loading again");
+          gone = true;
+          clearTimeout(timer);
+          note.textContent = "A new version is out. Loading it...";
+          window.location.reload();
+        }).catch(once);
+      }
+
+      whenFresh(load);
     </script>
   </body>
 </html>

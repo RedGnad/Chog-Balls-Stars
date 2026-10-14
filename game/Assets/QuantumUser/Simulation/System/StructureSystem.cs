@@ -5,7 +5,7 @@ namespace Quantum
 	// Builds the towers and the cores when a match begins and lets the towers shoot while it is
 	// played. The rules themselves are in Structures.
 	[Preserve]
-	public unsafe class StructureSystem : SystemMainThreadFilter<StructureSystem.Filter>, ISignalOnGameStart
+	public unsafe class StructureSystem : SystemMainThreadFilter<StructureSystem.Filter>, ISignalOnGameStart, ISignalOnCharacterDamage
 	{
 		public struct Filter
 		{
@@ -19,6 +19,12 @@ namespace Quantum
 		public void OnGameStart(Frame frame)
 		{
 			Structures.Build(frame);
+		}
+
+		// The signal is named after heroes, but every loss of health passes through it.
+		public void OnCharacterDamage(Frame frame, EntityRef character)
+		{
+			Structures.Hurt(frame, character);
 		}
 
 		public override void Update(Frame frame, ref Filter filter)

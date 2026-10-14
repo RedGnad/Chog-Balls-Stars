@@ -2652,18 +2652,20 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Structure : Quantum.IComponent {
-    public const Int32 SIZE = 40;
+    public const Int32 SIZE = 48;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public EStructureKind Kind;
-    [FieldOffset(32)]
+    [FieldOffset(40)]
     public FP Range;
-    [FieldOffset(8)]
-    public FP Damage;
     [FieldOffset(16)]
-    public FP Interval;
+    public FP Damage;
     [FieldOffset(24)]
+    public FP Interval;
+    [FieldOffset(32)]
     public FP NextShotTime;
+    [FieldOffset(8)]
+    public FP AlarmUntil;
     public override readonly Int32 GetHashCode() {
       unchecked { 
         var hash = 12973;
@@ -2672,12 +2674,14 @@ namespace Quantum {
         hash = hash * 31 + Damage.GetHashCode();
         hash = hash * 31 + Interval.GetHashCode();
         hash = hash * 31 + NextShotTime.GetHashCode();
+        hash = hash * 31 + AlarmUntil.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Structure*)ptr;
         serializer.Stream.Serialize((Byte*)&p->Kind);
+        FP.Serialize(&p->AlarmUntil, serializer);
         FP.Serialize(&p->Damage, serializer);
         FP.Serialize(&p->Interval, serializer);
         FP.Serialize(&p->NextShotTime, serializer);

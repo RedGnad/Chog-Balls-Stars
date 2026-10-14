@@ -30,15 +30,31 @@ internal static unsafe class Verifier
         // A test of the rules, never a verdict: "--test-core-falls 1@900" destroys the core of
         // team 1 once tick 900 is reached, to see the match end for the other team. A report
         // made that way says so (testOptions).
+        // "--test-seed 7" replays the record with another seed: the bots then play another match
+        // against the same recorded commands, which is a quick way to watch what they do.
+        // "--test-all-bots 1" hands the heroes of the recorded players to bots when the match
+        // begins, as the game does for a player who left: six bots, three against three.
         (int team, int tick)? coreFalls = null;
-        if (args.Length == 6 && args[4] == "--test-core-falls")
+        int? seed = null;
+        var allBots = false;
+        var usage = args.Length < 4 || args.Length % 2 != 0;
+        for (var i = 4; i + 1 < args.Length && !usage; i += 2)
         {
-            var parts = args[5].Split('@');
-            coreFalls = (int.Parse(parts[0]), int.Parse(parts[1]));
+            if (args[i] == "--test-core-falls")
+            {
+                var parts = args[i + 1].Split('@');
+                coreFalls = (int.Parse(parts[0]), int.Parse(parts[1]));
+            }
+            else if (args[i] == "--test-seed")
+                seed = int.Parse(args[i + 1]);
+            else if (args[i] == "--test-all-bots" && args[i + 1] == "1")
+                allBots = true;
+            else
+                usage = true;
         }
-        else if (args.Length != 4)
+        if (usage)
         {
-            Console.Error.WriteLine("usage: Chog.Quantum.Verifier <replay.json | folder of a match> <asset database.json> <LUT folder> <report.json> [--test-core-falls <team>@<tick>]");
+            Console.Error.WriteLine("usage: Chog.Quantum.Verifier <replay.json | folder of a match> <asset database.json> <LUT folder> <report.json> [--test-core-falls <team>@<tick>] [--test-seed <number>] [--test-all-bots 1]");
             return 2;
         }
 
@@ -64,6 +80,9 @@ internal static unsafe class Verifier
         using var resources = new ResourceManagerStatic(serializer.AssetsFromByteArray(System.Text.Encoding.UTF8.GetBytes(database)),
             DotNetRunnerFactory.CreateNativeAllocator());
         var runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.RuntimeConfigData.Decode(), compressed: true);
+        var testedRules = seed != null;
+        if (seed != null)
+            runtimeConfig.Seed = seed.Value;
 
         // What the simulation says while it is replayed: the same events the game's own screens
         // react to. The match begins when the selection of characters ends, and from then on
@@ -86,6 +105,9 @@ internal static unsafe class Verifier
             if (e.Game.Frames.Verified.TryGet<TeamInfo>(e.Structure, out var owner) && owner.Index >= 0 && owner.Index < 2)
                 towerShots[owner.Index]++;
         });
+        // What fell, whose it was and when.
+        var fallen = new List<object>();
+        events.SubscribeManual((EventStructureDestroyed e) => fallen.Add(new { team = e.Team, kind = e.Kind.ToString(), tick = e.Tick }));
 
         var runner = SessionRunner.Start(new SessionRunner.Arguments
         {
@@ -105,12 +127,21 @@ internal static unsafe class Verifier
         // As fast as the machine goes: nothing is drawn and nobody is waited for.
         var started = DateTime.UtcNow;
         List<object> playersAtStart = null;
-        var testedRules = false;
         while (runner.Session.FramePredicted == null || runner.Session.FramePredicted.Number < replay.LastTick)
         {
             runner.Service(1.0f);
             if (playersAtStart == null && selectionEndedAtTick != null && game.Frames.Verified != null)
                 playersAtStart = PlayersOf(game.Frames.Verified);
+            if (allBots && selectionEndedAtTick != null && game.Frames.Verified != null)
+            {
+                var now = game.Frames.Verified;
+                var heroes = now.Filter<Character, Bot>();
+                while (heroes.NextUnsafe(out EntityRef entity, out Character* character, out Bot* bot))
+                    if (bot->IsActive == false)
+                        AISetupHelper.Botify(now, entity);
+                allBots = false;
+                testedRules = true;
+            }
             if (coreFalls != null && game.Frames.Verified != null && game.Frames.Verified.Number >= coreFalls.Value.tick)
             {
                 var now = game.Frames.Verified;
@@ -141,6 +172,10 @@ internal static unsafe class Verifier
             coreLostBy = frame.Global->DestroyedCore == 0 ? (int?)null : frame.Global->DestroyedCore - 1,
             // Hits by the tower of team 0 and by the tower of team 1.
             towerShots,
+            // The health each structure had left when the replay stopped, and what fell at
+            // which tick: facts about the match, used to tune the structures and the bots.
+            structures = StructuresOf(frame),
+            fallen,
             endedAtTick,
             selectionEndedAtTick,
             // The first tick of the record: with the pace, it places any tick in real time.
@@ -165,6 +200,20 @@ internal static unsafe class Verifier
             ? $"no winner: the record ends at tick {frame.Number} in state {report.state}"
             : $"team {winnerTeam} won at tick {endedAtTick}, {report.scores[0]} to {report.scores[1]} ({frame.Number} ticks replayed in {report.seconds} s)");
         return 0;
+    }
+
+    private static List<object> StructuresOf(Frame frame)
+    {
+        var all = new List<object>();
+        var structures = frame.Filter<Structure, TeamInfo>();
+        while (structures.Next(out EntityRef entity, out Structure structure, out TeamInfo owner))
+            all.Add(new
+            {
+                team = owner.Index,
+                kind = structure.Kind.ToString(),
+                health = AttributesHelper.GetAttributeData(frame, entity, EAttributeType.Health).CurrentValue.AsInt,
+            });
+        return all;
     }
 
     private static List<object> PlayersOf(Frame frame)

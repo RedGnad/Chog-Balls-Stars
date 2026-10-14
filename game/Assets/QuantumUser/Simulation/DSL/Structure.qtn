@@ -19,6 +19,10 @@ component Structure
 	FP Damage;
 	FP Interval;
 	FP NextShotTime;
+
+	// The time until which this structure counts as under attack: each hit it takes pushes it
+	// further. The bots of its team come to defend it while it lasts.
+	FP AlarmUntil;
 }
 
 global

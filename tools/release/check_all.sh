@@ -29,9 +29,7 @@ run "roster is up to date with the catalog" python3 "$ROOT/tools/hero-catalog/ru
 run "hero page data is up to date" python3 "$ROOT/tools/web/build_hero_data.py" --check
 run "catalog and simulation tests" python3 "$ROOT/tools/quantum/headless.py" test --dotnet "$DOTNET"
 run "view tests" sh "$ROOT/tools/dev/view_tests.sh"
-run "game services tests" node --test "$ROOT/server/test/chain.test.js" "$ROOT/server/test/session.test.js" \
-  "$ROOT/server/test/career.test.js" "$ROOT/server/test/loan.test.js" "$ROOT/server/test/shop.test.js" \
-  "$ROOT/server/test/rental.test.js" "$ROOT/server/test/host.test.js"
+run "game services tests" node --test "$ROOT"/server/test/*.test.js
 run "shop, rental and wager contract tests" forge test --root "$ROOT/contracts"
 if [ "$1" = "--fork" ]; then
   MONAD_FORK=1 run "shop contract on a copy of Monad mainnet" forge test --root "$ROOT/contracts" --network monad \

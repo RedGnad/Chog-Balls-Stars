@@ -65,8 +65,8 @@ namespace Chog.Editor
                 throw new BuildFailedException("Enabled build scenes must exist.");
 
             var repository = Path.GetFullPath(Path.Combine(Application.dataPath, "../.."));
-            var runDirectory = Path.Combine(repository, ".artifacts", "unity",
-                DateTime.UtcNow.ToString("yyyyMMddTHHmmssfffZ") + "-" + Guid.NewGuid().ToString("N"));
+            var stamp = DateTime.UtcNow.ToString("yyyyMMddTHHmmssfffZ");
+            var runDirectory = Path.Combine(repository, ".artifacts", "unity", stamp + "-" + Guid.NewGuid().ToString("N"));
             var outputPath = Path.Combine(runDirectory, "webgl");
             Directory.CreateDirectory(runDirectory);
 
@@ -86,13 +86,27 @@ namespace Chog.Editor
             // by itself when a file did not arrive.
             PlayerSettings.WebGL.template = PageTemplate;
 
-            var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
+            // The build carries its own stamp as its version: it is what the game tells Photon
+            // (Chog.Screens.BuildIdentity), what the page compares with the build its server
+            // serves, and the start of the folder's name, which the assembled site records.
+            // The project's own version is put back afterwards, so a build changes no setting.
+            var projectVersion = PlayerSettings.bundleVersion;
+            PlayerSettings.bundleVersion = stamp;
+            UnityEditor.Build.Reporting.BuildReport report;
+            try
             {
-                scenes = scenes,
-                locationPathName = outputPath,
-                target = BuildTarget.WebGL,
-                options = BuildOptions.None
-            });
+                report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
+                {
+                    scenes = scenes,
+                    locationPathName = outputPath,
+                    target = BuildTarget.WebGL,
+                    options = BuildOptions.None
+                });
+            }
+            finally
+            {
+                PlayerSettings.bundleVersion = projectVersion;
+            }
             var summary = report.summary;
             var evidence = new BuildEvidence
             {

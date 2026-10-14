@@ -195,7 +195,10 @@ requests a month, so about 40 whole loads of the game; a warning page in front o
 browser's first visit ("Visit Site", then quiet for 7 days; requests that are not from a
 browser, such as Photon's, never see it); and with the account as it is set up on this Mac
 the address is drawn at random at each start of the tunnel, so restarting ngrok means
-restarting `serve_public.sh` with the new address and correcting Photon's dashboard. A file
+restarting `serve_public.sh` with the new address and correcting Photon's dashboard. Tried
+on 14 October 2026: `ngrok http 8087 --url 'https://'`, which ngrok's manual
+(`https://ngrok.com/docs/universal-gateway/domains/`) gives for the account's own dev domain,
+also drew a new address on this account (ngrok 3.25.1). A file
 asked without "Accept-Encoding: gzip" comes back unpacked (46 MB for the program alone):
 `check_public.sh` asks for headers only.
 

@@ -74,10 +74,10 @@ def generate():
     for name in ("Quantum.Engine", "Quantum.Deterministic", "Quantum.Log"):
         reference(items, name, libs / (name + ".dll"))
     # Use the same addon DLL labels as Photon's Unity .NET exporter.
-    for meta in (PROJECT / "Assets").rglob("*.dll.meta"):
-        if "- QuantumDotnetInclude" in meta.read_text():
-            dll = Path(str(meta)[:-5])
-            reference(items, dll.stem, dll)
+    addons = sorted(Path(str(meta)[:-5]) for meta in (PROJECT / "Assets").rglob("*.dll.meta")
+                    if "- QuantumDotnetInclude" in meta.read_text())
+    for dll in addons:
+        reference(items, dll.stem, dll)
     simulation_path = OUT / "Simulation/Quantum.Simulation.csproj"
     save_project(simulation_path, simulation)
 
@@ -99,6 +99,10 @@ def generate():
     ET.SubElement(items, "ProjectReference", Include=str(checks_path), ReferenceOutputAssembly="false")
     for name in ("Quantum.Engine", "Quantum.Deterministic", "Quantum.Log"):
         reference(items, name, libs / (name + ".dll"))
+    # The components of a bot hold types of the addons (the Bot SDK): a test that makes a bot
+    # needs them too.
+    for dll in addons:
+        reference(items, dll.stem, dll)
     test_path = OUT / "Tests/Chog.Quantum.Tests.csproj"
     save_project(test_path, test)
 
@@ -116,6 +120,9 @@ def generate():
     for name in ("Quantum.Engine", "Quantum.Deterministic", "Quantum.Log", "Quantum.Json"):
         reference(items, name, libs / (name + ".dll"))
     reference(items, "Newtonsoft.Json", newtonsoft[-1])
+    # Its test option that hands every hero to a bot touches the bot's component.
+    for dll in addons:
+        reference(items, dll.stem, dll)
     verifier_path = OUT / "Verifier/Chog.Quantum.Verifier.csproj"
     save_project(verifier_path, verifier)
     print("Simulation source folders:", *[str(p.relative_to(PROJECT)) for p in folders], sep="\n  ", flush=True)

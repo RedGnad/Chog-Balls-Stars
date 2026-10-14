@@ -1052,6 +1052,7 @@ namespace Quantum.Prototypes {
     public FP Damage;
     public FP Interval;
     public FP NextShotTime;
+    public FP AlarmUntil;
     partial void MaterializeUser(Frame frame, ref Quantum.Structure result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Structure component = default;
@@ -1064,6 +1065,7 @@ namespace Quantum.Prototypes {
         result.Damage = this.Damage;
         result.Interval = this.Interval;
         result.NextShotTime = this.NextShotTime;
+        result.AlarmUntil = this.AlarmUntil;
         MaterializeUser(frame, ref result, in context);
     }
   }

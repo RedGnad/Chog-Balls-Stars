@@ -1,0 +1,1882 @@
+"""Builds a complete Chog on the polished H3 head and dresses it with the traits of one Genesis, each
+trait as its own 3D part. Pictures only: nothing here goes into the game.
+
+Run it without the interface of Blender (5.2):
+
+    /Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup \
+        --python tools/blender/make_chog_traits.py -- --genesis 1287 [--out FOLDER]
+    ... -- --base                             the polished base alone, no trait part
+    ... -- --genesis 1287 --hat "MMGA Cap"    the same hero under another entry of HATS
+    ... -- --genesis 1287 --set BRIM_LENGTH=0.13 --set BRIM_RISE_DEG=-9 --out FOLDER
+                                              the same hero, numbers of its hat replaced (to try some)
+    ... -- --coverage                         build nothing: how many Genesis each entry serves
+
+It writes ChogBody.blend, ChogBody.fbx and parts.json (what was built, with its triangles) into
+.artifacts/chog-body/traits/<number>/ (or traits/base/). Look at the result with
+render_chog_traits.py, then lay the pictures on one sheet with make_chog_traits_sheet.py, and the
+heroes side by side with make_chog_traits_overview.py.
+
+The base is head H3 of make_chog_full.py, which the owner chose. What changes:
+
+- the blades of the crown keep their places, lengths, widths and thicknesses, and become leaves: a
+  round section in place of a diamond, shaded smooth, widest a quarter of the way up, with a blunt
+  point that curls back a little. The official drawings (.artifacts/chog-reference/body.png,
+  site_tools_jump.png) show soft leaves, not cut gems;
+- the face carries no eyes and no mouth. In the collection Eyes and Mouth are traits, so they are
+  parts (below). The base keeps the cream face, its dark line, the pink nose, the two pink cheeks
+  and the teeth of hair on the brow;
+- the cream face is wider (0.25 from its middle in place of 0.225, and wider still at the brow), as
+  the pictures of the collection draw it: from one row of spikes to the other. The head under it,
+  the leaves and so the outline of the character are those of H3.
+
+A trait part is one object, child of "Head" (or of "Body", "armLeft", "armRight" for clothing) with
+no move, turn or scale of its own, so it follows the part it sits on. Its name says what it is and
+its materials carry the name of its trait:
+
+    Hat_<Shape>    one shape serves every hat of that shape: it takes a colour set and, optionally, a
+                   print or a mark, and its own numbers (how long the brim is, how far it rises).
+                   HATS maps a value of the trait "Head" to all that.
+    Eyes_<Kind>    EYES maps a value of the trait "Eyes" to a kind and its colours.
+    Mouth_<Kind>   MOUTHS maps a value of the trait "Mouth" to a kind and its colours.
+    Cloth_<Kind>   CLOTHES maps a value of the trait "Body" to a kind and its colours. A first pass:
+                   a shirt is a thin shell over the torso (Cloth_<Kind>, child of "Body") and one
+                   over each arm (Cloth_<Kind>_armLeft, Cloth_<Kind>_armRight).
+
+The traits of a Genesis are read from research/evidence/genesis-metadata.jsonl; a value with no entry
+below is said (NOT MODELLED) and left out.
+
+Things that have volume (hats, glasses, a visor, a bubble, a stream, beams) are shells with the dark
+outline of the model, the shared material "ChogOutline". Things that are drawn (eyes, mouths) are
+flat coloured shapes laid on the curved face, made of geometry, never of an image.
+
+The four rigid parts the game animates ("Body", "Head", "armLeft", "armRight") and their origins are
+those of make_chog_full.py, checked by its report.
+
+Lettering: the word of a print is drawn with the font built into Blender ("Bfont Regular", no file
+of this Mac), thickened, cut into small pieces and laid on the panel. Colours: measured on the
+1000-point pictures of the Genesis (.artifacts/genesis-art/1000/), given here as they look on the
+screen.
+"""
+
+import argparse
+import ast
+import json
+import math
+import os
+import sys
+from types import SimpleNamespace
+
+import bmesh
+import bpy
+from mathutils import Matrix, Vector
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+sys.dont_write_bytecode = True   # no __pycache__ folder beside the scripts
+
+import make_chog_full as full  # noqa: E402  (the folder of this file must be on the path first)
+from render_chog_body import linear  # noqa: E402
+
+variants, base = full.variants, full.base
+X, Y, Z, NOWHERE = base.X, base.Y, base.Z, base.NOWHERE
+at = base.at
+SKIN, OUTLINE = full.SKIN, full.OUTLINE
+
+REPOSITORY = os.path.normpath(os.path.join(HERE, "..", ".."))
+METADATA = os.path.join(REPOSITORY, "research", "evidence", "genesis-metadata.jsonl")
+TRAITS_FOLDER = os.path.join(REPOSITORY, ".artifacts", "chog-body", "traits")
+
+TRIANGLE_LIMIT = 8000        # one dressed hero, outline shells included
+
+# ---------------------------------------------------------------------------------------------
+# The polished base: head H3, and what replaces its numbers.
+# ---------------------------------------------------------------------------------------------
+POLISH = {
+    # A leaf from its root to its point: where along its length, then its width and its thickness
+    # against the largest. The last line is the blunt point.
+    "LEAF_PROFILE": (
+        (0.00, 0.90, 0.92),
+        (0.12, 0.99, 1.00),
+        (0.25, 1.00, 0.95),
+        (0.46, 0.79, 0.70),
+        (0.69, 0.49, 0.42),
+        (0.89, 0.19, 0.17),
+    ),
+    "LEAF_SIDES": 6,             # points around a leaf: its section is an oval
+    "LEAF_CURL": 0.07,           # how far the point bends back, against the length
+    # The nose is a little smaller than on H3: it has to show between a pair of glasses and a grin.
+    "NOSE": (0.0, -0.042, 0.018, 0.012),
+    # The face spans the head as the pictures draw it, more so at the brow; the cheeks and the teeth
+    # of hair follow. (H3: 0.225 wide from its middle, 0.10 wider at the brow.)
+    "FACE_HALF_WIDTH": 0.250,
+    "FACE_TAPER": 0.22,
+    "CHEEK": (0.180, -0.062, 0.046, 0.032),
+    "FRINGE_WIDTH": 0.088,
+    "FRINGE_DROP": 0.050,
+}
+
+# What a Genesis looks like besides its parts. The colour of each value of "Skin", and of the face
+# when it is not the cream of the collection (less yellow than the cream of the official drawings).
+SKINS = {
+    "Red": {"skin": (0.95, 0.05, 0.05)},
+    "Pink": {"skin": (0.95, 0.45, 0.68)},
+    "Yellow": {"skin": (0.95, 0.82, 0.10)},
+    "Origin": {"skin": (0.36, 0.21, 0.69)},
+    "Black": {"skin": (0.17, 0.17, 0.18), "face": (0.36, 0.18, 0.11)},
+}
+GENESIS_FACE = (0.94, 0.91, 0.85)
+GENESIS_BLUSH = (0.83, 0.27, 0.50)
+# The flat colour behind a bust is the one recorded for the value of "Background" in this file,
+# which derive_trait_colors.py of tools/genesis-art wrote (it is not part of the repository).
+BACKGROUNDS = os.path.join(REPOSITORY, ".artifacts", "genesis-art", "background-colours.json")
+
+
+def background_colour(value):
+    """The recorded colour of a value of "Background", as it looks on the screen, or None."""
+    if not value or not os.path.isfile(BACKGROUNDS):
+        return None
+    with open(BACKGROUNDS, encoding="utf-8") as source:
+        found = json.load(source).get("backgrounds", {}).get(value)
+    return tuple(channel / 255.0 for channel in found[0]) if found else None
+
+# The lifts of what is drawn on the face, off the head: above the cheeks of the base (0.0216).
+DRAWN = (0.0245, 0.0277, 0.0307, 0.0337, 0.0367, 0.0397)
+
+# ---------------------------------------------------------------------------------------------
+# Hats. A shape is built once; a hat of the collection is a shape, a colour set, a print or a mark,
+# and the numbers it replaces ("numbers"), first of all those of its brim.
+# ---------------------------------------------------------------------------------------------
+# What the camera of the game asks of a hat: it looks down from 73 degrees and the head of H3 looks
+# up by 20, so anything that reaches forward over the brow hides the face under it. A brim is
+# therefore short and rises towards its edge (BRIM_LENGTH, BRIM_RISE_DEG below, to be set per hat).
+
+# The cap, in the axes of "Head" before the head is turned up, heights counted from the middle of
+# the head. Its crown is a dome whose front leans back as one flat panel, where the print goes.
+CAP = {
+    "RIM_HALF_WIDTH": 0.318,
+    "RIM_HALF_DEPTH": 0.282,
+    "SQUARENESS": 2.9,           # 2 is an oval seen from above, more is squarer: a flatter front
+    # One ring per line, from the rim up: height, size against the rim, how far it is moved back.
+    "RINGS": (
+        (0.040, 0.99, 0.000),
+        (0.092, 1.00, 0.004),
+        (0.236, 0.91, 0.030),
+        (0.300, 0.77, 0.050),
+        (0.345, 0.50, 0.064),
+    ),
+    "TOP": (0.362, 0.070),       # height of the top, how far it is moved back
+    "SIDES": 20,
+    # The button on the top: half its width, half its height.
+    "BUTTON": (0.032, 0.014),
+    # The brim: at which height it leaves the crown, how far it reaches in its middle, how far it
+    # goes around the crown on each side of the front (degrees), how much wider than the crown its
+    # edge is, its thickness, how much it rises towards its edge (degrees, negative: it dips), how
+    # much lower its ends are than its middle.
+    # (First: 0.150 long, dipping by 4 degrees, as wide as the crown; seen from the front it was a
+    # thin dark line. Then 0.130 long, dipping by 9 degrees, wider than the crown: a broad band as
+    # on the picture of CHOG #1287, but from the camera of the game it hid the whole face. Then four
+    # short brims that rise, 0.070 by 20 degrees, 0.065 by 28, 0.060 by 35 and 0.050 by 30: all let
+    # the lenses show from above, the third the most of them while the bust still reads as a cap.)
+    "BRIM_HEIGHT": 0.062,
+    "BRIM_LENGTH": 0.060,
+    "BRIM_AROUND_DEG": 70.0,
+    "BRIM_WIDER": 1.13,
+    "BRIM_THICKNESS": 0.034,
+    "BRIM_RISE_DEG": 35.0,
+    "BRIM_DROOP": 0.036,
+    "BRIM_SECTIONS": 9,
+    # How much of the outline each point of a section gets: on the top at the crown, half way, at
+    # the edge, then under the brim at the edge, half way, at the crown.
+    "BRIM_OUTLINE_SHARES": (0.0, 0.0, 1.0, 1.0, 0.3, 0.0),
+    # The print: height of its capitals, height of the line they stand on, how much the strokes are
+    # thickened and how much more for the dark line around them (in units of the font, whose
+    # capitals are 0.70 tall), the space between letters against the usual, how far each layer
+    # stands off the panel, and the width of the pieces the word is cut into to follow the panel.
+    # (The word stood on 0.110 and was 0.104 tall; a brim that rises then hid its foot from the front.)
+    "PRINT_CAPITALS": 0.096,
+    "PRINT_BASELINE": 0.124,
+    "PRINT_BOLD": 0.040,
+    "PRINT_LINE": 0.040,
+    "PRINT_SPACING": 1.22,
+    "PRINT_LIFT": (0.004, 0.008),
+    "PRINT_CUT": 0.035,
+    "OUTLINE_THICKNESS": 0.020,
+}
+FONT_CAPITALS = 0.70             # height of a capital of "Bfont Regular" at size 1, measured
+
+# The bucket hat: a soft round crown and a brim all around it. The brim dips at the sides and at
+# the back as the pictures draw it; at the front it is shorter and rises, for the camera of the game.
+BUCKET = {
+    "RIM_HALF_WIDTH": 0.316,
+    "RIM_HALF_DEPTH": 0.281,
+    "SQUARENESS": 2.25,
+    "RINGS": (
+        (0.062, 0.99, 0.000),
+        (0.118, 1.00, 0.004),
+        (0.218, 0.93, 0.018),
+        (0.288, 0.74, 0.034),
+        (0.328, 0.42, 0.046),
+    ),
+    "TOP": (0.341, 0.050),
+    "SIDES": 16,
+    "BRIM_HEIGHT": 0.094,
+    "BRIM_THICKNESS": 0.026,
+    # (First: 0.050 long at the front, rising by 8 degrees. From the camera of the game it still hid
+    # the eyes drawn on the face, which lie further back than a pair of glasses. Turned up against
+    # the crown, it hides nothing, and from the front it is still a band between crown and eyes.)
+    "BRIM_LENGTH": 0.080,        # at the sides and at the back
+    "BRIM_DIP_DEG": 30.0,
+    "BRIM_FRONT_LENGTH": 0.066,  # in the middle of the front
+    "BRIM_FRONT_RISE_DEG": 52.0,
+    "BRIM_FRONT_SPREAD": 2.0,    # how narrow the raised front is: more is narrower
+    # The mark on the front of the crown: its height, and half its width.
+    "MARK_HEIGHT": 0.185,
+    "MARK_HALF_WIDTH": 0.060,
+    "MARK_LIFT": 0.005,
+    "OUTLINE_THICKNESS": 0.020,
+}
+
+# The crown: a band around the top of the head that flares, eight points, gems on the band. It is
+# open: the leaves of the head stand inside it, as the pictures show the skin through its arches.
+CROWN = {
+    "RIM_HALF_WIDTH": 0.318,
+    "RIM_HALF_DEPTH": 0.283,
+    "SQUARENESS": 2.2,
+    # From the rim up: the rim, the top of the line of trim, the top of the band, the tips. It
+    # flares, and leans back as it rises: seen from the camera of the game its front then stands
+    # behind the brow in place of over it. (First: moved back by 0.012 and 0.024 only; from above
+    # the flared front covered the eyes.)
+    "RINGS": (
+        (0.070, 1.000, 0.000),
+        (0.094, 1.006, 0.002),
+        (0.190, 1.060, 0.030),
+        (0.305, 1.110, 0.056),
+    ),
+    "SIDES": 16,                 # twice the number of points
+    "VALLEY": 0.208,             # height of the dips between the points
+    "FLOOR": (0.150, 0.80),      # the floor inside the crown, hidden by the head: height, size
+    # The gems: where around the crown (degrees from the front, towards the left of the character),
+    # at which height, half width, half height, and which material.
+    "GEMS": (
+        (0.0, 0.140, 0.040, 0.050, "Trim"),
+        (0.0, 0.140, 0.029, 0.038, "GemRed"),
+        (38.0, 0.132, 0.014, 0.014, "GemBlue"),
+        (-38.0, 0.132, 0.014, 0.014, "GemBlue"),
+        (76.0, 0.140, 0.014, 0.014, "GemBlue"),
+        (-76.0, 0.140, 0.014, 0.014, "GemBlue"),
+        (124.0, 0.140, 0.014, 0.014, "GemBlue"),
+        (-124.0, 0.140, 0.014, 0.014, "GemBlue"),
+        (180.0, 0.140, 0.020, 0.024, "GemRed"),
+    ),
+    "GEM_LIFT": (0.005, 0.010),  # the rim of a gem and its middle, off the band
+    "OUTLINE_THICKNESS": 0.020,
+}
+
+# The beanie: a dome and a thick cuff around the brow, rings printed on the dome.
+BEANIE = {
+    "RIM_HALF_WIDTH": 0.314,
+    "RIM_HALF_DEPTH": 0.279,
+    "SQUARENESS": 2.15,
+    "RINGS": (
+        (0.066, 1.000, 0.000),
+        (0.140, 1.000, 0.005),
+        (0.225, 0.910, 0.020),
+        (0.295, 0.700, 0.036),
+        (0.335, 0.400, 0.048),
+    ),
+    "TOP": (0.352, 0.052),
+    "SIDES": 16,
+    # The cuff, a shell of its own around the foot of the dome, so that the dark line of the model
+    # runs along its upper edge: its lower and upper edge, how far it stands off the dome (against
+    # the size of the rim), how much more in its middle. (First: a step in the dome itself, 0.05
+    # wider. It did not show: the picture was a smooth swimming cap.)
+    "CUFF": (0.058, 0.148, 0.062, 0.026),
+    # The ribs of the cuff: how many around, the width of one, how far it stands off the cuff.
+    "RIBS": (24, 0.007, 0.004),
+    # The rings printed on the dome: degrees from the front, height, radius.
+    "PRINTS": (
+        (-26.0, 0.190, 0.030), (26.0, 0.205, 0.030), (70.0, 0.190, 0.028), (-74.0, 0.200, 0.028),
+        (0.0, 0.268, 0.027), (-50.0, 0.266, 0.025), (48.0, 0.272, 0.025), (116.0, 0.205, 0.028),
+        (-120.0, 0.208, 0.028), (164.0, 0.215, 0.028),
+    ),
+    "PRINT_INSIDE": 0.56,        # the hole of a ring, against its radius
+    "PRINT_LIFT": 0.005,
+    "OUTLINE_THICKNESS": 0.020,
+}
+
+# value of the trait "Head": shape, colours of its materials, print or mark, numbers it replaces.
+HATS = {
+    "TISM Cap": {
+        "shape": "Cap",
+        "colours": {
+            "Crown": (0.89, 0.16, 0.24),
+            "Brim": (0.19, 0.18, 0.25),
+            "Button": (0.19, 0.18, 0.25),
+            "Print": (0.95, 0.95, 0.95),
+            "PrintLine": (0.06, 0.05, 0.06),
+        },
+        "print": "TISM",
+        "numbers": {"BRIM_LENGTH": 0.060, "BRIM_RISE_DEG": 35.0},
+    },
+    # Not finished art: here to check that the same shape takes another colour set and another word.
+    # Colours read on the 256-point picture of CHOG #448, whose letters have serifs ours have not.
+    "MMGA Cap": {
+        "shape": "Cap",
+        "colours": {
+            "Crown": (0.75, 0.80, 0.81),
+            "Brim": (0.21, 0.50, 0.77),
+            "Button": (0.21, 0.50, 0.77),
+            "Print": (0.20, 0.06, 0.95),
+            "PrintLine": (0.08, 0.05, 0.28),
+        },
+        "print": "MMGA",
+        "numbers": {"BRIM_LENGTH": 0.060, "BRIM_RISE_DEG": 35.0},
+    },
+    "Blue Bucket Cap": {
+        "shape": "BucketCap",
+        "colours": {
+            "Crown": (0.20, 0.29, 0.73),
+            "Brim": (0.20, 0.29, 0.73),
+            "Under": (0.13, 0.20, 0.63),
+            "Mark": (0.76, 0.76, 0.76),
+        },
+        "mark": "label",
+    },
+    # Its name says cap; the pictures show the bucket hat, purple, with a white stitched drawing.
+    "Balls Cap": {
+        "shape": "BucketCap",
+        "colours": {
+            "Crown": (0.64, 0.18, 0.76),
+            "Brim": (0.64, 0.18, 0.76),
+            "Under": (0.46, 0.08, 0.53),
+            "Mark": (0.95, 0.95, 0.95),
+        },
+        "mark": "wave",
+    },
+    "Crown": {
+        "shape": "Crown",
+        "colours": {
+            "Gold": (0.91, 0.64, 0.16),
+            "Trim": (0.80, 0.43, 0.11),
+            "GemRed": (0.95, 0.10, 0.11),
+            "GemBlue": (0.13, 0.22, 0.90),
+        },
+    },
+    "Wizard Beanie": {
+        "shape": "Beanie",
+        "colours": {
+            "Dome": (0.06, 0.21, 0.90),
+            "Cuff": (0.07, 0.22, 0.91),
+            "Rib": (0.04, 0.05, 0.20),
+            "Print": (0.94, 0.86, 0.09),
+        },
+    },
+}
+
+# ---------------------------------------------------------------------------------------------
+# Eyes. Places are counted from the middle of the face, as in make_chog_full.py.
+# ---------------------------------------------------------------------------------------------
+ANIME_GLASS = {
+    # A lens: to the side of the middle of the face, above it, half width, half height.
+    # (First: 0.096 by 0.064, three wide for two tall. On the picture a lens is about four wide for
+    # three tall, and the pair spans the face.)
+    "LENS": (0.128, 0.018, 0.104, 0.074),
+    "LENS_SQUARENESS": 3.2,
+    "LENS_TAPER": 0.10,          # how much wider the top of a lens is than its bottom
+    "LENS_SEGMENTS": 16,
+    "RIM": 0.20,                 # the share of a lens taken by its frame, all around
+    "THICKNESS": 0.032,
+    "LENS_BULGE": 0.006,         # how far the middle of the white stands out of the frame
+    "WRAP": 0.45,                # 0: both lenses look straight ahead, 1: each lies on the head
+    "BRIDGE_UP": 0.030,          # above the middle of the lenses
+    "BRIDGE": (0.011, 0.009),    # half height, half depth of the bar between the lenses
+    "TEMPLE_UP": 0.034,
+    "TEMPLE": (0.010, 0.007),    # half height, half width of an arm
+    "TEMPLE_END": (1.0, 0.16, 0.12),   # where an arm ends on the head: to the side, back, up
+    # Thinner than elsewhere: on the picture the frame is mostly teal, with a fine dark line.
+    "OUTLINE_THICKNESS": 0.011,
+}
+
+# An eye drawn on the face, as "Normal Eye" and the laser eyes have it: a tall dark oval whose top
+# is cut by a slanted brow, lower towards the nose.
+DARK_EYE = {
+    "AT": (0.112, 0.008),        # to the side of the middle of the face, above it
+    "SIZE": (0.043, 0.060),      # half width, half height
+    "BROW_AT": 0.50,             # where the brow cuts the eye, against its half height
+    "BROW_SLOPE": 0.42,
+    "BROW": (0.011, 0.016, 0.004),   # thickness of the brow, how far it runs past the eye outwards and inwards
+    "SEGMENTS": 14,
+    # The glints: each to the side of the middle of the eye (the same side for both eyes: where the
+    # light is), above it, half width, half height.
+    "GLINTS": ((-0.012, 0.010, 0.013, 0.017), (-0.016, -0.026, 0.006, 0.007)),
+}
+LASER = {
+    # A beam leaves each eye level with the ground, straight ahead: how long, how thick (half), how
+    # far behind the face it starts.
+    "BEAM_LENGTH": 0.28,
+    "BEAM_RADIUS": 0.019,
+    "BEAM_SUNK": 0.03,
+    # (First: six sides, two of them the light core. Seen from the front and from above, where those
+    # two are what shows, the beam was a pale pink stick; on the pictures it is purple with a thin
+    # light line along it.)
+    "BEAM_SIDES": 8,
+    "BEAM_CORE": (1,),           # which of its sides is the light core: up, towards the left
+    "OUTLINE_THICKNESS": 0.010,
+}
+HAPPY = {
+    "AT": (0.110, 0.012),
+    "ARC": (0.050, 0.034, 0.017),    # half width, height of the arch, thickness in its middle
+    "STEPS": 8,
+}
+ROUND = {
+    "AT": (0.112, 0.006),
+    "LINE": (0.060, 0.066),      # half width, half height of the dark disc around the eye
+    "WHITE": (0.049, 0.055),
+    "PUPIL": (0.033, 0.039),
+}
+# The visor: one band that wraps the front of the head from one row of leaves to the other.
+VISOR = {
+    "UP": 0.020,                 # its middle, above the middle of the face
+    "HALF_HEIGHT": (0.056, 0.042),   # in the middle of the front, at its ends
+    "HALF_WIDTH": 0.338,         # the oval it follows seen from above: half width, half depth
+    "HALF_DEPTH": 0.306,
+    "AROUND_DEG": 80.0,
+    "THICKNESS": 0.024,
+    "BULGE": 0.008,
+    # The material of each piece across the band, from one end to the other.
+    "PIECES": ("Edge", "Edge", "Mid", "Dark", "Dark", "Dark", "Dark", "Mid", "Edge", "Edge"),
+    "OUTLINE_THICKNESS": 0.014,
+}
+EYES = {
+    "Anime Glass": {
+        "kind": "AnimeGlass",
+        "colours": {
+            "Frame": (0.25, 0.42, 0.37),
+            "Lens": (0.96, 0.96, 0.96),
+        },
+        "unlit": ("Lens",),      # drawn in its colour whatever the light: the glare of the lenses
+    },
+    "Normal Eye": {
+        "kind": "NormalEye",
+        "colours": {"Dark": (0.05, 0.05, 0.05), "Glint": (0.95, 0.95, 0.95)},
+        "unlit": ("Dark", "Glint"),
+    },
+    "Purple laser": {
+        "kind": "Laser",
+        "colours": {"Dark": (0.05, 0.05, 0.05), "Beam": (0.78, 0.10, 0.85), "Core": (0.94, 0.55, 0.89)},
+        "unlit": ("Dark", "Beam", "Core"),
+    },
+    "Happy": {
+        "kind": "Happy",
+        "colours": {"Dark": (0.05, 0.05, 0.05)},
+        "unlit": ("Dark",),
+    },
+    "Round": {
+        "kind": "Round",
+        "colours": {"Dark": (0.05, 0.05, 0.05), "White": (0.95, 0.95, 0.95)},
+        "unlit": ("Dark", "White"),
+    },
+    "Sunset visor": {
+        "kind": "Visor",
+        "colours": {"Edge": (0.86, 0.44, 0.15), "Mid": (0.58, 0.06, 0.05), "Dark": (0.45, 0.06, 0.11)},
+    },
+}
+
+# ---------------------------------------------------------------------------------------------
+# Mouths.
+# ---------------------------------------------------------------------------------------------
+GOLD_TOOTH = {
+    # The grin: half its width, the height of its corners above the middle of the face, then how
+    # far below the corners are the middle of its upper edge, of the line between the two rows of
+    # teeth and of its lower edge.
+    # (First tries: corners at -0.070 then -0.060 with the teeth lit like the face. The bottom of
+    # the face of H3 turns under the head, so the grin was seen edge on and came out grey.)
+    "HALF_WIDTH": 0.150,
+    "CORNERS_UP": -0.058,
+    "SAG_TOP": 0.020,
+    "SAG_BITE": 0.050,
+    "SAG_BOTTOM": 0.084,
+    "LINE": 0.014,               # width of the dark line around the grin
+    "BITE_LINE": 0.006,          # width of the dark line between the rows
+    # The share of each row, from its top, that is in shade: the upper row, the lower row. Measured
+    # on the picture of CHOG #1287: a thin edge under the lip, nearly half of the lower row.
+    "SHADE": (0.14, 0.44),
+    "STEPS": 12,                 # pieces across the grin
+    # The gold tooth: where across the grin (-1 left corner as seen, +1 right corner; the left of the
+    # character is at +1), half its width at the top and at the bottom, how far it reaches above and
+    # below the line between the rows.
+    "TOOTH_AT": 0.46,
+    "TOOTH": (0.023, 0.019, 0.010, 0.024),
+    "TOOTH_LINE": 0.007,
+    "TOOTH_LEAN": 0.3,           # how much of the slope of the line between the rows the tooth takes
+}
+SMILE = {
+    "AT": (0.0, -0.078),         # its corners: to the side of the middle of the face, above it
+    "HALF_WIDTH": 0.052,
+    "SAG": 0.024,
+    "THICKNESS": 0.012,
+    "STEPS": 8,
+}
+DROOL = {
+    # The mouth: a short line whose middle is higher than its ends; the drool hangs from its end on
+    # the left of the character (the right of the picture), with a drop.
+    "AT": (0.0, -0.092),
+    "HALF_WIDTH": 0.040,
+    "ARCH": 0.010,
+    "THICKNESS": 0.012,
+    "DROOL": (0.034, 0.012, 0.050),      # to the side of the middle of the mouth, width, how far it hangs
+    "DROP": (0.010, 0.015),
+    "STEPS": 6,
+}
+# "Drooling" as the pictures of Side=Left draw it: a wide open mouth, a tongue, a thick thread of
+# drool running down from it.
+DROOL_OPEN = {
+    "AT": (0.020, -0.086),       # the middle of the mouth
+    "SIZE": (0.052, 0.040),      # half width, half height of the dark line around it
+    "LINE": 0.008,
+    "TONGUE": (-0.012, 0.036, 0.022),    # below the middle of the mouth, half width, half height
+    "DROOL": (-0.026, 0.016, 0.062),     # to the side of the middle of the mouth, width, how far it runs
+}
+WO = {
+    "AT": (-0.012, -0.090),
+    "SIZE": (0.018, 0.023),
+    "GLINT": (-0.005, 0.007, 0.005),
+}
+RAINBOW = {
+    # The open mouth, drawn: to the side, above the middle of the face, half width, half height.
+    "MOUTH": (0.0, -0.092, 0.060, 0.030),
+    # The stream leaves the mouth and falls: one section per line, each ahead of the mouth (level
+    # with the ground), below it, half its width, its thickness. The first is inside the head.
+    "PATH": (
+        (-0.030, -0.004, 0.050, 0.030),
+        (0.028, 0.000, 0.054, 0.032),
+        (0.066, 0.044, 0.064, 0.034),
+        (0.088, 0.120, 0.078, 0.036),
+        (0.096, 0.215, 0.090, 0.036),
+        (0.094, 0.310, 0.098, 0.034),
+    ),
+    "END": (0.090, 0.345),       # where it ends: ahead, below
+    "ARCH": 0.25,                # how much its sides fall away from its middle, against its thickness
+    # The stripes, from the right of the character to its left (left to right on the picture).
+    "STRIPES": ("Red", "Orange", "Yellow", "Green", "Blue", "Purple"),
+    "OUTLINE_THICKNESS": 0.014,
+}
+BUBBLE = {
+    # The bubble: to the side of the middle of the face, above it, how far its middle stands off the
+    # face, its radius. Then the knot that holds it to the mouth.
+    # (On the picture of CHOG #1078 it is half as wide as the face. That large it hid most of the
+    # face from above, so it is two fifths.)
+    "AT": (-0.020, -0.100),
+    "OFF": 0.085,
+    "RADIUS": 0.098,
+    "SIDES": 12,
+    "STACKS": 6,
+    "KNOT": 0.020,
+    # The glint: a patch on the upper side: degrees to the right of the character, degrees up, size.
+    "GLINT": (12.0, 52.0, 0.044, 0.020),
+    "OUTLINE_THICKNESS": 0.018,
+}
+MOUTHS = {
+    "Gold Tooth": {
+        "kind": "GoldTooth",
+        "colours": {
+            "Line": (0.06, 0.05, 0.07),
+            "Teeth": (0.95, 0.95, 0.96),
+            "Shade": (0.62, 0.67, 0.88),
+            "Gold": (0.94, 0.66, 0.05),
+            "Shine": (0.96, 0.89, 0.64),
+        },
+        # Paint: drawn in its colours whatever the light.
+        "unlit": ("Line", "Teeth", "Shade", "Gold", "Shine"),
+    },
+    "normal smile": {
+        "kind": "Smile",
+        "colours": {"Line": (0.05, 0.05, 0.05)},
+        "unlit": ("Line",),
+    },
+    "Drooling": {
+        "kind": "Drool",
+        "colours": {"Line": (0.05, 0.05, 0.05), "Drool": (0.56, 0.78, 0.94)},
+        "unlit": ("Line", "Drool"),
+    },
+    "wo": {
+        "kind": "Wo",
+        "colours": {"Line": (0.05, 0.05, 0.05), "Glint": (0.95, 0.95, 0.95)},
+        "unlit": ("Line", "Glint"),
+    },
+    "Rainbow Puke": {
+        "kind": "RainbowPuke",
+        "colours": {
+            "Dark": (0.05, 0.05, 0.05),
+            "Red": (0.96, 0.05, 0.05),
+            "Orange": (0.96, 0.45, 0.06),
+            "Yellow": (0.95, 0.79, 0.06),
+            "Green": (0.05, 0.88, 0.15),
+            "Blue": (0.06, 0.40, 0.85),
+            "Purple": (0.47, 0.12, 0.82),
+        },
+        "unlit": ("Dark",),
+    },
+    "Bubblegum": {
+        "kind": "Bubblegum",
+        "colours": {"Gum": (0.95, 0.51, 0.92), "Glint": (0.97, 0.90, 0.97)},
+        "unlit": ("Glint",),
+    },
+}
+
+# The pictures of Side=Left are drawn by another hand: some values are not the same drawing there.
+# What is here replaces the entry above for a Genesis of that side.
+MOUTHS_OF_SIDE = {
+    "Left": {
+        "Drooling": {
+            "kind": "DroolOpen",
+            "colours": {"Line": (0.05, 0.05, 0.05), "Inside": (0.30, 0.10, 0.11), "Tongue": (0.82, 0.24, 0.47),
+                        "Drool": (0.26, 0.81, 0.93)},
+            "unlit": ("Line", "Inside", "Tongue", "Drool"),
+        },
+    },
+}
+
+# ---------------------------------------------------------------------------------------------
+# Clothing, a first pass: a shirt in one colour, with stripes if its entry names them.
+# ---------------------------------------------------------------------------------------------
+TEE = {
+    "LIFT": 0.008,               # how far the cloth stands off the body
+    "HEM": 0.245,                # height of its lower edge above the ground
+    "HEM_FLARE": 0.006,
+    "STEP": 0.038,               # height of a band, which is the height of a stripe
+    "COLLAR": (0.580, 0.593),    # the band at the neck, in the collar material
+    "SLEEVE": 0.125,             # how far a sleeve reaches down the arm from the shoulder; 0: none
+    "SLEEVE_FLARE": 0.005,
+    "SIDES": 20,
+    "ARM_SIDES": 12,
+}
+CLOTHES = {
+    # The pictures show a red shirt with a dark collar and nothing else: no flame is drawn where a
+    # picture is cut, so none is invented here.
+    "Fire Shirt": {
+        "kind": "Tee",
+        "colours": {"Main": (0.93, 0.18, 0.17), "Collar": (0.45, 0.07, 0.10)},
+    },
+    "Prisoner": {
+        "kind": "Tee",
+        "colours": {"Main": (0.95, 0.95, 0.95), "Stripe": (0.07, 0.07, 0.07), "Collar": (0.07, 0.07, 0.07)},
+        "stripes": True,
+    },
+    # A jersey: no sleeves. Its number (143) is not drawn.
+    "Red 143 Jersey": {
+        "kind": "Tee",
+        "colours": {"Main": (0.84, 0.31, 0.27), "Collar": (0.95, 0.95, 0.95)},
+        "numbers": {"SLEEVE": 0.0, "COLLAR": (0.566, 0.593)},
+    },
+}
+
+
+def head_numbers():
+    return SimpleNamespace(**{**full.HEAD, **full.STYLES["H3"]["head"], **POLISH})
+
+
+# ---------------------------------------------------------------------------------------------
+# The polished base.
+# ---------------------------------------------------------------------------------------------
+
+def add_leaf_crown(part, numbers, surface):
+    """The crown of add_crown of make_chog_full.py, blade for blade, each one a leaf."""
+    for turn_deg, back_deg, length, width, thickness, flat in numbers.SPIKES:
+        mirrored = turn_deg not in (0.0, 180.0)
+        for side in ((1.0, -1.0) if mirrored else (1.0,)):
+            turn, back = math.radians(turn_deg) * side, math.radians(back_deg)
+            away = Vector((math.sin(turn) * math.cos(back), math.sin(back), math.cos(turn) * math.cos(back)))
+            root = surface.towards(away)
+            # The flat sides look the way "looks" points; the leaf is wide across that. "thick"
+            # then points to the side that is looked at, and the point curls away from it.
+            looks = -Y if flat == "front" else Z
+            wide = looks.cross(away).normalized()
+            thick = away.cross(wide)
+            half_wide, half_thick = width * 0.5, thickness * 0.5
+            curl = -thick * length * numbers.LEAF_CURL
+
+            profile = numbers.LEAF_PROFILE
+            rings = [(root - away * numbers.SPIKE_SUNK, wide * half_wide * profile[0][1],
+                      thick * half_thick * profile[0][2])]
+            for along, wider, thicker in profile[1:]:
+                rings.append((root + away * length * along + curl * along * along, wide * half_wide * wider,
+                              thick * half_thick * thicker))
+            rings.append((root + away * length + curl, NOWHERE, NOWHERE))
+            part.shell(rings, numbers.LEAF_SIDES, SKIN, numbers.OUTLINE_THICKNESS, smooth=True)
+
+
+# ---------------------------------------------------------------------------------------------
+# What every trait part is made with.
+# ---------------------------------------------------------------------------------------------
+
+class TraitShapes(variants.PartShapes):
+    """The shapes of one object of a trait, in the axes of the part it sits on. Its materials carry
+    the name of the trait ("prefix"), which is also the name of its first object."""
+
+    def __init__(self, name, prefix, colours):
+        super().__init__(tuple(f"{prefix}_{key}" for key in colours) + (OUTLINE,))
+        self.name = name
+        self.prefix = prefix
+
+    def named(self, key):
+        return f"{self.prefix}_{key}"
+
+
+def trait_materials(prefix, colours, unlit, shared):
+    """The materials of a trait, in the colours of its colour set. "srgb" keeps the colour as it was
+    given, for the renders; "unlit" says it is drawn in that colour whatever the light."""
+    materials = {OUTLINE: shared[OUTLINE]}
+    for key, colour in colours.items():
+        material = bpy.data.materials.new(f"{prefix}_{key}")
+        material.diffuse_color = linear(colour)
+        shader = material.node_tree.nodes.get("Principled BSDF") if material.node_tree else None
+        if shader is not None:
+            shader.inputs["Base Color"].default_value = linear(colour)
+            shader.inputs["Roughness"].default_value = 0.9
+            shader.inputs["Metallic"].default_value = 0.0
+        material["srgb"] = list(colour)
+        material["unlit"] = key in unlit
+        materials[f"{prefix}_{key}"] = material
+    return materials
+
+
+class Maker:
+    """What the builder of a trait is given: the numbers of the head and of the body, where the
+    surface of the head is, the entry of its table, and a way to open the objects it builds."""
+
+    def __init__(self, prefix, entry, head, body, surface):
+        self.prefix, self.entry = prefix, entry
+        self.head, self.body, self.surface = head, body, surface
+        self.parts = []          # (shapes, name of the part of the body it sits on)
+
+    def numbers(self, defaults):
+        """The numbers of a shape, those the entry replaces in their place."""
+        unknown = set(self.entry.get("numbers", {})) - set(defaults)
+        if unknown:
+            raise SystemExit(f"CHOG_TRAITS {self.prefix} sets numbers that do not exist: {sorted(unknown)}")
+        return SimpleNamespace(**{**defaults, **self.entry.get("numbers", {})})
+
+    def part(self, on="Head"):
+        """A new object of this trait, on a part of the body. The first is named after the trait,
+        the others after the trait and the part they sit on."""
+        name = self.prefix if not self.parts else f"{self.prefix}_{on}"
+        shapes = TraitShapes(name, self.prefix, self.entry["colours"])
+        self.parts.append((shapes, on))
+        return shapes
+
+
+def power(value, squareness):
+    """The cosine or sine of a rounded square: 2 is a circle, more is squarer."""
+    return math.copysign(abs(value) ** (2.0 / squareness), value)
+
+
+def add_loops(part, loops, material, outline, smooth=True, shares=None):
+    """One closed shell from rows of points given one by one, a row of one point being a tip; an end
+    row of several points is closed by a flat face. "shares", when given, says for each point of
+    each row how much of the thickness of the outline it gets (1 all of it, 0 none): for a shape
+    that enters another, or that lies close over another part. Returns the faces of each band
+    between two rows, in the order of the points, then those of the flat ends."""
+    mesh = part.mesh
+    rows = [[mesh.verts.new(point) for point in loop] for loop in loops]
+    fade = None
+    if shares is not None:
+        fade = {point: share for row, row_shares in zip(rows, shares) for point, share in zip(row, row_shares)}
+    bands = []
+    for lower, upper in zip(rows, rows[1:]):
+        count = max(len(lower), len(upper))
+        band = []
+        for index in range(count):
+            after = (index + 1) % count
+            if len(lower) == 1:
+                corners = (lower[0], upper[after], upper[index])
+            elif len(upper) == 1:
+                corners = (lower[index], lower[after], upper[0])
+            else:
+                corners = (lower[index], lower[after], upper[after], upper[index])
+            face = mesh.faces.new(corners)
+            face.smooth = smooth
+            band.append(face)
+        bands.append(band)
+    ends = []
+    if len(rows[0]) > 1:
+        ends.append(mesh.faces.new(list(reversed(rows[0]))))
+    if len(rows[-1]) > 1:
+        ends.append(mesh.faces.new(rows[-1]))
+    faces = [face for band in bands for face in band] + ends
+    part.paint(faces, material)
+    if outline > 0.0:
+        part.outlined.append((faces, outline, fade))
+    return bands, ends
+
+
+def ring_points(centre, first, second, sides):
+    """The points of an oval: "first" and "second" are its two half axes."""
+    return [centre + first * math.cos(2.0 * math.pi * index / sides) + second * math.sin(2.0 * math.pi * index / sides)
+            for index in range(sides)]
+
+
+def outward(surface, side, up):
+    """The way the head looks at a place of its front."""
+    return (surface.front(side, up, 1.0) - surface.front(side, up, 0.0)).normalized()
+
+
+def level_axes(head):
+    """Straight ahead and straight down as the ground has them, in the axes of "Head" before the
+    head is turned up: what is built along them is level once the head looks up."""
+    back = Matrix.Rotation(math.radians(head.HEAD_PITCH_DEG), 3, "X")
+    return back @ -Y, back @ -Z
+
+
+def oval(middle, half_width, half_height, segments):
+    """The places of the edge of an oval drawn on the face: (to the side, above)."""
+    return [(middle[0] + half_width * math.cos(2.0 * math.pi * index / segments),
+             middle[1] + half_height * math.sin(2.0 * math.pi * index / segments)) for index in range(segments)]
+
+
+def draw_shape(part, surface, material, edge, lift, middle=None):
+    """A flat shape drawn on the face: "edge" is its outline as places (to the side, above), which
+    must be seen whole from "middle" (the mean of the edge when not given)."""
+    if middle is None:
+        middle = (sum(place[0] for place in edge) / len(edge), sum(place[1] for place in edge) / len(edge))
+    full.add_skin(part, surface, [[surface.front(middle[0], middle[1], lift)],
+                                  [surface.front(side, up, lift) for side, up in edge]], material)
+
+
+def draw_line(part, surface, material, places, thickness, lift):
+    """A line drawn on the face through "places" (to the side, above); "thickness" gives its width
+    at each place."""
+    lower, upper = [], []
+    for index, (side, up) in enumerate(places):
+        before, after = places[max(index - 1, 0)], places[min(index + 1, len(places) - 1)]
+        along = Vector((after[0] - before[0], after[1] - before[1]))
+        across = Vector((-along.y, along.x)).normalized() * thickness[index] * 0.5
+        lower.append(surface.front(side - across.x, up - across.y, lift))
+        upper.append(surface.front(side + across.x, up + across.y, lift))
+    full.add_skin(part, surface, [lower, upper], material, around=False)
+
+
+# ---------------------------------------------------------------------------------------------
+# Hats.
+# ---------------------------------------------------------------------------------------------
+
+class CapCrown:
+    """Where the wall of a hat is, in the axes of "Head" before the head is turned up: rings one
+    above the other, each a rounded square seen from above."""
+
+    def __init__(self, numbers, middle):
+        self.numbers = numbers
+        self.middle = middle
+
+    def at_height(self, height):
+        """Half width, half depth and move back of the wall at a height."""
+        rings = self.numbers.RINGS
+        height = min(max(height, rings[0][0]), rings[-1][0])
+        for lower, upper in zip(rings, rings[1:]):
+            if height <= upper[0]:
+                amount = (height - lower[0]) / (upper[0] - lower[0])
+                size = lower[1] + (upper[1] - lower[1]) * amount
+                back = lower[2] + (upper[2] - lower[2]) * amount
+                return self.numbers.RIM_HALF_WIDTH * size, self.numbers.RIM_HALF_DEPTH * size, back
+        raise SystemExit("CHOG_TRAITS the rings of a hat are not in order")
+
+    def around(self, height, angle, size=1.0):
+        """The point of the wall at a height and an angle seen from above: 0 is the left of the
+        character, 270 degrees is the front."""
+        half_width, half_depth, back = self.at_height(height)
+        square = self.numbers.SQUARENESS
+        return self.middle + Vector((half_width * size * power(math.cos(angle), square),
+                                     half_depth * size * power(math.sin(angle), square) + back, height))
+
+    def loop(self, height, size=1.0):
+        sides = self.numbers.SIDES
+        return [self.around(height, 2.0 * math.pi * index / sides, size) for index in range(sides)]
+
+    def on_front(self, side, height):
+        """The point of the front of the wall "side" to the left of its middle, at a height: on the
+        flat pieces the wall is made of, not on the curve they follow."""
+        front = sorted((point for point in self.loop(height) if point.y < self.middle.y + self.at_height(height)[2]),
+                       key=lambda point: point.x)
+        for first, second in zip(front, front[1:]):
+            if first.x <= side <= second.x:
+                amount = (side - first.x) / max(second.x - first.x, 1e-9)
+                return first + (second - first) * amount
+        raise SystemExit(f"CHOG_TRAITS {side:+.3f} is beyond the front of the hat")
+
+    def front(self, side, height, lift):
+        """The same point pushed "lift" off the wall."""
+        here = self.on_front(side, height)
+        small = 0.002
+        across = self.on_front(side + small, height) - self.on_front(side - small, height)
+        upwards = self.on_front(side, height + small) - self.on_front(side, height - small)
+        normal = across.cross(upwards).normalized()
+        if normal.y > 0.0:
+            normal = -normal
+        return here + normal * lift
+
+    def frame(self, degrees, height):
+        """A place of the wall given by degrees from the front (towards the left of the character)
+        and a height: the point, then the ways along the wall, up the wall and out of it."""
+        angle = math.radians(270.0 + degrees)
+        small = 0.01
+        here = self.around(height, angle)
+        along = (self.around(height, angle + small) - self.around(height, angle - small)).normalized()
+        low = max(height - small, self.numbers.RINGS[0][0])
+        upwards = (self.around(low + 2.0 * small, angle) - self.around(low, angle)).normalized()
+        out = along.cross(upwards).normalized()
+        if out.dot(here - self.middle) < 0.0:
+            out = -out
+        return here, along, upwards, out
+
+
+def lay_disc(part, surface, wall, material, degrees, height, half_width, half_height, lifts, segments=8):
+    """A small raised disc on the wall of a hat: a gem, a patch."""
+    here, along, upwards, out = wall.frame(degrees, height)
+    low, high = lifts
+    edge = [here + out * low + along * half_width * math.cos(2.0 * math.pi * index / segments)
+            + upwards * half_height * math.sin(2.0 * math.pi * index / segments) for index in range(segments)]
+    full.add_skin(part, surface, [[here + out * high], edge], material)
+
+
+def word_pieces(word, thicker, spacing):
+    """The filled outline of a word in the font built into Blender, as flat triangles in the units of
+    the font: the word is centred, stands on the line y = 0 and reads towards +x."""
+    curve = bpy.data.curves.new("ChogPrintWord", "FONT")
+    curve.body = word
+    curve.size = 1.0
+    curve.align_x = "CENTER"
+    curve.offset = thicker
+    curve.space_character = spacing
+    curve.resolution_u = 2
+    if curve.font is None or curve.font.filepath != "<builtin>":
+        raise SystemExit("CHOG_TRAITS the font of the print is not the one built into Blender")
+    thing = bpy.data.objects.new("ChogPrintWord", curve)
+    bpy.context.scene.collection.objects.link(thing)
+    bpy.context.view_layer.update()
+    filled = bpy.data.meshes.new_from_object(thing.evaluated_get(bpy.context.evaluated_depsgraph_get()))
+    pieces = bmesh.new()
+    pieces.from_mesh(filled)
+    bpy.data.meshes.remove(filled)
+    bpy.data.objects.remove(thing)
+    bpy.data.curves.remove(curve)
+    return pieces
+
+
+def lay_word(part, crown, word, material, thicker, lift):
+    """Lays a word on the front panel of the cap: cut into narrow pieces, each point then put on the
+    panel. Returns how wide the word is."""
+    numbers = crown.numbers
+    scale = numbers.PRINT_CAPITALS / FONT_CAPITALS
+    pieces = word_pieces(word, thicker, numbers.PRINT_SPACING)
+    left = min(point.co.x for point in pieces.verts)
+    right = max(point.co.x for point in pieces.verts)
+    step = numbers.PRINT_CUT / scale
+    cut = math.ceil(left / step) * step
+    while cut < right:
+        bmesh.ops.bisect_plane(pieces, geom=pieces.verts[:] + pieces.edges[:] + pieces.faces[:], dist=1e-6,
+                               plane_co=Vector((cut, 0.0, 0.0)), plane_no=X)
+        cut += step
+    bmesh.ops.triangulate(pieces, faces=pieces.faces[:])
+
+    mesh = part.mesh
+    placed = {}
+    faces = []
+    for piece in pieces.faces:
+        corners = []
+        for point in piece.verts:
+            if point.index not in placed:
+                placed[point.index] = mesh.verts.new(crown.front(point.co.x * scale,
+                                                                 numbers.PRINT_BASELINE + point.co.y * scale, lift))
+            corners.append(placed[point.index])
+        face = mesh.faces.new(corners)
+        face.smooth = True
+        face.normal_update()
+        if face.normal.dot(face.calc_center_median() - crown.middle) < 0.0:
+            face.normal_flip()
+        faces.append(face)
+    pieces.free()
+    part.paint(faces, material)
+    part.open_faces.extend(faces)
+    return (right - left) * scale
+
+
+def add_dome(part, wall, material, outline):
+    """The crown of a hat: its rings, closed under the rim inside the head, and its top. Returns the
+    faces of each band."""
+    numbers = wall.numbers
+    loops = [wall.loop(height) for height, _, _ in numbers.RINGS]
+    top_height, top_back = numbers.TOP
+    loops.append([wall.middle + Vector((0.0, top_back, top_height))])
+    bands, _ = add_loops(part, loops, material, outline)
+    return bands
+
+
+def build_cap(maker):
+    """The shape "Cap": a crown, a brim, a button, and the word of the print on the front panel."""
+    numbers = maker.numbers(CAP)
+    part, surface = maker.part(), maker.surface
+    crown = CapCrown(numbers, surface.middle)
+    add_dome(part, crown, part.named("Crown"), numbers.OUTLINE_THICKNESS)
+
+    top_height, top_back = numbers.TOP
+    half_width, half_height = numbers.BUTTON
+    part.shell(base.ball_rings(surface.middle + Vector((0.0, top_back, top_height)), Z, X, half_height, half_width,
+                               half_width, 3), 8, part.named("Button"), numbers.OUTLINE_THICKNESS * 0.6)
+
+    # The brim: a slab cut across its width into sections, each one a ring of six points going from
+    # the crown out to the edge along the top and back under it.
+    sections = numbers.BRIM_SECTIONS
+    rise = math.tan(math.radians(numbers.BRIM_RISE_DEG))
+    half_thick = numbers.BRIM_THICKNESS * 0.5
+    loops, shares = [], []
+    for index in range(sections):
+        across = -1.0 + 2.0 * index / (sections - 1)
+        angle = math.radians(270.0 + across * numbers.BRIM_AROUND_DEG)
+        # The two end sections lie wholly inside the crown, so the brim comes out of its wall with
+        # its full thickness. (First try: each end thinned to a point on the wall, and the outline
+        # of that point showed as a dark sliver beside the cap.)
+        at_end = index in (0, sections - 1)
+        inner = crown.around(numbers.BRIM_HEIGHT, angle, 0.86 if at_end else 0.95)
+        reach = numbers.BRIM_LENGTH * (1.0 - across * across) ** 0.6
+        edge = crown.around(numbers.BRIM_HEIGHT, angle, 0.92 if at_end else 1.0)
+        wider = 1.0 if at_end else numbers.BRIM_WIDER
+        edge = Vector((edge.x * wider, edge.y - reach,
+                       edge.z + reach * rise - numbers.BRIM_DROOP * across * across))
+        inner = inner - Z * numbers.BRIM_DROOP * across * across
+        middle = inner + (edge - inner) * 0.62 + Z * 0.004
+        loops.append([
+            inner + Z * half_thick, middle + Z * half_thick, edge + Z * half_thick * 0.45,
+            edge - Z * half_thick * 0.45, middle - Z * half_thick, inner - Z * half_thick,
+        ])
+        shares.append((0.0,) * 6 if at_end else numbers.BRIM_OUTLINE_SHARES)
+    # The outline of the brim is whole along its edge, absent on its top up to the crown and at the
+    # two ends inside the crown, and thin under it. (First try: the whole thickness everywhere. The
+    # shell then stood off the crown and off the glasses under the brim, and showed as two dark
+    # slivers, one on the crown above the brim and one across the lenses. Second try: 0.8 of it
+    # half way along the top; the sliver on the crown stayed.)
+    add_loops(part, loops, part.named("Brim"), numbers.OUTLINE_THICKNESS, shares=shares)
+
+    word = maker.entry.get("print")
+    if word:
+        low, high = numbers.PRINT_LIFT
+        lay_word(part, crown, word, part.named("PrintLine"), numbers.PRINT_BOLD + numbers.PRINT_LINE, low)
+        wide = lay_word(part, crown, word, part.named("Print"), numbers.PRINT_BOLD, high)
+        print(f"CHOG_TRAITS the word {word!r} is {wide:.3f} wide on a front panel "
+              f"{2.0 * crown.at_height(numbers.PRINT_BASELINE)[0]:.3f} wide")
+
+
+def build_bucket(maker):
+    """The shape "BucketCap": a round crown, a brim all around it, and a mark on the front."""
+    numbers = maker.numbers(BUCKET)
+    part, surface = maker.part(), maker.surface
+    crown = CapCrown(numbers, surface.middle)
+    add_dome(part, crown, part.named("Crown"), numbers.OUTLINE_THICKNESS)
+
+    # The brim: four rings, from the crown out along the top and back under it. At the sides and at
+    # the back it dips; in the middle of the front it is shorter and rises.
+    sides, height = numbers.SIDES, numbers.BRIM_HEIGHT
+    half_thick = numbers.BRIM_THICKNESS * 0.5
+    axis = surface.middle + Vector((0.0, crown.at_height(height)[2], height))
+    rows = [[], [], [], []]
+    for index in range(sides):
+        angle = 2.0 * math.pi * index / sides
+        front = max(0.0, -math.sin(angle)) ** numbers.BRIM_FRONT_SPREAD
+        length = numbers.BRIM_LENGTH + (numbers.BRIM_FRONT_LENGTH - numbers.BRIM_LENGTH) * front
+        rise = math.radians(-numbers.BRIM_DIP_DEG + (numbers.BRIM_FRONT_RISE_DEG + numbers.BRIM_DIP_DEG) * front)
+        wall = crown.around(height, angle)
+        inner = crown.around(height, angle, 0.93)
+        away = Vector((wall.x - axis.x, wall.y - axis.y, 0.0)).normalized()
+        edge = wall + away * length * math.cos(rise) + Z * length * math.sin(rise)
+        rows[0].append(inner + Z * half_thick)
+        rows[1].append(edge + Z * half_thick * 0.5)
+        rows[2].append(edge - Z * half_thick * 0.5)
+        rows[3].append(inner - Z * half_thick)
+    none, whole = (0.0,) * sides, (1.0,) * sides
+    bands, _ = add_loops(part, rows, part.named("Brim"), numbers.OUTLINE_THICKNESS, shares=[none, whole, whole, none])
+    # Under the brim the cloth is in shade where the brim dips; where it is turned up, its underside
+    # is what is seen from the front, and it keeps the colour of the hat.
+    dips = [max(0.0, -math.sin(2.0 * math.pi * index / sides)) ** numbers.BRIM_FRONT_SPREAD < 0.4
+            for index in range(sides)]
+    part.paint([face for index, face in enumerate(bands[2]) if dips[index] and dips[(index + 1) % sides]],
+               part.named("Under"))
+
+    mark = maker.entry.get("mark")
+    wide, lift = numbers.MARK_HALF_WIDTH, numbers.MARK_LIFT
+    if mark == "label":
+        # A sewn label: a rectangle.
+        low, high = numbers.MARK_HEIGHT - 0.022, numbers.MARK_HEIGHT + 0.022
+        columns = [-wide * 0.8, 0.0, wide * 0.8]
+        full.add_skin(part, surface, [[crown.front(side, low, lift) for side in columns],
+                                      [crown.front(side, high, lift) for side in columns]], part.named("Mark"),
+                      around=False)
+    elif mark == "wave":
+        # A stitched drawing, kept to its lower edge: a line of three humps.
+        steps = 12
+        lower, upper = [], []
+        for index in range(steps + 1):
+            along = -1.0 + 2.0 * index / steps
+            hump = abs(math.sin(along * 1.5 * math.pi)) * 0.016
+            lower.append(crown.front(along * wide, numbers.MARK_HEIGHT - hump - 0.006, lift))
+            upper.append(crown.front(along * wide, numbers.MARK_HEIGHT - hump + 0.006, lift))
+        full.add_skin(part, surface, [lower, upper], part.named("Mark"), around=False)
+
+
+def build_crown(maker):
+    """The shape "Crown": a band that flares, a line of trim at its foot, points, gems."""
+    numbers = maker.numbers(CROWN)
+    part, surface = maker.part(), maker.surface
+    wall = CapCrown(numbers, surface.middle)
+    sides = numbers.SIDES
+    rim, trim, band, tips = (ring[0] for ring in numbers.RINGS)
+    floor_height, floor_size = numbers.FLOOR
+    # The points: every other place of the last ring is a tip, the others a dip. A tip stands in
+    # the middle of the front.
+    points = [wall.around(tips if index % 2 == 0 else numbers.VALLEY, 2.0 * math.pi * index / sides)
+              for index in range(sides)]
+    whole, none = (1.0,) * sides, (0.0,) * sides
+    bands, _ = add_loops(part, [wall.loop(rim), wall.loop(trim), wall.loop(band), points,
+                                wall.loop(floor_height, floor_size)], part.named("Gold"),
+                         numbers.OUTLINE_THICKNESS, smooth=False, shares=[whole, whole, whole, whole, none])
+    part.paint(bands[0], part.named("Trim"))
+    for degrees, height, half_width, half_height, material in numbers.GEMS:
+        low, high = numbers.GEM_LIFT
+        if material == "Trim":
+            low, high = low * 0.5, low * 0.5      # the setting of a gem: flat, under it
+        lay_disc(part, surface, wall, part.named(material), degrees, height, half_width, half_height, (low, high))
+
+
+def build_beanie(maker):
+    """The shape "Beanie": a dome, a thick ribbed cuff around the brow, rings printed on the dome."""
+    numbers = maker.numbers(BEANIE)
+    part, surface = maker.part(), maker.surface
+    wall = CapCrown(numbers, surface.middle)
+    add_dome(part, wall, part.named("Dome"), numbers.OUTLINE_THICKNESS)
+
+    low, high, off, bulge = numbers.CUFF
+    middle = (low + high) * 0.5
+    sides = numbers.SIDES
+    whole, none = (1.0,) * sides, (0.0,) * sides
+    add_loops(part, [wall.loop(low, 0.95), wall.loop(low, 1.0 + off * 0.8), wall.loop(middle, 1.0 + off + bulge),
+                     wall.loop(high, 1.0 + off * 0.8), wall.loop(high, 0.95)], part.named("Cuff"),
+              numbers.OUTLINE_THICKNESS, shares=[none, whole, whole, whole, none])
+    count, width, lift = numbers.RIBS
+    for index in range(count):
+        angle = 2.0 * math.pi * (index + 0.5) / count
+        half = width * 0.5 / numbers.RIM_HALF_WIDTH
+        stood = lift / numbers.RIM_HALF_WIDTH
+        rows = [[wall.around(height, angle + side * half, size + stood) for side in (-1.0, 1.0)]
+                for height, size in ((low + 0.008, 1.0 + off * 0.86), (middle, 1.0 + off + bulge),
+                                     (high - 0.008, 1.0 + off * 0.86))]
+        full.add_skin(part, surface, rows, part.named("Rib"), around=False)
+    segments = 8
+    for degrees, height, radius in numbers.PRINTS:
+        here, along, upwards, out = wall.frame(degrees, height)
+        rings = []
+        for size in (numbers.PRINT_INSIDE, 1.0):
+            rings.append([here + out * numbers.PRINT_LIFT
+                          + (along * math.cos(2.0 * math.pi * index / segments)
+                             + upwards * math.sin(2.0 * math.pi * index / segments)) * radius * size
+                          for index in range(segments)])
+        full.add_skin(part, surface, rings, part.named("Print"))
+
+
+# ---------------------------------------------------------------------------------------------
+# Eyes.
+# ---------------------------------------------------------------------------------------------
+
+def build_anime_glass(maker):
+    """Two thick lenses, each a slab whose front is a frame around a white glass, a bar between them
+    and an arm from each to the side of the head."""
+    numbers = maker.numbers(ANIME_GLASS)
+    part, surface, head = maker.part(), maker.surface, maker.head
+    lens_side, lens_up, half_width, half_height = numbers.LENS
+    segments, thickness = numbers.LENS_SEGMENTS, numbers.THICKNESS
+    frame, glass = part.named("Frame"), part.named("Lens")
+
+    placed = {}
+    for side in (1.0, -1.0):
+        # The plane of the lens: between looking straight ahead and lying on the head.
+        normal = ((-Y) * (1.0 - numbers.WRAP) + outward(surface, side * lens_side, lens_up) * numbers.WRAP).normalized()
+        right = (X - normal * X.dot(normal)).normalized()
+        up = normal.cross(right)
+        centre = surface.front(side * lens_side, lens_up, head.FACE_LIFT) + normal * thickness * 0.5
+
+        def ring(size, forward):
+            points = []
+            for index in range(segments):
+                angle = 2.0 * math.pi * index / segments
+                tall = half_height * power(math.sin(angle), numbers.LENS_SQUARENESS)
+                across = half_width * power(math.cos(angle), numbers.LENS_SQUARENESS)
+                across *= 1.0 + numbers.LENS_TAPER * tall / half_height
+                points.append(centre + (right * across + up * tall) * size + normal * forward)
+            return points
+
+        front = thickness * 0.5
+        bands, ends = add_loops(part, [
+            ring(0.94, -front),
+            ring(1.0, front),
+            ring(1.0 - numbers.RIM, front + numbers.LENS_BULGE * 0.4),
+            [centre + normal * (front + numbers.LENS_BULGE)],
+        ], frame, numbers.OUTLINE_THICKNESS)
+        part.paint(bands[2], glass)
+        for face in bands[1] + bands[2] + ends:
+            face.smooth = False
+        placed[side] = (centre, normal, right, up)
+
+    # The bar between the lenses, a little arched.
+    half_tall, half_deep = numbers.BRIDGE
+    ends = []
+    for side in (1.0, -1.0):
+        centre, normal, right, up = placed[side]
+        ends.append((centre - right * side * half_width * 0.90 + up * numbers.BRIDGE_UP
+                     + normal * (thickness * 0.5 - half_deep), up, normal))
+    (start, up_start, normal_start), (end, up_end, normal_end) = ends
+    up_middle, normal_middle = (up_start + up_end).normalized(), (normal_start + normal_end).normalized()
+    part.shell([
+        (start, up_start * half_tall, normal_start * half_deep),
+        ((start + end) * 0.5 + up_middle * 0.005 + normal_middle * 0.004, up_middle * half_tall,
+         normal_middle * half_deep),
+        (end, up_end * half_tall, normal_end * half_deep),
+    ], 4, frame, numbers.OUTLINE_THICKNESS * 0.7)
+
+    # An arm from the outer side of each lens back to the side of the head, where it ends inside it.
+    half_tall, half_wide = numbers.TEMPLE
+    to_side, to_back, to_up = numbers.TEMPLE_END
+    for side in (1.0, -1.0):
+        centre, normal, right, up = placed[side]
+        start = centre + right * side * half_width * 0.92 + up * numbers.TEMPLE_UP - normal * thickness * 0.2
+        end = surface.towards(Vector((side * to_side, to_back, to_up)).normalized())
+        end = surface.middle + (end - surface.middle) * 0.94
+        along = (end - start).normalized()
+        across = Z.cross(along).normalized()
+        tall = along.cross(across)
+        part.shell([(start, tall * half_tall, across * half_wide), (end, tall * half_tall, across * half_wide)],
+                   4, frame, numbers.OUTLINE_THICKNESS * 0.7)
+
+
+def draw_dark_eyes(part, surface, material, glint=None):
+    """The two eyes of DARK_EYE. Returns where the middle of each is: (to the side, above)."""
+    numbers = SimpleNamespace(**DARK_EYE)
+    half_width, half_height = numbers.SIZE
+    thick, outwards, inwards = numbers.BROW
+    middles = []
+    for side in (1.0, -1.0):
+        middle = (side * numbers.AT[0], numbers.AT[1])
+
+        def brow(place):
+            """The height of the brow at a place: lower towards the nose."""
+            return middle[1] + half_height * numbers.BROW_AT + numbers.BROW_SLOPE * (place - middle[0]) * side
+
+        edge = [(place, min(up, brow(place))) for place, up in oval(middle, half_width, half_height, numbers.SEGMENTS)]
+        draw_shape(part, surface, material, edge, DRAWN[0], middle=(middle[0], middle[1] - half_height * 0.15))
+        steps = 4
+        start, stop = middle[0] - side * (half_width + inwards), middle[0] + side * (half_width + outwards)
+        places = [(start + (stop - start) * index / steps, 0.0) for index in range(steps + 1)]
+        places = [(place, brow(place)) for place, _ in places]
+        draw_line(part, surface, material, places, [thick] * (steps + 1), DRAWN[1])
+        if glint:
+            for to_side, above, wide, tall in numbers.GLINTS:
+                full.add_skin(part, surface, full.patch_loops(surface, (middle[0] + to_side, middle[1] + above), wide,
+                                                              tall, 2.0, 0.0, DRAWN[2], 1, 8), glint)
+        middles.append(middle)
+    return middles
+
+
+def build_normal_eye(maker):
+    """Two dark eyes under a slanted brow, each with two glints."""
+    part = maker.part()
+    draw_dark_eyes(part, maker.surface, part.named("Dark"), glint=part.named("Glint"))
+
+
+def build_laser(maker):
+    """The dark eyes of "Normal Eye" without their glints, and a short beam leaving each, level with
+    the ground and straight ahead. The game draws the long beam itself when the hero attacks."""
+    numbers = maker.numbers(LASER)
+    part, surface = maker.part(), maker.surface
+    ahead, down = level_axes(maker.head)
+    radius, sides = numbers.BEAM_RADIUS, numbers.BEAM_SIDES
+    for middle in draw_dark_eyes(part, surface, part.named("Dark")):
+        start = surface.front(middle[0], middle[1], 0.0)
+        stations = ((-numbers.BEAM_SUNK, 0.7), (0.02, 1.0), (numbers.BEAM_LENGTH - 0.03, 1.0),
+                    (numbers.BEAM_LENGTH, 0.55))
+        loops = [ring_points(start + ahead * distance, X * radius * size, -down * radius * size, sides)
+                 for distance, size in stations]
+        shares = [(0.0,) * sides] + [(1.0,) * sides] * (len(stations) - 1)
+        bands, ends = add_loops(part, loops, part.named("Beam"), numbers.OUTLINE_THICKNESS, shares=shares)
+        for band in bands:
+            part.paint([band[index] for index in numbers.BEAM_CORE], part.named("Core"))
+        part.paint(ends[-1:], part.named("Core"))
+
+
+def build_happy(maker):
+    """Two closed eyes: arches, thick in their middle."""
+    numbers = maker.numbers(HAPPY)
+    part, surface = maker.part(), maker.surface
+    half_width, arch, thick = numbers.ARC
+    steps = numbers.STEPS
+    for side in (1.0, -1.0):
+        places, widths = [], []
+        for index in range(steps + 1):
+            along = -1.0 + 2.0 * index / steps
+            hollow = 1.0 - along * along
+            places.append((side * numbers.AT[0] + along * half_width, numbers.AT[1] + arch * (hollow - 0.5)))
+            widths.append(thick * (0.45 + 0.55 * hollow ** 0.7))
+        draw_line(part, surface, part.named("Dark"), places, widths, DRAWN[0])
+
+
+def build_round(maker):
+    """Two round eyes: a white disc in a dark line, a large dark pupil in its middle."""
+    numbers = maker.numbers(ROUND)
+    part, surface = maker.part(), maker.surface
+    layers = ((numbers.LINE, "Dark", DRAWN[0]), (numbers.WHITE, "White", DRAWN[1]), (numbers.PUPIL, "Dark", DRAWN[2]))
+    for side in (1.0, -1.0):
+        middle = (side * numbers.AT[0], numbers.AT[1])
+        for (half_width, half_height), material, lift in layers:
+            full.add_skin(part, surface, full.patch_loops(surface, middle, half_width, half_height, 2.0, 0.0, lift,
+                                                          2, 14), part.named(material))
+
+
+def build_visor(maker):
+    """One band across the eyes, wrapped around the front of the head, cut into pieces across its
+    width that take the colours of its entry from one end to the other."""
+    numbers = maker.numbers(VISOR)
+    part, surface, head = maker.part(), maker.surface, maker.head
+    pieces = numbers.PIECES
+    height = head.FACE_MIDDLE[1] + numbers.UP
+    middle_tall, end_tall = numbers.HALF_HEIGHT
+    loops, shares = [], []
+    for index in range(len(pieces) + 1):
+        across = -1.0 + 2.0 * index / len(pieces)
+        angle = math.radians(across * numbers.AROUND_DEG)
+        here = surface.middle + Vector((numbers.HALF_WIDTH * math.sin(angle), -numbers.HALF_DEPTH * math.cos(angle),
+                                        height))
+        out = Vector((math.sin(angle) / numbers.HALF_WIDTH, -math.cos(angle) / numbers.HALF_DEPTH, 0.0)).normalized()
+        tall = middle_tall + (end_tall - middle_tall) * across * across
+        back = here - out * numbers.THICKNESS
+        loops.append([here + Z * tall, here + out * numbers.BULGE, here - Z * tall,
+                      back - Z * tall * 0.96, back + Z * tall * 0.96])
+        at_end = index in (0, len(pieces))
+        shares.append((0.0,) * 5 if at_end else (1.0, 1.0, 1.0, 0.2, 0.2))
+    bands, _ = add_loops(part, loops, part.named(pieces[0]), numbers.OUTLINE_THICKNESS, shares=shares)
+    for band, material in zip(bands, pieces):
+        part.paint(band, part.named(material))
+
+
+# ---------------------------------------------------------------------------------------------
+# Mouths.
+# ---------------------------------------------------------------------------------------------
+
+def build_gold_tooth(maker):
+    """A wide grin painted on the face: a dark shape, two rows of teeth on it with a dark line
+    between them, the top of each row in shade, and one gold tooth with its own dark line."""
+    numbers = maker.numbers(GOLD_TOOTH)
+    part, surface = maker.part(), maker.surface
+    half_width, corners = numbers.HALF_WIDTH, numbers.CORNERS_UP
+    line, bite = numbers.LINE, numbers.BITE_LINE
+    steps = numbers.STEPS
+    lift_line, lift_teeth, lift_shade, lift_tooth_line, lift_tooth, lift_shine = DRAWN
+
+    def band(material, lift, wide, top, bottom, top_sag, bottom_sag, rows=1, start=-1.0, stop=1.0):
+        """A strip across the grin between two curves, each given by the height of its ends and how
+        far its middle sags; "start" and "stop" cut it short (-1 and 1 are the corners)."""
+        loops = []
+        for row in range(rows + 1):
+            share = row / rows
+            loop = []
+            for index in range(steps + 1):
+                along = start + (stop - start) * index / steps
+                hollow = 1.0 - along * along
+                upper = top - top_sag * hollow
+                lower = bottom - bottom_sag * hollow
+                loop.append(surface.front(along * wide, lower + (upper - lower) * share, lift))
+            loops.append(loop)
+        full.add_skin(part, surface, loops, material, around=False)
+
+    # The dark shape: the grin made larger by the width of the line, with pointed corners.
+    band(part.named("Line"), lift_line, half_width + line * 1.6, corners + line, corners + line,
+         numbers.SAG_TOP, numbers.SAG_BOTTOM + 2.0 * line, rows=3)
+    # The two rows of teeth; between them the dark shape shows as the line where they meet. They
+    # stop short of the corners, which stay dark.
+    reach = 0.965
+    rows = (
+        (numbers.SAG_TOP, numbers.SAG_BITE - bite * 0.5),
+        (numbers.SAG_BITE + bite * 0.5, numbers.SAG_BOTTOM),
+    )
+    for (top_sag, bottom_sag), shade in zip(rows, numbers.SHADE):
+        band(part.named("Teeth"), lift_teeth, half_width, corners, corners, top_sag, bottom_sag, rows=2,
+             start=-reach, stop=reach)
+        shade_sag = top_sag + (bottom_sag - top_sag) * shade
+        band(part.named("Shade"), lift_shade, half_width, corners, corners, top_sag, shade_sag, start=-reach,
+             stop=reach)
+
+    # The gold tooth, across the line between the rows.
+    half_top, half_bottom, above, below = numbers.TOOTH
+    where = numbers.TOOTH_AT * half_width
+    middle = corners - numbers.SAG_BITE * (1.0 - numbers.TOOTH_AT ** 2)
+    # The line between the rows climbs towards the corner: the tooth leans with it.
+    slope = 2.0 * numbers.SAG_BITE * numbers.TOOTH_AT / half_width * numbers.TOOTH_LEAN
+
+    def tooth(material, lift, grow, size=1.0, shift=(0.0, 0.0)):
+        corners_of = []
+        for across, tall in ((-half_bottom, -below), (half_bottom, -below), (half_top, above), (-half_top, above)):
+            across = across * size + math.copysign(grow, across) + shift[0]
+            tall = tall * size + math.copysign(grow, tall) + shift[1]
+            corners_of.append(surface.front(where + across, middle + tall + across * slope, lift))
+        full.add_skin(part, surface, [corners_of[:2], [corners_of[3], corners_of[2]]], material, around=False)
+
+    tooth(part.named("Line"), lift_tooth_line, numbers.TOOTH_LINE)
+    tooth(part.named("Gold"), lift_tooth, 0.0)
+    tooth(part.named("Shine"), lift_shine, 0.0, size=0.34, shift=(-half_top * 0.36, above * 0.30))
+
+
+def build_smile(maker):
+    """A thin line that sags in its middle."""
+    numbers = maker.numbers(SMILE)
+    part = maker.part()
+    places, widths = [], []
+    for index in range(numbers.STEPS + 1):
+        along = -1.0 + 2.0 * index / numbers.STEPS
+        hollow = 1.0 - along * along
+        places.append((numbers.AT[0] + along * numbers.HALF_WIDTH, numbers.AT[1] - numbers.SAG * hollow))
+        widths.append(numbers.THICKNESS * (0.45 + 0.55 * hollow))
+    draw_line(part, maker.surface, part.named("Line"), places, widths, DRAWN[0])
+
+
+def build_drool(maker):
+    """A short mouth, and a thread of drool hanging from one of its ends, with its drop."""
+    numbers = maker.numbers(DROOL)
+    part, surface = maker.part(), maker.surface
+    places, widths = [], []
+    for index in range(numbers.STEPS + 1):
+        along = -1.0 + 2.0 * index / numbers.STEPS
+        hollow = 1.0 - along * along
+        places.append((numbers.AT[0] + along * numbers.HALF_WIDTH, numbers.AT[1] + numbers.ARCH * (hollow - 1.0)))
+        widths.append(numbers.THICKNESS * (0.6 + 0.4 * hollow))
+    to_side, wide, hangs = numbers.DROOL
+    start = (numbers.AT[0] + to_side, numbers.AT[1] - numbers.ARCH * (to_side / numbers.HALF_WIDTH) ** 2)
+    thread = [(start[0], start[1] - hangs * index / 3) for index in range(4)]
+    draw_line(part, surface, part.named("Drool"), thread, [wide, wide * 0.8, wide * 0.7, wide * 0.9], DRAWN[0])
+    drop_wide, drop_tall = numbers.DROP
+    full.add_skin(part, surface, full.patch_loops(surface, (start[0], start[1] - hangs - drop_tall * 0.5), drop_wide,
+                                                  drop_tall, 2.0, -0.5, DRAWN[0], 1, 8), part.named("Drool"))
+    draw_line(part, surface, part.named("Line"), places, widths, DRAWN[1])
+
+
+def build_drool_open(maker):
+    """A wide open mouth with its tongue, and a thick thread of drool running down from it."""
+    numbers = maker.numbers(DROOL_OPEN)
+    part, surface = maker.part(), maker.surface
+    half_width, half_height = numbers.SIZE
+    line = numbers.LINE
+    full.add_skin(part, surface, full.patch_loops(surface, numbers.AT, half_width, half_height, 2.3, 0.15, DRAWN[0],
+                                                  2, 12), part.named("Line"))
+    full.add_skin(part, surface, full.patch_loops(surface, numbers.AT, half_width - line, half_height - line, 2.3,
+                                                  0.15, DRAWN[1], 2, 12), part.named("Inside"))
+    below, wide, tall = numbers.TONGUE
+    full.add_skin(part, surface, full.patch_loops(surface, (numbers.AT[0], numbers.AT[1] + below), wide, tall, 2.0,
+                                                  0.0, DRAWN[2], 1, 10), part.named("Tongue"))
+    to_side, width, runs = numbers.DROOL
+    start = (numbers.AT[0] + to_side, numbers.AT[1] - half_height * 0.45)
+    thread = [(start[0], start[1] - runs * index / 3) for index in range(4)]
+    draw_line(part, surface, part.named("Drool"), thread, [width * 1.5, width, width * 0.9, width * 0.6], DRAWN[3])
+
+
+def build_wo(maker):
+    """A small round mouth, open: a dark oval with a glint."""
+    numbers = maker.numbers(WO)
+    part, surface = maker.part(), maker.surface
+    half_width, half_height = numbers.SIZE
+    full.add_skin(part, surface, full.patch_loops(surface, numbers.AT, half_width, half_height, 2.0, 0.0, DRAWN[0],
+                                                  1, 10), part.named("Line"))
+    to_side, above, radius = numbers.GLINT
+    full.add_skin(part, surface, full.patch_loops(surface, (numbers.AT[0] + to_side, numbers.AT[1] + above), radius,
+                                                  radius, 2.0, 0.0, DRAWN[1], 1, 6), part.named("Glint"))
+
+
+def build_rainbow(maker):
+    """An open mouth drawn on the face, and a rainbow leaving it: a stream with real volume that
+    falls in front of the body, its six stripes side by side."""
+    numbers = maker.numbers(RAINBOW)
+    part, surface = maker.part(), maker.surface
+    ahead, down = level_axes(maker.head)
+    to_side, above, half_width, half_height = numbers.MOUTH
+    full.add_skin(part, surface, full.patch_loops(surface, (to_side, above), half_width, half_height, 2.4, 0.0,
+                                                  DRAWN[0], 2, 12), part.named("Dark"))
+    mouth = surface.front(to_side, above, 0.0)
+    stripes = numbers.STRIPES
+    path = [mouth + ahead * forward + down * below for forward, below, _, _ in numbers.PATH]
+    path.append(mouth + ahead * numbers.END[0] + down * numbers.END[1])
+    loops, shares = [], []
+    for index, (_, _, wide, thick) in enumerate(numbers.PATH):
+        along = (path[index + 1] - path[max(index - 1, 0)]).normalized()
+        top = along.cross(X).normalized()          # the side of the stream that is seen: ahead and up
+        if top.dot(ahead - down) < 0.0:
+            top = -top
+        loop = []
+        for place in range(len(stripes) + 1):
+            across = -1.0 + 2.0 * place / len(stripes)
+            # The stripes run from the right of the character (-X) to its left.
+            loop.append(path[index] + X * across * wide + top * thick * (0.5 - numbers.ARCH * across * across))
+        loop.append(path[index] - top * thick * 0.5)
+        loops.append(loop)
+        shares.append((0.0 if index == 0 else 1.0,) * len(loop))
+    loops.append([path[-1]])
+    shares.append((1.0,))
+    bands, ends = add_loops(part, loops, part.named(stripes[0]), numbers.OUTLINE_THICKNESS, shares=shares)
+    for band in bands:
+        for place, face in enumerate(band):
+            # The last two faces of a section are its underside: they take the colours beside them.
+            stripe = stripes[min(place, len(stripes) - 1)] if place <= len(stripes) else stripes[0]
+            part.paint([face], part.named(stripe))
+
+
+def build_bubblegum(maker):
+    """A bubble of gum in front of the mouth: a ball with real volume, the knot that holds it, and a
+    glint painted on it."""
+    numbers = maker.numbers(BUBBLE)
+    part, surface = maker.part(), maker.surface
+    ahead, down = level_axes(maker.head)
+    mouth = surface.front(numbers.AT[0], numbers.AT[1], 0.0)
+    out = (outward(surface, numbers.AT[0], numbers.AT[1]) + ahead).normalized()
+    centre = mouth + out * numbers.OFF
+    radius = numbers.RADIUS
+    part.shell(base.ball_rings(centre, out, X, radius, radius, radius, numbers.STACKS), numbers.SIDES,
+               part.named("Gum"), numbers.OUTLINE_THICKNESS)
+    knot = numbers.KNOT
+    part.shell(base.tube_rings(mouth - out * 0.02, out, X, ((0.0, knot * 0.6), (numbers.OFF - radius * 0.8, knot))),
+               6, part.named("Gum"), numbers.OUTLINE_THICKNESS * 0.5)
+    # The glint: a small patch just off the ball, on its upper side.
+    to_right, up_deg, wide, tall = numbers.GLINT
+    turn, lift = math.radians(to_right), math.radians(up_deg)
+    towards = (out * math.cos(turn) * math.cos(lift) - X * math.sin(turn) * math.cos(lift)
+               - down * math.sin(lift)).normalized()
+    across = (-down).cross(towards).normalized()
+    along = towards.cross(across)
+    here = centre + towards * (radius + 0.004)
+    edge = [here + across * wide * math.cos(2.0 * math.pi * index / 8) + along * tall * math.sin(2.0 * math.pi * index / 8)
+            for index in range(8)]
+    edge = [centre + (point - centre).normalized() * (radius + 0.004) for point in edge]
+    full.add_skin(part, SimpleNamespace(middle=centre), [[here], edge], part.named("Glint"))
+
+
+# ---------------------------------------------------------------------------------------------
+# Clothing.
+# ---------------------------------------------------------------------------------------------
+
+def torso_section(body, height):
+    """Half the width and half the depth of the torso at a height above the ground."""
+    rings = body.TORSO_RINGS
+    height = min(max(height, rings[0][0]), rings[-1][0])
+    for lower, upper in zip(rings, rings[1:]):
+        if height <= upper[0]:
+            amount = (height - lower[0]) / (upper[0] - lower[0])
+            return ((lower[1] + (upper[1] - lower[1]) * amount) * 0.5,
+                    (lower[2] + (upper[2] - lower[2]) * amount) * 0.5)
+    raise SystemExit("CHOG_TRAITS the rings of the torso are not in order")
+
+
+def build_tee(maker):
+    """A shirt: a thin shell over the torso from the hips to the neck, and one over the top of each
+    arm. It has no outline of its own: it lies inside the outline of the body. Bands of the same
+    height take the stripe colour in turn when the entry asks for stripes."""
+    numbers = maker.numbers(TEE)
+    body = maker.body
+    striped = bool(maker.entry.get("stripes"))
+    lift = numbers.LIFT
+
+    torso = maker.part(on="Body")
+    collar_from, collar_to = numbers.COLLAR
+    heights = [numbers.HEM]
+    while heights[-1] + numbers.STEP < collar_from - 0.012:
+        heights.append(heights[-1] + numbers.STEP)
+    heights += [collar_from, collar_to]
+    loops = []
+    for index, height in enumerate(heights):
+        half_width, half_depth = torso_section(body, height)
+        flare = numbers.HEM_FLARE if index == 0 else 0.0
+        loops.append(ring_points(Z * height, X * (half_width + lift + flare), Y * (half_depth + lift + flare),
+                                 numbers.SIDES))
+    bands, _ = add_loops(torso, loops, torso.named("Main"), 0.0)
+    if striped:
+        for band in bands[1:-1:2]:
+            torso.paint(band, torso.named("Stripe"))
+    torso.paint(bands[-1], torso.named("Collar"))
+
+    if numbers.SLEEVE <= 0.0:
+        return
+    spread, ahead = math.radians(body.ARM_SPREAD_DEG), math.radians(body.ARM_FORWARD_DEG)
+    ball, radius = body.SHOULDER_RADIUS, body.ARM_RADIUS
+    for name, side in (("armLeft", 1.0), ("armRight", -1.0)):
+        sleeve = maker.part(on=name)
+        down = Vector((side * math.sin(spread), -math.sin(ahead), -math.cos(spread) * math.cos(ahead))).normalized()
+        first, second = base.frame_across(down, -Y)
+        stations = [(-ball * 0.70, ball * 0.72), (0.0, ball), (ball * 0.6, ball + (radius - ball) * 0.6),
+                    (ball * 1.2, radius)]
+        while stations[-1][0] + numbers.STEP < numbers.SLEEVE - 0.010:
+            stations.append((stations[-1][0] + numbers.STEP, radius))
+        stations.append((numbers.SLEEVE, radius + numbers.SLEEVE_FLARE))
+        loops = [[down * (-ball - lift)]]
+        loops += [ring_points(down * distance, first * (size + lift), second * (size + lift), numbers.ARM_SIDES)
+                  for distance, size in stations]
+        bands, _ = add_loops(sleeve, loops, sleeve.named("Main"), 0.0)
+        if striped:
+            for band in bands[1::2]:
+                sleeve.paint(band, sleeve.named("Stripe"))
+
+
+HAT_SHAPES = {"Cap": build_cap, "BucketCap": build_bucket, "Crown": build_crown, "Beanie": build_beanie}
+EYE_KINDS = {"AnimeGlass": build_anime_glass, "NormalEye": build_normal_eye, "Laser": build_laser,
+             "Happy": build_happy, "Round": build_round, "Visor": build_visor}
+MOUTH_KINDS = {"GoldTooth": build_gold_tooth, "Smile": build_smile, "Drool": build_drool,
+               "DroolOpen": build_drool_open, "Wo": build_wo,
+               "RainbowPuke": build_rainbow, "Bubblegum": build_bubblegum}
+CLOTH_KINDS = {"Tee": build_tee}
+# trait of the collection: (start of the name of its part, its table, the word that names the
+# builder in an entry, the builders). Clothing comes first: it is under everything else.
+OF_SIDE = {"Mouth": MOUTHS_OF_SIDE}
+TRAIT_PARTS = {
+    "Body": ("Cloth", CLOTHES, "kind", CLOTH_KINDS),
+    "Head": ("Hat", HATS, "shape", HAT_SHAPES),
+    "Eyes": ("Eyes", EYES, "kind", EYE_KINDS),
+    "Mouth": ("Mouth", MOUTHS, "kind", MOUTH_KINDS),
+}
+
+
+# ---------------------------------------------------------------------------------------------
+# A Genesis: its traits, its objects, the report.
+# ---------------------------------------------------------------------------------------------
+
+def traits_of(number):
+    """The traits of a Genesis, by the number shown in its name, from the recorded metadata."""
+    if not os.path.isfile(METADATA):
+        raise SystemExit(f"CHOG_TRAITS no metadata at {METADATA}")
+    with open(METADATA, encoding="utf-8") as lines:
+        for line in lines:
+            if not line.strip():
+                continue
+            record = json.loads(line)
+            if int(record["metadata_id"]) == int(number):
+                return {str(item["trait_type"]): str(item["value"])
+                        for item in json.loads(record["raw_json"]).get("attributes", [])}
+    raise SystemExit(f"CHOG_TRAITS no Genesis named CHOG #{number} in the recorded metadata")
+
+
+def coverage():
+    """Prints, from the recorded metadata, how many Genesis each entry of the tables serves, and how
+    many Genesis are dressed whole by the entries that exist today."""
+    tokens = []
+    with open(METADATA, encoding="utf-8") as lines:
+        for line in lines:
+            if line.strip():
+                record = json.loads(line)
+                tokens.append({str(item["trait_type"]): str(item["value"])
+                               for item in json.loads(record["raw_json"]).get("attributes", [])})
+    print(f"CHOG_COVERAGE {len(tokens)} Genesis in {os.path.relpath(METADATA, REPOSITORY)}")
+    for trait, (start, table, word, _) in TRAIT_PARTS.items():
+        by_part = {}
+        for value, entry in table.items():
+            by_part.setdefault(f"{start}_{entry[word]}", []).append(value)
+        for name, values in by_part.items():
+            counts = [f"{value} {sum(1 for traits in tokens if traits.get(trait) == value)}" for value in values]
+            total = sum(1 for traits in tokens if traits.get(trait) in values)
+            print(f"CHOG_COVERAGE {name:20s} serves {total:4d} Genesis: {', '.join(counts)}")
+        have = sum(1 for traits in tokens if trait in traits)
+        done = sum(1 for traits in tokens if traits.get(trait) in table)
+        print(f"CHOG_COVERAGE   trait {trait}: {done} of the {have} Genesis that have one, "
+              f"{len(table)} of its {len({traits[trait] for traits in tokens if trait in traits})} values")
+    whole, by_side = [], {}
+    for traits in tokens:
+        if traits.get("Base") != "Origin" or traits.get("Skin") not in SKINS:
+            continue
+        if all(trait not in traits or traits[trait] in table for trait, (_, table, _, _) in TRAIT_PARTS.items()):
+            whole.append(traits)
+            by_side[traits.get("Side")] = by_side.get(traits.get("Side"), 0) + 1
+    print(f"CHOG_COVERAGE dressed whole today (base Origin, a skin of SKINS, every Head, Eyes, Mouth and Body value "
+          f"it has is an entry): {len(whole)} of {len(tokens)}, by Side {by_side}")
+    print("CHOG_COVERAGE not counted and not modelled: the traits Accessory and Aura. The entries were drawn from "
+          "pictures of Side=Right, but for Drooling; the pictures of Side=Left draw several values another way.")
+
+
+def build(traits=None, replaced=None):
+    """Empties the scene and builds the polished base, then the parts of each trait that has an
+    entry. "replaced" gives numbers put in place of those of the hat, to try some. Returns the root,
+    the four parts, the trait parts, the numbers of the body and of the head, and the trait values
+    left out."""
+    body_n, head_n = full.body_numbers(), head_numbers()
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    materials = full.make_materials()
+
+    root = bpy.data.objects.new(base.ROOT_NAME, None)
+    root.empty_display_size = 0.2
+    bpy.context.scene.collection.objects.link(root)
+
+    body = variants.PartShapes(full.MATERIAL_ORDER)
+    variants.add_torso(body, body_n)
+    variants.add_legs_and_feet(body, body_n)
+
+    head = variants.PartShapes(full.MATERIAL_ORDER)
+    surface = full.HeadSurface(head_n)
+    full.add_head(head, head_n)
+    add_leaf_crown(head, head_n, surface)
+    full.add_face(head, head_n, surface, eyes=False, mouth=False)
+    full.turn_head_up(head, head_n)
+
+    arms = {}
+    for name, side in (("armLeft", 1.0), ("armRight", -1.0)):
+        arms[name] = variants.PartShapes(full.MATERIAL_ORDER)
+        variants.add_arm(arms[name], body_n, side)
+
+    shoulder = body_n.SHOULDER_HALF_WIDTH
+    parts = [
+        body.finish("Body", Vector((0.0, 0.0, 0.0)), root, materials, on_ground=True),
+        head.finish("Head", at(0.0, 0.0, full.NECK_HEIGHT), root, materials),
+        arms["armLeft"].finish("armLeft", at(shoulder, 0.0, body_n.SHOULDER_HEIGHT), root, materials),
+        arms["armRight"].finish("armRight", at(-shoulder, 0.0, body_n.SHOULDER_HEIGHT), root, materials),
+    ]
+    by_name = {part.name: part for part in parts}
+
+    trait_parts, left_out = [], []
+    for trait, (start, table, word, builders) in TRAIT_PARTS.items():
+        value = (traits or {}).get(trait)
+        if value is None:
+            continue
+        entry = OF_SIDE.get(trait, {}).get((traits or {}).get("Side"), {}).get(value) or table.get(value)
+        if entry is None or entry[word] not in builders:
+            left_out.append(f"{trait}={value}")
+            continue
+        if replaced and trait == "Head":
+            entry = {**entry, "numbers": {**entry.get("numbers", {}), **replaced}}
+        maker = Maker(f"{start}_{entry[word]}", entry, head_n, body_n, surface)
+        builders[entry[word]](maker)
+        trait_made = trait_materials(maker.prefix, entry["colours"], entry.get("unlit", ()), materials)
+        for shapes, on in maker.parts:
+            if on == "Head":
+                full.turn_head_up(shapes, head_n)
+            made = shapes.finish(shapes.name, Vector((0.0, 0.0, 0.0)), by_name[on], trait_made)
+            made["trait"] = f"{trait}={value}"
+            made["prefix"] = maker.prefix
+            trait_parts.append(made)
+
+    for material in list(bpy.data.materials):
+        if material.users == 0:
+            bpy.data.materials.remove(material)
+    bpy.context.view_layer.update()
+    return root, parts, trait_parts, body_n, head_n, left_out
+
+
+def report(label, parts, trait_parts, body_n, head_n):
+    """The report of make_chog_full.py for the four parts, then the trait parts and the total.
+    Returns the counts: triangles of the base, of each trait part, and in all."""
+    full.report(label, parts, body_n, head_n)
+    total = sum(len(part.data.polygons) for part in parts)
+    counts = {"base": total, "parts": {}}
+    print(f"CHOG_TRAITS {label} base: {total} triangles")
+    failures = []
+    for part in trait_parts:
+        names = [slot.material.name for slot in part.material_slots]
+        triangles = len(part.data.polygons)
+        outline = sum(1 for face in part.data.polygons if names[face.material_index] == OUTLINE)
+        total += triangles
+        counts["parts"][part.name] = triangles
+        print(f"CHOG_TRAITS {label} part {part.name:22s} on {part.parent.name:8s} triangles {triangles:5d} "
+              f"(outline {outline:4d})  for {part['trait']}  materials {names}")
+        if part.parent is None or part.parent.name not in ("Head", "Body", "armLeft", "armRight"):
+            failures.append(f"{part.name} is not a child of one of the four parts")
+        if part.matrix_parent_inverse != Matrix.Identity(4) or part.location.length > 1e-9:
+            failures.append(f"{part.name} does not sit exactly on {part.parent.name}")
+        if any(len(face.vertices) != 3 for face in part.data.polygons):
+            failures.append(f"{part.name} has faces that are not triangles")
+        if any(not name.startswith(part["prefix"] + "_") and name != OUTLINE for name in names):
+            failures.append(f"{part.name} has a material that is not named after its trait: {names}")
+    print(f"CHOG_TRAITS {label} dressed: {total} triangles (limit {TRIANGLE_LIMIT})")
+    if total > TRIANGLE_LIMIT:
+        failures.append(f"{total} triangles, the limit is {TRIANGLE_LIMIT}")
+    if failures:
+        raise SystemExit(f"CHOG_TRAITS {label} FAILED: " + "; ".join(failures))
+    counts["total"] = total
+    return counts
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Builds a Chog dressed with the traits of one Genesis.")
+    parser.add_argument("--genesis", default=None, help="the number shown in the name of the Genesis (CHOG #n)")
+    parser.add_argument("--base", action="store_true", help="the polished base alone, no trait part")
+    parser.add_argument("--coverage", action="store_true", help="build nothing: print how many Genesis each "
+                        "entry serves and how many are dressed whole today")
+    parser.add_argument("--hat", default=None, help=f"wear this entry of HATS in place of the hat of the Genesis: "
+                                                    f"{sorted(HATS)}")
+    parser.add_argument("--set", action="append", default=[], metavar="NAME=VALUE", help="a number of the hat put "
+                        "in place of its own, for instance BRIM_LENGTH=0.06 (may be given several times)")
+    parser.add_argument("--out", default=None, help="folder for ChogBody.fbx and ChogBody.blend (default: "
+                                                    ".artifacts/chog-body/traits/<number>, or traits/base)")
+    arguments = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
+    if arguments.coverage:
+        coverage()
+        return
+    if bool(arguments.genesis) == arguments.base:
+        raise SystemExit("CHOG_TRAITS give either --genesis NUMBER or --base")
+
+    replaced = {}
+    for item in arguments.set:
+        name, value = item.split("=", 1)
+        replaced[name] = ast.literal_eval(value)
+    if arguments.base:
+        label, traits = "base", None
+    else:
+        label, traits = arguments.genesis, traits_of(arguments.genesis)
+        print(f"CHOG_TRAITS CHOG #{label}: " + ", ".join(f"{key}={value}" for key, value in traits.items()))
+        if arguments.hat:
+            if arguments.hat not in HATS:
+                raise SystemExit(f"CHOG_TRAITS no hat named {arguments.hat!r} in HATS")
+            traits["Head"] = arguments.hat
+            label = f"{label}_{arguments.hat.replace(' ', '')}"
+    if replaced and not arguments.out:
+        raise SystemExit("CHOG_TRAITS with --set, give --out: a try does not replace the model of the Genesis")
+    folder = os.path.abspath(arguments.out or os.path.join(TRAITS_FOLDER, label))
+
+    root, parts, trait_parts, body_n, head_n, left_out = build(traits, replaced)
+    counts = report(label, parts, trait_parts, body_n, head_n)
+    for value in left_out:
+        print(f"CHOG_TRAITS {label} NOT MODELLED, left out: {value}")
+
+    # What the renders need to know of this Genesis, kept in the file.
+    if traits:
+        skin = SKINS.get(traits.get("Skin"))
+        if skin is None:
+            raise SystemExit(f"CHOG_TRAITS no colour recorded for Skin={traits.get('Skin')}")
+        root["chog_genesis"] = str(arguments.genesis)
+        root["chog_skin"] = list(skin["skin"])
+        root["chog_face"] = list(skin.get("face", GENESIS_FACE))
+        root["chog_blush"] = list(GENESIS_BLUSH)
+        root["chog_side"] = traits.get("Side", "Right")
+        background = background_colour(traits.get("Background"))
+        if background:
+            root["chog_background"] = list(background)
+        else:
+            print(f"CHOG_TRAITS {label} no colour recorded for Background={traits.get('Background')}: grey is used")
+
+    blend_path, fbx_path = base.export(root, parts + trait_parts, folder)
+    print(f"CHOG_TRAITS saved {blend_path}")
+    print(f"CHOG_TRAITS saved {fbx_path}")
+
+    # What was built, for the sheets: the traits read, the parts and their triangles.
+    built = {
+        "label": label,
+        "traits": traits or {},
+        "replaced": replaced,
+        "parts": {part.name: {"trait": part["trait"], "on": part.parent.name,
+                              "triangles": counts["parts"][part.name],
+                              "materials": [slot.material.name for slot in part.material_slots]}
+                  for part in trait_parts},
+        "triangles_base": counts["base"],
+        "triangles_total": counts["total"],
+        "left_out": left_out,
+    }
+    with open(os.path.join(folder, "parts.json"), "w", encoding="utf-8") as target:
+        json.dump(built, target, indent=1)
+    print(f"CHOG_TRAITS saved {os.path.join(folder, 'parts.json')}")
+
+
+if __name__ == "__main__":
+    main()

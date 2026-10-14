@@ -87,6 +87,82 @@ is would hide the `Head` part and tint every material one colour. Still crude: t
 round and generic where a Chog looks sideways, and the blades are faceted where the drawing
 has soft leaves.
 
+## Trait parts on the polished head (12 October 2026, pictures only)
+
+`make_chog_traits.py` builds head H3 polished, then the 3D parts of each trait of a Genesis,
+read from `research/evidence/genesis-metadata.jsonl`. `render_chog_traits.py` renders it,
+`make_chog_traits_sheet.py` lays one sheet per Genesis, `make_chog_traits_overview.py` one
+sheet for all, and `make_chog_traits_all.py` runs the lot. **Nothing of this is in the game.**
+
+- **The base** keeps the head, the leaves and so the outline of H3. Its blades are leaves
+  (round section, shaded smooth, a blunt point that curls back); its cream face is wider
+  (0.25 from its middle, 0.225 on H3) and has no eyes and no mouth: in the collection those
+  are traits. It keeps the dark line of the face, the nose, the cheeks and the teeth of
+  hair on the brow. 5,953 triangles (H3: 5,177).
+- **A trait part** is one object, child of `Head` (clothing: of `Body`, `armLeft`,
+  `armRight`) with no move of its own, whose materials carry the name of its trait; the
+  outline shell is the shared `ChogOutline`. An entry of `HATS`, `EYES`, `MOUTHS` or
+  `CLOTHES` maps a value of the collection to a shape, a colour set, a print or a mark,
+  and the numbers it replaces (first of all the brim of a hat). A value with no entry is
+  printed as NOT MODELLED. `-- --coverage` prints how many Genesis each entry serves.
+
+| Part | What it is | Values of the collection it has an entry for |
+| --- | --- | --- |
+| `Hat_Cap` | crown, short raised brim, button, a word in Blender's built-in font | TISM Cap (49); MMGA Cap (34), a check only |
+| `Hat_BucketCap` | round crown, brim all around, turned up at the front, a mark | Blue Bucket Cap (48), Balls Cap (62) |
+| `Hat_Crown` | flared band, eight points, gems | Crown (54) |
+| `Hat_Beanie` | dome, ribbed cuff, printed rings | Wizard Beanie (30) |
+| `Eyes_AnimeGlass` | thick frame, white lenses | Anime Glass (64) |
+| `Eyes_Laser` | drawn dark eyes and two short beams | Purple laser (96) |
+| `Eyes_Visor` | one band wrapped around the face, in three colours | Sunset visor (53) |
+| `Eyes_NormalEye`, `Eyes_Happy`, `Eyes_Round` | flat shapes on the face | Normal Eye (74), Happy (121), Round (77) |
+| `Mouth_RainbowPuke`, `Mouth_Bubblegum` | a stream of six stripes, a ball: volume | Rainbow Puke (145), Bubblegum (168) |
+| `Mouth_GoldTooth`, `Mouth_Smile`, `Mouth_Drool`, `Mouth_DroolOpen`, `Mouth_Wo` | flat shapes on the face | Gold Tooth (127), normal smile (195), Drooling (184, the open mouth for Side=Left), wo (120) |
+| `Cloth_Tee` (+ `_armLeft`, `_armRight`) | a thin shell over the torso and the top of the arms, stripes if asked | Fire Shirt (31), Prisoner (33), Red 143 Jersey (9) |
+
+Seven Genesis are dressed (triangles with the outline shells, limit 8,000): #1287 7,546,
+#1241 7,357, #80 6,821, #1408 6,011, #1078 7,801, #83 6,181, #1948 7,393. With these
+entries 24 of the 1,969 Genesis are dressed whole (`-- --coverage`).
+
+```sh
+# everything: models, pictures, one sheet per Genesis, the overview, the brim strip (about 10 minutes)
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_all.py
+# one Genesis by hand
+B=/Applications/Blender.app/Contents/MacOS/Blender
+$B --background --factory-startup --python tools/blender/make_chog_traits.py -- --genesis 1287
+$B --background --factory-startup --python tools/blender/render_chog_traits.py -- --name 1287
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_sheet.py --genesis 1287 --with-base
+# try numbers of a hat without touching the model of the Genesis
+$B --background --factory-startup --python tools/blender/make_chog_traits.py -- --genesis 1287 \
+    --set BRIM_LENGTH=0.07 --set BRIM_RISE_DEG=20 --out .artifacts/chog-body/traits/experiments/brim_try
+```
+
+The sheets are `.artifacts/chog-body/traits/<number>/sheet_<number>.png`,
+`traits/overview_six.png` and `traits/1287/brim_before_after.png`. They read the 1000-point
+pictures (`tools/genesis-art/fetch_portraits.py --size 1000 --quality 95 --ids ...`) and the
+red pictures of H3 in `.artifacts/chog-body/full/H3/`.
+
+What was learnt, and what is not right yet:
+
+- **The camera of the game sees the eyes, never the mouth.** It looks down from 73 degrees
+  and the head looks up by 20: the lower face turns away from it (computed and seen on the
+  hero without a hat). So a hat must leave the brow clear (short brim that rises, crown
+  that leans back), and from above a mouth shows only if it has volume (bubble, rainbow).
+  Showing a grin from above would take a head turned up further, which is a change to H3.
+- **A name is not a shape.** "Balls Cap", "Cloud Cap", "Dollar Cap", "Thunder Cap", "Star
+  Cap", "Red Peace Cap", "Peace hat" are drawn as bucket hats, and so is "Mon Cap" on the
+  pictures of Side=Right: `tools/genesis-art/trait_coverage.py` counts them as caps (951),
+  which is too many by at least 313. Look at a `trait_sheet.py` sheet before modelling.
+- **Side=Left is another drawing.** Hats, eyes and clothes hardly cross the two sides (4
+  of 66 head values, 6 of 58 eyes); no Genesis wears a beanie and a visor. Mouths cross,
+  but "Drooling" is an open mouth on the left: `MOUTHS_OF_SIDE` holds such cases.
+- The leaves of H3 are much larger than the spikes of the Genesis pictures, and the busts
+  are framed wider than the pictures. Clothing is a first pass: one colour, stripes, no
+  print (the 143 of the jersey, the collar of a shirt beyond a band). Lettering is one
+  geometric font. Drawn parts and lenses are shown in their colour whatever the light and
+  trait parts cast no shadow: choices of these renders. No import in Unity, no check of
+  the FBX, no Accessory, no Aura.
+
 The sections below describe the first body, which `make_chog_body.py` still builds.
 
 ## Commands

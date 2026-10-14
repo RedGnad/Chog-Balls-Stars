@@ -61,6 +61,8 @@ namespace Chog.Match
         private float _noticeUntil;
         private int _localTeam = -1;
         private GUIStyle _noticeStyle;
+        // The alarm of the player's own team, empty while none of its structures is hit.
+        private string _alarm = "";
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Create()
@@ -88,6 +90,12 @@ namespace Chog.Match
             return mine ? "YOUR TOWER FELL" : "ENEMY TOWER DESTROYED";
         }
 
+        /// <summary>What the screen says while a structure of the player's team is being hit.</summary>
+        public static string AlarmFor(EStructureKind kind)
+        {
+            return kind == EStructureKind.Core ? "YOUR CORE IS UNDER ATTACK" : "YOUR TOWER IS UNDER ATTACK";
+        }
+
         private void OnFell(EventStructureDestroyed fell)
         {
             _notice = NoticeFor(fell.Kind, fell.Team, _localTeam);
@@ -96,23 +104,28 @@ namespace Chog.Match
         }
 
         // One line near the top of the screen, sized with it, on a dark band so it reads on
-        // any ground.
+        // any ground: what fell, for a few seconds, or else the alarm of a structure of the
+        // player's team, smaller and pulsing for as long as it is hit.
         private void OnGUI()
         {
-            if (Time.time >= _noticeUntil || _notice.Length == 0)
+            var fell = Time.time < _noticeUntil && _notice.Length > 0;
+            if (!fell && _alarm.Length == 0)
                 return;
 
             if (_noticeStyle == null)
                 _noticeStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
-            _noticeStyle.fontSize = Mathf.Max(14, Mathf.RoundToInt(Screen.height * 0.065f));
-            _noticeStyle.normal.textColor = _noticeColour;
+            _noticeStyle.fontSize = Mathf.Max(fell ? 14 : 11, Mathf.RoundToInt(Screen.height * (fell ? 0.065f : 0.045f)));
+            var colour = fell ? _noticeColour : Theirs;
+            if (!fell)
+                colour.a = 0.55f + 0.45f * Mathf.PingPong(Time.time * 2f, 1f);
+            _noticeStyle.normal.textColor = colour;
 
-            var band = new Rect(0f, Screen.height * 0.16f, Screen.width, Screen.height * 0.11f);
+            var band = new Rect(0f, Screen.height * 0.16f, Screen.width, Screen.height * (fell ? 0.11f : 0.08f));
             var before = GUI.color;
-            GUI.color = new Color(0f, 0f, 0f, 0.6f);
+            GUI.color = new Color(0f, 0f, 0f, fell ? 0.6f : 0.45f);
             GUI.DrawTexture(band, Texture2D.whiteTexture);
             GUI.color = before;
-            GUI.Label(band, _notice, _noticeStyle);
+            GUI.Label(band, fell ? _notice : _alarm, _noticeStyle);
         }
 
         private void OnDestroy() => QuantumEvent.UnsubscribeListener(this);
@@ -124,14 +137,21 @@ namespace Chog.Match
             var roster = frame != null ? QuantumUnityDB.GetGlobalAsset(frame.RuntimeConfig.GenesisRoster) : null;
             foreach (var drawing in _drawings.Values)
                 drawing.Seen = false;
+            _alarm = "";
 
             if (roster != null && roster.ShapeMaterial != null)
             {
                 var localTeam = LocalTeam(game, frame);
                 _localTeam = localTeam;
+                var now = frame.Number * frame.DeltaTime;
                 var structures = frame.Filter<Structure, Transform2D, TeamInfo, Health>();
                 while (structures.Next(out var entity, out var structure, out var place, out var team, out var health))
                 {
+                    // The core speaks louder than the tower when both are hit.
+                    if (team.Index == (localTeam < 0 ? 0 : localTeam) && !health.IsDead && structure.AlarmUntil > now
+                        && (_alarm.Length == 0 || structure.Kind == EStructureKind.Core))
+                        _alarm = AlarmFor(structure.Kind);
+
                     if (!_drawings.TryGetValue(entity, out var drawing))
                     {
                         // Without a local player (a spectator) team 0 is drawn as "ours".

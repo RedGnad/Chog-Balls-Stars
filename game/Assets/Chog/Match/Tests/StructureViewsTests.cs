@@ -20,5 +20,12 @@ namespace Chog.Match.Tests
             Assert.AreEqual(StructureViews.NoticeFor(EStructureKind.Core, 1, 0), StructureViews.NoticeFor(EStructureKind.Core, 1, -1));
             Assert.AreEqual(StructureViews.NoticeFor(EStructureKind.Tower, 0, 0), StructureViews.NoticeFor(EStructureKind.Tower, 0, -1));
         }
+
+        [Test]
+        public void AStructureThatIsHitIsNamedInTheAlarm()
+        {
+            Assert.AreEqual("YOUR TOWER IS UNDER ATTACK", StructureViews.AlarmFor(EStructureKind.Tower));
+            Assert.AreEqual("YOUR CORE IS UNDER ATTACK", StructureViews.AlarmFor(EStructureKind.Core));
+        }
     }
 }

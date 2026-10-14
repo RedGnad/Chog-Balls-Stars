@@ -56,9 +56,11 @@ async function bodyOf(request) {
  *   when absent it is taken from the request, which is only right behind a proxy we control
  * @param {string} [services.reownProjectId] the Reown project id of this deployment; without it
  *   the page offers no connection to a wallet app and keeps to the wallet of the browser
+ * @param {string | (() => Promise<string>)} [services.build] the build of the game served
+ *   beside these services, or a function that reads it; empty when they do not know
  * @returns {(request: Request) => Promise<Response>}
  */
-export function createApi({ chain, sessions, careers, shop, rental, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '' }) {
+export function createApi({ chain, sessions, careers, shop, rental, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
   // The page a wallet is asked to trust: it is written in the message the player signs.
   function pageOf(request, url) {
     const origin = publicOrigin
@@ -230,7 +232,12 @@ export function createApi({ chain, sessions, careers, shop, rental, photon, phot
 
     // Whether the game must tell Photon who its player is when it connects: true once Photon's
     // dashboard asks these services (see docs/DEPLOY.md). The page reads this before it connects.
-    'GET /api/photon': async () => json(200, { authentication: Boolean(photon) && photonAuthentication }),
+    // "build" is the build of the game served here, as it names itself to Photon, or an empty
+    // text when these services do not know: a page that runs another one loads itself again.
+    'GET /api/photon': async () => json(200, {
+      authentication: Boolean(photon) && photonAuthentication,
+      build: typeof build === 'function' ? await build() : build,
+    }),
 
     // Asked by Photon's cloud when a player connects, never by a page: who is this player.
     'GET /api/photon/auth': async (request, url) => {

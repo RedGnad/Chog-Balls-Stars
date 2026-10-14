@@ -23,10 +23,24 @@ namespace Quantum
 				}
 			}
 
-			// Last, the towers of the other team: a bot stays out of their reach.
-			desiredDirection += Structures.KeepAway(frame, agent);
+			// Last, the towers of the other team: a bot stays out of their reach, unless it is
+			// attacking a structure of that team.
+			desiredDirection += Structures.KeepAway(frame, agent, Pushed(frame, agent));
 
 			return desiredDirection.Normalized;
+		}
+
+		// The structure this bot is attacking, or none.
+		private static EntityRef Pushed(Frame frame, EntityRef agent)
+		{
+			if (frame.Unsafe.TryGetPointer<Bot>(agent, out var bot) == false || bot->CurrentTactic != ETactics.Engage
+				|| frame.Unsafe.TryGetPointer<AIBlackboardComponent>(agent, out var blackboard) == false)
+			{
+				return default;
+			}
+
+			EntityRef target = blackboard->GetEntityRef(frame, AIConstants.KEY_TARGET);
+			return frame.Has<Structure>(target) ? target : default;
 		}
 
 		private FPVector2 ProcessSteeringEntry(Frame frame, EntityRef agent, SteeringData steeringData)

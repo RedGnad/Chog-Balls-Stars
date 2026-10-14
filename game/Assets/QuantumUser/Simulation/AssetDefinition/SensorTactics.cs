@@ -24,6 +24,23 @@ namespace Quantum
 				return;
 			}
 
+			// A structure to defend or to push comes before every other tactic. The bot fights
+			// there: the state that fights a hero does the rest, whatever the target is. The
+			// state is entered once, since entering it again would restart its wait before a shot.
+			EntityRef duty = Structures.BotObjective(frame, entity);
+			if (duty != default)
+			{
+				frame.Unsafe.GetPointer<AIBlackboardComponent>(entity)->Set(frame, AIConstants.KEY_TARGET, duty);
+				if (bot->CurrentTactic != ETactics.Engage)
+				{
+					HFSMManager.TriggerEvent(frame, entity, AIConstants.TACTIC_EVENT_ENGAGE);
+					bot->CurrentTactic = ETactics.Engage;
+				}
+
+				bot->TacticalCommitment = FP._1;
+				return;
+			}
+
 			for (int i = 0; i < _tacticalSensors.Length; i++)
 			{
 				bool succeeded = _tacticalSensors[i].TrySetTactic(frame, entity, bot);

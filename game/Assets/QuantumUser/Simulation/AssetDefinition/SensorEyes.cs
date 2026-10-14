@@ -26,6 +26,13 @@ namespace Quantum
 					VisibilityRange, checkLineSight: false, ignoreSameTeam: true, out closestEnemy);
 			}
 
+			// A structure to defend or to push comes before the enemy the eyes found.
+			EntityRef duty = Structures.BotObjective(frame, entity);
+			if (duty != default)
+			{
+				closestEnemy = duty;
+			}
+
 			if(closestEnemy == default)
 			{
 				return;

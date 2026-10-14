@@ -276,7 +276,13 @@ class PartShapes:
             twins = copy["vert_map"]
             for point in points:
                 twin = twins[point]
-                twin.co = point.co + point.normal * thickness * (fade(point.co) if fade else 1.0)
+                # "fade" is a function of the place of a point, or (make_chog_traits.py) a table that
+                # gives the share of some points, the others getting the whole thickness.
+                if isinstance(fade, dict):
+                    share = fade.get(point, 1.0)
+                else:
+                    share = fade(point.co) if fade else 1.0
+                twin.co = point.co + point.normal * thickness * share
                 if on_ground:
                     twin.co.z = max(twin.co.z, 0.0)
             hull = [item for item in copy["geom"] if isinstance(item, bmesh.types.BMFace)]

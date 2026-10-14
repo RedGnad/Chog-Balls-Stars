@@ -18,7 +18,7 @@ const AVATAR = '2430278665492933905';
 const LOADOUT = '440543562436170603';
 
 // Services where HOLDER holds the Genesis 1795 and rents 8, and the Genesis 1795 has its second form.
-function services({ replay, onReplayEnded } = {}) {
+function services({ replay, onReplayEnded, build } = {}) {
   const state = { holders: new Map([[1795, HOLDER.address], [408, '0x' + 'c3'.repeat(20)]]), rented: new Set([`8:${HOLDER.address}`]), bought: new Set([1795]) };
   const chain = {
     holds: async (address, tokenId) => ({ holds: state.holders.get(tokenId) === address.toLowerCase() }),
@@ -30,12 +30,12 @@ function services({ replay, onReplayEnded } = {}) {
   const careers = createCareers({ load: async () => saved, save: async value => { saved = value; } });
   const sessions = createSessions({ secret: SECRET });
   const matches = createMatches({ store: createMemoryStore() });
-  const judge = replay ? createJudge({ matches, replay }) : null;
+  const judge = replay ? createJudge({ matches, replay, build }) : null;
   const photon = createPhoton({
-    secret: PHOTON_SECRET, sessions, careers, chain, shop, rental, matches,
+    secret: PHOTON_SECRET, sessions, careers, chain, shop, rental, matches, build,
     onReplayEnded: onReplayEnded ?? (judge ? gameId => judge.judge(gameId) : undefined),
   });
-  const api = createApi({ chain, sessions, careers, shop, rental, photon, photonAuthentication: true, publicOrigin: ORIGIN });
+  const api = createApi({ chain, sessions, careers, shop, rental, photon, photonAuthentication: true, publicOrigin: ORIGIN, build });
   return { state, api, sessions, careers, matches, judge, photon };
 }
 
@@ -83,7 +83,7 @@ test('Photon is told who connects: a wallet by its address, a guest and a visito
   assert.match(visitor.body.UserId, /^visitor-/);
   assert.deepEqual(visitor.body.AuthCookie, { visitor: true });
 
-  assert.deepEqual(await api(new Request(`${ORIGIN}/api/photon`)).then(response => response.json()), { authentication: true });
+  assert.deepEqual(await api(new Request(`${ORIGIN}/api/photon`)).then(response => response.json()), { authentication: true, build: '' });
 });
 
 test('a webhook without the secret of the dashboard is refused and changes nothing', async () => {
@@ -227,6 +227,35 @@ async function playedMatch(api, gameId = 'g5') {
 const report = changes => ({
   winnerTeam: 1, scores: [3, 11], endedAtTick: 3235, selectionEndedAtTick: 387, firstTick: 60, lastTick: 3239, updateRate: 30,
   players: [{ player: 0, team: 0, tokenId: 1795 }, { player: 1, team: 1, tokenId: 0 }], simulation: 'abc', ...changes,
+});
+
+test('a page that runs another build opens no room here, and a match played with another build is void', async () => {
+  let served = '20261012T035911141Z';
+  let replays = 0;
+  const { api, matches } = services({ build: async () => served, replay: async () => { replays++; return report(); } });
+  const create = version => hook(api, 'game/create',
+    `{"AppId":"app","AppVersion":"${version}","Region":"eu","Cloud":"0","UserId":"u","RoomName":"party","GameId":"0:eu:party"}`);
+
+  const stale = await create('20261011T120000000Z');
+  assert.equal(stale.status, 400, 'a page that kept an older build opens no room');
+  assert.equal(JSON.parse(stale.text).Error, 'AnotherBuild');
+  assert.deepEqual(await api(new Request(`${ORIGIN}/api/photon`)).then(response => response.json()), { authentication: true, build: served },
+    'the page is told which build is served, to load itself again when it runs another');
+
+  const first = JSON.parse((await create(served)).text).GameId;
+  await playedMatch(api, first);
+  assert.equal((await matches.get(first)).verdict.winnerTeam, 1, 'a match of the served build is judged');
+  assert.equal(replays, 1);
+
+  // The site is assembled again while a match of the build before is being played.
+  const second = JSON.parse((await create(served)).text).GameId;
+  served = '20261013T101500000Z';
+  await playedMatch(api, second);
+  const { at, ...verdict } = (await matches.get(second)).verdict;
+  assert.deepEqual(verdict, {
+    void: true, why: 'the match was played with another build than the one judged here', playedWith: '20261012T035911141Z', build: served,
+  });
+  assert.equal(replays, 1, 'the program of another build was not asked: it would have played another match');
 });
 
 test('the verdict of a match is what its replay says, never what a page claims', async () => {

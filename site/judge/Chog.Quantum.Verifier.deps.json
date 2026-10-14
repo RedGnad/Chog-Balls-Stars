@@ -10,6 +10,7 @@
         "dependencies": {
           "Quantum.Simulation": "1.0.0",
           "Newtonsoft.Json": "13.0.0.0",
+          "Quantum.BotSDK.Core": "1.0.0.0",
           "Quantum.Deterministic": "3.0.9.1932",
           "Quantum.Engine": "3.0.9.1932",
           "Quantum.Json": "3.0.9.1932",
@@ -29,6 +30,14 @@
           "Newtonsoft.Json.dll": {
             "assemblyVersion": "13.0.0.0",
             "fileVersion": "13.0.2.0"
+          }
+        }
+      },
+      "Quantum.BotSDK.Core/1.0.0.0": {
+        "runtime": {
+          "Quantum.BotSDK.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
           }
         }
       },
@@ -63,14 +72,6 @@
             "fileVersion": "3.0.9.1932"
           }
         }
-      },
-      "Quantum.BotSDK.Core/1.0.0.0": {
-        "runtime": {
-          "Quantum.BotSDK.Core.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
       }
     }
   },
@@ -86,6 +87,11 @@
       "sha512": ""
     },
     "Newtonsoft.Json/13.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Quantum.BotSDK.Core/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -106,11 +112,6 @@
       "sha512": ""
     },
     "Quantum.Log/3.0.9.1932": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Quantum.BotSDK.Core/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

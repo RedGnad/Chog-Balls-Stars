@@ -323,9 +323,10 @@ def patch_loops(surface, middle, half_width, half_height, squareness, taper, lif
     return loops
 
 
-def add_face(part, numbers, surface):
+def add_face(part, numbers, surface, eyes=True, mouth=True):
     """The cream face with its dark line, and what is drawn on it. Everything is a thin skin on
-    the head, each a little further off it than what it lies on."""
+    the head, each a little further off it than what it lies on. "eyes" and "mouth" say whether the
+    generic ones are drawn: make_chog_traits.py leaves them out, a Genesis brings its own."""
     width, height = numbers.FACE_HALF_WIDTH, numbers.FACE_HALF_HEIGHT
     square, taper, lift, line = numbers.FACE_SQUARENESS, numbers.FACE_TAPER, numbers.FACE_LIFT, numbers.FACE_LINE
     rings, segments = numbers.FACE_RINGS, numbers.FACE_SEGMENTS
@@ -339,10 +340,11 @@ def add_face(part, numbers, surface):
     glint_side, glint_up, glint_radius = numbers.EYE_GLINT
     cheek_side, cheek_up, cheek_width, cheek_height = numbers.CHEEK
     for side in (1.0, -1.0):
-        add_skin(part, surface, patch_loops(surface, (side * eye_side, eye_up), eye_width, eye_height, 2.0, 0.0,
-                                            drawn, 2, 12), EYE)
-        add_skin(part, surface, patch_loops(surface, (side * eye_side + glint_side, eye_up + glint_up), glint_radius,
-                                            glint_radius, 2.0, 0.0, lift * 2.4, 1, 8), FACE)
+        if eyes:
+            add_skin(part, surface, patch_loops(surface, (side * eye_side, eye_up), eye_width, eye_height, 2.0, 0.0,
+                                                drawn, 2, 12), EYE)
+            add_skin(part, surface, patch_loops(surface, (side * eye_side + glint_side, eye_up + glint_up),
+                                                glint_radius, glint_radius, 2.0, 0.0, lift * 2.4, 1, 8), FACE)
         add_skin(part, surface, patch_loops(surface, (side * cheek_side, cheek_up), cheek_width, cheek_height, 2.0,
                                             0.0, drawn, 1, 12), BLUSH)
     nose_side, nose_up, nose_width, nose_height = numbers.NOSE
@@ -350,16 +352,17 @@ def add_face(part, numbers, surface):
              BLUSH)
 
     # The mouth: a thin line that sags in its middle.
-    mouth_side, mouth_up, mouth_width, sag, thick = numbers.MOUTH
-    steps = 8
-    upper, lower = [], []
-    for index in range(steps + 1):
-        along = -1.0 + 2.0 * index / steps
-        height_here = mouth_up - sag * (1.0 - along * along)
-        fine = thick * (0.35 + 0.65 * (1.0 - along * along))
-        upper.append(surface.front(mouth_side + along * mouth_width, height_here + fine * 0.5, drawn))
-        lower.append(surface.front(mouth_side + along * mouth_width, height_here - fine * 0.5, drawn))
-    add_skin(part, surface, [lower, upper], EYE, around=False)
+    if mouth:
+        mouth_side, mouth_up, mouth_width, sag, thick = numbers.MOUTH
+        steps = 8
+        upper, lower = [], []
+        for index in range(steps + 1):
+            along = -1.0 + 2.0 * index / steps
+            height_here = mouth_up - sag * (1.0 - along * along)
+            fine = thick * (0.35 + 0.65 * (1.0 - along * along))
+            upper.append(surface.front(mouth_side + along * mouth_width, height_here + fine * 0.5, drawn))
+            lower.append(surface.front(mouth_side + along * mouth_width, height_here - fine * 0.5, drawn))
+        add_skin(part, surface, [lower, upper], EYE, around=False)
 
     # The fringe: teeth of hair on the brow, in the skin colour, over the top of the face.
     teeth = numbers.FRINGE_TEETH

@@ -402,8 +402,77 @@ internal static unsafe class Program
                     "Outside the reach of a tower nothing must push a bot");
                 Require(Structures.KeepAway(frame, HeroAt(frame, 0, at + new FPVector2(0, 2))) == default, "A tower must not push its own team away");
 
+                Require(Structures.KeepAway(frame, inside, tower) == default, "A bot that attacks a tower must be let under it");
+                Require(Structures.KeepAway(frame, inside, StructureOf(frame, 0, EStructureKind.Core)) == default,
+                    "A bot that attacks a core must be let under the tower of that team");
+                Require(Structures.KeepAway(frame, inside, StructureOf(frame, 1, EStructureKind.Core)) == push,
+                    "What a bot attacks elsewhere must not let it under this tower");
+
                 frame.Unsafe.GetPointer<Health>(tower)->IsDead = true;
                 Require(Structures.KeepAway(frame, inside) == default, "A destroyed tower must not keep anyone away");
+            });
+        });
+
+        Test("a bot defends its structure under attack, and pushes the other team's with the numbers or behind a player", () => {
+            InFrame(new AssetObject[0], new RuntimeConfig(), frame => {
+                Structures.Build(frame);
+                void Move(EntityRef hero, FPVector2 to) => frame.Unsafe.GetPointer<Transform2D>(hero)->Position = to;
+                void Alive(EntityRef hero, bool alive) => frame.Unsafe.GetPointer<Health>(hero)->IsDead = !alive;
+                EntityRef BotAt(int team, FPVector2 position) {
+                    var hero = HeroAt(frame, team, position);
+                    frame.Add(hero, new Bot { IsActive = true });
+                    return hero;
+                }
+
+                var agent = BotAt(0, default);
+                var mate = BotAt(0, new FPVector2(1, 0));
+                var spare = BotAt(0, new FPVector2(2, 0));
+                var first = BotAt(1, new FPVector2(8, 0));
+                var second = BotAt(1, new FPVector2(-8, 0));
+                var third = BotAt(1, new FPVector2(8, 3));
+                var theirTower = StructureOf(frame, 1, EStructureKind.Tower);
+                var theirCore = StructureOf(frame, 1, EStructureKind.Core);
+                var ourTower = StructureOf(frame, 0, EStructureKind.Tower);
+
+                Require(Structures.BotObjective(frame, agent) == default, "Three against three and nothing under attack: a bot has no duty");
+
+                // The numbers: one of theirs is down.
+                Alive(third, false);
+                Require(Structures.BotObjective(frame, agent) == theirTower, "With more heroes alive a bot must push their tower");
+                Move(first, new FPVector2(Structures.PushCalmDistance - 1, 0));
+                Require(Structures.BotObjective(frame, agent) == default, "A bot with an enemy hero close to it must fight that hero, not push");
+                Move(first, new FPVector2(8, 0));
+                frame.Unsafe.GetPointer<Health>(theirTower)->IsDead = true;
+                Require(Structures.Attackable(frame, 1) == theirCore && Structures.BotObjective(frame, agent) == theirCore,
+                    "Once their tower fell, their core is what a bot pushes");
+                frame.Unsafe.GetPointer<Health>(theirTower)->IsDead = false;
+                Alive(third, true);
+
+                // Behind a player: a hero of the team that no bot plays stands under their tower.
+                var towerAt = frame.Get<Transform2D>(theirTower).Position;
+                Move(mate, towerAt + new FPVector2(0, -2));
+                Require(Structures.BotObjective(frame, agent) == default, "A bot under their tower must not draw the other bots there");
+                // The player takes the place of a bot, so the teams stay three against three.
+                Alive(spare, false);
+                var player = HeroAt(frame, 0, towerAt + new FPVector2(0, -2));
+                Require(Structures.BotObjective(frame, agent) == theirTower, "A player under their tower must be followed by the bots of the team");
+                Require(Structures.BotObjective(frame, player) == default, "Nobody stands under their tower but that hero: it has no one to follow");
+                Alive(player, false);
+                Require(Structures.BotObjective(frame, agent) == default, "A defeated player leads no push");
+
+                // Defence: our tower is hit, the nearest of their heroes around it is the one to stop.
+                Structures.Hurt(frame, agent);
+                Structures.Hurt(frame, ourTower);
+                Require(Structures.BotObjective(frame, agent) == default, "An alarm with no enemy hero around the structure gives no duty");
+                Move(second, frame.Get<Transform2D>(ourTower).Position + new FPVector2(3, 0));
+                Require(Structures.BotObjective(frame, agent) == second, "A bot must go for the hero that attacks its team's tower");
+                Require(Structures.BotObjective(frame, first) == ourTower,
+                    "The alarm of a tower is not for the other team: with three heroes against two, it goes on pushing that tower");
+                frame.Add(agent, new AIMemory { HealthStatus = EHealthStatus.Low });
+                Require(Structures.BotObjective(frame, agent) == default, "A bot low on health must be left to run");
+                frame.Unsafe.GetPointer<AIMemory>(agent)->HealthStatus = EHealthStatus.High;
+                frame.Unsafe.GetPointer<Structure>(ourTower)->AlarmUntil = 0;
+                Require(Structures.BotObjective(frame, agent) == default, "Once the alarm is over the bots go back to what they did");
             });
         });
 

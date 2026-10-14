@@ -12,7 +12,8 @@
 //     simulation }
 //
 // A report becomes a verdict here. The match is void, which gives every stake back, when it
-// cannot be judged: the record is not whole, the match did not reach its end, or a player did
+// cannot be judged: the record is not whole, the match was played with another build of the
+// game than the one the program belongs to, the match did not reach its end, or a player did
 // not play the Genesis the webhooks admitted it with. When the program itself fails there is
 // no verdict at all, and judging can be asked again.
 
@@ -22,8 +23,12 @@ import { DRAW } from './referee.js';
  * @param {object} options
  * @param {ReturnType<import('./matches.js').createMatches>} options.matches
  * @param {(folder: string, gameId: string) => Promise<object>} options.replay
+ * @param {string | (() => Promise<string>)} [options.build] the build of the game the replay
+ *   program belongs to, as that build names itself to Photon, or a function that reads it; a
+ *   match played with another one is void, since replayed with another simulation it would not
+ *   be the same match. Empty: nothing is compared
  */
-export function createJudge({ matches, replay }) {
+export function createJudge({ matches, replay, build = '' }) {
   /** Judges a match once its input history is whole; answers the verdict that is kept. */
   async function judge(gameId) {
     const given = await matches.verdictOf(gameId);
@@ -33,6 +38,13 @@ export function createJudge({ matches, replay }) {
       // A record that has not ended may still be arriving: only one that ended with a hole is judged void.
       if (!record.ended) return null;
       return matches.setVerdict(gameId, { void: true, why: 'the record of the match is not whole', missing: record.missing });
+    }
+
+    const match = await matches.get(gameId);
+    const playedWith = match?.app?.appVersion ?? null;
+    const judged = typeof build === 'function' ? await build() : build;
+    if (judged && playedWith !== judged) {
+      return matches.setVerdict(gameId, { void: true, why: 'the match was played with another build than the one judged here', playedWith, build: judged });
     }
 
     const report = await replay(matches.folderOf(gameId), gameId);
@@ -48,7 +60,6 @@ export function createJudge({ matches, replay }) {
       return matches.setVerdict(gameId, { void: true, why: 'the replayed match does not say when it began', ...facts });
     }
 
-    const match = await matches.get(gameId);
     for (const admission of match.admissions) {
       if (!Number.isInteger(admission.player)) continue;
       const played = report.players.find(player => player.player === admission.player);

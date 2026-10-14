@@ -11,8 +11,8 @@ namespace Quantum
 	{
 		// First numbers, to be tuned by play. A hero has about 6,000 health and hits for 400 to
 		// 900: a tower takes some fifteen hits, a core some thirty.
-		public static readonly FP TowerHealth = 12000;
-		public static readonly FP CoreHealth = 24000;
+		public static readonly FP TowerHealth = 8000;
+		public static readonly FP CoreHealth = 12000;
 		public static readonly FP TowerRadius = FP._0_50 + FP._0_10;
 		public static readonly FP CoreRadius = FP._0_75;
 		public static readonly FP TowerRange = 5;
@@ -145,9 +145,10 @@ namespace Quantum
 		/// What a bot adds to the direction it wants to go, to stay out of the reach of the
 		/// living towers of the other team: nothing outside that reach, a push straight away
 		/// from the tower inside it. Without this a bot walks under a tower and dies there,
-		/// since nothing else in its mind knows the towers.
+		/// since nothing else in its mind knows the towers. A bot that attacks a structure
+		/// (pushed) is let under the towers of that structure's team.
 		/// </summary>
-		public static FPVector2 KeepAway(Frame frame, EntityRef agent)
+		public static FPVector2 KeepAway(Frame frame, EntityRef agent, EntityRef pushed = default)
 		{
 			if (frame.Unsafe.TryGetPointer<Transform2D>(agent, out var transform) == false
 				|| frame.Unsafe.TryGetPointer<TeamInfo>(agent, out var team) == false)
@@ -155,11 +156,13 @@ namespace Quantum
 				return default;
 			}
 
+			int pushedTeam = frame.Unsafe.TryGetPointer<Structure>(pushed, out _) ? frame.Get<TeamInfo>(pushed).Index : -1;
+
 			FPVector2 push = default;
 			var towers = frame.Filter<Structure, Transform2D, TeamInfo, Health>();
 			while (towers.NextUnsafe(out EntityRef tower, out Structure* structure, out Transform2D* towerTransform, out TeamInfo* towerTeam, out Health* towerHealth))
 			{
-				if (structure->Range <= 0 || towerHealth->IsDead || towerTeam->Index == team->Index)
+				if (structure->Range <= 0 || towerHealth->IsDead || towerTeam->Index == team->Index || towerTeam->Index == pushedTeam)
 				{
 					continue;
 				}
@@ -176,6 +179,134 @@ namespace Quantum
 			}
 
 			return push;
+		}
+
+		// How long a structure that was hit calls its team's bots, how far from it an attacker
+		// is looked for (a little more than the longest attack of a hero, 9), and how close to a
+		// bot an enemy hero must be for that bot to fight it and leave the structure alone.
+		public static readonly FP AlarmDuration = 4;
+		public static readonly FP AlarmRadius = 10;
+		public static readonly FP PushCalmDistance = 6;
+
+		/// <summary>A structure was hit: its team's bots come while the alarm lasts.</summary>
+		public static void Hurt(Frame frame, EntityRef entity)
+		{
+			if (frame.Unsafe.TryGetPointer<Structure>(entity, out var structure))
+			{
+				structure->AlarmUntil = frame.Number * frame.DeltaTime + AlarmDuration;
+			}
+		}
+
+		/// <summary>The structure of that team a hero of the other team can attack now: its tower while it stands, then its core. None once both fell.</summary>
+		public static EntityRef Attackable(Frame frame, int team)
+		{
+			EntityRef core = default;
+			var all = frame.Filter<Structure, TeamInfo, Health>();
+			while (all.NextUnsafe(out EntityRef entity, out Structure* structure, out TeamInfo* owner, out Health* health))
+			{
+				if (owner->Index != team || health->IsDead)
+				{
+					continue;
+				}
+
+				if (structure->Kind == EStructureKind.Tower)
+				{
+					return entity;
+				}
+
+				core = entity;
+			}
+
+			return core;
+		}
+
+		/// <summary>
+		/// What a bot goes for before anything else it had in mind, or none.
+		/// First it defends: when a structure of its team is under attack, the living enemy hero
+		/// nearest to that structure. Then it pushes the structure of the other team that can be
+		/// attacked, when its team has more heroes alive than the other, or when a player of its
+		/// team already stands within a tower's reach of that structure. A bot with an enemy hero
+		/// close to it does not push: it fights that hero. A bot low on health does neither.
+		/// </summary>
+		public static EntityRef BotObjective(Frame frame, EntityRef agent)
+		{
+			if (frame.Unsafe.TryGetPointer<Transform2D>(agent, out var transform) == false
+				|| frame.Unsafe.TryGetPointer<TeamInfo>(agent, out var team) == false)
+			{
+				return default;
+			}
+
+			if (frame.Unsafe.TryGetPointer<AIMemory>(agent, out var memory) && memory->HealthStatus == EHealthStatus.Low)
+			{
+				return default;
+			}
+
+			FP now = frame.Number * frame.DeltaTime;
+			EntityRef raider = default;
+			FP raiderDistance = AlarmRadius * AlarmRadius;
+			var mine = frame.Filter<Structure, Transform2D, TeamInfo, Health>();
+			while (mine.NextUnsafe(out EntityRef structureEntity, out Structure* structure, out Transform2D* place, out TeamInfo* owner, out Health* health))
+			{
+				if (owner->Index != team->Index || health->IsDead || structure->AlarmUntil <= now)
+				{
+					continue;
+				}
+
+				var attackers = frame.Filter<Character, Transform2D, TeamInfo, Health>();
+				while (attackers.NextUnsafe(out EntityRef hero, out Character* character, out Transform2D* heroPlace, out TeamInfo* heroTeam, out Health* heroHealth))
+				{
+					FP distance = FPVector2.DistanceSquared(place->Position, heroPlace->Position);
+					if (heroTeam->Index != team->Index && heroHealth->IsDead == false && distance < raiderDistance)
+					{
+						raiderDistance = distance;
+						raider = hero;
+					}
+				}
+			}
+
+			if (raider != default)
+			{
+				return raider;
+			}
+
+			EntityRef target = Attackable(frame, 1 - team->Index);
+			if (target == default)
+			{
+				return default;
+			}
+
+			FPVector2 targetPosition = frame.Unsafe.GetPointer<Transform2D>(target)->Position;
+			int allies = 0;
+			int enemies = 0;
+			bool playerThere = false;
+			var heroes = frame.Filter<Character, Transform2D, TeamInfo, Health>();
+			while (heroes.NextUnsafe(out EntityRef hero, out Character* character, out Transform2D* heroPlace, out TeamInfo* heroTeam, out Health* heroHealth))
+			{
+				if (heroHealth->IsDead)
+				{
+					continue;
+				}
+
+				if (heroTeam->Index != team->Index)
+				{
+					enemies++;
+					if (FPVector2.DistanceSquared(transform->Position, heroPlace->Position) < PushCalmDistance * PushCalmDistance)
+					{
+						return default;
+					}
+
+					continue;
+				}
+
+				allies++;
+				bool isPlayer = frame.Unsafe.TryGetPointer<Bot>(hero, out var bot) == false || bot->IsActive == false;
+				if (isPlayer && hero != agent && FPVector2.DistanceSquared(targetPosition, heroPlace->Position) <= TowerRange * TowerRange)
+				{
+					playerThere = true;
+				}
+			}
+
+			return allies > enemies || playerThere ? target : default;
 		}
 
 		/// <summary>

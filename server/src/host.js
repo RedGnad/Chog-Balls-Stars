@@ -48,7 +48,7 @@ import { createCareers } from './career.js';
 import { CHAIN_ID, createChain, DEFAULT_RPC_URLS } from './chain.js';
 import { createJudge } from './judge.js';
 import { createMatches } from './matches.js';
-import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, reownProjectId, sessionSecret } from './node.js';
+import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, reownProjectId, servedBuild, sessionSecret } from './node.js';
 import { createPhoton } from './photon.js';
 import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
@@ -106,9 +106,16 @@ const tables = resolve(environment.QUANTUM_LUT
 if (verifier && !(await exists(database))) {
   console.warn(`The judge has no simulation assets at ${database}: no match will get a verdict.`);
 }
+// The build served here, read each time it is needed: the site folder can be assembled again
+// while this program runs, and the game and its judge change together there.
+const build = () => servedBuild(siteFolder);
+console.log((await build())
+  ? `Serving the build ${await build()}: a room or a match of another build is refused.`
+  : 'The site folder names no build (no RELEASE.json): matches of any build are accepted and judged.');
 const judge = verifier && (await exists(database))
   ? createJudge({
     matches,
+    build,
     replay: dotnetReplay({
       dotnet: environment.DOTNET ?? 'dotnet', verifier: resolve(verifier), database, lut: tables, matchesRoot: matchStore.root,
     }),
@@ -126,9 +133,10 @@ const api = createApi({
   sessions,
   photon: createPhoton({
     secret: await photonSecret(dataFolder, environment.PHOTON_SECRET),
-    sessions, careers, chain, shop, rental, matches,
+    sessions, careers, chain, shop, rental, matches, build,
     onReplayEnded: judge ? gameId => judge.judge(gameId) : undefined,
   }),
+  build,
   photonAuthentication: environment.PHOTON_AUTH === '1',
   wager: createWager({ chain, referee, matches }),
   reownProjectId: await reownProjectId(dataFolder, environment.REOWN_PROJECT_ID),

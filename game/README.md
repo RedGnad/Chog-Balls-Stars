@@ -634,13 +634,14 @@ Each team defends two structures on the sample's map, built when the match begin
 
 | Structure | Where | Health | What it does |
 | --- | --- | --- | --- |
-| Core | in front of the team's spawn points, (0, -12.5) for team 0 and (0, 12.5) for team 1 | 24,000 | when it is destroyed the match ends at once and the other team wins, whatever the coins |
-| Tower | 4 units further out, (0.5, -8.5) and (-0.5, 8.5) | 12,000 | every second it takes 500 health from the nearest living enemy hero within 5 units |
+| Core | in front of the team's spawn points, (0, -12.5) for team 0 and (0, 12.5) for team 1 | 12,000 | when it is destroyed the match ends at once and the other team wins, whatever the coins |
+| Tower | 4 units further out, (0.5, -8.5) and (-0.5, 8.5) | 8,000 | every second it takes 500 health from the nearest living enemy hero within 5 units |
 
-These are first numbers, to be tuned by play (a hero has about 6,000 health). The spots were
-measured on the map's colliders, which turn onto themselves around the centre
-(`tools/quantum/draw_map.py` draws the map, `free_ground.py` says how much room a spot has).
-The coins still decide a match in which no core falls.
+A hero has about 6,000 health. The health of the structures was 24,000 and 12,000 at first
+and was lowered on 12 October after watching bots play (below); it is still to be tuned by
+people playing. The spots were measured on the map's colliders, which turn onto themselves
+around the centre (`tools/quantum/draw_map.py` draws the map, `free_ground.py` says how much
+room a spot has). The coins still decide a match in which no core falls.
 
 How it fits the sample without touching its assets:
 
@@ -663,23 +664,57 @@ How it fits the sample without touching its assets:
   (`Structures.KeepAway`, called at the end of `AISteering.GetDesiredDirection`). Without it
   the bots walked under the towers: in the first match recorded with towers one tower hit 31
   times, the other 12, and the match ended 17 to 0.
+- **A bot defends and pushes** (`Structures.BotObjective`, read by the bot's eyes in
+  `SensorEyes` and before every other tactic in `SensorTactics`). It defends: a structure that
+  is hit calls its team for 4 seconds (`Structure.AlarmUntil`, set by `Structures.Hurt` on the
+  damage signal), and the bots of that team go for the living enemy hero nearest to it
+  within 10 units. It pushes: the other team's tower while it stands, then its core, when its
+  team has more heroes alive than the other, or when a player of its team already stands
+  within 5 units of that structure (the bots follow a player in; a bot there draws nobody).
+  A bot with an enemy hero within 6 units fights that hero and does not push, and a bot low
+  on health does neither. Nothing was added to the bots' state machine: the state that fights
+  a hero does the rest with a structure as its target, and a bot that attacks a structure is
+  let under the towers of that team.
 
 **What the player sees** (`Assets/Chog/Match/StructureViews.cs`): the tower is a totem with
 the head of a Chog, and what it shoots with is the laser of its eyes; the core is a heart
 inside a crown of Chog spikes. Both are flat pictures facing the camera, like the heads of the
 heroes, on a base in the colour of their side (blue for the player's team, red for the other)
-under a bar of their health; a destroyed one stays as a grey ruin.
+under a bar of their health; a destroyed one stays as a grey ruin. Two lines near the top of
+the screen: a large one for a few seconds when a structure falls ("ENEMY TOWER DESTROYED",
+"YOUR CORE FELL"), and a smaller red one that pulses for as long as a structure of the
+player's own team is being hit ("YOUR TOWER IS UNDER ATTACK"), which reads the same alarm
+that calls the bots.
 
-**Checked:** five tests of the rules on a real Quantum frame (28 in all), a replay in which a
+**Watching the bots play** (`python3 tools/quantum/watch_bots.py <replay.json> [seeds]
+[--all-bots]`): the judge replays one record with other seeds, and can hand the recorded
+player's hero to a bot, so each seed is another match of bots, played in under a second. It
+prints who won and how, the hits of each tower, the health each structure had left and what
+fell when. What it showed on 12 October, on matches of about two minutes:
+
+| Structures | Who plays | Towers | Cores |
+| --- | --- | --- | --- |
+| 12,000 and 24,000, bots that defend and push | six bots | one fell in 5 matches of 10 | none fell, the weakest had 19,050 left |
+| 8,000 and 12,000 (kept) | six bots | one fell in 8 matches of 10 | none fell, the weakest had 6,404 left |
+| 8,000 and 12,000 | two bots and an idle player against three bots | the idle player's fell in 6 of 6, after 24 to 63 seconds | the idle player's fell in 2 of 6 |
+
+So between even teams of bots the coins still end the match, with a tower down on the way,
+and a team that plays a hero short can lose its core in a minute or two. Whether a core should
+fall more often between even teams is a choice of design, not made yet.
+
+**Checked:** six tests of the rules on a real Quantum frame (29 in all), a replay in which a
 core is made to fall at a given tick (`Chog.Quantum.Verifier ... --test-core-falls 1@1500`:
 the match ends that second for team 0, and for team 1 when the other core falls), the
 structures seen standing in a headless match
 ([capture](../research/evidence/structures-and-body-b-close-up-headless-2026-10-12.png)),
-and towers shooting in whole matches played there: hits of exactly 500 in the damage log,
-which no earlier match had, counted by the replay program. **Not seen:** the laser of a tower
-on a picture, a structure destroyed by play, the end of a match by a core. **Not done:** the
-bots neither attack nor defend a structure, and slide along one that is in their way; no
-sound; no message on the screen when a structure falls.
+towers shooting in whole matches played there (hits of exactly 500 in the damage log), and
+the bots of the other team attacking the tower of an idle player's team in a headless match
+([capture](../research/evidence/bots-push-a-tower-headless-2026-10-12.png); that tower hit
+them 20 times and the core behind it lost 875 health). **Not seen:** a structure destroyed
+in a match played in a browser (only in replays), so neither the line that says so nor a
+match ended by a core there; the bots coming back to defend (the rule is tested, nobody
+watched it happen). **Not done:** a bot slides along a structure that is in its way; no
+sound.
 
 ### The page the game is served in (10 October)
 

@@ -52,9 +52,15 @@ const refused = (error, message) => ({ status: 400, body: { Status: 400, Error: 
  * @param {ReturnType<import('./matches.js').createMatches>} options.matches
  * @param {(gameId: string) => Promise<void>} [options.onReplayEnded] called once when the last
  *   slice of a match's input history was kept; its failure is logged and changes no answer
+ * @param {string | (() => Promise<string>)} [options.build] the build of the game these
+ *   services serve and can judge, as that build names itself to Photon (its AppVersion), or a
+ *   function that reads it (a site folder can be assembled again while the services run); a
+ *   room of another build is refused. Empty when the services do not know what they serve:
+ *   every room is then accepted
  */
-export function createPhoton({ secret, sessions, careers, chain, shop, rental, matches, onReplayEnded }) {
+export function createPhoton({ secret, sessions, careers, chain, shop, rental, matches, onReplayEnded, build = '' }) {
   if (typeof secret !== 'string' || secret.length < 32) throw new Error('The Photon secret must be at least 32 characters');
+  const servedNow = typeof build === 'function' ? build : async () => build;
 
   /**
    * The answer to Photon's question "who is this": {ResultCode: 1, UserId, AuthCookie} lets the
@@ -136,6 +142,12 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, m
     // other: neither in what is kept of it nor on the chain, where its stakes are held under
     // that name. Photon uses the name given back here in every later request for this room.
     'game/create': async request => {
+      // A page that kept an older build would play a match nobody here can judge: the judge
+      // only replays right what was played with its own simulation.
+      const served = await servedNow();
+      if (served && request.AppVersion !== served) {
+        return refused('AnotherBuild', 'this page runs another version of the game than the one served here: load it again');
+      }
       const gameId = `${request.GameId}~${randomName('')}`;
       await matches.entered(gameId, {
         how: 'create', userId: request.UserId, authCookie: request.AuthCookie ?? null,

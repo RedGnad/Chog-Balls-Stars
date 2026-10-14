@@ -43,17 +43,81 @@ some are whole costumes with a hood or a helmet (shark, astronaut). 100 Genesis 
 another base (Skull, Radioactive, 1:1) and need their own head. The grouping into shapes
 was checked on pictures for the caps, bucket caps, beanies and headbands; the rest is read
 from the names.
-**Waiting on the user:** their answer to the view given on the traits in 3D (order of the
-families, what a Genesis shows while one of its traits is not modelled, where the hero is
-seen from close); a try of CONNECT WALLET on their phone through the public address, since
+**The user said go to the view given on the traits that day** and added that the special
+Chogs (the skeletons, the 1:1, the radioactive ones and any other) must be made too. The
+plan they accepted: the H3 base polished first (softer spikes; the eyes and the mouth leave
+the base, they are traits); then their own Genesis #1287 whole (TISM cap, Anime glasses,
+gold tooth, red skin) and five very different ones, as pictures beside their NFT, for them
+to judge the level before parts are made in number; then the parts by the number of Genesis
+they dress (hats, eye objects, the most worn looks, the mouths), clothing first as a colour
+and a few cuts, the prints of the caps in a second pass; costumes, accessories and the 100
+Genesis on a special base last, each special base with its own head (a skull and a skeleton
+body for Skull; a melted, gradient Chog with horns or a gem for Radioactive; ten made one by
+one for the 1:1). Rules: a drawn look or mouth is a flat coloured shape laid on the curved
+face, made by us; a trait that is not modelled yet is never replaced by a wrong one, the
+hero shows what exists and its card says which traits are in 3D; the NFT picture stays in
+the menus and never goes on the model; a screen shows the hero from close (at the pick of
+the hero, beside the NFT picture, and at the victory); every batch is shown as pictures
+before the game. Target given for 23 October, an estimate: 10 hat shapes, 20 eye kinds, the
+15 mouths and clothing as colours. **Started:** the base and #1287, as pictures only
+(scripts under `tools/blender/`, outputs under `.artifacts/chog-body/traits/`).
+**Waiting on the user:** a try of CONNECT WALLET on their phone through the public address, since
 nothing after the pick of a wallet was ever run; the creation of the service on Render from
 the repository (`render.yaml`); and whether to make a second Photon application for
 development, since the test entries `?token=` no longer give a Genesis now that every match
 passes the admission.
-**Next action (dev):** see a core fall in a real match (only tests and a forced replay show
-the match ending that way; the towers' hits are counted in real matches, their laser was
-never seen on a picture), then let the bots attack and defend the structures, and tune the
-numbers by play.
+**Since 06:10 that day the bots defend and push the structures** (build
+`20261012T035911141Z`, assembled in `site/` and served by the public address;
+[game/README.md](../game/README.md), "A tower and a core for each team"). A structure that
+is hit calls the bots of its team to the nearest attacker; a team with more heroes alive
+pushes the other team's tower, then its core, and the bots follow a player who goes under
+it. The player reads "YOUR TOWER IS UNDER ATTACK" for as long as it lasts
+([capture](../research/evidence/tower-under-attack-alarm-headless-2026-10-12.png)). The
+structures were lowered to 8,000 (tower) and 12,000 (core) after watching the bots:
+`tools/quantum/watch_bots.py` replays one record with other seeds, each a match of bots in
+under a second. With six bots a tower falls in 8 matches of 10 and no core falls (the coins
+end the match after about two minutes); with an idle player on one side that side lost its
+core in 2 matches of 6. 29 simulation tests, 68 view tests, the judge agrees with the game
+on the two records made with this simulation (the two older records no longer replay the
+same and were set aside). **Not seen:** a structure destroyed in a match played in a
+browser, the bots coming back to defend.
+**Found on the way, to fix before stakes go public:** the judge only gives the right answer
+for a match played with the same build of the simulation. The public instance judged the two
+test matches above, which Photon sent it, with the judge of the previous build: same winner
+by luck, but another last tick (3,144 for a match the game ended at 3,177) and other scores.
+Nothing tells the judge today which build a match was played with, and two players whose
+browsers hold different builds can meet. **Written that morning, the guard:** a build names
+itself to Photon with its own stamp (`Chog.Screens.BuildIdentity`, the stamp set as the
+version by `QualificationBuild`), so only pages of the same build meet; the page reloads
+itself once when the server serves another build; the services refuse to open a room of
+another build (`AnotherBuild`) and give a void verdict for a match played with another build
+than the one they judge. Tested in the services (69 tests), built (`20261012T041344613Z`,
+assembled in `site/`). **Not seen:** a match through the public address with it, so it is not
+yet known that the game really gives the stamp to Photon.
+
+**14 October 2026, 21:00.** The session of the 12th ended without warning and everything
+that ran on the Mac stopped with it (tunnel, public instance, local services). The user
+validated: commit and push the work (and push from now on without asking), verify the guard
+with one headless match through the public address, and go on to the 3D parts in number
+after seeing the second batch (`.artifacts/chog-body/traits/overview_six.png`: #1287, #1241,
+#80, #1408, #1078, #83, #1948, each beside its picture and seen from the game camera; the
+brim of the cap shortened and raised so the glasses show under it). Seen on that sheet: from
+the game camera a hero reads by its hat, its colour and the traits with volume (visor,
+lasers, bubble, rainbow); the drawn looks and mouths are hidden by the angle of the head, and
+show on a close view only. Correction: several Head values named "Cap" are drawn as bucket
+hats on the pictures of Side=Right (Balls Cap, #1078, among them), so the count of 951
+Genesis for one cap mesh given above is too high by at least 313; to be counted again from
+pictures. `tools/release/check_all.sh` passed that evening (29 simulation, 68 view, services,
+54 contract tests). The tunnel was started again and got another address
+(`https://fe0f-92-88-170-244.ngrok-free.app`; `--url 'https://'`, which ngrok's manual gives
+for the account's dev domain, also drew a new one): Photon's dashboard still points to the old
+one, so nobody can sign in through Photon until its two addresses are corrected. The Mac is
+now at `10.169.166.151` on its local network.
+**Next action (dev):** Photon's dashboard on the new address (the user, or in their browser
+with their word), then one headless match through the public address to see the guard; a
+structure seen falling in a browser match; the 3D parts in number, as pictures first.
+**Waiting on the user:** the two addresses in Photon's dashboard; Render, to stop depending
+on the Mac and on the tunnel's address.
 
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
