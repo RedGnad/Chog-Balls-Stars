@@ -90,6 +90,27 @@ TURN_FRAME = 0.95
 TURN_SIZE = 360
 
 
+def gradient_skin(material, bottom, top, low=0.62, high=1.12):
+    """Makes "material" run from "bottom" (at the height "low" above the ground) to "top" (at "high")."""
+    tree = render.node_tree(material)
+    nodes, links = tree.nodes, tree.links
+    shader = nodes.get("Principled BSDF")
+    position = nodes.new("ShaderNodeNewGeometry")
+    split = nodes.new("ShaderNodeSeparateXYZ")
+    ramp = nodes.new("ShaderNodeMapRange")
+    ramp.inputs["From Min"].default_value = low
+    ramp.inputs["From Max"].default_value = high
+    ramp.clamp = True
+    mix = nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.inputs[6].default_value = render.linear(bottom)
+    mix.inputs[7].default_value = render.linear(top)
+    links.new(position.outputs["Position"], split.inputs["Vector"])
+    links.new(split.outputs["Z"], ramp.inputs["Value"])
+    links.new(ramp.outputs["Result"], mix.inputs["Factor"])
+    links.new(mix.outputs[2], shader.inputs["Base Color"])
+
+
 def unlit_material(name, colour):
     """One flat colour whatever the light."""
     material = bpy.data.materials.new(name)
@@ -200,6 +221,9 @@ def render_one(name, blend=None, out=None, only=None, colour=None, size=504, bus
     side = root.get("chog_side", "Right")
 
     used, parts, camera, lights = render.prepare_scene(size, skin)
+    if genesis and "chog_skin_top" in root:
+        # A radioactive Genesis: its skin runs from its colour at the feet to a lighter one at the top.
+        gradient_skin(bpy.data.materials["ChogRenderSkin"], skin, tuple(root["chog_skin_top"]))
     scene = bpy.context.scene
     scene.render.image_settings.compression = 90
     made = flat.dress(parts, remembered, tones)

@@ -447,6 +447,7 @@ HATS = {
 # Every other value of "Head" whose shape is built, the shapes added after these four, and the
 # clothing beyond the first three shirts: chog_trait_hats.py (imported above).
 HATS.update(hats_and_clothes.HATS)
+HATS.update(bases.HATS)
 
 # ---------------------------------------------------------------------------------------------
 # Eyes. Places are counted from the middle of the face, as in make_chog_full.py.
@@ -2217,9 +2218,10 @@ def build_tee(maker):
 
 hats_and_clothes.bind(sys.modules[__name__])
 HAT_SHAPES = {"Cap": build_cap, "BucketCap": build_bucket, "Crown": build_crown, "Beanie": build_beanie,
-              **hats_and_clothes.HAT_SHAPES}
+              **hats_and_clothes.HAT_SHAPES, **bases.HAT_SHAPES}
 # The numbers of each hat shape: where its "LEAVES" are.
-HAT_NUMBERS = {"Cap": CAP, "BucketCap": BUCKET, "Crown": CROWN, "Beanie": BEANIE, **hats_and_clothes.HAT_NUMBERS}
+HAT_NUMBERS = {"Cap": CAP, "BucketCap": BUCKET, "Crown": CROWN, "Beanie": BEANIE, **hats_and_clothes.HAT_NUMBERS,
+               **bases.HAT_NUMBERS}
 
 
 def hat_numbers_of(entry, replaced=None):
@@ -2270,7 +2272,7 @@ OF_SIDE = {"Mouth": faces.by_side(MOUTHS_OF_SIDE, faces.MOUTHS_OF_SIDE), "Eyes":
 TRAIT_PARTS = {
     "Body": ("Cloth", CLOTHES, "kind", CLOTH_KINDS),
     "Head": ("Hat", HATS, "shape", HAT_SHAPES),
-    "Eyes": ("Eyes", {**EYES, **faces.EYES}, "kind", EYE_KINDS),
+    "Eyes": ("Eyes", {**EYES, **faces.EYES, **bases.radioactive_eyes({**EYES, **faces.EYES})}, "kind", EYE_KINDS),
     "Mouth": ("Mouth", {**MOUTHS, **faces.MOUTHS}, "kind", MOUTH_KINDS),
 }
 # Hats and clothing that a Side draws otherwise (Mon Cap, Russian Hat, Tuxedo): chog_trait_hats.py.
@@ -2488,8 +2490,9 @@ def build(traits=None, replaced=None, head_replaced=None):
     body = variants.PartShapes(full.MATERIAL_ORDER)
     variants.add_torso(body, body_n)
     variants.add_legs_and_feet(body, body_n)
-    if bases.is_skull(traits):
-        # The skeleton under the skull: ribs and breastbone on the torso (clothing covers them).
+    if bases.is_skull(traits) or bases.is_radioactive(traits):
+        # The skeleton under the skull, or seen through a radioactive body: ribs and breastbone on the
+        # torso (clothing covers them).
         bases.add_ribs(body, body_n, full.EYE)
 
     head = variants.PartShapes(full.MATERIAL_ORDER)
@@ -2501,6 +2504,12 @@ def build(traits=None, replaced=None, head_replaced=None):
         # A skull: no leaf, no hair, no cream face; the bone is the face (chog_trait_bases.py).
         leaves = []
         bases.add_skull_face(head, head_n, surface, full, draw_shape, oval, SKIN, full.EYE, full.BLUSH, full.FACE)
+    elif bases.is_radioactive(traits):
+        # A radioactive Chog: the crown its hat leaves (all of it under horns), no cream face, the skull's
+        # teeth and nose showing, no cheek.
+        leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN))
+        bases.add_skull_face(head, head_n, surface, full, draw_shape, oval, SKIN, full.EYE, full.BLUSH, full.FACE,
+                             cheeks=False)
     else:
         leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN))
         leaves += rim_leaves_for(head, traits, replaced, head_n, body_n, surface)
@@ -2578,7 +2587,10 @@ def build(traits=None, replaced=None, head_replaced=None):
     head_object["spikes_seen"] = "; ".join(f"{view}: {', '.join(f'{sector:+d}' for sector in sorted(sectors))}"
                                            for view, sectors in seen.items())
     row = (head_entry(traits, replaced) or {}).get("under_rim") or {}
-    head_object["spikes_missing"] = spikes_missing(seen, row.get("SECTORS", SPIKE_SECTORS)) if leaves else ""
+    # A thing on the head that stands where spikes would (the ram horns at the sides) names the sectors that
+    # must still show tips ("SECTORS" of its numbers), as a row under a rim does.
+    required = hat_numbers.get("SECTORS") or row.get("SECTORS", SPIKE_SECTORS)
+    head_object["spikes_missing"] = spikes_missing(seen, required) if leaves else ""
 
     for material in list(bpy.data.materials):
         if material.users == 0:
@@ -2695,11 +2707,14 @@ def make_one(number, out=None, hat=None, replaced=None, head_replaced=None):
 
     # What the renders need to know of this Genesis, kept in the file.
     if traits:
-        skin = bases.skin_of(traits) if bases.is_skull(traits) else SKINS.get(traits.get("Skin"))
+        skin = (bases.skin_of(traits) if bases.is_skull(traits) or bases.is_radioactive(traits)
+                else SKINS.get(traits.get("Skin")))
         if skin is None:
             raise SystemExit(f"CHOG_TRAITS no colour recorded for Skin={traits.get('Skin')}")
         root["chog_genesis"] = str(number)
         root["chog_skin"] = list(skin["skin"])
+        if "top" in skin:
+            root["chog_skin_top"] = list(skin["top"])
         root["chog_face"] = list(skin.get("face", GENESIS_FACE))
         root["chog_blush"] = list(GENESIS_BLUSH)
         root["chog_side"] = traits.get("Side", "Right")

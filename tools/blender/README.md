@@ -580,3 +580,31 @@ wide, under a picture 1.2 units wide.
 - A report that "Apply Transform" loses the place of child objects:
   <https://devtalk.blender.org/t/fbx-exporter-apply-transform/26640>. Checked here: the file keeps
   each part at its place under the root (see the "file:" lines of the check).
+
+## Batch 7: the robber, the Skull and Radioactive bases (16 October 2026, night, pictures only, branch `3d-batch-7`)
+
+Nothing of this is in the game: the game's library of parts was not written again (the export of this
+branch writes to a scratch file). The owner says yes or no first.
+
+- **The robber.** The four leaves placed by hand under the knitted mask (batch 6) read from behind as a
+  collar at mid height, unlike the bare head and the plumber the owner compared them with. A knitted mask
+  is pulled over the spiky head, so the whole crown of a bare head now comes through it, each leaf where it
+  grows (`ROBBER_POINTS = FULL_CROWN`). The mask is lighter (14 sides, 10 ribs) so a robber in a heavy robe
+  stays under 8,000 triangles. Sheet: `research/evidence/chog-traits-batch7-robber-before-after-2026-10-16.png`.
+- **The Skull base** (60 Genesis, `chog_trait_bases.py`): a bald skull in the bone colour of its Skin (ten
+  colours read on the pictures), no leaf, no cream face, the pink cheeks, a nose hole, a row of teeth in
+  place of the mouth (no Skull Genesis has a Mouth), ribs and breastbone on the body. Hats and eyes are
+  those of the other Genesis. It is in the export of this branch: all 1,929 Genesis of Origin and Skull
+  built, all matching their parts (`--check 5000`), none over 8,000 triangles; a bare skull throws bones.
+  Sheet: `research/evidence/chog-traits-batch7-skull-2026-10-16.png`.
+- **The Radioactive base** (30 Genesis): the spiky Chog in a gradient from a deep colour at the feet to a
+  light one at the top (four Skins), no cream face, the skull's teeth and nose showing, no cheek, the ribs,
+  and its own eyes: the eyes of Side=Left in a glowing tint of the skin (17 values). Its values of Head are
+  modelled: ram horns curling at the sides (Red Horn, Purple Horn), ridged horns (Demon, Void, devil), a
+  third eye, a gem (Diamond), a gold seal (Holy Seal), a beam (Blue Laser), mushrooms (Poison Shroom). Not
+  yet in the export: the game draws one colour per material; the gradient needs a colour role that the game
+  computes from the height of each point (a change of `ChogPartsLibrary` and `ChogHeroModel`).
+  Sheets: `research/evidence/chog-traits-batch7-radioactive-2026-10-16.png`.
+- **Still wrong:** the ram horns are smaller than drawn; the skull keeps the round head of a Chog where the
+  pictures draw a skull with a narrower jaw; Red Bandana is not modelled; the ten 1:1 Genesis keep the
+  earlier look.
