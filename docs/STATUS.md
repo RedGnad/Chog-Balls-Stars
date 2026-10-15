@@ -109,15 +109,40 @@ hats on the pictures of Side=Right (Balls Cap, #1078, among them), so the count 
 Genesis for one cap mesh given above is too high by at least 313; to be counted again from
 pictures. `tools/release/check_all.sh` passed that evening (29 simulation, 68 view, services,
 54 contract tests). The tunnel was started again and got another address
-(`https://fe0f-92-88-170-244.ngrok-free.app`; `--url 'https://'`, which ngrok's manual gives
-for the account's dev domain, also drew a new one): Photon's dashboard still points to the old
-one, so nobody can sign in through Photon until its two addresses are corrected. The Mac is
-now at `10.169.166.151` on its local network.
-**Next action (dev):** Photon's dashboard on the new address (the user, or in their browser
-with their word), then one headless match through the public address to see the guard; a
-structure seen falling in a browser match; the 3D parts in number, as pictures first.
-**Waiting on the user:** the two addresses in Photon's dashboard; Render, to stop depending
-on the Mac and on the tunnel's address.
+(`--url 'https://'`, which ngrok's manual gives for the account's dev domain, also drew a new
+one). The two agents that made the 3D parts were run in parallel and started three Blender
+processes at once; the user cut the session before the Mac crashed. Since then: one 3D agent
+at a time, one Blender at a time, with 4 threads. Found by the hat agent before it stopped,
+from the pictures: caps 592, bucket hats 490; the 10 most worn hat shapes give 1,850 Genesis
+their right hat (the 253 without one counted).
+
+**15 October 2026, 08:00.** The tunnel and the public instance now run apart from the
+session (`nohup`, logs in `.artifacts/services-public/ngrok.log` and `public.log`), so a cut
+of the session no longer changes the address:
+`https://a6c8-92-88-170-244.ngrok-free.app`. With the user's word, its two addresses were
+written in Photon's dashboard ("Chog Arena": the authentication URL, and `WebHookBaseUrl`
+of the Quantum 3 plugin) and seen saved. **The build guard is seen working end to end:** a
+match played by the headless browser from the local test server (`browser_check.sh match`,
+port 8084, build `20261012T041344613Z`) reached Photon, Photon asked the public instance
+who the player was (200), and sent `game/create` with `AppVersion` `20261012T041344613Z`,
+which the instance accepted; the record holds that version and the judge replayed it (0.73 s).
+Its verdict is void because the run stopped the match before its end, as it should. In that
+replay the bots of the other team brought down the player's tower (tick 2,681): **the first
+structure fallen in a match played in a browser**, seen through the judge, not on screen.
+A visit through the public address itself (`browse_public.sh`) loaded the game, which logged
+`CHOG_BUILD version 20261012T041344613Z`, but stayed on the menu: Reown's relay refused the
+page 213 times ("Unauthorized: origin not allowed"), since the Reown project allows the
+domains it was given and the address is new. Reown's manual
+(`https://docs.reown.com/cloud/relay`) allows a wildcard per label (`https://*.ngrok-free.app`)
+and says a change takes 15 minutes. **Running on the Mac:** the tunnel, the public instance,
+the local services (8090) and the test server (8084, `http://10.169.166.151:8084/` on the
+local network), one 3D agent (hats, clothing, eyes and mouths, pictures in
+`.artifacts/chog-body/traits/batch-2/`).
+**Next action (dev):** the 3D sheets shown to the user; the fall of a structure seen on
+screen; numbers tuned by playing.
+**Waiting on the user:** the domain of the game in Reown's dashboard (a wildcard for the
+tunnel until Render, or the exact address each time); Render, to stop depending on the Mac
+and on the tunnel's address; a try of CONNECT WALLET on their phone.
 
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
