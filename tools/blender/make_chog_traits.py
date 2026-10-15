@@ -9,7 +9,10 @@ Run it without the interface of Blender (5.2):
     ... -- --genesis 1287 --hat "MMGA Cap"    the same hero under another entry of HATS
     ... -- --genesis 1287 --set BRIM_LENGTH=0.13 --set BRIM_RISE_DEG=-9 --out FOLDER
                                               the same hero, numbers of its hat replaced (to try some)
-    ... -- --coverage                         build nothing: how many Genesis each entry serves
+    ... -- --coverage                         build nothing: how many Genesis each entry serves, and how
+                                              many have their hat, eyes, mouth (and all three) right
+    ... -- --budget                           build each entry once and add up the triangles of every
+                                              dressed hero on the base Origin (limit 8,000)
 
 It writes ChogBody.blend, ChogBody.fbx and parts.json (what was built, with its triangles) into
 .artifacts/chog-body/traits/<number>/ (or traits/base/). Look at the result with
@@ -77,6 +80,7 @@ sys.dont_write_bytecode = True   # no __pycache__ folder beside the scripts
 
 import make_chog_full as full  # noqa: E402  (the folder of this file must be on the path first)
 from render_chog_body import linear  # noqa: E402
+import chog_trait_faces as faces  # noqa: E402  (eyes and mouths added on 14 October 2026, registered below)
 
 variants, base = full.variants, full.base
 X, Y, Z, NOWHERE = base.X, base.Y, base.Z, base.NOWHERE
@@ -166,7 +170,7 @@ CAP = {
         (0.345, 0.50, 0.064),
     ),
     "TOP": (0.362, 0.070),       # height of the top, how far it is moved back
-    "SIDES": 20,
+    "SIDES": 16,                 # (20 until 15 October 2026: lowered for the triangles of the prints)
     # The button on the top: half its width, half its height.
     "BUTTON": (0.032, 0.014),
     # The brim: at which height it leaves the crown, how far it reaches in its middle, how far it
@@ -200,7 +204,19 @@ CAP = {
     "PRINT_LINE": 0.040,
     "PRINT_SPACING": 1.22,
     "PRINT_LIFT": (0.004, 0.008),
-    "PRINT_CUT": 0.035,
+    # (0.035 until 15 October 2026. With a word on every cap, a cap with a long word and its dark line
+    # reached 1,276 triangles and 40 dressed heroes went over 8,000. At 0.070 a piece of the word sags
+    # under the curve of the panel by about 0.002, half the lift of the lowest layer: it stays above.)
+    "PRINT_CUT": 0.070,
+    # A longer print is made smaller: no wider than PRINT_FIT across the panel, its lines no taller
+    # together than PRINT_BLOCK, the baselines of two lines PRINT_LEADING capitals apart.
+    # (Added 15 October 2026 for the words of the other caps: "BUTTCOIN" or "MAKE CHOG / GREAT AGAIN" at
+    # the size of "TISM" ran round the sides of the crown.)
+    "PRINT_FIT": 0.44,
+    "PRINT_BLOCK": 0.150,
+    "PRINT_LEADING": 1.35,
+    # A logo in place of a word (chog_trait_hats.py, lay_logo): the height of its middle, half its size.
+    "LOGO": (0.185, 0.060),
     "OUTLINE_THICKNESS": 0.020,
 }
 FONT_CAPITALS = 0.70             # height of a capital of "Bfont Regular" at size 1, measured
@@ -373,6 +389,10 @@ HATS = {
         },
     },
 }
+# Every other value of "Head" whose shape is built, the shapes added after these four, and the
+# clothing beyond the first three shirts: chog_trait_hats.py (its folder is on the path above).
+import chog_trait_hats as hats_and_clothes  # noqa: E402
+HATS.update(hats_and_clothes.HATS)
 
 # ---------------------------------------------------------------------------------------------
 # Eyes. Places are counted from the middle of the face, as in make_chog_full.py.
@@ -502,7 +522,7 @@ GOLD_TOOTH = {
     # The share of each row, from its top, that is in shade: the upper row, the lower row. Measured
     # on the picture of CHOG #1287: a thin edge under the lip, nearly half of the lower row.
     "SHADE": (0.14, 0.44),
-    "STEPS": 12,                 # pieces across the grin
+    "STEPS": 10,                 # pieces across the grin (12 until 15 October 2026, for the triangle budget)
     # The gold tooth: where across the grin (-1 left corner as seen, +1 right corner; the left of the
     # character is at +1), half its width at the top and at the bottom, how far it reaches above and
     # below the line between the rows.
@@ -570,8 +590,8 @@ BUBBLE = {
     "AT": (-0.020, -0.100),
     "OFF": 0.085,
     "RADIUS": 0.098,
-    "SIDES": 12,
-    "STACKS": 6,
+    "SIDES": 10,                 # (12 and 6 until 15 October 2026: lowered for the triangle budget)
+    "STACKS": 5,
     "KNOT": 0.020,
     # The glint: a patch on the upper side: degrees to the right of the character, degrees up, size.
     "GLINT": (12.0, 52.0, 0.044, 0.020),
@@ -649,8 +669,11 @@ TEE = {
     "COLLAR": (0.580, 0.593),    # the band at the neck, in the collar material
     "SLEEVE": 0.125,             # how far a sleeve reaches down the arm from the shoulder; 0: none
     "SLEEVE_FLARE": 0.005,
-    "SIDES": 20,
-    "ARM_SIDES": 12,
+    # (20 and 12, the sides of the torso and of the arms, until 15 October 2026. With a print on every
+    # cap, 40 dressed heroes went over 8,000 triangles; 16 and 10 still clear the body, the shell
+    # standing 0.008 off it.)
+    "SIDES": 16,
+    "ARM_SIDES": 10,
 }
 CLOTHES = {
     # The pictures show a red shirt with a dark collar and nothing else: no flame is drawn where a
@@ -663,6 +686,8 @@ CLOTHES = {
         "kind": "Tee",
         "colours": {"Main": (0.95, 0.95, 0.95), "Stripe": (0.07, 0.07, 0.07), "Collar": (0.07, 0.07, 0.07)},
         "stripes": True,
+        # Wider stripes than the bands of a shirt (0.038), as the pictures draw them, and two bands fewer.
+        "numbers": {"STEP": 0.046},
     },
     # A jersey: no sleeves. Its number (143) is not drawn.
     "Red 143 Jersey": {
@@ -671,6 +696,7 @@ CLOTHES = {
         "numbers": {"SLEEVE": 0.0, "COLLAR": (0.566, 0.593)},
     },
 }
+CLOTHES.update(hats_and_clothes.CLOTHES)
 
 
 def head_numbers():
@@ -939,16 +965,17 @@ def lay_disc(part, surface, wall, material, degrees, height, half_width, half_he
     full.add_skin(part, surface, [[here + out * high], edge], material)
 
 
-def word_pieces(word, thicker, spacing):
+def word_pieces(word, thicker, spacing, resolution=2):
     """The filled outline of a word in the font built into Blender, as flat triangles in the units of
-    the font: the word is centred, stands on the line y = 0 and reads towards +x."""
+    the font: the word is centred, stands on the line y = 0 and reads towards +x. "resolution" is the
+    number of points per curve of a letter."""
     curve = bpy.data.curves.new("ChogPrintWord", "FONT")
     curve.body = word
     curve.size = 1.0
     curve.align_x = "CENTER"
     curve.offset = thicker
     curve.space_character = spacing
-    curve.resolution_u = 2
+    curve.resolution_u = resolution
     if curve.font is None or curve.font.filepath != "<builtin>":
         raise SystemExit("CHOG_TRAITS the font of the print is not the one built into Blender")
     thing = bpy.data.objects.new("ChogPrintWord", curve)
@@ -963,12 +990,22 @@ def word_pieces(word, thicker, spacing):
     return pieces
 
 
-def lay_word(part, crown, word, material, thicker, lift):
+def word_width(word, thicker, spacing):
+    """How wide a word is in the units of the font, its strokes thickened by "thicker"."""
+    pieces = word_pieces(word, thicker, spacing)
+    wide = max(point.co.x for point in pieces.verts) - min(point.co.x for point in pieces.verts)
+    pieces.free()
+    return wide
+
+
+def lay_word(part, crown, word, material, thicker, lift, baseline=None, scale=None, resolution=2):
     """Lays a word on the front panel of the cap: cut into narrow pieces, each point then put on the
-    panel. Returns how wide the word is."""
+    panel. "baseline" and "scale" (units of the model per unit of the font) replace those of the
+    numbers of the cap when given. Returns how wide the word is."""
     numbers = crown.numbers
-    scale = numbers.PRINT_CAPITALS / FONT_CAPITALS
-    pieces = word_pieces(word, thicker, numbers.PRINT_SPACING)
+    scale = scale or numbers.PRINT_CAPITALS / FONT_CAPITALS
+    baseline = numbers.PRINT_BASELINE if baseline is None else baseline
+    pieces = word_pieces(word, thicker, numbers.PRINT_SPACING, resolution)
     left = min(point.co.x for point in pieces.verts)
     right = max(point.co.x for point in pieces.verts)
     step = numbers.PRINT_CUT / scale
@@ -986,8 +1023,8 @@ def lay_word(part, crown, word, material, thicker, lift):
         corners = []
         for point in piece.verts:
             if point.index not in placed:
-                placed[point.index] = mesh.verts.new(crown.front(point.co.x * scale,
-                                                                 numbers.PRINT_BASELINE + point.co.y * scale, lift))
+                placed[point.index] = mesh.verts.new(crown.front(point.co.x * scale, baseline + point.co.y * scale,
+                                                                 lift))
             corners.append(placed[point.index])
         face = mesh.faces.new(corners)
         face.smooth = True
@@ -1059,11 +1096,34 @@ def build_cap(maker):
 
     word = maker.entry.get("print")
     if word:
+        # One word, or several lines one under the other ("print" is then a tuple). The block is made
+        # smaller when it would be wider than PRINT_FIT or taller than PRINT_BLOCK, and its middle stays
+        # where the middle of a single word of PRINT_CAPITALS is. No dark line when the colour set has
+        # no "PrintLine".
+        lines = (word,) if isinstance(word, str) else tuple(word)
         low, high = numbers.PRINT_LIFT
-        lay_word(part, crown, word, part.named("PrintLine"), numbers.PRINT_BOLD + numbers.PRINT_LINE, low)
-        wide = lay_word(part, crown, word, part.named("Print"), numbers.PRINT_BOLD, high)
-        print(f"CHOG_TRAITS the word {word!r} is {wide:.3f} wide on a front panel "
-              f"{2.0 * crown.at_height(numbers.PRINT_BASELINE)[0]:.3f} wide")
+        lined = "PrintLine" in maker.entry["colours"]
+        scale = numbers.PRINT_CAPITALS / FONT_CAPITALS
+        widest = max(word_width(line, numbers.PRINT_BOLD, numbers.PRINT_SPACING) for line in lines)
+        scale = min(scale, numbers.PRINT_FIT / widest,
+                    numbers.PRINT_BLOCK / (FONT_CAPITALS * (1.0 + (len(lines) - 1) * numbers.PRINT_LEADING)))
+        capitals = FONT_CAPITALS * scale
+        step = capitals * numbers.PRINT_LEADING
+        middle = numbers.PRINT_BASELINE + numbers.PRINT_CAPITALS * 0.5
+        top = middle + (len(lines) - 1) * step * 0.5 - capitals * 0.5
+        for index, line in enumerate(lines):
+            baseline = top - index * step
+            if lined:
+                # The dark line under the letters is drawn with one point per curve: its rounded parts
+                # are hidden under the letters (it saved 30 to 90 triangles a cap).
+                lay_word(part, crown, line, part.named("PrintLine"), numbers.PRINT_BOLD + numbers.PRINT_LINE, low,
+                         baseline, scale, resolution=1)
+            wide = lay_word(part, crown, line, part.named("Print"), numbers.PRINT_BOLD, high, baseline, scale)
+            print(f"CHOG_TRAITS the word {line!r} is {wide:.3f} wide, capitals {capitals:.3f}, on a front panel "
+                  f"{2.0 * crown.at_height(baseline)[0]:.3f} wide")
+    logo = maker.entry.get("logo")
+    if logo:
+        hats_and_clothes.lay_logo(part, crown, logo, part.named("Print"), numbers.LOGO, numbers.PRINT_LIFT[1])
 
 
 def build_bucket(maker):
@@ -1120,6 +1180,12 @@ def build_bucket(maker):
             lower.append(crown.front(along * wide, numbers.MARK_HEIGHT - hump - 0.006, lift))
             upper.append(crown.front(along * wide, numbers.MARK_HEIGHT - hump + 0.006, lift))
         full.add_skin(part, surface, [lower, upper], part.named("Mark"), around=False)
+    elif mark:
+        # A logo (a star, a peace sign, a bolt, a cloud, the Monad mark): chog_trait_hats.py.
+        # (First: as large as the label, 0.063 from its middle: on the bust a small mark under the
+        # leaves, where the pictures draw a logo half as tall as the crown.)
+        hats_and_clothes.lay_logo(part, crown, mark, part.named("Mark"), (numbers.MARK_HEIGHT + 0.018, wide * 1.45),
+                                  lift)
 
 
 def build_crown(maker):
@@ -1179,6 +1245,9 @@ def build_beanie(maker):
                              + upwards * math.sin(2.0 * math.pi * index / segments)) * radius * size
                           for index in range(segments)])
         full.add_skin(part, surface, rings, part.named("Print"))
+    if maker.entry.get("patch"):
+        # A sewn patch on the dome (a pizza slice, a feather, a small Chog): chog_trait_hats.py.
+        hats_and_clothes.lay_patch(part, wall, maker.entry["patch"], maker.entry["colours"], part.named)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -1625,22 +1694,29 @@ def build_tee(maker):
                 sleeve.paint(band, sleeve.named("Stripe"))
 
 
-HAT_SHAPES = {"Cap": build_cap, "BucketCap": build_bucket, "Crown": build_crown, "Beanie": build_beanie}
+hats_and_clothes.bind(sys.modules[__name__])
+HAT_SHAPES = {"Cap": build_cap, "BucketCap": build_bucket, "Crown": build_crown, "Beanie": build_beanie,
+              **hats_and_clothes.HAT_SHAPES}
+# The eyes and mouths of chog_trait_faces.py use the helpers of this file. Its "Laser" draws the
+# lasers of Side=Left and hands those of Side=Right to build_laser above.
+faces.attach(sys.modules[__name__])
 EYE_KINDS = {"AnimeGlass": build_anime_glass, "NormalEye": build_normal_eye, "Laser": build_laser,
-             "Happy": build_happy, "Round": build_round, "Visor": build_visor}
+             "Happy": build_happy, "Round": build_round, "Visor": build_visor, **faces.EYE_KINDS}
 MOUTH_KINDS = {"GoldTooth": build_gold_tooth, "Smile": build_smile, "Drool": build_drool,
                "DroolOpen": build_drool_open, "Wo": build_wo,
-               "RainbowPuke": build_rainbow, "Bubblegum": build_bubblegum}
-CLOTH_KINDS = {"Tee": build_tee}
+               "RainbowPuke": build_rainbow, "Bubblegum": build_bubblegum, **faces.MOUTH_KINDS}
+CLOTH_KINDS = {"Tee": build_tee, **hats_and_clothes.CLOTH_KINDS}
 # trait of the collection: (start of the name of its part, its table, the word that names the
 # builder in an entry, the builders). Clothing comes first: it is under everything else.
-OF_SIDE = {"Mouth": MOUTHS_OF_SIDE}
+OF_SIDE = {"Mouth": faces.by_side(MOUTHS_OF_SIDE, faces.MOUTHS_OF_SIDE), "Eyes": faces.EYES_OF_SIDE}
 TRAIT_PARTS = {
     "Body": ("Cloth", CLOTHES, "kind", CLOTH_KINDS),
     "Head": ("Hat", HATS, "shape", HAT_SHAPES),
-    "Eyes": ("Eyes", EYES, "kind", EYE_KINDS),
-    "Mouth": ("Mouth", MOUTHS, "kind", MOUTH_KINDS),
+    "Eyes": ("Eyes", {**EYES, **faces.EYES}, "kind", EYE_KINDS),
+    "Mouth": ("Mouth", {**MOUTHS, **faces.MOUTHS}, "kind", MOUTH_KINDS),
 }
+# Hats and clothing that a Side draws otherwise (Mon Cap, Russian Hat, Tuxedo): chog_trait_hats.py.
+OF_SIDE.update({"Head": hats_and_clothes.HATS_OF_SIDE, "Body": hats_and_clothes.CLOTHES_OF_SIDE})
 
 
 # ---------------------------------------------------------------------------------------------
@@ -1662,9 +1738,21 @@ def traits_of(number):
     raise SystemExit(f"CHOG_TRAITS no Genesis named CHOG #{number} in the recorded metadata")
 
 
+def entry_for(trait, traits):
+    """The entry a Genesis gets for a trait, on its Side: "none" when it has no value for that trait,
+    None when its value (on that Side) has no part whose shape or kind is built."""
+    _, table, word, builders = TRAIT_PARTS[trait]
+    value = traits.get(trait)
+    if value is None:
+        return "none"
+    entry = OF_SIDE.get(trait, {}).get(traits.get("Side"), {}).get(value) or table.get(value)
+    return entry if entry and entry.get(word) in builders else None
+
+
 def coverage():
-    """Prints, from the recorded metadata, how many Genesis each entry of the tables serves, and how
-    many Genesis are dressed whole by the entries that exist today."""
+    """Prints, from the recorded metadata, how many Genesis each part serves (on the Side each value
+    is drawn), the values with no part, and how many Genesis have their hat, their eyes, their mouth,
+    and all three right: a Genesis without the trait counts as right for it (there is nothing to show)."""
     tokens = []
     with open(METADATA, encoding="utf-8") as lines:
         for line in lines:
@@ -1672,30 +1760,103 @@ def coverage():
                 record = json.loads(line)
                 tokens.append({str(item["trait_type"]): str(item["value"])
                                for item in json.loads(record["raw_json"]).get("attributes", [])})
-    print(f"CHOG_COVERAGE {len(tokens)} Genesis in {os.path.relpath(METADATA, REPOSITORY)}")
-    for trait, (start, table, word, _) in TRAIT_PARTS.items():
-        by_part = {}
-        for value, entry in table.items():
-            by_part.setdefault(f"{start}_{entry[word]}", []).append(value)
-        for name, values in by_part.items():
-            counts = [f"{value} {sum(1 for traits in tokens if traits.get(trait) == value)}" for value in values]
-            total = sum(1 for traits in tokens if traits.get(trait) in values)
-            print(f"CHOG_COVERAGE {name:20s} serves {total:4d} Genesis: {', '.join(counts)}")
+    origin = [traits for traits in tokens if traits.get("Base") == "Origin"]
+    print(f"CHOG_COVERAGE {len(tokens)} Genesis in {os.path.relpath(METADATA, REPOSITORY)}, {len(origin)} on the "
+          f"base Origin (the only base built)")
+    for trait, (start, _, word, _) in TRAIT_PARTS.items():
+        by_part, missing = {}, {}
+        for traits in tokens:
+            entry = entry_for(trait, traits)
+            if entry == "none":
+                continue
+            label = f"{traits[trait]} [{traits.get('Side')}]"
+            if entry is None:
+                missing[label] = missing.get(label, 0) + 1
+            else:
+                values = by_part.setdefault(f"{start}_{entry[word]}", {})
+                values[label] = values.get(label, 0) + 1
+        for name, values in sorted(by_part.items(), key=lambda item: -sum(item[1].values())):
+            shown = ", ".join(f"{label} {count}" for label, count in sorted(values.items(), key=lambda item: -item[1]))
+            print(f"CHOG_COVERAGE {name:22s} serves {sum(values.values()):4d} Genesis: {shown}")
         have = sum(1 for traits in tokens if trait in traits)
-        done = sum(1 for traits in tokens if traits.get(trait) in table)
-        print(f"CHOG_COVERAGE   trait {trait}: {done} of the {have} Genesis that have one, "
-              f"{len(table)} of its {len({traits[trait] for traits in tokens if trait in traits})} values")
-    whole, by_side = [], {}
+        print(f"CHOG_COVERAGE   trait {trait}: {have - sum(missing.values())} of the {have} Genesis that have one wear "
+              f"a built part, {len(by_part)} parts")
+        if missing:
+            shown = ", ".join(f"{label} {count}" for label, count in sorted(missing.items(), key=lambda item: -item[1]))
+            print(f"CHOG_COVERAGE   {trait} with no part: {shown}")
+
+    def right(traits, trait):
+        return entry_for(trait, traits) is not None
+
+    for label, chosen in (("all Genesis", tokens), ("on the base Origin", origin)):
+        counts = {trait: sum(1 for traits in chosen if right(traits, trait)) for trait in ("Head", "Eyes", "Mouth")}
+        three = sum(1 for traits in chosen if all(right(traits, trait) for trait in ("Head", "Eyes", "Mouth")))
+        four = sum(1 for traits in chosen if all(right(traits, trait) for trait in TRAIT_PARTS))
+        print(f"CHOG_COVERAGE right, {label} ({len(chosen)}): hat {counts['Head']}, eyes {counts['Eyes']}, mouth "
+              f"{counts['Mouth']}, hat and eyes and mouth {three}, and the clothing too {four}")
+    print("CHOG_COVERAGE 'right' means: the value, on the Side of the Genesis, has a part whose shape or kind is built "
+          "(or the Genesis has no value for that trait). A print not drawn yet (the word of a cap) still counts. "
+          "Not counted and not modelled: the traits Accessory and Aura, the bases other than Origin.")
+
+
+def budget():
+    """Builds every entry once, alone, counts its triangles (outline shells included), then adds them
+    up for every Genesis on the base Origin: the triangles of each dressed hero, without building the
+    1,869 of them. Prints the largest, and every hero over TRIANGLE_LIMIT."""
+    tokens = []
+    with open(METADATA, encoding="utf-8") as lines:
+        for line in lines:
+            if line.strip():
+                record = json.loads(line)
+                traits = {str(item["trait_type"]): str(item["value"])
+                          for item in json.loads(record["raw_json"]).get("attributes", [])}
+                traits["number"] = str(record["metadata_id"])
+                if traits.get("Base") == "Origin":
+                    tokens.append(traits)
+    root, parts, _, body_n, head_n, _ = build(None)
+    base_total = sum(len(part.data.polygons) for part in parts)
+    shared = {OUTLINE: next(material for material in bpy.data.materials if material.name == OUTLINE)}
+    surface = full.HeadSurface(head_n)
+    counted = {}
+
+    def triangles_of(trait, entry, traits):
+        key = (trait, id(entry))
+        if key not in counted:
+            start, _, word, builders = TRAIT_PARTS[trait]
+            maker = Maker(f"{start}_{entry[word]}", entry, head_n, body_n, surface)
+            builders[entry[word]](maker)
+            made = trait_materials(maker.prefix, entry["colours"], entry.get("unlit", ()), shared)
+            total = 0
+            for shapes, _ in maker.parts:
+                thing = shapes.finish(shapes.name, Vector((0.0, 0.0, 0.0)), None, made)
+                total += len(thing.data.polygons)
+                data = thing.data
+                bpy.data.objects.remove(thing)
+                bpy.data.meshes.remove(data)
+            counted[key] = (total, f"{start}_{entry[word]} ({trait}={traits[trait]}, Side={traits.get('Side')})")
+        return counted[key][0]
+
+    totals, worn = [], {}
     for traits in tokens:
-        if traits.get("Base") != "Origin" or traits.get("Skin") not in SKINS:
-            continue
-        if all(trait not in traits or traits[trait] in table for trait, (_, table, _, _) in TRAIT_PARTS.items()):
-            whole.append(traits)
-            by_side[traits.get("Side")] = by_side.get(traits.get("Side"), 0) + 1
-    print(f"CHOG_COVERAGE dressed whole today (base Origin, a skin of SKINS, every Head, Eyes, Mouth and Body value "
-          f"it has is an entry): {len(whole)} of {len(tokens)}, by Side {by_side}")
-    print("CHOG_COVERAGE not counted and not modelled: the traits Accessory and Aura. The entries were drawn from "
-          "pictures of Side=Right, but for Drooling; the pictures of Side=Left draw several values another way.")
+        total = base_total
+        for trait in TRAIT_PARTS:
+            entry = entry_for(trait, traits)
+            if isinstance(entry, dict):
+                count = triangles_of(trait, entry, traits)
+                total += count
+                worn.setdefault(traits["number"], []).append(f"{traits[trait]} {count}")
+        totals.append((total, traits["number"]))
+    totals.sort(reverse=True)
+    for total, number in totals[:3]:
+        print(f"CHOG_BUDGET #{number} {total}: base {base_total} + " + ", ".join(worn[number]))
+    over = [(total, number) for total, number in totals if total > TRIANGLE_LIMIT]
+    print(f"CHOG_BUDGET base {base_total} triangles; {len(counted)} entries built once; {len(totals)} heroes on the "
+          f"base Origin")
+    print(f"CHOG_BUDGET largest dressed heroes: " + ", ".join(f"#{number} {total}" for total, number in totals[:8]))
+    print(f"CHOG_BUDGET median {totals[len(totals) // 2][0]}, smallest {totals[-1][0]}; over {TRIANGLE_LIMIT}: "
+          f"{len(over)} " + ", ".join(f"#{number} {total}" for total, number in over[:20]))
+    for (trait, _), (total, label) in sorted(counted.items(), key=lambda item: -item[1][0])[:10]:
+        print(f"CHOG_BUDGET heaviest part: {label} {total}")
 
 
 def build(traits=None, replaced=None):
@@ -1756,6 +1917,8 @@ def build(traits=None, replaced=None):
             made = shapes.finish(shapes.name, Vector((0.0, 0.0, 0.0)), by_name[on], trait_made)
             made["trait"] = f"{trait}={value}"
             made["prefix"] = maker.prefix
+            # What the pictures show on this value that its part does not draw yet (a word, a logo).
+            made["missing"] = entry.get("print_missing", "")
             trait_parts.append(made)
 
     for material in list(bpy.data.materials):
@@ -1804,6 +1967,8 @@ def main():
     parser.add_argument("--base", action="store_true", help="the polished base alone, no trait part")
     parser.add_argument("--coverage", action="store_true", help="build nothing: print how many Genesis each "
                         "entry serves and how many are dressed whole today")
+    parser.add_argument("--budget", action="store_true", help="build each entry once and print the triangles of "
+                        "every dressed hero on the base Origin, the largest first")
     parser.add_argument("--hat", default=None, help=f"wear this entry of HATS in place of the hat of the Genesis: "
                                                     f"{sorted(HATS)}")
     parser.add_argument("--set", action="append", default=[], metavar="NAME=VALUE", help="a number of the hat put "
@@ -1813,6 +1978,9 @@ def main():
     arguments = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
     if arguments.coverage:
         coverage()
+        return
+    if arguments.budget:
+        budget()
         return
     if bool(arguments.genesis) == arguments.base:
         raise SystemExit("CHOG_TRAITS give either --genesis NUMBER or --base")
@@ -1867,6 +2035,7 @@ def main():
         "replaced": replaced,
         "parts": {part.name: {"trait": part["trait"], "on": part.parent.name,
                               "triangles": counts["parts"][part.name],
+                              "missing": part.get("missing", ""),
                               "materials": [slot.material.name for slot in part.material_slots]}
                   for part in trait_parts},
         "triangles_base": counts["base"],

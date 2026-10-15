@@ -144,6 +144,38 @@ screen; numbers tuned by playing.
 tunnel until Render, or the exact address each time); Render, to stop depending on the Mac
 and on the tunnel's address; a try of CONNECT WALLET on their phone.
 
+**15 October 2026, 09:30.** The user added the domain in Reown's dashboard (which entry is
+not known here). A visit through the public address in the headless browser
+(`browse_public.sh ... connector`, `.artifacts/unity/check-public-reown-connector/`) opened
+Reown's window over the game with its list of wallets, then closed it, and the game heard
+both; **no line "origin not allowed" this time** (930 in the visit of 08:00). Not seen: a real
+wallet app answering, which only a phone can show.
+**The 3D parts in number exist as pictures** (one agent, one Blender at a time;
+`tools/blender/chog_trait_hats.py`, `chog_trait_faces.py`, `make_chog_traits_batch.py`,
+`make_chog_traits_review.py`; [tools/blender/README.md](../tools/blender/README.md), "batch 2").
+Built: 10 hat shapes, each cap and bucket hat with its word or logo; 30 eye kinds; the 15
+mouths; the 32 Body values worn by 20 Genesis or more, as colours on three cuts (tee, jacket,
+track). Counted again by `make_chog_traits.py -- --coverage` that morning: **on the base Origin
+(1,869 Genesis) hat right 1,791, eyes 1,869, mouth 1,869; hat, eyes and mouth together 1,791;
+the clothing too 1,110.** Clothing is the gap: 989 of the 1,762 Genesis that wear one have a
+built part; left are the costumes (Gangster 41, Duck Float 29, Banana 25, Shark 25, Astro 24,
+Dragon 23) and many Side=Left values worn by 11 to 18 Genesis each (hoodies, sleeveless,
+jerseys, tees). Hats not built: Clown Nose 31, Plumber 25, Robber 24 and small ones. Largest
+dressed hero 7,994 triangles (limit 8,000). Looked at on the sheets
+(`.artifacts/chog-body/traits/batch-2/*.png`, the random one kept as
+[evidence](../research/evidence/chog-traits-batch2-random-twelve-2026-10-15.png)): from close,
+the hat, eyes, mouth and colour of the clothing read as the Genesis; weak are the Ushanka (ear
+flaps barely show), the curly wigs (smooth, not fluffy), the Spartan crest (a thin stick),
+prints on clothing and some cap prints (listed in orange on each sheet). From the game camera
+at phone size: the hats, beams, visors, goggles, headsets, glasses, the bubble and the rainbow
+show; the drawn eyes and mouths do not. **Nothing of it is in the game**; the older renders of
+#1287 and `overview_six.png` are out of date (shared numbers were lowered for the budget).
+**Next action (dev):** the sheets to the user for their yes before any import in Unity; the
+fall of a structure seen on screen; numbers tuned by playing.
+**Waiting on the user:** their yes on the 3D batch; CONNECT WALLET tried on their phone through
+`https://a6c8-92-88-170-244.ngrok-free.app`; Render; testnet or mainnet for the contracts, and
+the wallet that deploys them.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a

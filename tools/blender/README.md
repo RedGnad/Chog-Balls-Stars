@@ -163,6 +163,44 @@ What was learnt, and what is not right yet:
   trait parts cast no shadow: choices of these renders. No import in Unity, no check of
   the FBX, no Accessory, no Aura.
 
+## More trait parts, batch 2 (14 and 15 October 2026, pictures only)
+
+The tables grew into two modules that `make_chog_traits.py` imports: `chog_trait_hats.py` (hat shapes,
+logos, beanie patches, clothing) and `chog_trait_faces.py` (eyes and mouths). **Nothing of this is in
+the game.** What they hold, with the Genesis each serves (`-- --coverage`):
+
+- **Hats, 10 shapes** (assignment by picture in `tools/genesis-art/trait_coverage.py`, `HEAD_SHAPES`):
+  Cap 592, BucketCap 490, Beanie 129, Ushanka 67, Headband 65, CurlyWig 63, Crown 54, Durag 50,
+  WizardHat 47, SpartanHelmet 40. Every cap carries its word (font built into Blender) or its logo;
+  bucket hats their logo; beanies their patch. Not built: Clown Nose, Plumber, Robber (78 Genesis on
+  the base Origin) and the hats of the other bases.
+- **Eyes, 30 kinds**: every Eyes value worn on the base Origin, both Sides.
+- **Mouths, 15 kinds**: every Mouth value; "Drooling" (an open mouth) and "Bubblegum" (other cheek)
+  are other drawings on Side=Left.
+- **Clothing**: the 32 Body values worn by 20 Genesis or more, on three cuts (`Tee`, `Jacket`,
+  `Track`); costumes with a hood or helmet and the duck float are left out (`LEFT_OUT`).
+
+On the base Origin (1,869 Genesis): hat right 1,791, eyes 1,869, mouth 1,869, all three 1,791,
+clothing too 1,110. `-- --budget` adds up the triangles of every dressed hero: the largest is 7,994
+(limit 8,000), after lowering the sides of the shirt, the cap and the bubble and cutting the words
+into wider pieces (each change is noted at its number).
+
+```sh
+# build and render several Genesis into one folder, one Blender at a time (nice -n 10, -t 4)
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_batch.py \
+    --out .artifacts/chog-body/traits/batch-2 --genesis 97,103,8 [--only bust,studio,towards]
+# review sheets: real picture beside the 3D hero, game camera, phone size
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_review.py rows \
+    --batch .artifacts/chog-body/traits/batch-2 --trait Head --genesis 97,103 --out FILE.png
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_review.py rows \
+    --batch .artifacts/chog-body/traits/batch-2 --random 12 --seed 20261015 --missing --out FILE.png
+```
+
+The sheets are in `.artifacts/chog-body/traits/batch-2/` (`hats_sheet_part*.png`, `clothes_sheet.png`,
+`eyes_sheet_part*.png`, `mouths_sheet_part*.png`, `random_twelve.png`). From the game camera at
+phone size the hats, the beams, visors, goggles, headsets, glasses, the bubble and the rainbow show;
+eyes and mouths drawn on the face mostly do not (head H3 and the camera are unchanged).
+
 The sections below describe the first body, which `make_chog_body.py` still builds.
 
 ## Commands
