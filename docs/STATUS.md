@@ -332,6 +332,30 @@ bucket hats' row shows only its points from the game camera; the bare head of Si
 whole star; the durag's row looks like ears from the front; the Spartan helmet.
 **Next action (dev):** the sheets to the user; the hair; on their yes, the import into Unity.
 
+**15 October 2026, 17:15.** The user: no push while the 3D is tuned; batch 5 right on the caps,
+wrong on others with the same head (bucket hats, durag behind, Side=Left caps), the crown's lone
+spike; the process is wrong. Causes found: the row under the rim silently dropped the leaves that
+crossed the hat (2 of 9 kept under bucket hats); the pictures of Side=Left had been read as showing
+no spike, when their spiky head fills the frame around the face. Batch 6 (pictures only, not
+committed): one head for all, no leaf dropped (moved until it fits, or the build fails), and a check
+on every hero that spike tips are seen all around from above and from the game's angle; hair as big
+clumps. 49 Genesis built through both checks; coverage unchanged; largest hero 7,984 triangles.
+Details: [tools/blender/README.md](../tools/blender/README.md), "Batch 6".
+**Waiting on the user:** their eye on the batch 6 sheets.
+
+**15 October 2026, 20:10.** The user found batch 6 good enough for now, to be improved later
+(committed and pushed with three sheets as evidence), and asked for the next steps and what their
+own Genesis is still needed for, since they would like to sell it soon. Read on the hackathon page
+that evening ([facts](../research/evidence/chogathon-site-facts-2026-10-15.json)): submissions are
+open until 23 October 15:00 UTC through a form (banner, description, demo video of three minutes
+at most, app link, repository, judge access instructions), and judges score after that, over about
+seven days, from the description, the video and the links. Nothing asks a participant to hold a
+Chog. What depends on a Genesis held in a real wallet: the first run of the holder's path on the
+real chain (never done with a real wallet yet), the video's holder path, a stake in $CHOG on
+mainnet with a Genesis, and the loan pass a judge without a Genesis would play with, which stops
+when its lender no longer holds the Genesis (`server/README.md`). The test benches do not depend
+on it: they take Genesis 1795 from whoever holds it on the local copy (`tools/contracts/on_copy.sh`).
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a

@@ -837,23 +837,53 @@ UNDER_RIM = {
     "SWEEP_DEG": 38.0,
     "DROOP_DEG": 0.0,
     "LIFT": 0.22,
+    # Inside an open hat (the crown): (degrees from the front, polar degrees) of leaves rooted on the head
+    # within it, on both sides but 0 and 180; their length against the leaf of the row.
+    "INSIDE": (),
+    "INSIDE_LENGTH": 1.0,
+    # The sectors where the check of spike_sectors_seen wants a tip seen (SPIKE_SECTORS below when not
+    # given): fewer only where the hat covers the sides of the head down to the jaw.
+    "SECTORS": None,
 }
-RIM_REACH = 0.10                 # a ray out of the head that meets the hat within this is covered
+# The leaves of the row are smaller than those of the crown: a lighter section from root to point (four
+# rings in place of six of LEAF_PROFILE), so that 9 to 12 of them keep a dressed hero under TRIANGLE_LIMIT
+# (#44, crown and duck float, went over with the profile of the crown, 15 October 2026).
+RIM_PROFILE = (
+    (0.00, 0.90, 0.92),
+    (0.20, 1.00, 0.96),
+    (0.52, 0.72, 0.64),
+    (0.84, 0.26, 0.24),
+)
+RIM_REACH = 0.30                 # a ray out of the head that meets the hat within this is covered (0.10
+                                 # until batch 6: the roomy crown of a bucket hat stands further off the head)
 RIM_SCAN = (6.0, 160.0, 1.0)     # polar degrees scanned from the top down, and the step
+# How a leaf of the row that would cross its hat is moved, tried in this order (add_rim_leaves): its
+# length against the leaf of the row, degrees turned from its angle, degrees rooted lower, degrees leaning
+# further down. None is dropped: a leaf that finds no place stops the build.
+RIM_TRIES = {
+    "LENGTH": (1.0, 0.85, 0.70),
+    "TURN_DEG": (0.0, 8.0, -8.0, 16.0, -16.0),
+    "BELOW_DEG": (0.0, 6.0, 12.0, 18.0, 24.0),
+    "DROOP_DEG": (0.0, 12.0, 24.0, 36.0, 48.0, 60.0),
+}
 
 
-def hat_tree(hat_shapes, surface):
-    """A tree of the faces of the hat that lie outside the head (as leaf_crossings counts them)."""
+def hat_outside(hat_shapes, surface):
+    """The faces of a hat that lie outside the head, as a tree, and their edges: what leaf_crossings and
+    the row under the rim test against (the rows of a hat tucked inside the head are not seen). (None,
+    []) when the hat has none."""
     from mathutils.bvhtree import BVHTree
-    points, polygons = [], []
+    points, polygons, edges = [], [], []
     for shapes in hat_shapes:
         for face in shapes.mesh.faces:
             centre = face.calc_center_median() - surface.middle
             if sum((centre[index] / surface.half[index]) ** 2 for index in range(3)) <= 1.02 ** 2:
                 continue
-            polygons.append([len(points) + index for index in range(len(face.verts))])
-            points.extend(point.co.copy() for point in face.verts)
-    return BVHTree.FromPolygons(points, polygons) if polygons else None
+            corners = [point.co.copy() for point in face.verts]
+            polygons.append([len(points) + index for index in range(len(corners))])
+            points.extend(corners)
+            edges.extend((corners[index], corners[(index + 1) % len(corners)]) for index in range(len(corners)))
+    return (BVHTree.FromPolygons(points, polygons) if polygons else None), edges
 
 
 def rim_polar(tree, surface, angle):
@@ -880,9 +910,12 @@ def rim_polar(tree, surface, angle):
 
 def add_rim_leaves(part, numbers, surface, hat_shapes, under):
     """The row of leaves under the rim of a hat (see UNDER_RIM). Returns them as add_leaf_crown does,
-    for leaf_crossings(); a leaf that would cross the hat is lowered, and dropped if it still does."""
+    for leaf_crossings(). A leaf that would cross the hat is moved until it does not (RIM_TRIES); one that
+    finds no place stops the build: no leaf is left out without a word (15 October 2026, after batch 5,
+    where the brim of the bucket hats and the tails of the durag silently took 5 to 7 leaves of 9)."""
     under = {**UNDER_RIM, **under}
-    tree = hat_tree(hat_shapes, surface)
+    outside = hat_outside(hat_shapes, surface)
+    tree = outside[0]
     if tree is None:
         return []
     _, _, length, width, thickness, _ = numbers.SPIKES[-2]      # the pair of the back row of H3
@@ -891,9 +924,9 @@ def add_rim_leaves(part, numbers, surface, hat_shapes, under):
     thickness *= under["THICK"] * numbers.LEAF_WIDTH
     ahead, down = level_axes(numbers)
     back, up = -ahead, -down
-    profile = numbers.LEAF_PROFILE
+    profile = RIM_PROFILE
 
-    def rings_of(angle, below, droop):
+    def rings_of(angle, rim, below, droop, length):
         """The rings of one leaf rooted "below" degrees under the rim at that angle, leaning down by
         "droop" degrees from straight out of the head."""
         polar = math.radians(rim + below)
@@ -919,33 +952,70 @@ def add_rim_leaves(part, numbers, surface, hat_shapes, under):
         rings.append((root + away * length + curl, NOWHERE, NOWHERE))
         return rings
 
-    built, rims = [], []
+    def place(degrees, side, name):
+        """The first way of placing the leaf that does not cross the hat (as leaf_crossings judges it,
+        outline included), in the order of RIM_TRIES: its whole length first, at its own angle, then
+        rooted lower and leaning down; then a little to either side of its angle (past a tail, a
+        flap); then shorter. Returns (rings, what was changed) or None."""
+        for share in RIM_TRIES["LENGTH"]:
+            for turn in RIM_TRIES["TURN_DEG"]:
+                angle = math.radians(270.0 + side * (degrees + turn))
+                rim = rim_polar(tree, surface, angle)
+                if rim is None:
+                    continue
+                for below in RIM_TRIES["BELOW_DEG"]:
+                    for droop in RIM_TRIES["DROOP_DEG"]:
+                        rings = rings_of(angle, rim, under["BELOW_DEG"] + below, under["DROOP_DEG"] + droop,
+                                         length * share)
+                        if not leaf_crossings([(name, rings)], hat_shapes, numbers, surface, outside):
+                            moved = [f"{label} {value:+.0f}" for label, value in
+                                     (("turn", turn), ("lower", below), ("down", droop)) if value]
+                            if share < 1.0:
+                                moved.append(f"length {share:.2f}")
+                            return rings, f"rim {rim:.0f}" + (", " + ", ".join(moved) if moved else "")
+        return None
+
+    built, said = [], []
     for degrees in under["ANGLES"]:
         for side in ((1.0,) if degrees in (0.0, 180.0) else (1.0, -1.0)):
-            angle = math.radians(270.0 + side * degrees)
-            rim = rim_polar(tree, surface, angle)
-            if rim is None:
-                continue
             where = "" if degrees in (0.0, 180.0) else (" left" if side > 0.0 else " right")
             name = f"rim leaf {degrees:.0f}{where}"
-            # Lowered, then rooted further down, until it no longer crosses the hat (as leaf_crossings
-            # judges it, outline included); dropped when nothing fits.
-            placed = None
-            for below in (under["BELOW_DEG"], under["BELOW_DEG"] + 6.0, under["BELOW_DEG"] + 12.0):
-                for droop in (under["DROOP_DEG"], under["DROOP_DEG"] + 12.0, under["DROOP_DEG"] + 24.0):
-                    rings = rings_of(angle, below, droop)
-                    if not leaf_crossings([(name, rings)], hat_shapes, numbers, surface):
-                        placed = rings
+            found = place(degrees, side, name)
+            if found is None:
+                rims = [rim_polar(tree, surface, math.radians(270.0 + side * (degrees + turn)))
+                        for turn in RIM_TRIES["TURN_DEG"]]
+                raise SystemExit(f"CHOG_TRAITS FAILED: {name} finds no place under the rim of the hat that does "
+                                 f"not cross it (RIM_TRIES); rim found at polar degrees "
+                                 + ", ".join("none" if rim is None else f"{rim:.0f}" for rim in rims))
+            rings, how = found
+            part.shell(rings, numbers.LEAF_SIDES, SKIN, numbers.OUTLINE_THICKNESS, smooth=True)
+            built.append((name, rings))
+            said.append(f"{degrees:.0f}{where[:2]} ({how})")
+
+    # Inside an open hat (the crown): leaves rooted on the head within it, straight out of the head and
+    # leaning back, shortened or tilted until they cross nothing.
+    for degrees, polar_deg in under["INSIDE"]:
+        for side in ((1.0,) if degrees in (0.0, 180.0) else (1.0, -1.0)):
+            where = "" if degrees in (0.0, 180.0) else (" left" if side > 0.0 else " right")
+            name = f"inside leaf {degrees:.0f}{where}"
+            angle = math.radians(270.0 + side * degrees)
+            found = None
+            for share in RIM_TRIES["LENGTH"] + (0.55,):
+                for droop in (0.0, -12.0, 12.0, 24.0):
+                    rings = rings_of(angle, polar_deg, 0.0, droop, length * under["INSIDE_LENGTH"] * share)
+                    if not leaf_crossings([(name, rings)], hat_shapes, numbers, surface, outside):
+                        how = ([f"length {share:.2f}"] if share < 1.0 else []) + ([f"tilt {droop:+.0f}"] if droop else [])
+                        found = rings, ", ".join(how)
                         break
-                if placed:
+                if found:
                     break
-            if placed is None:
-                print(f"CHOG_TRAITS {name}: no place under the rim that does not cross the hat, left out")
-                continue
-            part.shell(placed, numbers.LEAF_SIDES, SKIN, numbers.OUTLINE_THICKNESS, smooth=True)
-            built.append((name, placed))
-            rims.append(f"{degrees:.0f}{where[:2]} {rim:.0f}")
-    print(f"CHOG_TRAITS rim row: {len(built)} leaves; rim (polar degrees) at " + ", ".join(rims))
+            if found is None:
+                raise SystemExit(f"CHOG_TRAITS FAILED: {name} finds no place inside the hat that does not "
+                                 f"cross it")
+            part.shell(found[0], numbers.LEAF_SIDES, SKIN, numbers.OUTLINE_THICKNESS, smooth=True)
+            built.append((name, found[0]))
+            said.append(f"inside {degrees:.0f}{where[:2]}" + (f" ({found[1]})" if found[1] else ""))
+    print(f"CHOG_TRAITS rim row: {len(built)} leaves: " + "; ".join(said))
     return built
 
 
@@ -976,22 +1046,68 @@ def rim_leaves_for(part, traits, replaced, numbers, body_n, surface):
             made.mesh.free()
 
 
-def cream_head(part):
-    """Side=Left draws the whole head in the cream of the face, its points too: the skin colour of the
-    head (skull and leaves, so far) becomes the cream. Points of hair under a hood are added after and
-    keep the skin colour."""
-    skin, cream = part.order.index(SKIN), part.order.index(full.FACE)
-    for face in part.mesh.faces:
-        if face.material_index == skin:
-            face.material_index = cream
+# The check of "same head, same result" (15 October 2026, after batch 5). The owner found the spikes
+# all around some hats from the camera of the game and none around others, on the same head. Every
+# Genesis whose head keeps leaves must show, from each view of SPIKE_VIEWS (turn around the character
+# and degrees above the horizon, as render_chog_body.place_camera takes them), the tip of at least one
+# leaf in each sector of SPIKE_SECTORS (degrees from the front, + its left, - its right, 45 degrees
+# wide): a tip hidden by the hat or by the head does not count. A Genesis that fails stops its build.
+SPIKE_VIEWS = {"from above": (180.0, 89.0), "game, behind": (160.0, 73.0)}
+SPIKE_SECTORS = (90, -90, 135, -135, 180)
 
 
-def leaf_crossings(leaves, hat_shapes, numbers, surface):
+def spike_sectors_seen(leaves, hat_shapes, numbers, surface):
+    """For each view of SPIKE_VIEWS, the sectors where the tip of a leaf is seen (see above). Leaves and
+    hat in the axes of "Head" before the head is turned up."""
+    tree = hat_outside(hat_shapes, surface)[0] if hat_shapes else None
+    pitch = Matrix.Rotation(math.radians(numbers.HEAD_PITCH_DEG), 3, "X")
+    middle, half = surface.middle, surface.half
+    seen = {}
+    for view, (turn_deg, elevation_deg) in SPIKE_VIEWS.items():
+        turn, elevation = math.radians(turn_deg), math.radians(elevation_deg)
+        world = Vector((math.sin(turn) * math.cos(elevation), -math.cos(turn) * math.cos(elevation),
+                        math.sin(elevation)))
+        towards = (pitch @ world).normalized()
+        sectors = set()
+        for _, rings in leaves:
+            for point in (rings[-1][0], rings[-2][0]):      # the tip, and just under it
+                start = point + towards * 0.003
+                if tree is not None and tree.ray_cast(start, towards, 5.0)[0] is not None:
+                    continue
+                # The head, an egg: does the line towards the camera enter it?
+                where = Vector(((start - middle)[index] / half[index] for index in range(3)))
+                way = Vector((towards[index] / half[index] for index in range(3)))
+                a, b, c = way.dot(way), 2.0 * where.dot(way), where.dot(where) - 1.0
+                inside = b * b - 4.0 * a * c
+                if inside >= 0.0 and (-b + math.sqrt(inside)) / (2.0 * a) > 0.0 and c > 0.0 and \
+                        (-b - math.sqrt(inside)) / (2.0 * a) > 0.0:
+                    continue
+                away = point - middle
+                degrees = math.degrees(math.atan2(away.x, -away.y))
+                sector = int(round(degrees / 45.0)) * 45
+                sectors.add(180 if sector == -180 else sector)
+                break
+        seen[view] = sectors
+    return seen
+
+
+def spikes_missing(seen, required=SPIKE_SECTORS):
+    """What spike_sectors_seen lacks against the sectors required (SPIKE_SECTORS, or the "SECTORS" of
+    the row of a hat whose flaps or cheek guards cover the sides of the head), in words, or ""."""
+    lacking = []
+    for view, sectors in seen.items():
+        missing = [sector for sector in required if sector not in sectors]
+        if missing:
+            lacking.append(f"{view}: no tip seen at {', '.join(f'{sector:+d}' for sector in missing)}")
+    return "; ".join(lacking)
+
+
+def leaf_crossings(leaves, hat_shapes, numbers, surface, outside=None):
     """The leaves (from add_leaf_crown) that go through a hat, or that a thin part of the hat (a band, a
     brim) goes through: an edge of a leaf, made thicker by its outline, crosses a face of the hat, or an
     edge of the hat crosses a face of that leaf. Only the faces of the hat that lie outside the head
-    count (the rows of a hat tucked inside the head and the face that closes it there are not seen).
-    Both are in the axes of "Head" before the head is turned up. Returns the names of those leaves."""
+    count (hat_outside(), which "outside" gives when it is already made). Both are in the axes of "Head"
+    before the head is turned up. Returns the names of those leaves."""
     from mathutils.bvhtree import BVHTree
 
     def cut(tree, segments):
@@ -1001,19 +1117,9 @@ def leaf_crossings(leaves, hat_shapes, numbers, surface):
                 return True
         return False
 
-    points, polygons, hat_edges = [], [], []
-    for shapes in hat_shapes:
-        for face in shapes.mesh.faces:
-            centre = face.calc_center_median() - surface.middle
-            if sum((centre[index] / surface.half[index]) ** 2 for index in range(3)) <= 1.02 ** 2:
-                continue
-            corners = [point.co.copy() for point in face.verts]
-            polygons.append([len(points) + index for index in range(len(corners))])
-            points.extend(corners)
-            hat_edges.extend((corners[index], corners[(index + 1) % len(corners)]) for index in range(len(corners)))
-    if not polygons:
+    hat_tree, hat_edges = outside or hat_outside(hat_shapes, surface)
+    if hat_tree is None:
         return []
-    hat_tree = BVHTree.FromPolygons(points, polygons)
     grow, sides = numbers.OUTLINE_THICKNESS, numbers.LEAF_SIDES
     crossing = []
     for name, rings in leaves:
@@ -2122,10 +2228,10 @@ def hat_numbers_of(entry, replaced=None):
     return {**HAT_NUMBERS[entry["shape"]], **entry.get("numbers", {}), **(replaced or {})}
 
 
-def face_numbers(head, hat_numbers, left=False):
+def face_numbers(head, hat_numbers):
     """The numbers of the head for its face: without the teeth of hair on the brow under a hat whose
-    numbers say "FRINGE": False, and on Side=Left, whose head is all cream (cream_head)."""
-    if hat_numbers.get("FRINGE", True) and not left:
+    numbers say "FRINGE": False."""
+    if hat_numbers.get("FRINGE", True):
         return head
     return SimpleNamespace(**{**vars(head), "FRINGE_TEETH": 0})
 
@@ -2388,13 +2494,10 @@ def build(traits=None, replaced=None, head_replaced=None):
     hat_numbers = head_look(traits, replaced)
     leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN))
     leaves += rim_leaves_for(head, traits, replaced, head_n, body_n, surface)
-    left = (traits or {}).get("Side") == "Left"
-    if left:
-        cream_head(head)
     # Points of hair that a hat lets out on the brow (the durag), in the skin colour: part of the head.
     if hat_numbers.get("HAIR_POINTS"):
         hats_and_clothes.add_hair_points(head, surface, hat_numbers["HAIR_POINTS"], SKIN)
-    full.add_face(head, face_numbers(head_n, hat_numbers, left), surface, eyes=False, mouth=False)
+    full.add_face(head, face_numbers(head_n, hat_numbers), surface, eyes=False, mouth=False)
     full.turn_head_up(head, head_n)
 
     arms = {}
@@ -2417,6 +2520,7 @@ def build(traits=None, replaced=None, head_replaced=None):
     # pictures draw it) says "THROUGH": its crossings are kept in parts.json, not refused.
     hidden = set(hat_numbers.get("HIDES", ()))
     through = bool(hat_numbers.get("THROUGH"))
+    seen = None
     for trait, (start, table, word, builders) in TRAIT_PARTS.items():
         value = (traits or {}).get(trait)
         if value is None:
@@ -2438,6 +2542,8 @@ def build(traits=None, replaced=None, head_replaced=None):
             # A hat, or the hood of a costume. Before the head and the part are turned up: both are
             # still in the axes of add_leaf_crown.
             crossing = leaf_crossings(leaves, worn_on_head, head_n, surface)
+            if trait == "Head":
+                seen = spike_sectors_seen(leaves, worn_on_head, head_n, surface)
         trait_made = trait_materials(maker.prefix, entry["colours"], entry.get("unlit", ()), materials)
         for shapes, on in maker.parts:
             if on == "Head":
@@ -2453,6 +2559,16 @@ def build(traits=None, replaced=None, head_replaced=None):
             made["leaves_crossing"] = "" if through else ", ".join(on_the_head)
             made["leaves_through"] = ", ".join(on_the_head) if through else ""
             trait_parts.append(made)
+
+    # Same head, same result: where the head keeps leaves, their tips must show all around it from the
+    # camera of the game and from above (SPIKE_VIEWS).
+    if seen is None:
+        seen = spike_sectors_seen(leaves, [], head_n, surface)
+    head_object = by_name["Head"]
+    head_object["spikes_seen"] = "; ".join(f"{view}: {', '.join(f'{sector:+d}' for sector in sorted(sectors))}"
+                                           for view, sectors in seen.items())
+    row = (head_entry(traits, replaced) or {}).get("under_rim") or {}
+    head_object["spikes_missing"] = spikes_missing(seen, row.get("SECTORS", SPIKE_SECTORS)) if leaves else ""
 
     for material in list(bpy.data.materials):
         if material.users == 0:
@@ -2487,6 +2603,11 @@ def report(label, parts, trait_parts, body_n, head_n):
             failures.append(f"{part.name} has a material that is not named after its trait: {names}")
         if part.get("leaves_crossing"):
             failures.append(f"leaves of the crown go through {part.name}: {part['leaves_crossing']}")
+    for part in parts:
+        if part.get("spikes_seen"):
+            print(f"CHOG_TRAITS {label} spike tips seen: {part['spikes_seen']}")
+        if part.get("spikes_missing"):
+            failures.append(f"spikes not seen all around the head ({part['spikes_missing']})")
     print(f"CHOG_TRAITS {label} dressed: {total} triangles (limit {TRIANGLE_LIMIT})")
     if total > TRIANGLE_LIMIT:
         failures.append(f"{total} triangles, the limit is {TRIANGLE_LIMIT}")

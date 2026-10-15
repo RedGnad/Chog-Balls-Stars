@@ -381,6 +381,12 @@ CURLY_WIG = {
     # where there is no hair); how many waves its two edges make around the head and how deep they are
     # (degrees); the share of it, from its lower edge, in the colour "Line"; points around the head.
     "BAND": None,
+    # Big clumps in place of the curls (batch 6, 15 October 2026, after the owner found the hair unlike the
+    # pictures: they draw a few large clumps with a curly outline, not a pile of small balls): one line per
+    # clump, degrees from the front (on both sides but 0 and 180), polar degrees, radius, and how far out
+    # its middle is (against the head). None: the curls above. LOBE_SHAPE: see add_hair_lobe.
+    "LOBES": None,
+    "LOBE_SHAPE": (10, 4, 5, 0.10),
     "OUTLINE_THICKNESS": 0.020,
     # Hair, not a hat: it replaces the crown of leaves (the owner, 15 October 2026). (Several pictures of
     # Bob Hair still draw the tip of one spike above the hair, at the far side; it is left out.)
@@ -429,6 +435,27 @@ def add_hair_band(part, surface, numbers, mass_size, rims, lined):
         part.paint(bands[0] + bands[1], part.named("Line"))
 
 
+def add_hair_lobe(part, centre, axis, radius, material, numbers):
+    """One clump of hair (LOBES of CURLY_WIG): a ball whose outline waves, as the pictures draw a curly
+    clump, "radius" large, its axis pointing out of the head. LOBE_SHAPE: points around, rings from pole to
+    pole, how many waves around it and how deep (against its radius)."""
+    sides, stacks, waves, depth = numbers.LOBE_SHAPE
+    first, second = base.frame_across(axis, Z if abs(axis.normalized().z) < 0.9 else X)
+    axis = axis.normalized()
+    loops = [[centre - axis * radius]]
+    for ring in range(1, stacks):
+        polar = math.pi * ring / stacks
+        loop = []
+        for index in range(sides):
+            around = 2.0 * math.pi * index / sides
+            reach = radius * (1.0 + depth * math.cos(waves * around + ring * 0.7) * math.sin(polar))
+            loop.append(centre + (-axis * math.cos(polar) + (first * math.cos(around) + second * math.sin(around))
+                                  * math.sin(polar)) * reach)
+        loops.append(loop)
+    loops.append([centre + axis * radius])
+    KIT.add_loops(part, loops, material, numbers.OUTLINE_THICKNESS)
+
+
 def build_curly_wig(maker):
     numbers = maker.numbers(CURLY_WIG)
     part, surface = maker.part(), maker.surface
@@ -460,6 +487,8 @@ def build_curly_wig(maker):
             return "Top" if polar < numbers.TOP_POLAR else "Curl"
         if sweep:
             arch = math.degrees(math.atan2(away.z, away.x))      # 0: left of the character, 90: top
+            if arch < -90.0:
+                arch += 360.0                                     # below the right shoulder: the first colour
             share = (205.0 - min(max(arch, -25.0), 205.0)) / 230.0
             return sweep[min(int(share * len(sweep)), len(sweep) - 1)]
         return first
@@ -468,6 +497,17 @@ def build_curly_wig(maker):
 
     if numbers.BAND:
         add_hair_band(part, surface, numbers, mass_size, rims, "Line" in colours)
+
+    if numbers.LOBES:
+        # Big clumps with a curly outline, in place of the small curls (15 October 2026, batch 6).
+        for degrees, polar_deg, radius, size in numbers.LOBES:
+            for side in ((1.0,) if degrees in (0.0, 180.0) else (1.0, -1.0)):
+                angle = math.radians(270.0 + side * degrees)
+                polar = math.radians(polar_deg)
+                out = head_normal(surface, angle, polar)
+                centre = on_head(surface, angle, polar, size)
+                add_hair_lobe(part, centre, out, radius, part.named(colour_at(centre)), numbers)
+        return
 
     # The curls, on the mass.
     rows_of_curls = list(numbers.CURL_ROWS)
@@ -1215,14 +1255,17 @@ HATS = {
         # yellow top over a narrow band.)
         "numbers": {"RIM": ((0.0, 66.0), (30.0, 70.0), (55.0, 112.0), (180.0, 116.0)),
                     "SIZE": ((0.0, 1.18), (40.0, 1.36), (90.0, 1.48), (180.0, 1.44)),
-                    # Curls above the band (on top, two over the brow) and below it (the puffs beside the
-                    # face and behind); none where the band lies, which would hide it.
-                    "CURL_ROWS": ((22.0, 0.115, (40.0, 104.0, 160.0)), (44.0, 0.100, (18.0,)),
-                                  (104.0, 0.120, (62.0, 96.0, 132.0, 180.0))),
+                    # Clumps above the band (the top, over the brow, behind) and below it (the big puffs
+                    # beside the face at the height of the cheeks, and behind); none where the band lies,
+                    # which would hide it. (Until batch 6: 15 small curls, a pile of balls.)
+                    "LOBES": ((0.0, 26.0, 0.17, 1.10), (55.0, 40.0, 0.16, 1.20), (125.0, 42.0, 0.17, 1.20),
+                              (180.0, 45.0, 0.17, 1.18), (78.0, 102.0, 0.17, 1.26), (118.0, 106.0, 0.17, 1.28),
+                              (180.0, 108.0, 0.17, 1.24)),
                     "HAIRLINE": None,
+                    # The band of the pictures is wide, its upper edge a frill of many small waves.
                     "BAND": (((0.0, 81.0), (40.0, 81.0), (90.0, 84.0), (180.0, 86.0)),
-                             ((0.0, 64.0), (40.0, 65.0), (90.0, 67.0), (180.0, 69.0)),
-                             0.10, 9, 3.0, 0.24, 36)},
+                             ((0.0, 60.0), (40.0, 61.0), (90.0, 63.0), (180.0, 65.0)),
+                             0.10, 18, 2.5, 0.24, 36)},
     },
     # A big afro in six colours, from the right of the character over the top to its left.
     "Rainbow Wig": {
@@ -1230,7 +1273,13 @@ HATS = {
         "colours": {"Red": (0.85, 0.13, 0.12), "Orange": (0.85, 0.45, 0.12), "Yellow": (0.95, 0.88, 0.14),
                     "Green": (0.21, 0.85, 0.09), "Blue": (0.09, 0.50, 0.93), "Purple": (0.58, 0.10, 0.94)},
         "sweep": ("Red", "Orange", "Yellow", "Green", "Blue", "Purple"),
-        "numbers": {"SIZE": ((0.0, 1.20), (35.0, 1.55), (90.0, 1.78), (180.0, 1.72))},
+        # Eleven big clumps, one colour each, in an arch from beside one shoulder over the top to the other
+        # (red, orange, yellow, green, blue, purple around the face, as drawn),
+        # as the pictures draw blocks of colour larger than the face. (Until batch 6: small curls in
+        # stripes.)
+        "numbers": {"SIZE": ((0.0, 1.20), (35.0, 1.55), (90.0, 1.78), (180.0, 1.72)),
+                    "LOBES": ((25.0, 18.0, 0.24, 1.32), (60.0, 48.0, 0.24, 1.45), (95.0, 85.0, 0.24, 1.55),
+                              (115.0, 122.0, 0.22, 1.45), (140.0, 50.0, 0.24, 1.40), (180.0, 90.0, 0.24, 1.40))},
     },
     "Durag": {
         "shape": "Durag",
@@ -1309,12 +1358,14 @@ HATS_OF_SIDE = {
 # of the seven lines of the crown (SIDE_POINTS, BIG_SIDE_POINTS, CROWN_POINTS, DURAG_POINTS, USHANKA_POINTS,
 # in the history of this file): from behind and from above that made two spikes on each side and none at
 # the back. They now take RIM_ROW and its kin (below), planted under the real rim of each hat.
-# Above and below a headband: the leaf on top and the upper pair (raised a little) stand above it, the
-# middle pair would grow out of the band, the rest stand under it as under a cap.
-BAND_POINTS = (WHOLE, leaf(1.0, 24.0), GONE, leaf(1.10, 112.0, 22.0, 0.0, 0.75), GONE,
-               leaf(1.10, 104.0, 62.0, 0.0, 0.75), leaf(1.10, None, 104.0, 0.0, 0.75))
-# Through the knitted mask, as drawn ("THROUGH"): the middle pair near the top, and those of a cap.
-ROBBER_POINTS = (GONE, GONE, leaf(1.0, 80.0, 30.0, 0.0, 0.66), leaf(1.10, 112.0, 24.0, 0.0, 0.70), GONE,
+# Above and below a headband: the leaf on top and the upper pair (raised a little) stand above it (the top
+# of the back row went through the band); under it, the row under the rim of every hat (RIM_ROW), at the
+# sides and the back (until batch 6 the pairs of a cap: nothing seen at the sides from above).
+BAND_POINTS = (WHOLE, leaf(1.0, 24.0), GONE, GONE, GONE, GONE, GONE)
+# Through the knitted mask, as drawn ("THROUGH"): the middle pair near the top, and those of a cap; the side
+# ones 1.4 times as long and the middle pair straight out to the sides since batch 6, so their points pass
+# the mask seen from above, beside the head.
+ROBBER_POINTS = (GONE, GONE, leaf(1.40, 84.0, 4.0, 0.0, 0.66), leaf(1.40, 112.0, 24.0, 0.0, 0.70), GONE,
                  leaf(1.10, 104.0, 62.0, 0.0, 0.70), leaf(1.10, None, 104.0, 0.0, 0.70))
 
 
@@ -1338,12 +1389,21 @@ BIG_RIM_ROW = {"LENGTH": 1.10, "WIDTH": 0.90}
 # the camera of the game and from behind (seen on batch 5, 15 October 2026), where the pictures draw two
 # or three spikes out from under the brim. Longer, so their points pass its edge.
 BUCKET_RIM_ROW = {"LENGTH": 1.40, "WIDTH": 0.70, "SWEEP_DEG": 30.0}
-# Under the fur of the ushanka: a few short ones at the back only, behind the flaps.
-USHANKA_RIM_ROW = {"ANGLES": (138.0, 162.0), "LENGTH": 0.80, "WIDTH": 0.70}
-# Inside the open band of the crown: the leaf on top, short enough to stand at the height of its points
-# (the head is a spiky head with a crown on it, not a bald dome nor a gold floor). The upper pair and
-# the top of the back row went through the band (first try, 15 October 2026).
-CROWN_TOP = (leaf(0.60), GONE, GONE, GONE, GONE, GONE, GONE)
+# Under the fur of the ushanka, and the helmet: their flaps and cheek guards cover the sides of the head down
+# to the jaw, so the row starts behind them, and the check wants it seen behind and three quarters behind.
+USHANKA_RIM_ROW = {"ANGLES": (94.0, 116.0, 138.0, 160.0, 180.0), "SWEEP_DEG": 18.0, "SECTORS": (135, -135, 180)}
+# The crown sits on the spiky head: the row under its band, and a tuft inside the open band, rooted on
+# the top of the head and leaning back, whose points rise behind its points, as the pictures draw spikes
+# behind the crown. (Batch 5 kept one short leaf on top: a lone spike in the middle of the crown.)
+CROWN_ROW = {"INSIDE": ((0.0, 8.0), (130.0, 24.0)), "INSIDE_LENGTH": 1.05}
+
+
+# What the pictures of Side=Left show around a hat (15 October 2026, after batch 5): they are framed closer,
+# and the head behind the face, in the skin colour and spiky as on Side=Right, fills the picture beside
+# and behind the hat, often in the colour of the backdrop. Batch 4 read it as the backdrop: no spike.
+LEFT_HEAD = ("the head behind the face is the skin colour and spiky, as on Side=Right: framed closer, its "
+             "mass fills the picture beside and behind the hat, often the colour of the backdrop (read as "
+             "no spike until batch 5)")
 
 
 # (value of "Head", Side): what its pictures show. The numbers given replace those of the entry of HATS
@@ -1383,44 +1443,59 @@ HEAD_VALUES = {
     ("Mon Cap", "Right"): seen((8, 461, 792, 1309, 1934), "a purple bucket hat; 1 or 2 short spikes on the far "
                                "side under the brim", NO_CROWN, BUCKET_RIM_ROW),
     # Caps of Side=Left: no spike at all.
-    ("Mon Cap", "Left"): seen((361, 864, 1065, 1423, 1761), "a white cap, purple brim; no spike anywhere",
-                              NO_CROWN),
-    ("BTC Cap", "Left"): seen((162, 492, 702, 1579, 1954), "no spike anywhere", NO_CROWN),
-    ("MCGA", "Left"): seen((103, 568, 1028, 1472, 1951), "no spike anywhere", NO_CROWN),
-    ("Chog Cap", "Left"): seen((142, 578, 1129, 1362, 1882), "the MAKE CHOG GREAT AGAIN cap of MCGA; no spike",
-                               NO_CROWN),
-    ("Buttcoin Cap", "Left"): seen((203, 516, 970, 1378, 1930), "no spike anywhere", NO_CROWN),
-    ("MEGA Chog", "Left"): seen((45, 426, 714, 1406, 1891), "no spike anywhere", NO_CROWN),
-    ("10k TPS Cap", "Left"): seen((26, 575, 980, 1538, 1823), "no spike anywhere", NO_CROWN),
-    ("JEET Cap", "Left"): seen((63, 563, 1029, 1555, 1963), "no spike anywhere", NO_CROWN),
-    ("RETARD Cap", "Left"): seen((46, 379, 929, 1505, 1871), "no spike anywhere", NO_CROWN),
-    ("WAGMI Cap", "Left"): seen((59, 485, 1025, 1528, 1929), "no spike anywhere", NO_CROWN),
-    ("NEET", "Left"): seen((7, 396, 562, 1022, 1949), "no spike anywhere", NO_CROWN),
-    ("MCGA Cap", "Left"): seen((36, 528, 677, 1149, 1900), "no spike anywhere", NO_CROWN),
+    ("Mon Cap", "Left"): seen((361, 864, 1065, 1423, 1761), "a white cap, purple brim; " + LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("BTC Cap", "Left"): seen((162, 492, 702, 1579, 1954), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("MCGA", "Left"): seen((103, 568, 1028, 1472, 1951), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("Chog Cap", "Left"): seen((142, 578, 1129, 1362, 1882), "the MAKE CHOG GREAT AGAIN cap of MCGA; " + LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("Buttcoin Cap", "Left"): seen((203, 516, 970, 1378, 1930), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("MEGA Chog", "Left"): seen((45, 426, 714, 1406, 1891), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("10k TPS Cap", "Left"): seen((26, 575, 980, 1538, 1823), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("JEET Cap", "Left"): seen((63, 563, 1029, 1555, 1963), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("RETARD Cap", "Left"): seen((46, 379, 929, 1505, 1871), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("WAGMI Cap", "Left"): seen((59, 485, 1025, 1528, 1929), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("NEET", "Left"): seen((7, 396, 562, 1022, 1949), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("MCGA Cap", "Left"): seen((36, 528, 677, 1149, 1900), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
     # Beanies of Side=Left: the beanie covers the head to the brow, no spike shows, behind it either.
-    ("Wizard Beanie", "Left"): seen((70, 565, 969, 1314, 1948), "no spike anywhere", NO_CROWN),
-    ("Choggie Beanie", "Left"): seen((4, 271, 841, 1422, 1968), "no spike anywhere", NO_CROWN),
-    ("BTC Beanie", "Left"): seen((2, 517, 1182, 1392, 1604), "no spike anywhere", NO_CROWN),
-    ("RH Beanie", "Left"): seen((191, 510, 1017, 1602, 1919), "no spike anywhere", NO_CROWN),
-    ("Mon Beanie", "Left"): seen((71, 765, 1002, 1351, 1801), "no spike anywhere", NO_CROWN),
+    ("Wizard Beanie", "Left"): seen((70, 565, 969, 1314, 1948), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("Choggie Beanie", "Left"): seen((4, 271, 841, 1422, 1968), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("BTC Beanie", "Left"): seen((2, 517, 1182, 1392, 1604), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("RH Beanie", "Left"): seen((191, 510, 1017, 1602, 1919), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
+    ("Mon Beanie", "Left"): seen((71, 765, 1002, 1351, 1801), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
     # The other headwear of Side=Right.
     ("Crown", "Right"): seen((44, 858, 1127, 1358, 1899), "3 or 4 short spikes on the far side, from beside the "
                              "band of the crown down to the cheek; spikes behind its points at the top",
-                             CROWN_TOP, RIM_ROW),
+                             NO_CROWN, CROWN_ROW),
     ("Wizard Hat", "Right"): seen((10, 472, 872, 1495, 1809), "2 or 3 spikes on the far side, from under the hat "
                                   "down to the cheek, larger than under a cap", NO_CROWN, BIG_RIM_ROW),
     ("Durag", "Right"): seen((51, 570, 1001, 1563, 1884), "3 large spikes on the far side, from the height of "
                              "the top of the durag down to the cheek; no point of hair on the brow", NO_CROWN, BIG_RIM_ROW),
     ("Spartan Helmet", "Right"): seen((21, 331, 1081, 1536, 1903), "a full helmet down to the jaw, nose guard, "
-                                      "red plume; 3 or 4 spikes behind it on the far side", NO_CROWN, RIM_ROW),
+                                      "red plume; 3 or 4 spikes behind it on the far side", NO_CROWN, USHANKA_RIM_ROW),
     ("Russian Hat", "Right"): seen((39, 322, 830, 1177, 1785), "tan fur hat, fur flaps; 1 or 2 small spikes on "
                                    "the far side, behind the flap, near the top", NO_CROWN, USHANKA_RIM_ROW),
-    ("Russian Hat", "Left"): seen((34, 504, 982, 1518, 1876), "cream fur, dark leather flaps with snaps; no spike "
-                                  "anywhere", NO_CROWN),
+    ("Russian Hat", "Left"): seen((34, 504, 982, 1518, 1876), "cream fur, dark leather flaps with snaps; " + LEFT_HEAD,
+        NO_CROWN, USHANKA_RIM_ROW),
     ("Red Headband", "Right"): seen((12, 686, 1014, 1790, 1957), "the whole crown above the band and down the far "
-                                    "side; a darker line along its lower edge", BAND_POINTS),
+                                    "side; a darker line along its lower edge", BAND_POINTS, RIM_ROW),
     ("Japan Headband", "Right"): seen((65, 523, 891, 1435, 1962), "the whole crown above the white band, a red "
-                                      "sun on its front", BAND_POINTS),
+                                      "sun on its front", BAND_POINTS, RIM_ROW),
     ("Bob Hair", "Right"): seen((43, 48, 159, 470, 482, 1137, 1380), "yellow curly hair, a red band with waving "
                                 "edges tied over the brow; the tip of one spike above the band, far side",
                                 NO_CROWN),
@@ -1440,7 +1515,8 @@ HEAD_VALUES = {
     ("Peace Cap", "Right"): seen((1642,), "a skull head: no spike", NO_CROWN),
     ("8 Ball Beanie", "Right"): seen((388,), "a skull head: no spike; an 8 ball on the side of the beanie",
                                      NO_CROWN),
-    ("Jeet Cap", "Left"): seen((1221,), "a skull head: no spike", NO_CROWN),
+    ("Jeet Cap", "Left"): seen((1221,), LEFT_HEAD,
+        NO_CROWN, RIM_ROW),
     ("BTC Cap", "Right"): seen((729, 972, 1372), "skull heads: no spike", NO_CROWN),
     ("Chog Cap", "Right"): seen((1324,), "a skull head under the white CHOG cap of Choggie Cap: no spike",
                                 NO_CROWN),

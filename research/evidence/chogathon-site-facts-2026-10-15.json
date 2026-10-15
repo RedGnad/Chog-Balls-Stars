@@ -1,0 +1,30 @@
+{
+  "consulted_date_client": "2026-10-15",
+  "url": "https://chogathon.chog.xyz/",
+  "access": "curl with a browser User-Agent and Accept: text/html, HTTP 200, 217540 bytes; text read with tags stripped",
+  "supersedes_for_submission": "chogathon-site-facts-2026-10-09.json, whose page had no form for the final deliverables",
+  "timeline_quoted": [
+    "Registrations closed · Oct 11",
+    "Submissions close · Oct 23, 15:00 UTC",
+    "Winners · after judging",
+    "14 Days to build 7 Days of judging 50 Prizes"
+  ],
+  "how_it_works_quoted": [
+    "02 Submit your project: Open until Oct 23, 15:00 UTC. One project per team: banner, up to 8,000 characters of description, a demo video (YouTube or Google Drive, keep it to 3 minutes) and your links. Edit or delete it from My Projects anytime.",
+    "03 Explore and heart: Every submission shows up in Projects, open one for the full story, demo video included, and heart the ones you love. One heart per project, change it anytime.",
+    "04 Judging: Judges score every project after the hackathon ends, your description, demo video and links are what they review. Winners get announced here."
+  ],
+  "submit_form_fields_read": {
+    "01 Basics": ["Project name (required)", "Banner image", "Description (required, 8,000 characters)"],
+    "02 Show it": ["App link", "Demo video (required, YouTube or Google Drive)", "Tech stack"],
+    "03 For judges (organizers only, never shown on the public project page)": ["GitHub repo", "Contact email (required)", "Judge access instructions (8,000 characters)"],
+    "04 Go-to-market (optional)": ["Plan (8,000 characters)"]
+  },
+  "judging_view_quoted": "Gate = NFT essentiality (must pass to qualify). Score each criterion 1-5, total is weighted to 100 (30/20/20/15/15). Tie-breakers: novelty, then retention.",
+  "holding_rule": "Nothing on the page asks a participant to hold a Chog: the gate is the project's NFT essentiality, judged by the organisers.",
+  "consequences": [
+    "The judging runs about seven days after 23 Oct 15:00 UTC: the app link and the judge access instructions must keep working through that week, so the public instance cannot depend on this Mac and its tunnel.",
+    "Judges review the description, the video and the links first: the three-minute video carries the holder path, which only a real Genesis in a real wallet can show.",
+    "A judge without a Genesis plays a Genesis through a loan pass (server/README.md), which stops the moment its lender no longer holds the Genesis on chain."
+  ]
+}

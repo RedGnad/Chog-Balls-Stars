@@ -402,6 +402,56 @@ wig; from the game camera the row under a bucket hat shows only its points; the 
 keeps the whole star where the pictures draw a row of points over the top; the durag's row stands out
 like ears from the front; the Spartan helmet's cheek guards and eye holes (batch 4).
 
+## Batch 6: one head for all, no spike dropped, spikes checked all around, hair as big clumps (15 October 2026, pictures only)
+
+What the owner said after batch 5: some heroes are right (the caps), others show no spikes on the same
+head (the bucket hats, the durag behind, the Side=Left caps), the crown ends in one lone spike, and the
+process is wrong, not one hero. **Nothing of this is in the game.** The owner found batch 6 good enough for
+now, to be improved later (15 October, evening).
+
+Why, found before changing anything: under each hat the row of batch 5 dropped every leaf that crossed
+the hat, without failing the build (`#62` and `#80` kept 2 leaves of 9, `#51` 4: the brim that goes all
+around and the tails take them); batch 4 had read the pictures of Side=Left as showing no spike, when
+their spiky head, in the skin colour, fills the frame around the face and was taken for the backdrop
+(looked at again on twelve bare heads and four caps of Side=Left: `#410`, `#491`, `#760`, `#1083`,
+`#1120`, `#1193`, `#1194`, `#1271`, `#361`, `#864`, `#1065`, `#162`).
+
+- **One head for all.** Side=Left keeps the head of Side=Right, in its skin colour (the cream head of
+  batch 5 is gone), and every hat of Side=Left takes the row under the rim (`LEFT_HEAD` says what their
+  pictures show).
+- **No leaf dropped.** `add_rim_leaves` tries, in the order of `RIM_TRIES`, each leaf at its angle, rooted
+  lower, leaning further down, turned a little aside, then shorter; one that finds no place stops the
+  build. The rim is found by rays reaching 0.30 off the head (0.10 missed the roomy crown of a bucket hat).
+  The leaves of the row have a lighter section (`RIM_PROFILE`), for the triangle budget.
+- **Checked all around.** `spike_sectors_seen` casts a ray from the tip of each leaf towards the camera,
+  from above and from the game's angle behind: a tip hidden by the hat or the head does not count. Every
+  hero with leaves must show a tip in each sector of `SPIKE_SECTORS` (left and right sides, the two three
+  quarters behind, the back), else its build fails; the ushanka and the Spartan helmet, whose flaps and
+  cheek guards cover the sides down to the jaw, want them behind and three quarters behind only. The
+  sectors seen are printed per hero ("spike tips seen").
+- **Headbands, robber.** A headband keeps the leaf on top and the upper pair above it and the row under
+  it; the robber's leaves through the knit point out to the sides, longer.
+- **The crown** sits on the spiky head: the row under its band, and a tuft inside the open band
+  (`CROWN_ROW`, "INSIDE": rooted on the top of the head, leaning back) whose points rise behind its points.
+- **Hair as big clumps** (`LOBES`, `add_hair_lobe`): a few balls with a waving outline in place of small
+  curls. Bob Hair: seven clumps above and below a wider band whose upper edge is a frill; Rainbow Wig:
+  eleven, one colour each, red, orange, yellow, green, blue and purple around the face as drawn.
+
+Numbers (`-- --coverage`, `-- --budget`): hat, eyes, mouth 1,869 of 1,869 on the base Origin, clothing too
+1,789; largest dressed hero #470 7,984 triangles, median 6,671, none over 8,000. 49 Genesis built (every
+value of Head on each Side of the base Origin, and the bare heads), all through both checks.
+
+Sheets in `.artifacts/chog-body/traits/batch-6/`: `before_after_turned.png` (the heroes the owner pointed
+at, batch 5 above batch 6), `turn_caps_right_1.png`, `turn_caps_right_2.png`, `turn_caps_left_1.png`,
+`turn_caps_left_2.png`, `turn_beanies_left.png`, `turn_other_1.png`, `turn_other_2.png`, `turn_hair.png`.
+Three are kept as evidence:
+[before and after, turned around](../../research/evidence/chog-traits-batch6-before-after-turned-2026-10-15.jpg),
+[caps of Side=Left](../../research/evidence/chog-traits-batch6-turn-caps-left-2026-10-15.jpg),
+[hair](../../research/evidence/chog-traits-batch6-turn-hair-2026-10-15.jpg).
+Still wrong: the durag's side leaves stand out like ears seen from the front; the tuft in the crown reads
+as a flower from straight above; the Spartan helmet (cheek guards, eye holes); the spike tip the pictures
+of Bob Hair draw above the band; the curly edge of the face under the Rainbow Wig.
+
 The sections below describe the first body, which `make_chog_body.py` still builds.
 
 ## Commands
