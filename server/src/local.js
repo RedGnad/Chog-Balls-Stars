@@ -6,7 +6,8 @@
 //                            [--pretend-holder 0xaddress=408,1795]
 //                            [--shop 0xaddress] [--rental 0xaddress]
 //                            [--rpc http://127.0.0.1:8545]
-//                            [--wager 0xaddress --referee-key-file <file>]
+//                            [--wager 0xaddress --referee-key-file <file>
+//                             [--wager-network testnet --wager-token 0xaddress] [--wager-rpc <url>]]
 //                            [--verifier <Chog.Quantum.Verifier.dll> --quantum-db <quantum-db.json> [--dotnet <dotnet>]]
 //                            [--photon-auth] [--photon-secret <text>]
 //                            [--reown-project-id <32 hex digits>]
@@ -18,7 +19,10 @@
 // rental contract; without it nothing is rented. --rpc reads the chain from another endpoint,
 // for instance a local copy of Monad mainnet on which the contracts were deployed for a test.
 // --wager is the deployed wager contract and --referee-key-file a file that holds its
-// referee's key (64 hex digits): without both, no match is staked on. --verifier is the program
+// referee's key (64 hex digits): without both, no match is staked on. The wager is on the chain
+// the Genesis are read on, unless --wager-network testnet puts it on Monad's testnet, paid in
+// the test token --wager-token; --wager-rpc reads it from another endpoint, for instance a
+// local chain started as the testnet (anvil --chain-id 10143). --verifier is the program
 // that plays a match again and --quantum-db the simulation assets of the build it judges:
 // without them a match gets no verdict. --photon-auth tells the game to connect to Photon with
 // its session. The secret Photon's requests must carry is --photon-secret, else one kept in
@@ -31,7 +35,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createApi } from './api.js';
 import { createCareers } from './career.js';
-import { CHAIN_ID, createChain, isAddress } from './chain.js';
+import { createChain, isAddress } from './chain.js';
 import { createJudge } from './judge.js';
 import { createMatches } from './matches.js';
 import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, reownProjectId, sessionSecret } from './node.js';
@@ -40,7 +44,7 @@ import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
 import { createSessions } from './session.js';
 import { createShop } from './shop.js';
-import { createWager } from './wager.js';
+import { createWager, wagerNetwork } from './wager.js';
 
 function option(name, fallback) {
   const position = process.argv.indexOf(name);
@@ -86,9 +90,18 @@ const matchStore = matchFiles(join(dataFolder, 'matches'));
 const matches = createMatches({ store: matchStore });
 const wagerAddress = option('--wager', '');
 const refereeKeyFile = option('--referee-key-file');
+const wagerRpc = option('--wager-rpc');
+const wagerPlace = wagerNetwork({
+  network: option('--wager-network', 'mainnet'),
+  rpcUrls: wagerRpc ? [wagerRpc] : [],
+  token: option('--wager-token', ''),
+});
+// On mainnet, without an endpoint of its own, the wager is read where the Genesis are.
+const wagerChain = !wagerPlace.test && !wagerRpc ? chain : createChain({ rpcUrls: wagerPlace.rpcUrls });
 const referee = wagerAddress && refereeKeyFile
-  ? createReferee({ privateKey: (await readFile(refereeKeyFile, 'utf8')).trim(), chainId: CHAIN_ID, wager: wagerAddress })
+  ? createReferee({ privateKey: (await readFile(refereeKeyFile, 'utf8')).trim(), chainId: wagerPlace.chainId, wager: wagerAddress })
   : undefined;
+if (referee) console.log(`Wager ${wagerAddress} on ${wagerPlace.chainName} (chain ${wagerPlace.chainId}), paid in ${wagerPlace.token}`);
 const verifier = option('--verifier');
 const judge = verifier
   ? createJudge({
@@ -113,7 +126,7 @@ const handle = createApi({
   sessions,
   photon,
   photonAuthentication: process.argv.includes('--photon-auth'),
-  wager: createWager({ chain, referee, matches }),
+  wager: createWager({ chain: wagerChain, referee, matches, network: wagerPlace }),
   reownProjectId: await reownProjectId(dataFolder, option('--reown-project-id')),
 });
 

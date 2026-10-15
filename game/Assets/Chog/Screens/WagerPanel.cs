@@ -28,6 +28,10 @@ namespace Chog.Screens
         // The free corner of the preparation screen, under the first team's slots.
         private static readonly Vector2 PanelMin = new Vector2(0.02f, 0.02f);
         private static readonly Vector2 PanelMax = new Vector2(0.38f, 0.17f);
+        // Where the test tokens button sits, and the line beside it when it is shown.
+        private static readonly Vector2 TapMin = new Vector2(0.70f, 0.50f);
+        private static readonly Vector2 StatusMax = new Vector2(0.97f, 0.97f);
+        private static readonly Vector2 StatusMaxBesideTap = new Vector2(0.68f, 0.97f);
 
         private static int s_team = -1;
 
@@ -36,6 +40,7 @@ namespace Chog.Screens
         private Button _more;
         private Button _stake;
         private TextMeshProUGUI _stakeLabel;
+        private Button _tap;
         private int _amount = FirstAmount;
         private float _readAt;
 
@@ -58,16 +63,19 @@ namespace Chog.Screens
         /// <summary>Starts the match once its stakes are locked; at once when there is nothing to lock.</summary>
         public static void BeforeStart(Action start) => GenesisWager.WhenLocked(start);
 
-        /// <summary>The line the panel shows, from what is known of the stakes of the match.</summary>
+        /// <summary>
+        /// The line the panel shows, from what is known of the stakes of the match. "currency"
+        /// is what the stakes are called: "TEST $CHOG" when the wager is on the testnet.
+        /// </summary>
         public static string StatusText(bool signedIn, bool inMatch, bool locked, int stakers, string stakeWei, int stakedTeam,
-                                        int winnersIfMine, int losersIfMine, int burnedShare)
+                                        int winnersIfMine, int losersIfMine, int burnedShare, string currency = "$CHOG")
         {
             if (!signedIn)
-                return "SIGN IN ON THE MENU TO STAKE $CHOG ON A MATCH";
+                return "SIGN IN ON THE MENU TO STAKE " + currency + " ON A MATCH";
             if (!inMatch)
                 return "STAKES: WAITING FOR THE GAME SERVER";
 
-            var each = stakeWei.Length > 0 ? MonadTransactions.PriceText(stakeWei) + " $CHOG" : "";
+            var each = stakeWei.Length > 0 ? MonadTransactions.PriceText(stakeWei) + " " + currency : "";
             if (stakedTeam >= 0)
             {
                 var gain = GenesisWager.WinnerGain(stakeWei, winnersIfMine, losersIfMine, burnedShare);
@@ -79,18 +87,21 @@ namespace Chog.Screens
                 return "THE STAKES ARE LOCKED\n" + stakers + " STAKED " + each;
             return stakeWei.Length > 0
                 ? "THIS MATCH IS PLAYED FOR " + each + " EACH\n" + stakers + " STAKED"
-                : "STAKE $CHOG ON YOUR TEAM\nTHE WINNERS SHARE WHAT THE LOSERS STAKED";
+                : "STAKE " + currency + " ON YOUR TEAM\nTHE WINNERS SHARE WHAT THE LOSERS STAKED";
         }
 
-        /// <summary>What the panel says while something is under way, or empty.</summary>
-        public static string StepText(WagerStep step, WagerAction doing, int lockWaitSeconds, string problem)
+        /// <summary>What the panel says while something is under way, or empty. "chainName" is the chain of the wager.</summary>
+        public static string StepText(WagerStep step, WagerAction doing, int lockWaitSeconds, string problem, string chainName = "Monad")
         {
             switch (step)
             {
                 case WagerStep.Asking: return "ASKING THE REFEREE FOR A TICKET";
-                case WagerStep.Switching: return "YOUR WALLET: SWITCH TO MONAD";
+                case WagerStep.Switching: return "YOUR WALLET: SWITCH TO " + (chainName ?? "").ToUpperInvariant();
                 case WagerStep.Approving: return "YOUR WALLET: ALLOW THE STAKE";
-                case WagerStep.Sending: return doing == WagerAction.Claim ? "YOUR WALLET: CONFIRM THE PAYMENT" : "YOUR WALLET: CONFIRM THE STAKE";
+                case WagerStep.Sending:
+                    return doing == WagerAction.Claim ? "YOUR WALLET: CONFIRM THE PAYMENT"
+                        : doing == WagerAction.TestTokens ? "YOUR WALLET: CONFIRM THE TEST TOKENS"
+                        : "YOUR WALLET: CONFIRM THE STAKE";
                 case WagerStep.Confirming: return "WAITING FOR THE CHAIN";
                 case WagerStep.Locking:
                     return lockWaitSeconds > 0 ? "LOCKING THE STAKES: A TICKET IS STILL OUT, " + lockWaitSeconds + " S" : "LOCKING THE STAKES";
@@ -115,13 +126,16 @@ namespace Chog.Screens
             // A tap on the panel puts a failed stake away.
             gameObject.AddComponent<Button>().onClick.AddListener(GenesisWager.Dismiss);
 
-            _status = Text(template, "Status", new Vector2(0.03f, 0.45f), new Vector2(0.97f, 0.97f), Color.white, 30f, transform);
+            _status = Text(template, "Status", new Vector2(0.03f, 0.45f), StatusMax, Color.white, 30f, transform);
             _less = MakeButton(template, "Less", new Vector2(0.03f, 0.06f), new Vector2(0.15f, 0.42f), "-", out _);
             _more = MakeButton(template, "More", new Vector2(0.17f, 0.06f), new Vector2(0.29f, 0.42f), "+", out _);
             _stake = MakeButton(template, "Stake", new Vector2(0.32f, 0.06f), new Vector2(0.97f, 0.42f), "", out _stakeLabel);
+            // On the testnet only: test tokens from the tap of the test token, beside the line.
+            _tap = MakeButton(template, "TestTokens", TapMin, new Vector2(0.97f, 0.95f), "GET 1000\nTEST $CHOG", out _);
             _less.onClick.AddListener(() => Step(-1));
             _more.onClick.AddListener(() => Step(1));
             _stake.onClick.AddListener(() => GenesisWager.Stake(s_team, Amounts[_amount]));
+            _tap.onClick.AddListener(GenesisWager.TakeTestTokens);
             Refresh();
         }
 
@@ -154,10 +168,14 @@ namespace Chog.Screens
                     winners++;
 
             var busy = GenesisWager.Step != WagerStep.Idle;
+            var currency = GenesisWager.Currency;
             _status.text = busy
-                ? StepText(GenesisWager.Step, GenesisWager.Doing, GenesisWager.LockWaitSeconds, GenesisWager.Problem)
+                ? StepText(GenesisWager.Step, GenesisWager.Doing, GenesisWager.LockWaitSeconds, GenesisWager.Problem, GenesisWager.Chain.Name)
                 : StatusText(signedIn, GenesisWager.InMatch, GenesisWager.Locked, stakers.Count, GenesisWager.StakeWei, stakedTeam,
-                    winners, stakers.Count - winners, GenesisWager.BurnedShare);
+                    winners, stakers.Count - winners, GenesisWager.BurnedShare, currency);
+            var tap = signedIn && stakedTeam < 0 && GenesisWager.CanTakeTestTokens;
+            _tap.gameObject.SetActive(tap);
+            _status.rectTransform.anchorMax = tap ? StatusMaxBesideTap : StatusMax;
 
             var canStake = signedIn && GenesisWager.InMatch && !GenesisWager.Locked && stakedTeam < 0 && !busy && s_team >= 0
                 && PlayerWallet.State == WalletState.Ready;
@@ -166,7 +184,7 @@ namespace Chog.Screens
             _more.gameObject.SetActive(free);
             _stake.gameObject.SetActive(canStake);
             _stakeLabel.text = "STAKE " + (GenesisWager.StakeWei.Length > 0 ? MonadTransactions.PriceText(GenesisWager.StakeWei) : Amounts[_amount].ToString())
-                + " $CHOG";
+                + " " + currency;
         }
 
         private Button MakeButton(TextMeshProUGUI template, string name, Vector2 min, Vector2 max, string label, out TextMeshProUGUI text)

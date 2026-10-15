@@ -14,11 +14,51 @@
 // A decision is made once for a match and kept: the referee never signs two different ones.
 //
 // There is no wager until the contract is deployed and the services hold its referee's key.
+//
+// The wager can be on Monad's testnet while the Genesis are read on mainnet (chain.js): there
+// $CHOG does not exist and the stakes are in a test token (contracts/src/testnet/TestChog.sol),
+// which the game is told so it says so.
 
 import { keccak_256 } from '@noble/hashes/sha3.js';
+import { DEFAULT_RPC_URLS, isAddress } from './chain.js';
 import { listOf } from './rental.js';
 import { matchKeyOf } from './referee.js';
 import { CHOG_TOKEN } from './shop.js';
+
+// The chains a wager can be on, with the public endpoints the Monad documentation lists for
+// each (https://docs.monad.xyz/developer-essentials/testnet.md, read on 15 October 2026). The
+// first one is what a wallet that does not know the chain is offered.
+export const WAGER_NETWORKS = {
+  mainnet: { chainId: 143, chainName: 'Monad', rpcUrls: DEFAULT_RPC_URLS, test: false },
+  testnet: {
+    chainId: 10143, chainName: 'Monad Testnet', test: true,
+    rpcUrls: ['https://testnet-rpc.monad.xyz', 'https://rpc-testnet.monadinfra.com', 'https://rpc.ankr.com/monad_testnet'],
+  },
+};
+
+/**
+ * Where the wager is: its chain, the endpoints the services read it on, the token staked.
+ * Throws on settings that cannot be right: an unknown network, no token on the testnet, or
+ * anything but $CHOG on mainnet.
+ * @param {object} [options]
+ * @param {string} [options.network] "mainnet" (default) or "testnet"
+ * @param {string[]} [options.rpcUrls] endpoints to read the wager on, else the public ones
+ * @param {string} [options.token] the token staked: required on the testnet
+ */
+export function wagerNetwork({ network = 'mainnet', rpcUrls = [], token = '' } = {}) {
+  const known = WAGER_NETWORKS[network];
+  if (!known) throw new Error(`The wager network is "mainnet" or "testnet", not "${network}"`);
+  const staked = (token || (known.test ? '' : CHOG_TOKEN)).toLowerCase();
+  if (!isAddress(staked)) throw new Error('On the testnet the wager needs the address of the test token it is paid in');
+  if (!known.test && staked !== CHOG_TOKEN.toLowerCase()) throw new Error('On mainnet the wager is paid in $CHOG only');
+  return {
+    network, chainId: known.chainId, chainName: known.chainName, test: known.test, token: staked,
+    rpcUrls: rpcUrls.length > 0 ? rpcUrls : known.rpcUrls,
+    // The endpoint offered to a wallet is always a public one: the services may read the chain
+    // through an endpoint with a key in its address.
+    publicRpcUrl: known.rpcUrls[0],
+  };
+}
 
 // How long a ticket can be used, and how far behind ours the chain's clock is allowed to be.
 export const TICKET_SECONDS = 120;
@@ -43,13 +83,17 @@ const sameBook = (a, b) => a.length === b.length
 
 /**
  * @param {object} options
- * @param {ReturnType<import('./chain.js').createChain>} options.chain
+ * @param {ReturnType<import('./chain.js').createChain>} options.chain the chain the wager is on
  * @param {ReturnType<import('./referee.js').createReferee>} [options.referee] without it there is no wager
  * @param {ReturnType<import('./matches.js').createMatches>} options.matches
+ * @param {ReturnType<typeof wagerNetwork>} [options.network] where the wager is; mainnet by default
  * @param {() => number} [options.now] milliseconds
  */
-export function createWager({ chain, referee, matches, now = Date.now }) {
+export function createWager({ chain, referee, matches, network = wagerNetwork(), now = Date.now }) {
   const contract = referee?.wager ?? null;
+  if (referee && referee.chainId !== network.chainId) {
+    throw new Error(`The referee signs for chain ${referee.chainId} and the wager is on chain ${network.chainId}`);
+  }
   let settings = null;
 
   /** What a game page needs to stake; {enabled: false} when there is no wager or it is set up wrong. */
@@ -65,7 +109,8 @@ export function createWager({ chain, referee, matches, now = Date.now }) {
     // The contract only listens to the referee it knows: with another key here no ticket would work.
     if (settings.referee !== referee.address) return { enabled: false, reason: 'the contract knows another referee' };
     return {
-      enabled: true, address: contract, token: CHOG_TOKEN.toLowerCase(), chainId: referee.chainId, referee: referee.address,
+      enabled: true, address: contract, token: network.token, chainId: network.chainId, chainName: network.chainName,
+      rpcUrl: network.publicRpcUrl, test: network.test, referee: referee.address,
       burnedShare: settings.burnedShare, ticketSeconds: TICKET_SECONDS, refundAfterSeconds: REFUND_AFTER_SECONDS,
     };
   }

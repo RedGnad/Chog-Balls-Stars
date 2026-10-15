@@ -37,9 +37,9 @@ namespace Chog.Screens
         /// is nothing to tap.
         /// </summary>
         public static (string line, string button) Describe(WagerOutcome outcome, string chainState, bool mine, string stakeWei, string gainWei,
-                                                            string calledOffBecause, bool canClaim)
+                                                            string calledOffBecause, bool canClaim, string currency = "$CHOG")
         {
-            var stake = MonadTransactions.PriceText(stakeWei) + " $CHOG";
+            var stake = MonadTransactions.PriceText(stakeWei) + " " + currency;
             var paid = chainState == "settled" || chainState == "refunded";
             switch (outcome)
             {
@@ -50,7 +50,7 @@ namespace Chog.Screens
                     return ("NOBODY STAKED ON THE OTHER TEAM: YOUR STAKE OF " + stake + (paid ? " WAS GIVEN BACK" : " COMES BACK"),
                         paid ? "OK" : canClaim ? "GET IT BACK" : "");
                 case WagerOutcome.Won when mine:
-                    return ("YOUR TEAM WON: +" + MonadTransactions.PriceText(gainWei) + " $CHOG" + (paid ? ", PAID" : ""), paid ? "OK" : canClaim ? "CLAIM" : "");
+                    return ("YOUR TEAM WON: +" + MonadTransactions.PriceText(gainWei) + " " + currency + (paid ? ", PAID" : ""), paid ? "OK" : canClaim ? "CLAIM" : "");
                 case WagerOutcome.Won:
                     return ("YOUR TEAM LOST: YOUR STAKE OF " + stake + " GOES TO THE WINNERS", paid ? "OK" : canClaim ? "SETTLE" : "");
                 case WagerOutcome.Draw:
@@ -148,7 +148,7 @@ namespace Chog.Screens
 
             if (GenesisWager.Step != WagerStep.Idle && GenesisWager.Doing == WagerAction.Claim)
             {
-                _text.text = WagerPanel.StepText(GenesisWager.Step, GenesisWager.Doing, 0, GenesisWager.Problem);
+                _text.text = WagerPanel.StepText(GenesisWager.Step, GenesisWager.Doing, 0, GenesisWager.Problem, GenesisWager.Chain.Name);
                 _button.gameObject.SetActive(GenesisWager.Step == WagerStep.Failed);
                 _buttonLabel.text = "OK";
                 return;
@@ -157,7 +157,7 @@ namespace Chog.Screens
             var mine = GenesisWager.Outcome == WagerOutcome.Won && GenesisWager.WinnerTeam == GenesisWager.LastTeam;
             var gain = GenesisWager.WinnerGain(GenesisWager.LastStakeWei, GenesisWager.LastWinners, GenesisWager.LastLosers, GenesisWager.BurnedShare);
             var (line, button) = Describe(GenesisWager.Outcome, GenesisWager.LastChainState, mine, GenesisWager.LastStakeWei, gain,
-                GenesisWager.CalledOffBecause, GenesisWager.CanClaim);
+                GenesisWager.CalledOffBecause, GenesisWager.CanClaim, GenesisWager.Currency);
             _text.text = line;
             _button.gameObject.SetActive(button.Length > 0);
             _buttonLabel.text = button;

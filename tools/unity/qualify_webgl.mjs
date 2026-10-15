@@ -95,20 +95,32 @@ try {
     //   transactions there, as a wallet does for a purchase: every transaction is accepted at
     //   once and sent from the wallet's address, which anvil is asked to impersonate. Only for a
     //   local copy of a chain: nothing here can sign a transaction for a real one.
+    // CHOG_BROWSER_WALLET_SIGN=1, with a key and an endpoint, signs each transaction with the key
+    //   and sends it (tools/unity/test_wallet_tx.mjs) instead of asking anvil to impersonate: for
+    //   Monad's testnet, with a throwaway key made for the test and some testnet MON on it.
     let address=process.env.CHOG_BROWSER_WALLET,sign=null;
     const walletRpc=process.env.CHOG_BROWSER_WALLET_RPC||'';
+    const signsTransactions=process.env.CHOG_BROWSER_WALLET_SIGN==='1'&&Boolean(process.env.CHOG_BROWSER_WALLET_KEY);
     const bindings={};
     onBinding=async({name,payload})=>{if(bindings[name])await bindings[name](payload);};
     if(walletRpc){
       const ask=async(method,params)=>(await(await fetch(walletRpc,{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})})).json());
+      const askResult=async(method,params)=>{const answer=await ask(method,params);if(answer.error)throw new Error(answer.error.message||method+' failed');return answer.result;};
+      const signer=signsTransactions?await import(new URL('./test_wallet_tx.mjs',import.meta.url)):null;
+      const signingKey=signsTransactions?Uint8Array.from(process.env.CHOG_BROWSER_WALLET_KEY.replace(/^0x/,'').match(/.{2}/g),pair=>parseInt(pair,16)):null;
       await command('Runtime.addBinding',{name:'chogTestRpc'});
       bindings.chogTestRpc=async payload=>{
         const {id,method,params}=JSON.parse(payload);
         let answer;
         try{
-          if(method==='eth_sendTransaction')await ask('anvil_impersonateAccount',[params[0].from]);
-          answer=await ask(method,params??[]);
+          if(method==='eth_sendTransaction'&&signer){
+            answer={result:await signer.sendTransaction(params[0],signingKey,askResult)};
+            console.log('stand-in wallet sent '+answer.result);
+          }else{
+            if(method==='eth_sendTransaction')await ask('anvil_impersonateAccount',[params[0].from]);
+            answer=await ask(method,params??[]);
+          }
         }catch(error){answer={error:{message:String(error.message||error)}};}
         await command('Runtime.evaluate',{expression:`window.chogTestAnswered(${Number(id)},${JSON.stringify(JSON.stringify(answer))})`});
       };
@@ -141,7 +153,9 @@ try {
       window.chogTestAnswered=(id,text)=>{waiting[id](JSON.parse(text));delete waiting[id];};
       const onChain=['eth_chainId','eth_call','eth_sendTransaction','eth_getTransactionReceipt','eth_blockNumber'];
       window.ethereum={isChogTestStandIn:true,on(){},request:async({method,params})=>{
-        if(${walletRpc?'true':'false'}&&(method==='wallet_switchEthereumChain'||method==='wallet_addEthereumChain'))return null;
+        if(${walletRpc?'true':'false'}&&(method==='wallet_switchEthereumChain'||method==='wallet_addEthereumChain')){
+          console.log('CHOG_TEST_WALLET '+method+' '+JSON.stringify(params));return null;
+        }
         if(${walletRpc?'true':'false'}&&onChain.includes(method)){
           const answer=await new Promise(resolve=>{const id=++calls;waiting[id]=resolve;window.chogTestRpc(JSON.stringify({id,method,params}));});
           if(answer.error)throw Object.assign(new Error(answer.error.message||'the chain refused'),{code:answer.error.code||-32000});

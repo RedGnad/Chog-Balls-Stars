@@ -15,6 +15,28 @@ namespace Chog.Match.Tests
             "1b00000000000000000000000000000000000000000000000000000000000000";
 
         [Test]
+        public void TheWalletIsAskedForTheChainTheServicesName()
+        {
+            var testnet = MonadTransactions.ChainOf(10143, "Monad Testnet", "https://testnet-rpc.monad.xyz");
+            Assert.AreEqual("[{\"chainId\":\"0x279f\"}]", MonadTransactions.SwitchChainParameters(testnet));
+            Assert.AreEqual(
+                "[{\"chainId\":\"0x279f\",\"chainName\":\"Monad Testnet\",\"rpcUrls\":[\"https://testnet-rpc.monad.xyz\"]," +
+                "\"nativeCurrency\":{\"name\":\"Monad\",\"symbol\":\"MON\",\"decimals\":18}}]",
+                MonadTransactions.AddChainParameters(testnet));
+            Assert.AreEqual("[{\"chainId\":\"0x8f\"}]", MonadTransactions.SwitchChainParameters(MonadTransactions.Mainnet));
+        }
+
+        [Test]
+        public void AChainThatCannotBeRightIsNotTaken()
+        {
+            Assert.IsNull(MonadTransactions.ChainOf(0, "Monad", "https://rpc.monad.xyz"));
+            Assert.IsNull(MonadTransactions.ChainOf(10143, "Monad\"},{\"x", "https://testnet-rpc.monad.xyz"));
+            Assert.IsNull(MonadTransactions.ChainOf(10143, "Monad Testnet", "http://testnet-rpc.monad.xyz"));
+            Assert.IsNull(MonadTransactions.ChainOf(10143, "Monad Testnet", "https://a\"b"));
+            Assert.IsNull(MonadTransactions.ChainOf(10143, "", "https://testnet-rpc.monad.xyz"));
+        }
+
+        [Test]
         public void StakeIsEncodedAsTheContractReadsIt()
         {
             Assert.AreEqual(

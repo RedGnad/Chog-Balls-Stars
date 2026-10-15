@@ -7,7 +7,7 @@ import { createCareers } from '../src/career.js';
 import { createMatches, createMemoryStore } from '../src/matches.js';
 import { createReferee, matchKeyOf, resultDigest, ticketDigest, voidDigest } from '../src/referee.js';
 import { createSessions } from '../src/session.js';
-import { createWager, TICKET_SECONDS } from '../src/wager.js';
+import { createWager, TICKET_SECONDS, wagerNetwork } from '../src/wager.js';
 import { createWallet, hexToBytes } from './wallet.js';
 
 const SECRET = 'a test secret that is long enough to be accepted';
@@ -50,8 +50,8 @@ test('the referee signs the digests the contract computes', () => {
 });
 
 // Services with a wager contract whose stakes the test writes, and a clock the test moves.
-function services({ contractReferee } = {}) {
-  const referee = createReferee({ privateKey: REFEREE_KEY, chainId: 143, wager: WAGER });
+function services({ contractReferee, network = wagerNetwork() } = {}) {
+  const referee = createReferee({ privateKey: REFEREE_KEY, chainId: network.chainId, wager: WAGER });
   const state = { clock: 1_790_000_000_000, stakes: new Map(), referee: contractReferee ?? referee.address };
   const pack = (...lists) => {
     let heads = '';
@@ -83,7 +83,7 @@ function services({ contractReferee } = {}) {
   const sessions = createSessions({ secret: SECRET, now });
   let saved = null;
   const careers = createCareers({ load: async () => saved, save: async value => { saved = value; } });
-  const wager = createWager({ chain, referee, matches, now });
+  const wager = createWager({ chain, referee, matches, network, now });
   const api = createApi({ chain, sessions, careers, wager, publicOrigin: ORIGIN });
   return { state, api, matches, wager, referee };
 }
@@ -119,13 +119,43 @@ test('the game is told where to stake, and nothing when the contract knows anoth
   const { api, referee } = services();
   const described = (await call(api, 'GET', '/api/wager')).body;
   assert.deepEqual(described, {
-    enabled: true, address: WAGER, token: '0x350035555e10d9afaf1566aaebfced5ba6c27777', chainId: 143, referee: referee.address,
+    enabled: true, address: WAGER, token: '0x350035555e10d9afaf1566aaebfced5ba6c27777', chainId: 143, chainName: 'Monad',
+    rpcUrl: 'https://rpc.monad.xyz', test: false, referee: referee.address,
     burnedShare: 1000, ticketSeconds: TICKET_SECONDS, refundAfterSeconds: 3600,
   });
   const other = services({ contractReferee: '0x' + 'cc'.repeat(20) });
   assert.equal((await call(other.api, 'GET', '/api/wager')).body.enabled, false);
   const none = createApi({ chain: {}, sessions: createSessions({ secret: SECRET }), careers: {}, publicOrigin: ORIGIN });
   assert.deepEqual((await call(none, 'GET', '/api/wager')).body, { enabled: false });
+});
+
+test('on the testnet the game is told the chain and the test token, and tickets are for that chain', async () => {
+  const TEST_TOKEN = '0x' + 'dd'.repeat(20);
+  const network = wagerNetwork({ network: 'testnet', token: TEST_TOKEN, rpcUrls: ['https://key-in-the-address.example/secret'] });
+  const { api, matches, referee } = services({ network });
+  const described = (await call(api, 'GET', '/api/wager')).body;
+  assert.equal(described.chainId, 10143);
+  assert.equal(described.chainName, 'Monad Testnet');
+  assert.equal(described.token, TEST_TOKEN);
+  assert.equal(described.test, true);
+  assert.equal(described.rpcUrl, 'https://testnet-rpc.monad.xyz', 'a wallet is only ever offered a public endpoint');
+
+  await matchOfTwo(matches);
+  const alice = await sessionOf(api, ALICE);
+  const { body: ticket } = await call(api, 'POST', '/api/wager/ticket', alice, { team: 0, amount: AMOUNT });
+  const signed = chainId => signerOf(ticketDigest({ chainId, wager: WAGER, matchKey: ticket.matchKey, player: ALICE.address, team: 0, amount: AMOUNT, deadline: ticket.deadline }), ticket.signature);
+  assert.equal(signed(10143), referee.address);
+  assert.notEqual(signed(143), referee.address, 'a testnet ticket is worth nothing on mainnet');
+});
+
+test('a wager is set on a known chain, in its token', () => {
+  assert.throws(() => wagerNetwork({ network: 'sepolia' }), /mainnet" or "testnet/);
+  assert.throws(() => wagerNetwork({ network: 'testnet' }), /test token/);
+  assert.throws(() => wagerNetwork({ network: 'mainnet', token: '0x' + 'dd'.repeat(20) }), /\$CHOG only/);
+  assert.equal(wagerNetwork().token, '0x350035555e10d9afaf1566aaebfced5ba6c27777');
+  const referee = createReferee({ privateKey: REFEREE_KEY, chainId: 143, wager: WAGER });
+  const testnet = wagerNetwork({ network: 'testnet', token: '0x' + 'dd'.repeat(20) });
+  assert.throws(() => createWager({ chain: {}, referee, matches: {}, network: testnet }), /chain 143 and the wager is on chain 10143/);
 });
 
 test('a ticket is only for a wallet let into the match, and fixes what everyone stakes', async () => {

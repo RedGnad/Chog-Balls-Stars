@@ -810,6 +810,16 @@ new build without a restart.
 Shown only where the game services stake on matches (`GET api/wager` answers `enabled`); as
 no wager contract is deployed, that is nowhere but on the test bench today.
 
+**On Monad's testnet (15 October).** The services name the chain of the wager (`chainId`,
+`chainName`, a public `rpcUrl`, `test`); `GenesisWager` asks the wallet for that chain
+(`MonadTransactions.SwitchTo`, `0x279f` on the testnet, added to the wallet if it does not know
+it) and the screens call the stakes "TEST $CHOG", never $CHOG. Beside the stakes line, GET 1000
+TEST $CHOG takes test tokens from the tap of the test token (`claim()`, once a day per wallet;
+the wallet pays the gas in testnet MON). Where matches are staked on, a wallet that holds no
+Genesis is offered SIGN IN TO STAKE (TEST) $CHOG on the menu and stakes as a recruit. Seen on a
+local chain started as the testnet (build `20261015T103308125Z`): sign-in without a Genesis,
+1,000 tCHOG taken, 10 staked, stakes locked, the wallet asked for `0x279f`.
+
 - **Before the match** (`Assets/Chog/Screens/WagerPanel.cs`, on the Team Preparation screen):
   a signed-in player picks an amount (1 to 1,000 $CHOG) or sees the one the match is already
   played for, and taps STAKE. `GenesisWager.Stake` asks the referee for a ticket, then the

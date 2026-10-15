@@ -5,28 +5,33 @@
 #
 #   python3 tools/release/assemble_site.py --latest
 #   ngrok http 8087                      (in another terminal: it prints the public address)
-#   sh tools/release/serve_public.sh https://<public address> [--port 8087] [--photon-auth]
+#   sh tools/release/serve_public.sh https://<public address> [--port 8087] [--photon-auth] [--testnet-wager]
 #
 # --photon-auth tells the game to connect to Photon with the player's session or pass. Use it
 # only once Photon's dashboard asks these services who a player is (docs/DEPLOY.md, "Photon"):
 # before that, nobody could connect.
 #
 # Its data (careers, sessions, the secret Photon must send, the records of the matches) is kept
-# apart from the local test services, in .artifacts/services-public/. No stake is taken here:
-# no wager contract is deployed. A file reown-project-id in that folder (the Reown project id,
-# 32 hex digits) lets a phone's normal browser connect a wallet app; without it only the
-# wallet of the browser is offered.
+# apart from the local test services, in .artifacts/services-public/. --testnet-wager takes stakes
+# on the wager deployed on Monad's testnet, in its test token: the settings are the file
+# testnet-wager in that folder (the last line of tools/contracts/testnet_deployment.sh, one
+# setting a line) and the referee's key the file testnet-referee-key
+# (tools/contracts/new_referee_key.sh). Without it no stake is taken. A file reown-project-id
+# in that folder (the Reown project id, 32 hex digits) lets a phone's normal browser connect a
+# wallet app; without it only the wallet of the browser is offered.
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
-ORIGIN=${1:?usage: serve_public.sh https://<public address> [--port 8087] [--photon-auth]}
+ORIGIN=${1:?usage: serve_public.sh https://<public address> [--port 8087] [--photon-auth] [--testnet-wager]}
 shift
 PORT=8087
 PHOTON_AUTH=
+TESTNET_WAGER=
 while [ $# -gt 0 ]; do
   case "$1" in
     --port) PORT=$2; shift 2 ;;
     --photon-auth) PHOTON_AUTH=1; shift ;;
+    --testnet-wager) TESTNET_WAGER=1; shift ;;
     *) echo "unknown option $1" >&2; exit 2 ;;
   esac
 done
@@ -47,4 +52,16 @@ fi
 
 export PUBLIC_ORIGIN="$ORIGIN" PORT PHOTON_AUTH DOTNET
 export DATA_DIR="$ROOT/.artifacts/services-public"
+
+if [ -n "$TESTNET_WAGER" ]; then
+  if [ ! -s "$DATA_DIR/testnet-wager" ] || [ ! -s "$DATA_DIR/testnet-referee-key" ]; then
+    echo "--testnet-wager needs $DATA_DIR/testnet-wager and $DATA_DIR/testnet-referee-key" >&2
+    exit 1
+  fi
+  set -a
+  . "$DATA_DIR/testnet-wager"
+  set +a
+  REFEREE_KEY=$(cat "$DATA_DIR/testnet-referee-key")
+  export REFEREE_KEY
+fi
 exec node "$ROOT/server/src/host.js"

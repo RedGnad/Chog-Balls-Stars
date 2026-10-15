@@ -30,6 +30,12 @@
 //   WAGER_ADDRESS   optional, the deployed wager contract (contracts/src/ChogWager.sol), with
 //   REFEREE_KEY     the key of its referee, 64 hex digits: together or not at all. Without
 //                   them no match is staked on
+//   WAGER_NETWORK   "mainnet" (default) or "testnet": the chain the wager is on. The Genesis
+//                   are read on mainnet whatever this says
+//   WAGER_TOKEN     on the testnet, the test token the wager is paid in (contracts/src/testnet/
+//                   TestChog.sol); on mainnet it is $CHOG and this stays empty
+//   WAGER_RPC_URLS  optional, endpoints of the wager's chain separated by commas; default the
+//                   public ones of the Monad documentation
 //   VERIFIER_DLL    optional, the program that plays a match again (Chog.Quantum.Verifier.dll,
 //                   built by tools/quantum/headless.py); default judge/ in SITE_DIR, with
 //   QUANTUM_DB      the simulation assets of the build it judges; default quantum-db.json in
@@ -45,7 +51,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createApi } from './api.js';
 import { createCareers } from './career.js';
-import { CHAIN_ID, createChain, DEFAULT_RPC_URLS } from './chain.js';
+import { createChain, DEFAULT_RPC_URLS } from './chain.js';
 import { createJudge } from './judge.js';
 import { createMatches } from './matches.js';
 import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, reownProjectId, servedBuild, sessionSecret } from './node.js';
@@ -55,7 +61,7 @@ import { createRental } from './rental.js';
 import { createSessions } from './session.js';
 import { createShop } from './shop.js';
 import { createStatic } from './static.js';
-import { createWager } from './wager.js';
+import { createWager, wagerNetwork } from './wager.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const environment = process.env;
@@ -92,7 +98,16 @@ if (Boolean(wagerAddress) !== Boolean(refereeKey)) {
   console.error('WAGER_ADDRESS and REFEREE_KEY go together: set both, or neither.');
   process.exit(1);
 }
-const referee = wagerAddress ? createReferee({ privateKey: refereeKey, chainId: CHAIN_ID, wager: wagerAddress }) : undefined;
+const wagerRpcUrls = (environment.WAGER_RPC_URLS ?? '').split(',').map(url => url.trim()).filter(Boolean);
+const wagerPlace = wagerNetwork({
+  network: (environment.WAGER_NETWORK ?? '').trim() || 'mainnet',
+  rpcUrls: wagerRpcUrls,
+  token: (environment.WAGER_TOKEN ?? '').trim(),
+});
+// On mainnet, without endpoints of its own, the wager is read where the Genesis are.
+const wagerChain = !wagerPlace.test && wagerRpcUrls.length === 0 ? chain : createChain({ rpcUrls: wagerPlace.rpcUrls });
+const referee = wagerAddress ? createReferee({ privateKey: refereeKey, chainId: wagerPlace.chainId, wager: wagerAddress }) : undefined;
+if (referee) console.log(`Wager ${wagerAddress} on ${wagerPlace.chainName} (chain ${wagerPlace.chainId}), paid in ${wagerPlace.token}`);
 // The judge: the program that plays a match again. An assembled site carries it with the
 // assets and the tables of its build (tools/release/assemble_site.py); the settings name
 // another one. Without a program, or without the assets, no match gets a verdict.
@@ -138,7 +153,7 @@ const api = createApi({
   }),
   build,
   photonAuthentication: environment.PHOTON_AUTH === '1',
-  wager: createWager({ chain, referee, matches }),
+  wager: createWager({ chain: wagerChain, referee, matches, network: wagerPlace }),
   reownProjectId: await reownProjectId(dataFolder, environment.REOWN_PROJECT_ID),
 });
 

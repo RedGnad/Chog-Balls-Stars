@@ -17,7 +17,6 @@ namespace Chog.Match
     {
         public const int UserRefused = 4001;
 
-        private const string MonadChainId = "0x8f";
         private const string ApproveSelector = "0x095ea7b3";   // approve(address,uint256)
         private const string AllowanceSelector = "0xdd62ed3e"; // allowance(address,address)
         private const string BalanceSelector = "0x70a08231";   // balanceOf(address)
@@ -30,18 +29,62 @@ namespace Chog.Match
         private const int ReceiptAttempts = 90;
         private const float ReceiptSeconds = 1.5f;
         private const int UnknownChain = 4902;
-        private const string AddMonadParameters =
-            "[{\"chainId\":\"" + MonadChainId + "\",\"chainName\":\"Monad\",\"rpcUrls\":[\"https://rpc.monad.xyz\"]," +
-            "\"nativeCurrency\":{\"name\":\"Monad\",\"symbol\":\"MON\",\"decimals\":18}}]";
+
+        /// <summary>A chain the wallet is asked to be on: its id, its name, a public endpoint.</summary>
+        public sealed class ChainSpec
+        {
+            public readonly string HexId;
+            public readonly string Name;
+            public readonly string RpcUrl;
+
+            internal ChainSpec(int chainId, string name, string rpcUrl)
+            {
+                HexId = "0x" + chainId.ToString("x", CultureInfo.InvariantCulture);
+                Name = name;
+                RpcUrl = rpcUrl;
+            }
+        }
+
+        /// <summary>Monad mainnet, with the public endpoint the Monad documentation lists.</summary>
+        public static readonly ChainSpec Mainnet = new ChainSpec(0x8f, "Monad", "https://rpc.monad.xyz");
 
         /// <summary>
-        /// The wallet must be on Monad before anything is read or sent. A wallet that does not
-        /// know the chain (its code for that is 4902) is offered it, with the public endpoint
-        /// the Monad documentation lists.
+        /// The chain the game services name (the wager can be on Monad's testnet), or null when
+        /// what they gave cannot be right: the name and the endpoint go into what the wallet is
+        /// asked, so only plain names and https addresses without quotes are taken.
         /// </summary>
-        public static void SwitchToMonad(Action then, Action<int, string> fail)
+        public static ChainSpec ChainOf(int chainId, string name, string rpcUrl)
         {
-            PlayerWallet.Request("wallet_switchEthereumChain", "[{\"chainId\":\"" + MonadChainId + "\"}]", (switched, error, code) =>
+            if (chainId <= 0 || string.IsNullOrEmpty(name) || name.Length > 40 || string.IsNullOrEmpty(rpcUrl) || rpcUrl.Length > 200
+                || !rpcUrl.StartsWith("https://", StringComparison.Ordinal))
+                return null;
+            foreach (var letter in name)
+                if (!char.IsLetterOrDigit(letter) && letter != ' ')
+                    return null;
+            foreach (var letter in rpcUrl)
+                if (letter == '"' || letter == '\\' || letter <= ' ')
+                    return null;
+            return new ChainSpec(chainId, name, rpcUrl);
+        }
+
+        /// <summary>What the wallet is asked to switch to that chain.</summary>
+        public static string SwitchChainParameters(ChainSpec chain) => "[{\"chainId\":\"" + chain.HexId + "\"}]";
+
+        /// <summary>What a wallet that does not know that chain is asked to add it.</summary>
+        public static string AddChainParameters(ChainSpec chain) =>
+            "[{\"chainId\":\"" + chain.HexId + "\",\"chainName\":\"" + chain.Name + "\",\"rpcUrls\":[\"" + chain.RpcUrl + "\"]," +
+            "\"nativeCurrency\":{\"name\":\"Monad\",\"symbol\":\"MON\",\"decimals\":18}}]";
+
+        /// <summary>The wallet must be on Monad mainnet before anything is read or sent there.</summary>
+        public static void SwitchToMonad(Action then, Action<int, string> fail) => SwitchTo(Mainnet, then, fail);
+
+        /// <summary>
+        /// The wallet must be on the chain before anything is read or sent. A wallet that does
+        /// not know the chain (its code for that is 4902) is offered it, with its public endpoint.
+        /// </summary>
+        public static void SwitchTo(ChainSpec chain, Action then, Action<int, string> fail)
+        {
+            PlayerWallet.Request("wallet_switchEthereumChain", SwitchChainParameters(chain), (switched, error, code) =>
             {
                 if (error == null)
                 {
@@ -51,14 +94,14 @@ namespace Chog.Match
 
                 if (code != UnknownChain)
                 {
-                    fail(code, "the wallet is not on Monad: " + error);
+                    fail(code, "the wallet is not on " + chain.Name + ": " + error);
                     return;
                 }
 
-                PlayerWallet.Request("wallet_addEthereumChain", AddMonadParameters, (added, addError, addCode) =>
+                PlayerWallet.Request("wallet_addEthereumChain", AddChainParameters(chain), (added, addError, addCode) =>
                 {
                     if (addError != null)
-                        fail(addCode, "Monad could not be added to the wallet: " + addError);
+                        fail(addCode, chain.Name + " could not be added to the wallet: " + addError);
                     else
                         then();
                 });
@@ -82,15 +125,17 @@ namespace Chog.Match
         /// less is told so before it is asked to sign anything ("whatCosts" names what is paid
         /// for, as in "the second form costs"), and the contract is allowed to take the amount
         /// unless it already may. "approving" is called when the wallet is asked for that.
+        /// "currency" names the token in what the player reads.
         /// </summary>
         public static void AllowPayment(string payer, string token, string spender, string amountWei, string whatCosts,
-                                        Action approving, Action then, Action<int, string> fail)
+                                        Action approving, Action then, Action<int, string> fail, string currency = "$CHOG")
         {
             Read(token, BalanceData(payer), balance =>
             {
                 if (!IsAtLeast(balance, amountWei))
                 {
-                    fail(0, "this wallet holds " + PriceText(HexToDecimal(balance)) + " $CHOG and " + whatCosts + " " + PriceText(amountWei));
+                    fail(0, "this wallet holds " + PriceText(HexToDecimal(balance)) + " " + currency + " and " + whatCosts + " "
+                            + PriceText(amountWei));
                     return;
                 }
 

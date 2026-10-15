@@ -59,6 +59,10 @@
 #       two pages that stake against each other: start the host, then the guest with another
 #       wallet (CHOG_STAKER_KEY=<a public test key>, for instance the key of anvil's second
 #       account). The guest joins, changes team and stakes; the host stakes and starts.
+#       On Monad's testnet (a public instance started with --testnet-wager): each page with its
+#       own throwaway key holding testnet MON (CHOG_STAKER_KEY), CHOG_BROWSER_WALLET_SIGN=1 so the
+#       stand-in signs real transactions, CHOG_BROWSER_WALLET_RPC=https://testnet-rpc.monad.xyz,
+#       and CHOG_TAKE_TEST_TOKENS=1 to tap GET 1000 TEST $CHOG before staking.
 #   browser_check.sh staked <base url> <label> [look | claim, default look]
 #       the menu again with the same CHOG_BROWSER_PROFILE: what became of the stake, and with
 #       "claim" the button that brings the referee's decision to the contract.
@@ -92,6 +96,8 @@ START="480 440"
 CHANGE_TEAM="480 327"
 # The STAKE button of the preparation screen and the button of the menu's stake strip.
 STAKE="242 510"
+# On the testnet, the button beside the stakes line that takes test tokens from the tap.
+TEST_TOKENS="308 470"
 CLAIM="693 27"
 CONNECT="629 434"
 # Beside it on a phone without a wallet: the window of wallet apps.
@@ -227,8 +233,14 @@ case "$MODE" in
     tap 1 $CONNECT 6000
     tap 2 $SIGN_IN 6000
     tap 3 $QUICK_PLAY 55000
-    tap 4 $STAKE 35000
-    tap 5 $START 12000
+    if [ "${CHOG_TAKE_TEST_TOKENS:-0}" = 1 ]; then
+      tap 4 $TEST_TOKENS 30000
+      tap 5 $STAKE 45000
+      tap 6 $START 12000
+    else
+      tap 4 $STAKE 35000
+      tap 5 $START 12000
+    fi
     export CHOG_BROWSER_LINGER_MS=$(( ${4:-420} * 1000 )) CHOG_BROWSER_WAIT_FOR="${CHOG_BROWSER_WAIT_FOR:-CHOG_REPLAY}"
     ;;
   stake-guest)
@@ -239,7 +251,12 @@ case "$MODE" in
     tap 2 $SIGN_IN 6000
     tap 3 $QUICK_PLAY 14000
     tap 4 $CHANGE_TEAM 4000
-    tap 5 $STAKE 35000
+    if [ "${CHOG_TAKE_TEST_TOKENS:-0}" = 1 ]; then
+      tap 5 $TEST_TOKENS 30000
+      tap 6 $STAKE 45000
+    else
+      tap 5 $STAKE 35000
+    fi
     export CHOG_BROWSER_LINGER_MS=$(( ${4:-420} * 1000 ))
     ;;
   staked)

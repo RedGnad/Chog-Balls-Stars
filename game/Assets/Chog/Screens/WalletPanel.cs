@@ -154,6 +154,7 @@ namespace Chog.Screens
             GenesisForms.Changed += Refresh;
             GenesisShop.Changed += Refresh;
             GenesisRental.Changed += Refresh;
+            GenesisWager.Changed += Refresh;
             if (_title != null)
             {
                 // Back on the menu, for instance after a match: the careers may have moved.
@@ -173,6 +174,7 @@ namespace Chog.Screens
             GenesisForms.Changed -= Refresh;
             GenesisShop.Changed -= Refresh;
             GenesisRental.Changed -= Refresh;
+            GenesisWager.Changed -= Refresh;
         }
 
         private void Build()
@@ -360,14 +362,16 @@ namespace Chog.Screens
             // way to have a career recorded. A guest reads how long the loan lasts.
             var signedIn = PlayerWallet.SignIn == SignInState.SignedIn;
             var canRentOut = owns && GenesisRental.State == RentalState.Open;
-            _signIn.gameObject.SetActive(holds && !signedIn);
+            // Where matches are staked on, a wallet without a Genesis signs in too: it stakes as a recruit.
+            var signsInToStake = !holds && !guest && !checkingPass && state == WalletState.Ready && GenesisWager.State == WagerState.Open;
+            _signIn.gameObject.SetActive((holds || signsInToStake) && !signedIn);
             var signInArea = (RectTransform)_signIn.transform;
             signInArea.anchorMin = canRentOut ? SignInMinBesideRentOut : SignInMin;
             signInArea.anchorMax = canRentOut ? SignInMaxBesideRentOut : SignInMax;
             _signIn.interactable = PlayerWallet.SignIn != SignInState.Asking;
             _signInLabel.text = PlayerWallet.SignIn == SignInState.Asking ? "ANSWER IN YOUR WALLET..."
                 : PlayerWallet.SignInProblem.Length > 0 ? "SIGN-IN FAILED, TRY AGAIN"
-                : "SIGN IN TO RECORD ITS CAREER";
+                : holds ? "SIGN IN TO RECORD ITS CAREER" : "SIGN IN TO STAKE " + GenesisWager.Currency;
             var canLend = owns && signedIn && GenesisLoan.CanLend(played);
             _lend.gameObject.SetActive(canLend);
             _rentOut.gameObject.SetActive(canRentOut);

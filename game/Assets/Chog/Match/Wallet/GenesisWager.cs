@@ -42,7 +42,9 @@ namespace Chog.Match
         Stake,
         Lock,
         /// <summary>Bringing the referee's decision to the contract, which pays or gives back.</summary>
-        Claim
+        Claim,
+        /// <summary>Taking test tokens from the tap of the test token, on the testnet only.</summary>
+        TestTokens
     }
 
     /// <summary>What became of the stakes of a match, as far as the game has read.</summary>
@@ -82,6 +84,11 @@ namespace Chog.Match
         private const string StakeSelector = "0x0a621329";  // stake(bytes32,uint8,uint256,uint256,bytes)
         private const string SettleSelector = "0x99bcbc7f"; // settle(bytes32,uint8,bytes)
         private const string VoidSelector = "0xe3c01265";   // voidMatch(bytes32,bytes)
+        private const string TapSelector = "0x4e71d92d";    // claim() of the test token
+
+        // A first claim from the tap cost 107,537 on a local chain (15 October 2026); Monad
+        // prices some storage access higher, hence the margin.
+        private const int TapGasLimit = 200000;
 
         // Monad charges the gas limit of a transaction, not what it uses. Measured on a copy of
         // mainnet (contracts/README.md): a first stake 246,008 and a later one 177,896; paying a
@@ -102,6 +109,16 @@ namespace Chog.Match
         /// <summary>The wager contract and the $CHOG token, as the services gave them.</summary>
         public static string Address { get; private set; } = "";
         public static string Token { get; private set; } = "";
+
+        /// <summary>The chain the wager is on: Monad, or Monad's testnet where the stakes are a test token.</summary>
+        public static MonadTransactions.ChainSpec Chain { get; private set; } = MonadTransactions.Mainnet;
+        public static bool IsTest { get; private set; }
+
+        /// <summary>What the stakes are called on screen: a test token is never shown as $CHOG.</summary>
+        public static string Currency => IsTest ? "TEST $CHOG" : "$CHOG";
+
+        /// <summary>Whether this page already took test tokens from the tap (once a day per wallet).</summary>
+        public static bool TookTestTokens { get; private set; }
 
         /// <summary>The share of what the losers staked that is burned, in hundredths of a percent.</summary>
         public static int BurnedShare { get; private set; }
@@ -155,6 +172,10 @@ namespace Chog.Match
             public string address;
             public string token;
             public int burnedShare;
+            public int chainId;
+            public string chainName;
+            public string rpcUrl;
+            public bool test;
         }
 
         [Serializable]
@@ -243,12 +264,17 @@ namespace Chog.Match
                     return;
                 }
 
-                State = answer.enabled && MonadTransactions.LooksLikeAnAddress(answer.address) && MonadTransactions.LooksLikeAnAddress(answer.token)
+                // Services from before the chain was named answer no chainId: the wager is on mainnet.
+                var chain = answer.chainId == 0 ? MonadTransactions.Mainnet : MonadTransactions.ChainOf(answer.chainId, answer.chainName, answer.rpcUrl);
+                State = answer.enabled && chain != null && MonadTransactions.LooksLikeAnAddress(answer.address)
+                        && MonadTransactions.LooksLikeAnAddress(answer.token)
                     ? WagerState.Open : WagerState.Closed;
                 Address = answer.address ?? "";
                 Token = answer.token ?? "";
                 BurnedShare = answer.burnedShare;
-                Debug.Log("CHOG_WAGER " + (State == WagerState.Open ? "open" : "closed"));
+                Chain = chain ?? MonadTransactions.Mainnet;
+                IsTest = answer.test;
+                Debug.Log("CHOG_WAGER " + (State == WagerState.Open ? "open on " + Chain.Name + " (" + Chain.HexId + ")" : "closed"));
                 Changed?.Invoke();
             }));
         }
@@ -309,7 +335,7 @@ namespace Chog.Match
                 }
 
                 SetStep(WagerStep.Switching, WagerAction.Stake, "");
-                MonadTransactions.SwitchToMonad(() =>
+                MonadTransactions.SwitchTo(Chain, () =>
                 {
                     MonadTransactions.AllowPayment(player, Token, Address, ticket.amount, "the stake is",
                         () => SetStep(WagerStep.Approving, WagerAction.Stake, ""),
@@ -322,7 +348,7 @@ namespace Chog.Match
                                     Remember(ticket.gameId, ticket.matchKey, ticket.team, ticket.amount);
                                     Confirm(() => HasStaked, ReadMine, "the stake");
                                 }, Fail);
-                        }, Fail);
+                        }, Fail, Currency);
                 }, Fail);
             }));
         }
@@ -453,11 +479,39 @@ namespace Chog.Match
                 ? VoidData(s_lastMatchKey, s_decisionSignature)
                 : SettleData(s_lastMatchKey, WinnerTeam, s_decisionSignature);
             SetStep(WagerStep.Switching, WagerAction.Claim, "");
-            MonadTransactions.SwitchToMonad(() =>
+            MonadTransactions.SwitchTo(Chain, () =>
             {
                 SetStep(WagerStep.Sending, WagerAction.Claim, "");
                 MonadTransactions.Send(sender, Address, data, ClaimGasLimit, "the payment of the match",
                     () => Confirm(() => LastChainState == "settled" || LastChainState == "refunded", ReadOutcome, "the payment of the match"), Fail);
+            }, Fail);
+        }
+
+        /// <summary>Whether the connected wallet can take test tokens from the tap now (testnet only).</summary>
+        public static bool CanTakeTestTokens => State == WagerState.Open && IsTest && !TookTestTokens && !IsBusy
+            && PlayerWallet.State == WalletState.Ready;
+
+        /// <summary>
+        /// On the testnet only: the wallet takes test tokens from the tap of the test token (a
+        /// thousand, once a day), so the player can stake without being sent any. The wallet pays
+        /// the gas in testnet MON.
+        /// </summary>
+        public static void TakeTestTokens()
+        {
+            if (!CanTakeTestTokens)
+                return;
+
+            var player = PlayerWallet.Address;
+            SetStep(WagerStep.Switching, WagerAction.TestTokens, "");
+            MonadTransactions.SwitchTo(Chain, () =>
+            {
+                SetStep(WagerStep.Sending, WagerAction.TestTokens, "");
+                MonadTransactions.Send(player, Token, TapSelector, TapGasLimit, "the claim of test tokens (one a day)", () =>
+                {
+                    TookTestTokens = true;
+                    Debug.Log("CHOG_WAGER took test tokens");
+                    SetStep(WagerStep.Idle, WagerAction.None, "");
+                }, Fail);
             }, Fail);
         }
 

@@ -8,26 +8,60 @@ chain id `10143` (`0x279f`), RPC `https://testnet-rpc.monad.xyz` (also
 `https://rpc-testnet.monadinfra.com`, `https://rpc.ankr.com/monad_testnet`), faucet
 `https://faucet.monad.xyz`, explorers `https://testnet.monadvision.com` and
 `https://testnet.monadscan.com`; the testnet was reset from genesis on 2025-12-16. Neither
-$CHOG nor the Genesis collection is on the testnet: a test token and a stand-in for the
-collection have to be deployed beside the three contracts. The game asks the wallet for chain
-`0x8f` (mainnet) in `MonadTransactions.cs` today.
+$CHOG nor the Genesis collection is on the testnet: the wager goes there first, in a test token
+(`src/testnet/TestChog.sol`); the rental and the shop would also need a stand-in for the
+collection, not written. Multicall3 (`0xcA11bde05977b3631167028862bE2a173976CA11`), which the
+game services read through, has code on the testnet (checked on 15 October).
 
 | Contract | What it is for | State |
 | --- | --- | --- |
 | `src/ChogShop.sol` | an item bought for a Genesis (today: the second form of its attack) | not deployed; rehearsed on a local copy of the chain |
 | `src/ChogRental.sol` | a holder offers a Genesis for rent at a price a day, a player pays to play it | not deployed; rehearsed on a local copy of the chain |
-| `src/ChogWager.sol` | the players of a match stake $CHOG on their own team, the winners are paid on a result the game's referee signed | not deployed; rehearsed on a local copy of the chain by script only, not from the game |
+| `src/ChogWager.sol` | the players of a match stake $CHOG on their own team, the winners are paid on a result the game's referee signed | ready for Monad testnet (`script/DeployTestnet.s.sol`), not deployed yet; played from the game on a local chain |
+| `src/testnet/TestChog.sol` | "Test CHOG" (tCHOG): the stand-in for $CHOG on the testnet, 18 decimals, `burn`, and a tap: `claim()` gives 1,000 to any address once a day | deployed with the wager by the same script |
 
-`forge test` runs the three: 13 tests for the shop, 18 for the rental, 23 for the wager, no
-network needed.
+`forge test` runs them: 13 tests for the shop, 18 for the rental, 23 for the wager, 4 for the
+test token (one is a staked match paid in it), no network needed.
+
+## On Monad testnet: the deployment the user starts
+
+The game services sign with a referee key made on this Mac and never shown
+(`sh tools/contracts/new_referee_key.sh <file>` prints only its address; the one of the public
+instance is `.artifacts/services-public/testnet-referee-key`, address
+`0x5375243CeE1b2adB0986A332dC6131AEbB097b75`). Two throwaway wallets made the same way play the
+headless test matches (`.artifacts/testnet-bench/staker-a-key` `0x3dB356809Eb861225B40E3b222D7A28562177B6c`,
+`staker-b-key` `0x8A7bB7CfC540993572bD520e5F7EaA51092f225d`). In the user's own terminal, with
+their development wallet imported once into an encrypted keystore and about 1 MON of testnet
+MON on it (the simulation of 15 October estimated 0.49 MON of gas at most, and the script sends
+0.25 MON to each test wallet):
+
+```sh
+~/.foundry/bin/cast wallet import chog-dev --interactive
+cd contracts
+REFEREE=0x5375243CeE1b2adB0986A332dC6131AEbB097b75 \
+BENCH_WALLETS=0x3dB356809Eb861225B40E3b222D7A28562177B6c,0x8A7bB7CfC540993572bD520e5F7EaA51092f225d \
+~/.foundry/bin/forge script script/DeployTestnet.s.sol --rpc-url monad_testnet --account chog-dev --broadcast
+```
+
+The script refuses any chain but 10143. Then, on this Mac, `sh tools/contracts/testnet_deployment.sh
+0x5375243CeE1b2adB0986A332dC6131AEbB097b75` checks on the testnet that both contracts have code
+and the wager is paid in that token with that referee, and prints the settings of the services;
+written one a line into `.artifacts/services-public/testnet-wager`, they are what
+`tools/release/serve_public.sh ... --testnet-wager` reads. The game is told the chain by the
+services (`GET /api/wager`: `chainId`, `chainName`, a public `rpcUrl`, `test`): it asks the
+wallet for `0x279f`, names the stakes "TEST $CHOG", and offers GET 1000 TEST $CHOG beside the
+stakes. Rehearsed on 15 October on a local chain started as the testnet
+(`anvil --chain-id 10143`, Multicall3's code copied onto it): the deployment, the funding of
+the test wallets, and a page that signs in without a Genesis, takes 1,000 tCHOG and stakes 10
+(see `docs/STATUS.md`, 15 October).
 
 # ChogWager: $CHOG staked on a match
 
-**Not deployed, and not wired to the game yet.** Written on 10 October 2026 after the user put
-staking on a match in scope (decision D33 in `docs/STATUS.md`). The contract and its tests are
-here; the backend that signs tickets and results, and the screens that stake and collect, are
-separate work. **No transaction was ever sent to the real chain and no key of the project was
-used.**
+**Not deployed yet; ready for Monad testnet (above).** Written on 10 October 2026 after the user
+put staking on a match in scope (decision D33 in `docs/STATUS.md`). The backend that signs
+tickets and results (`server/src/wager.js`, `referee.js`) and the screens that stake and collect
+(`WagerPanel`, `WagerResult`) exist since 11 October. **No transaction was ever sent to Monad
+mainnet.**
 
 ## What the contract does
 
@@ -132,7 +166,9 @@ copy:
 Monad charges the gas limit of a transaction, not what it uses: the limits the game sends will
 have to sit above these, and a settlement costs more with every winner to pay.
 
-## Deploying (not done)
+## Deploying on mainnet (not done)
+
+For the testnet, see "On Monad testnet" at the top.
 
 ```sh
 forge create contracts/src/ChogWager.sol:ChogWager --root contracts --rpc-url https://rpc.monad.xyz \
@@ -161,7 +197,8 @@ apart, able to replace it. This command was not run against the real chain.
   players (a blocklist, a pause), the payment of the whole match would fail, `refundExpired`
   included. Whether $CHOG can refuse a transfer that way was not checked.
 - The contract was not reviewed by anyone else and not audited.
-- Never used with a real wallet, never from the game: the rehearsal is a script.
+- Never used with a real wallet. From the game only with test wallets in the headless browser,
+  on a local copy of mainnet (11 October) and a local chain started as the testnet (15 October).
 
 # ChogRental: a Genesis played for a few days against $CHOG
 

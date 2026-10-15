@@ -227,6 +227,35 @@ the rest in `.artifacts/chog-body/traits/batch-3/`.
 hero merged into few meshes and materials, measured on their phone with `?perf=1` before and
 after; the testnet deployment script meanwhile.
 
+**15 October 2026, 12:45.** The wager is ready for Monad's testnet, not deployed: a test token
+(`contracts/src/testnet/TestChog.sol`, "TEST CHOG", a tap of 1,000 a day), a deployment script
+for the user's own terminal (`contracts/script/DeployTestnet.s.sol`, refuses any chain but
+10143, also funds two throwaway test wallets), a referee key made on this Mac and never shown
+(address `0x5375243CeE1b2adB0986A332dC6131AEbB097b75`), the services told which chain the wager
+is on while the Genesis stay read on mainnet (`WAGER_NETWORK`, `WAGER_TOKEN`,
+`WAGER_RPC_URLS`; `--wager-network`, `--wager-token`, `--wager-rpc`), the public instance able
+to take it (`serve_public.sh --testnet-wager`), and the game asking the wallet for the chain the
+services name, calling the stakes TEST $CHOG, offering GET 1000 TEST $CHOG, and letting a
+wallet without a Genesis sign in to stake as a recruit (a product choice made alone, so that a
+judge without a Genesis can try a stake). The stand-in wallet of the headless browser can now
+sign real transactions with a throwaway key (`tools/unity/test_wallet_tx.mjs`, checked on a
+local chain). **Seen** on a local chain started as the testnet (`anvil --chain-id 10143`, the
+real deployment script, Multicall3's code copied from the testnet), with Photon's real cloud
+and bench services on the loopback address sharing the public instance's session secret: the
+menu offers SIGN IN TO STAKE TEST $CHOG to a wallet without a Genesis, the preparation screen
+offers GET 1000 TEST $CHOG and STAKE 10 TEST $CHOG, the wallet is asked for `0x279f`, the
+wallet ends with 990 tCHOG and the wager holds 10, the stakes are locked at START. Simulated
+against the real testnet without sending: 2.42 million gas, at most 0.49 MON, plus 0.25 MON to
+each test wallet. Build `20261015T103308125Z` is on the public address since 12:40 with no
+wager set (`GET /api/wager` answers `enabled: false`). Tests: 29 simulation, 71 view, the
+services, 58 contract (4 new). **Not seen:** anything on the real testnet, a match paid out on
+it, a real wallet (MetaMask) staking.
+**Waiting on the user:** the development wallet imported in their terminal, about 1 MON of
+testnet MON on it, and the one command of `contracts/README.md` ("On Monad testnet").
+**Then (dev):** `testnet_deployment.sh`, the public instance with `--testnet-wager`, two
+headless pages staking against each other through the public address and Photon's real cloud,
+judged and paid on the testnet; then the user stakes from MetaMask.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a
