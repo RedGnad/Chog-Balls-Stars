@@ -374,6 +374,27 @@ local address (no phone yet):
 **Not seen:** any of it on a phone, its cost there (`?perf=1`), a strike of the brute filmed.
 **Waiting on the user:** their eye on the menu and the heroes; the phone; the testnet deployment.
 
+**16 October 2026, 00:20 (same night, continued alone).** Built, seen in the headless browser, pushed,
+and served by the public address (build `20261015T210119927Z`):
+- **The end of a match** shows the result in Koulen and the player's hero in 3D, cheering or slumping
+  (`ChogResultScreen`); names over heroes, hit numbers and the alarms of structures are in Koulen; the
+  touch sticks are lavender, pink and gold.
+- **Under the hero of the menu, what its basic attack throws and from which trait** ("THROWS SNOWBALLS
+  FROM ITS RUSSIAN HAT"; library format 4); the classes read BRUTE, RANGER, CONTROLLER on the
+  preparation screen.
+- **A guide of three cards at the first visit** (what the Genesis does, the controls on a phone and a
+  computer, how a match is won) and a HOW TO PLAY button (`ChogGuide`); scripted visits pass
+  `noguide=1` (`browser_check.sh` adds it).
+- **When a special fires, the eyes it comes from pop up in 3D above the hero** (`ChogSignatureFlash`):
+  seen on the viewer page (`?heroes=...&flash=1`), not caught in a match picture yet.
+- **A census of the submitted projects** (4 of 451 applications; the nearest is Chog World, a social
+  island) and **a draft of the submission** (`docs/SUBMISSION.md`), every claim checked against the game.
+- **3D batch 7 as pictures, on the branch `3d-batch-7`, not in the game** (`tools/blender/README.md`,
+  "Batch 7"): the whole crown through the robber's knitted mask; the Skull base (60 Genesis, ready in the
+  export of the branch, checked against every Genesis); the Radioactive base (30, gradient skins, horns,
+  gem, third eye, seal, laser, mushrooms; the gradient needs a change of the game before it can go in).
+**Waiting on the user:** yes or no on batch 7 (robber, skulls, radioactive); the rest unchanged.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a
