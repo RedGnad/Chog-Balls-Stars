@@ -13,7 +13,13 @@ namespace Chog.Match
     /// </summary>
     public sealed class ChogPartsLibrary
     {
-        public const string Magic = "CHOGPARTS4";
+        public const string Magic = "CHOGPARTS5";
+
+        /// <summary>
+        /// Where a skin that runs to another colour starts and ends doing so: heights over the feet, in units
+        /// of the model (the neck, the top of the crown), as tools/blender/render_chog_traits.py draws it.
+        /// </summary>
+        public const float GradientLow = 0.62f, GradientHigh = 1.12f;
 
         /// <summary>The rest part of the objects of the basic attacks, which no hero wears.</summary>
         public const string AttackPart = "Attack";
@@ -40,6 +46,9 @@ namespace Chog.Match
             public string Name;
             public float SkinR, SkinG, SkinB;
             public float FaceR, FaceG, FaceB;
+            /// <summary>Whether the skin runs to another colour towards the top (the Radioactive base).</summary>
+            public bool HasTop;
+            public float TopR, TopG, TopB;
         }
 
         /// <summary>One of the four parts the game moves, and where it rests on its parent.</summary>
@@ -123,7 +132,9 @@ namespace Chog.Match
                 {
                     Name = ReadString(reader),
                     SkinR = reader.ReadSingle(), SkinG = reader.ReadSingle(), SkinB = reader.ReadSingle(),
-                    FaceR = reader.ReadSingle(), FaceG = reader.ReadSingle(), FaceB = reader.ReadSingle()
+                    FaceR = reader.ReadSingle(), FaceG = reader.ReadSingle(), FaceB = reader.ReadSingle(),
+                    HasTop = reader.ReadByte() != 0,
+                    TopR = reader.ReadSingle(), TopG = reader.ReadSingle(), TopB = reader.ReadSingle()
                 };
             }
 
@@ -216,12 +227,29 @@ namespace Chog.Match
         /// </summary>
         public void ColourOf(ushort material, int skin, out float r, out float g, out float b, out float a)
         {
+            ColourOf(material, skin, 0f, out r, out g, out b, out a);
+        }
+
+        /// <summary>
+        /// The same for a vertex at "height" over the feet (units of the model): a skin that runs to another
+        /// colour takes the share of it its height gives.
+        /// </summary>
+        public void ColourOf(ushort material, int skin, float height, out float r, out float g, out float b, out float a)
+        {
             var made = Materials[material];
             var colours = Skins[skin];
             switch (made.Role)
             {
                 case RoleSkin:
                     r = colours.SkinR; g = colours.SkinG; b = colours.SkinB;
+                    if (colours.HasTop)
+                    {
+                        var share = (height - GradientLow) / (GradientHigh - GradientLow);
+                        share = share < 0f ? 0f : share > 1f ? 1f : share;
+                        r += (colours.TopR - r) * share;
+                        g += (colours.TopG - g) * share;
+                        b += (colours.TopB - b) * share;
+                    }
                     break;
                 case RoleFace:
                     r = colours.FaceR; g = colours.FaceG; b = colours.FaceB;

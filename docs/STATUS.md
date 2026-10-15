@@ -374,7 +374,7 @@ local address (no phone yet):
 **Not seen:** any of it on a phone, its cost there (`?perf=1`), a strike of the brute filmed.
 **Waiting on the user:** their eye on the menu and the heroes; the phone; the testnet deployment.
 
-**16 October 2026, 00:20 (same night, continued alone).** Built, seen in the headless browser, pushed,
+**15 October 2026, 23:20 (same night, continued alone).** Built, seen in the headless browser, pushed,
 and served by the public address (build `20261015T210119927Z`):
 - **The end of a match** shows the result in Koulen and the player's hero in 3D, cheering or slumping
   (`ChogResultScreen`); names over heroes, hit numbers and the alarms of structures are in Koulen; the

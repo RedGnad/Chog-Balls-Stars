@@ -402,7 +402,7 @@ wig; from the game camera the row under a bucket hat shows only its points; the 
 keeps the whole star where the pictures draw a row of points over the top; the durag's row stands out
 like ears from the front; the Spartan helmet's cheek guards and eye holes (batch 4).
 
-## Into the game: the library of parts (16 October 2026)
+## Into the game: the library of parts (15 October 2026)
 
 After batch 6 the owner said yes to the 3D in the game. `export_chog_parts.py` writes
 `game/Assets/Chog/Resources/ChogParts.bytes` (2.1 MB), which the game assembles every hero from
@@ -417,7 +417,7 @@ Each part depends on one trait (and the Side): the head with its leaves on the h
 on `Head`, the eyes on `Eyes`, the mouth on `Mouth`, the clothing on `Body`. The script names the parts
 each Genesis wears by those keys, builds the 79 Genesis that wear all 324 parts between them (with the
 checks of `make_chog_traits.py`), and with `--check N` builds N more and fails if any of their objects
-differs from the one kept under its key. Run with `--check 5000` on 16 October: the 1,790 other Genesis of
+differs from the one kept under its key. Run with `--check 5000` on 15 October: the 1,790 other Genesis of
 the base Origin were all built and all matched, so a hero assembled in the game is the hero this folder
 builds. The 100 Genesis on another base are not exported (no head of their own yet). It also writes the
 bare Chog in grey, under the number 0, for the recruits. Summary in `.artifacts/chog-body/parts-export.json`.

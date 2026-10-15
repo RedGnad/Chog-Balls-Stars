@@ -1,4 +1,4 @@
-"""The objects of the basic attacks (16 October 2026): what a hero throws or strikes with, drawn from the
+"""The objects of the basic attacks (15 October 2026): what a hero throws or strikes with, drawn from the
 picture of its Genesis, value by value of the trait "Head" (docs/ATTACKS-FROM-THE-ART.md, where the
 table of what each picture shows lives). export_chog_parts.py builds them into the library of parts the
 game reads; the game moves them (Assets/Chog/Match/ChogAttackLook.cs).

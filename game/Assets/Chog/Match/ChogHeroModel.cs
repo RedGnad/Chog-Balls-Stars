@@ -293,6 +293,9 @@ namespace Chog.Match
         private static Mesh MeshOf(ChogPartsLibrary library, int metadataId, string restName)
         {
             library.TryGetHero(metadataId, out var hero);
+            // Where this part rests over the feet: the height a skin that runs to another colour reads.
+            var restIndex = System.Array.FindIndex(library.Rest, rest => rest.Name == restName);
+            var restHeight = restIndex >= 0 ? library.Rest[restIndex].Y : 0f;
             var vertices = new List<Vector3>();
             var normals = new List<Vector3>();
             var colours = new List<Color32>();
@@ -307,7 +310,8 @@ namespace Chog.Match
                 {
                     vertices.Add(new Vector3(piece.Positions[v * 3], piece.Positions[v * 3 + 1], piece.Positions[v * 3 + 2]));
                     normals.Add(new Vector3(piece.Normals[v * 3], piece.Normals[v * 3 + 1], piece.Normals[v * 3 + 2]) / 127f);
-                    library.ColourOf(piece.Materials[v], hero.Skin, out var r, out var g, out var b, out var a);
+                    library.ColourOf(piece.Materials[v], hero.Skin, restHeight + piece.Positions[v * 3 + 1],
+                        out var r, out var g, out var b, out var a);
                     colours.Add(new Color(r, g, b, a));
                 }
                 foreach (var corner in piece.Indices)
