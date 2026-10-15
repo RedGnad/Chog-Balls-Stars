@@ -24,10 +24,11 @@ How the library is made:
 
 The file (written to game/Assets/Chog/Resources/ChogParts.bytes by default), little endian:
 
-    "CHOGPARTS4"
+    "CHOGPARTS5"
     materials: count, then name, colour (3 floats, as on screen), role (0 its colour, 1 the skin of the
                Genesis, 2 its face), light (0 lit, 1 unlit, 2 outline: unlit and seen from inside)
-    skins:     count, then name, skin (3 floats), face (3 floats)
+    skins:     count, then name, skin (3 floats), face (3 floats), whether the skin runs to another
+               colour at the top (1 byte), that colour (3 floats; the skin's own when it does not)
     rest:      count, then name, parent ("" for the root), position (3 floats): the four parts the
                game moves (ChogBodyAnimator)
     pieces:    count, then name, the rest part it sits on, vertex count, positions (3 floats each),
@@ -73,7 +74,7 @@ from mathutils import Vector  # noqa: E402
 REST_PARTS = ("Body", "Head", "armLeft", "armRight")
 DEFAULT_OUT = os.path.join(traits.REPOSITORY, "game", "Assets", "Chog", "Resources", "ChogParts.bytes")
 SUMMARY = os.path.join(traits.REPOSITORY, ".artifacts", "chog-body", "parts-export.json")
-MAGIC = b"CHOGPARTS4"
+MAGIC = b"CHOGPARTS5"
 NO_ATTACK = 0xFFFF
 
 # The colours of the base, as render_chog_traits.py draws them (the skin and face are per Genesis).
@@ -296,6 +297,7 @@ def write_library(path, materials, rest, pieces, heroes, labels):
         for name, skin in SKINS.items():
             write_string(out, name)
             out.write(struct.pack("<6f", *skin["skin"], *skin.get("face", traits.GENESIS_FACE)))
+            out.write(struct.pack("<B3f", 1 if "top" in skin else 0, *skin.get("top", skin["skin"])))
         out.write(struct.pack("<I", len(rest)))
         for name, (parent, position) in rest.items():
             write_string(out, name)

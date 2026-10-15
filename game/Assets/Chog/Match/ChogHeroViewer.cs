@@ -9,7 +9,9 @@ namespace Chog.Match
     /// One screen to look at the 3D heroes (ChogHeroModel) without a match: for each Genesis named in
     /// the page option "?heroes=1287,14,17" (or "?heroes=1" for a set chosen to show many traits), its
     /// hero from close, three quarter from the front, above the same hero seen from the angle of the
-    /// game camera. "&spin=1" turns them slowly. It covers the menu.
+    /// game camera. "&spin=1" turns them slowly; "&flash=1" shows, every two seconds, the eyes of each
+    /// hero of the lower row popping above it as when it fires its special (ChogSignatureFlash). It covers
+    /// the menu.
     /// </summary>
     public sealed class ChogHeroViewer : MonoBehaviour
     {
@@ -37,6 +39,9 @@ namespace Chog.Match
         // the whole of it, so two cameras cannot share one.
         private readonly List<RenderTexture> _pictures = new List<RenderTexture>();
         private bool _spin;
+        private bool _flash;
+        private float _nextFlash;
+        private readonly List<(Transform Hero, int Number)> _gameRow = new List<(Transform, int)>();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Open()
@@ -65,6 +70,7 @@ namespace Chog.Match
         {
             PerformanceSampling.TryGetQueryValue(Application.absoluteURL, QueryParameter, out var value);
             _spin = PerformanceSampling.HasQueryFlag(Application.absoluteURL, "spin");
+            _flash = PerformanceSampling.HasQueryFlag(Application.absoluteURL, "flash");
             var numbers = Asked(value);
             var width = Mathf.Max(numbers.Length * CellWidth, 4f);
 
@@ -113,6 +119,7 @@ namespace Chog.Match
                 // Beside the hero seen by the game camera: what its basic attack throws, turning as it does.
                 if (elevation > 45f)
                 {
+                    _gameRow.Add((hero, numbers[column]));
                     var thrown = ChogHeroModel.BuildAttack(numbers[column], root, out var style, out _);
                     if (thrown != null)
                     {
@@ -158,6 +165,14 @@ namespace Chog.Match
 
         private void Update()
         {
+            if (_flash && Time.time >= _nextFlash)
+            {
+                _nextFlash = Time.time + 2f;
+                // The heroes of this page are drawn at the size they were made: the flash is scaled to them.
+                foreach (var (hero, number) in _gameRow)
+                    if (hero != null)
+                        ChogSignatureFlash.Show(hero.position - Vector3.up * (2.8f - 1.25f), number);
+            }
             foreach (var (thing, style) in _thrown)
             {
                 if (thing == null)

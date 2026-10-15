@@ -80,3 +80,11 @@ The 100 Genesis on another base (Skull, Radioactive, 1:1) get theirs with their 
   headless match.
 - **Not seen yet:** a strike of the brute and a burst filmed frame by frame; the cost on a phone
   (`?perf=1`, six heroes attacking); the special attack (from the Eyes) is still drawn flat.
+
+## The special: the eyes it comes from (15 October 2026)
+
+The special attack comes from the Eyes trait and was already drawn from it (the beams of laser eyes, the
+fan of a visor, the stare of drawn eyes: `GenesisAttackView`). When it fires, the eyes the hero wears now
+also pop up in 3D above it for under a second, turned to the camera, with a burst in their colour
+(`ChogSignatureFlash`, the very part of the library the hero wears). Seen on the viewer page
+(`?heroes=1287,1241,491,46,162&flash=1`); not yet caught in a match picture.

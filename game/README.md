@@ -642,7 +642,7 @@ matches. A body put in place of the class model does not turn half transparent i
 its own team, as the class models do. The weapons of the class models go with them. A body
 drawn larger than its collision circle overlaps a wall slightly when it stands against one.
 
-### The 3D heroes (16 October)
+### The 3D heroes (15 October)
 
 **Every Genesis of the base Origin (1,869) plays its own 3D hero**: the Chog of `tools/blender`
 (head H3, the crown of leaves its hat lets out, the hat, the eyes, the mouth and the clothing of
@@ -667,7 +667,7 @@ from inside only), from the alpha of its colour.
 `?heroes=1287,14,0` shows those (0 is the recruit), `&spin=1` turns them. On a private address
 `?hero3d=0` brings back the earlier look for a comparison.
 
-### The look of the screens (16 October)
+### The look of the screens (15 October)
 
 The menu was the sample's (navy blue, green buttons). It now wears the Chog identity read from the
 official sites (`research/chog-visual-identity-2026-10-15.md`): the night purple and the two halos of

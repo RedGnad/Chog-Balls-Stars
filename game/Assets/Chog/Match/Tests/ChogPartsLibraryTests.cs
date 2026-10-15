@@ -134,6 +134,30 @@ namespace Chog.Match.Tests
         }
 
         [Test]
+        public void ASkinThatRunsToAnotherColourTakesItByHeight()
+        {
+            var library = new ChogPartsLibrary
+            {
+                Materials = new[] { new ChogPartsLibrary.PartMaterial { Name = "ChogSkin", Role = ChogPartsLibrary.RoleSkin } },
+                Skins = new[]
+                {
+                    new ChogPartsLibrary.SkinColours { SkinR = 0f, SkinG = 0f, SkinB = 1f, HasTop = true, TopR = 1f, TopG = 0f, TopB = 0f },
+                    new ChogPartsLibrary.SkinColours { SkinR = 0f, SkinG = 1f, SkinB = 0f }
+                }
+            };
+            library.ColourOf(0, 0, 0.2f, out var r, out _, out var b, out _);
+            Assert.AreEqual(0f, r, 1e-5f, "at the feet: the skin's own colour");
+            Assert.AreEqual(1f, b, 1e-5f);
+            library.ColourOf(0, 0, 2f, out r, out _, out b, out _);
+            Assert.AreEqual(1f, r, 1e-5f, "over the crown: the colour of the top");
+            library.ColourOf(0, 0, (ChogPartsLibrary.GradientLow + ChogPartsLibrary.GradientHigh) * 0.5f, out r, out _, out _, out _);
+            Assert.AreEqual(0.5f, r, 1e-5f, "half way up the head: half of each");
+            library.ColourOf(0, 1, 2f, out _, out var g, out _, out _);
+            Assert.AreEqual(1f, g, 1e-5f, "a skin of one colour stays so at every height");
+            Assert.IsTrue(Library.Skins.All(skin => !skin.HasTop), "no Genesis of the game's library runs to another colour yet");
+        }
+
+        [Test]
         public void AFileOfAnotherLayoutIsRefused()
         {
             Assert.Throws<InvalidDataException>(() => ChogPartsLibrary.Read(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }));

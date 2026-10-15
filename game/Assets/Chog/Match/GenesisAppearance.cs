@@ -120,7 +120,7 @@ namespace Chog.Match
         }
 
         // How much higher than over a model of the sample the name and bars of a 3D hero stand, in
-        // world units, chosen on the captures of 16 October 2026.
+        // world units, chosen on the captures of 15 October 2026.
         private const float HeroLabelRaise = 0.3f;
 
         private static float Raise(Camera camera, Vector3 at, float canvasHeight, float higher)

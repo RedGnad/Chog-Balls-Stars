@@ -286,5 +286,11 @@ case "$MODE" in
     ;;
 esac
 
+# The guide of the first visit (ChogGuide, 16 October) would cover the menu the taps aim at.
+case "$CHOG_BROWSER_URL" in
+  *\?*) export CHOG_BROWSER_URL="$CHOG_BROWSER_URL&noguide=1" ;;
+  *) export CHOG_BROWSER_URL="$CHOG_BROWSER_URL?noguide=1" ;;
+esac
+
 node "$ROOT/tools/unity/qualify_webgl.mjs" 2>&1 | tail -2
 python3 "$HERE/summarise_log.py" "$CHOG_BROWSER_OUTPUT_DIR/touch-browser-smoke-events.json"
