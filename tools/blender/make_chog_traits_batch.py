@@ -5,13 +5,17 @@ Plain Python, no Blender needed to start it. Run it with the private environment
 
     .artifacts/tools-venv/bin/python tools/blender/make_chog_traits_batch.py \
         --out .artifacts/chog-body/traits/batch-2 --genesis 39,34,1287 [--only bust,towards] [--skip-done]
+    # one script of this folder, once nothing heavy runs, its output printed (coverage, budget):
+    .artifacts/tools-venv/bin/python tools/blender/make_chog_traits_batch.py \
+        --run make_chog_traits.py -- --budget
 
 For each Genesis it runs make_chog_traits.py (the model, into <out>/<number>/) then
 render_chog_traits.py (by default the bust and the game angle coming towards the camera, with its
-phone-size copy). The two run one after the other and never beside another Blender: before each
-start it waits until no Blender process is left on the machine. Blender is started lowered
-("nice -n 10") and with 4 threads ("-t 4"): this Mac has 8 GB of memory and Unity stays open
-beside it.
+phone-size copy). The two run one after the other and never beside another heavy job: before each
+start it waits until no Blender process is left on the machine and until the lock file
+.artifacts/heavy-job.lock no longer says "busy" (another heavy job, a Unity build for instance, writes
+it). Blender is started lowered ("nice -n 10") and with 4 threads ("-t 4"): this Mac has 8 GB of
+memory and Unity stays open beside it.
 
 It prints one line per Genesis (triangles, parts, values left out) and stops at the first failure.
 """
@@ -29,6 +33,9 @@ BLENDER = "/Applications/Blender.app/Contents/MacOS/Blender"
 THREADS = "4"
 NICENESS = "10"
 WAIT_LIMIT_S = 900
+# Another heavy job (a Unity build) writes "busy" into this file while it runs, "free" after.
+HEAVY_LOCK = os.path.join(REPOSITORY, ".artifacts", "heavy-job.lock")
+LOCK_WAIT_LIMIT_S = 3600
 
 
 def blender_running():
@@ -37,14 +44,35 @@ def blender_running():
     return bool(found.stdout.strip())
 
 
-def blender(script, *arguments):
-    """Runs one Blender script without its window, once no other Blender runs. Returns its output."""
+def heavy_job_running():
+    """True while the lock file of the heavy jobs exists and says "busy"."""
+    if not os.path.isfile(HEAVY_LOCK):
+        return False
+    with open(HEAVY_LOCK, encoding="utf-8", errors="replace") as source:
+        return "busy" in source.read()
+
+
+def wait_until_free():
+    """Waits until no other Blender runs and no heavy job holds the lock."""
     waited = 0.0
-    while blender_running():
-        if waited > WAIT_LIMIT_S:
-            raise SystemExit("CHOG_BATCH another Blender has been running for 15 minutes: stopped")
+    while True:
+        if heavy_job_running():
+            if waited > LOCK_WAIT_LIMIT_S:
+                raise SystemExit(f"CHOG_BATCH {HEAVY_LOCK} has said busy for an hour: stopped")
+            if waited % 60.0 == 0.0:
+                print(f"CHOG_BATCH waiting: {HEAVY_LOCK} says busy", flush=True)
+        elif blender_running():
+            if waited > WAIT_LIMIT_S:
+                raise SystemExit("CHOG_BATCH another Blender has been running for 15 minutes: stopped")
+        else:
+            return
         time.sleep(5.0)
         waited += 5.0
+
+
+def blender(script, *arguments):
+    """Runs one Blender script without its window, once nothing heavy runs. Returns its output."""
+    wait_until_free()
     words = ["nice", "-n", NICENESS, BLENDER, "--background", "--factory-startup", "-t", THREADS,
              "--python", os.path.join(HERE, script), "--", *arguments]
     done = subprocess.run(words, capture_output=True, text=True)
@@ -57,11 +85,20 @@ def blender(script, *arguments):
 
 def main():
     parser = argparse.ArgumentParser(description="Builds and renders several dressed Genesis, one Blender at a time.")
-    parser.add_argument("--out", required=True, help="the folder that receives one folder per Genesis")
-    parser.add_argument("--genesis", required=True, help="numbers shown in the names (CHOG #n), separated by commas")
+    parser.add_argument("--out", help="the folder that receives one folder per Genesis")
+    parser.add_argument("--genesis", help="numbers shown in the names (CHOG #n), separated by commas")
     parser.add_argument("--only", default="bust,towards", help="the families of pictures of render_chog_traits.py")
     parser.add_argument("--skip-done", action="store_true", help="leave out a Genesis whose pictures are all there")
-    arguments = parser.parse_args()
+    parser.add_argument("--run", default=None, help="in place of a batch: one script of this folder, the words "
+                        "after -- given to it, its output printed")
+    words = sys.argv[1:]
+    passed = words[words.index("--") + 1:] if "--" in words else []
+    arguments = parser.parse_args(words[:words.index("--")] if "--" in words else words)
+    if arguments.run:
+        print(blender(arguments.run, *passed))
+        return
+    if not arguments.out or not arguments.genesis:
+        raise SystemExit("CHOG_BATCH give --out and --genesis, or --run SCRIPT -- WORDS")
     out = os.path.abspath(arguments.out)
     numbers = [number.strip() for number in arguments.genesis.split(",") if number.strip()]
     started = time.monotonic()

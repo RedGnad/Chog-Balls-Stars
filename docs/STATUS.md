@@ -204,6 +204,29 @@ told which chain to use; the 3D batch 3 sheets to the user.
 **Waiting on the user:** the phone try; the public address of the development wallet, testnet
 MON from `https://faucet.monad.xyz` on it, and the keystore made in their own terminal.
 
+**15 October 2026, 12:15.** 3D batch 3 is drawn, as pictures only (nothing of it is in the
+game): no leaf goes through a hat any more (each of the 10 hat shapes removes, keeps or brings
+out under its rim each line of leaves, and every build fails a Genesis whose leaves cross its
+hat); Bob Hair, Rainbow Wig and the hoods replace the crown; the clothing of Side=Left, the
+six costumes, Clown Nose, Plumber, Robber, the prints asked for, and the fixes (ushanka flaps,
+round curls, Spartan crest, durag hair points, tuxedo lapels). Recounted by me after the agent
+(`-- --coverage`, `-- --budget`): on the base Origin (1,869 Genesis) hat, eyes and mouth are
+right for all 1,869, and 1,789 have their clothing too (1,110 in batch 2); on all 1,969, 1,921
+and 1,821. Largest dressed hero 7,940 triangles (#470), median 6,527, none over 8,000. One
+hero is 6 to 10 mesh objects and 9 to 24 materials: that, not the triangles, is what the
+import has to merge. Still wrong on the sheets: faceted curls, leaves under a brim splaying
+like wings from the front, the bare top of the head inside the open crown seen from above,
+lapels and shirt prints lost at the game camera, the Buttcoin bars faint, "10K" reading
+"1OK", no word on the tees whose word changes per Genesis, no glass on the astronaut helmet,
+no camouflage on the Army Vest, small dragon wings. Details and commands:
+[tools/blender/README.md](../tools/blender/README.md), "Batch 3"; sheets
+[before and after](../research/evidence/chog-traits-batch3-spikes-before-after-2026-10-15.png),
+[twelve at random](../research/evidence/chog-traits-batch3-random-twelve-2026-10-15.png), and
+the rest in `.artifacts/chog-body/traits/batch-3/`.
+**Next action (dev):** the sheets to the user; on their yes, the import into Unity with each
+hero merged into few meshes and materials, measured on their phone with `?perf=1` before and
+after; the testnet deployment script meanwhile.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a

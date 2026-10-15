@@ -23,9 +23,16 @@ entry ("print_missing"); make_chog_traits.py writes it into parts.json, and the 
 What these shapes ask of the camera of the game (73 degrees above, head turned up by 20): nothing
 reaches forward over the brow. The fur of the ushanka, the band, the curls and the helmet stand less
 far off the head at the front than at the sides and the back.
+
+Batch 3 (15 October 2026): each hat shape says which leaves of the crown it leaves ("LEAVES", see
+leaf() below), hair and hoods replace the crown; three values of "Head" that are not hats (Clown Nose,
+Plumber, Robber); the clothing of Side=Left (hoodies, tops without sleeves, jerseys, tees, shirts,
+jackets, vests); the prints of shirts and caps (decorate_shirt, lay_logo); the costumes (Gangster,
+Shark, Banana, Astro, Dragon, Duck Float).
 """
 
 import math
+import random
 from types import SimpleNamespace
 
 from mathutils import Vector
@@ -42,6 +49,43 @@ def bind(kit):
     """Gives the builders the helpers of make_chog_traits.py (the module itself)."""
     global KIT
     KIT = kit
+
+
+# ---------------------------------------------------------------------------------------------
+# The leaves a hat leaves (15 October 2026). Under a hat the leaves of the crown went through it: from
+# the camera of the game the hero was a hat pierced by spikes. The pictures of the collection draw the
+# spikes only where a hat leaves the head bare: beside it and behind it, under its brim or its rim. So
+# each hat shape says, in its numbers ("LEAVES"), what becomes of each line of SPIKES of head H3:
+#
+#     0  the leaf on top                     4  the top of the back row
+#     1  the upper pair of the star          5  the pair of the back row
+#     2  the middle pair, to the sides       6  the leaf straight back
+#     3  the lowest pair, sideways and down
+#
+# An item is leaf(share, turn, back, bend): its length against the leaf of SPIKES (1 the same, 0 none:
+# it is removed, its outline with it, more than 1 longer), the turn around the head (degrees from
+# straight up, seen from the front) and the lean back (degrees) that replace those of SPIKES (None:
+# its own), to bring a leaf out from under a brim, and how far its point bends back up (against its
+# length). A leaf brought under a brim points down and hides under the hat seen from above: it is made
+# longer (1.3), so that the spikes still show beside the hat from the camera of the game, as large as
+# the pictures draw them, and bent up, so that from the front it does not hang like an ear (seen on
+# the first try, 15 October 2026). A value of "Head" may give its own
+# in its "numbers". Hair (the curly wigs) replaces the crown: NO_CROWN. A hero with no hat, or with a
+# hat that is not modelled, keeps the whole crown. make_chog_traits.leaf_crossings() checks that no
+# leaf left goes through its hat: a Genesis whose leaves cross its hat fails its build.
+#
+# "FRINGE": False in the numbers of a hat removes the teeth of hair the base draws on the brow, where
+# the pictures show none under that hat (hair, a helmet).
+# ---------------------------------------------------------------------------------------------
+
+def leaf(share=1.0, turn=None, back=None, bend=0.0):
+    """What becomes of one line of SPIKES under a hat: see above."""
+    return (share, turn, back, bend)
+
+
+WHOLE, GONE = leaf(), leaf(0.0)
+FULL_CROWN = (WHOLE,) * 7
+NO_CROWN = (GONE,) * 7
 
 
 # ---------------------------------------------------------------------------------------------
@@ -152,9 +196,21 @@ USHANKA = {
     "CROWN_ROWS": 3,
     # An ear flap: degrees from the front, polar degrees where it starts (inside the fur) and ends,
     # how far it stands off the head at its top and at its foot, half width, half thickness.
-    "FLAP": (66.0, 80.0, 132.0, 1.10, 1.20, 0.072, 0.022),
-    "SNAPS": ((0.45, 0.013), (0.78, 0.013)),   # along the flap from its top, radius
+    # (Until 15 October 2026: 66 degrees, 80 to 132, 1.10 to 1.20, 0.072 wide. The leaves of the sides
+    # hid the flaps, and they lay against the head: from the camera of the game no flap showed. On the
+    # pictures they hang beside the face down to the chin, wider than an eye, and splay out.)
+    "FLAP": (68.0, 74.0, 140.0, 1.14, 1.34, 0.098, 0.026),
+    # Where a flap is leather (the colour "Snap" is given: Side=Left), a rim of fur around it: how much
+    # wider and longer the rim is, and how far behind the leather it lies.
+    "FLAP_RIM": (0.020, 0.024, 0.012),
+    "SNAPS": ((0.42, 0.015), (0.74, 0.015)),   # along the flap from its top, radius
     "OUTLINE_THICKNESS": 0.020,
+    # The fur hat covers the head down to the brow and over the ears: no leaf comes out of it at the
+    # top. The pictures of Side=Right show spikes beside and behind it (Side=Left, framed on the face,
+    # none): the lowest pair of the star, behind the flaps, the pair of the back row and the leaf
+    # straight back stay, brought out under the fur, which sits low: they point down more than under a cap.
+    "LEAVES": (GONE, GONE, GONE, leaf(1.3, 128.0, 30.0, 0.45), GONE, leaf(1.3, 130.0, 45.0, 0.45),
+               leaf(1.3, None, 120.0, 0.45)),
 }
 
 
@@ -192,16 +248,24 @@ def build_ushanka(maker):
     for side in (1.0, -1.0):
         angle = math.radians(270.0 + side * degrees)
         stations = 4
-        path, wide, thick = [], [], []
-        for index in range(stations):
-            share = index / (stations - 1)
-            polar = math.radians(start + (end - start) * share)
-            path.append(on_head(surface, angle, polar, size_top + (size_foot - size_top) * share))
-            across = Vector((-math.sin(angle), math.cos(angle), 0.0))
-            rounded = 1.0 if index < stations - 1 else 0.55
-            wide.append(across * half_wide * rounded)
-            thick.append(head_normal(surface, angle, polar) * half_thick)
-        slab(part, path, wide, thick, part.named("Flap"), outline)
+        across = Vector((-math.sin(angle), math.cos(angle), 0.0))
+
+        def flap(wider, longer, behind):
+            path, wide, thick = [], [], []
+            for index in range(stations):
+                share = index / (stations - 1)
+                polar = math.radians(start + (end + longer - start) * share)
+                out = head_normal(surface, angle, polar)
+                path.append(on_head(surface, angle, polar, size_top + (size_foot - size_top) * share) - out * behind)
+                rounded = 1.0 if index < stations - 1 else 0.55
+                wide.append(across * (half_wide + wider) * rounded)
+                thick.append(out * half_thick)
+            return path, wide, thick
+
+        slab(part, *flap(0.0, 0.0, 0.0), part.named("Flap"), outline)
+        if "Snap" in colours:
+            wider, longer, behind = numbers.FLAP_RIM
+            slab(part, *flap(wider, math.degrees(longer / 0.3), behind), part.named("Fur"), outline)
         if "Snap" in colours:
             for along, radius in numbers.SNAPS:
                 polar = math.radians(start + (end - start) * along)
@@ -217,12 +281,25 @@ def build_ushanka(maker):
 # ---------------------------------------------------------------------------------------------
 HEADBAND = {
     "SIDES": 18,
-    "LOWER": ((0.0, 74.0), (90.0, 72.0), (180.0, 66.0)),
-    "UPPER": ((0.0, 52.0), (90.0, 50.0), (180.0, 46.0)),
+    # Polar degrees of its lower and upper edge, by degrees from the front. On the pictures the band
+    # lies on the brow just above the eyes, the spikes standing above it.
+    # (Until 15 October 2026: 74 to 52 at the front, 66 to 46 at the back, higher on the head. The roots
+    # of the upper pairs of leaves then lay under it and every leaf but the top one went through it.)
+    # At the front its upper edge covers the dark line at the top of the face (54 degrees); at the sides
+    # it is lower, under the roots of the upper pair of leaves.
+    "LOWER": ((0.0, 82.0), (90.0, 80.0), (180.0, 76.0)),
+    "UPPER": ((0.0, 50.0), (35.0, 53.0), (70.0, 62.0), (180.0, 60.0)),
     "SIZE": ((0.0, 1.075), (90.0, 1.10), (180.0, 1.10)),
     "LINE": 0.30,                # the share of the band, from its lower edge, in the colour "Line"
     "SUN": (0.046, 0.008),       # radius, lift off the band
     "OUTLINE_THICKNESS": 0.016,
+    # The leaf on top and the upper pair stand above the band (the pair raised a little); the middle pair
+    # would grow out of the band itself and is removed; the lowest pair and the back row are brought
+    # out under it.
+    "LEAVES": (WHOLE, leaf(1.0, 24.0), GONE, leaf(1.2, 116.0, None, 0.35), GONE, leaf(1.2, 106.0, 40.0, 0.35),
+               leaf(1.2, None, 104.0, 0.35)),
+    # The band lies on the brow: the teeth of hair of the base would come through it.
+    "FRINGE": False,
 }
 
 
@@ -264,67 +341,93 @@ def build_headband(maker):
 # to its left (Rainbow Wig).
 # ---------------------------------------------------------------------------------------------
 CURLY_WIG = {
-    "SIDES": 24,
-    # Polar degrees of the edge of the curls, by degrees from the front: over the brow at the front,
+    "SIDES": 16,
+    # Polar degrees of the edge of the hair, by degrees from the front: over the brow at the front,
     # down to the ears at the sides and at the back.
     "RIM": ((0.0, 54.0), (30.0, 62.0), (62.0, 108.0), (180.0, 112.0)),
-    "ROWS": 5,
-    # How much larger than the head the mass of curls is, by degrees from the front: close over the
-    # brow (the camera of the game looks down on the face), a big puff at the sides and at the back,
-    # as the pictures draw it, twice as wide as the face.
-    # (First: 1.14 all around with shallow waves. On the bust it was a thin painted cap under the
-    # leaves, and from above a zigzag of two colours: no hair.)
+    "ROWS": 3,
+    # How much larger than the head the hair is, by degrees from the front: close over the brow (the
+    # camera of the game looks down on the face), a big puff at the sides and at the back, as the
+    # pictures draw it, twice as wide as the face. The curls stand on a smooth mass MASS times that size.
+    # (First: 1.14 all around with shallow waves: a thin painted cap. Then a mass at this size whose
+    # rows were scalloped: the owner, 15 October 2026, "a smooth scalloped cap, not fluffy curls".)
     "SIZE": ((0.0, 1.16), (40.0, 1.34), (90.0, 1.46), (180.0, 1.42)),
-    # The curls: lobes around the head, how deep a valley between two lobes is against the size;
-    # each row of lobes is shifted by half a lobe from the one under it.
-    "CURLS": (8, 0.16),
-    "TOP_POLAR": 40.0,           # with "Top": faces nearer the top than this take it
-    "OUTLINE_THICKNESS": 0.022,
+    "MASS": 0.88,
+    # The curls: round puffs, each its own ball with its dark outline, as the pictures draw the hair (a
+    # cloud of round curls, each edged by a line). One line per row: polar degrees, radius of a curl,
+    # degrees from the front of each (every one on both sides, but 0 and 180).
+    "CURL_ROWS": (
+        (0.0, 0.120, (0.0,)),
+        (36.0, 0.110, (34.0, 100.0, 160.0)),
+        (68.0, 0.105, (50.0, 92.0, 134.0, 180.0)),
+        (100.0, 0.100, (70.0, 106.0, 142.0, 180.0)),
+    ),
+    # Smaller curls along the hairline over the brow: polar degrees, radius, degrees from the front.
+    "HAIRLINE": (56.0, 0.060, (12.0, 34.0)),
+    # (6 first: on the bust, a honeycomb of hexagons. 8: round, but 2 heroes over 8,000 triangles.)
+    "CURL_SIDES": 7,
+    # How far a curl is sunk into the mass, against its radius.
+    "CURL_SUNK": 0.35,
+    "TOP_POLAR": 40.0,           # with "Top": what is nearer the top than this takes it
+    "OUTLINE_THICKNESS": 0.020,
+    # Hair, not a hat: it replaces the crown of leaves (the owner, 15 October 2026). (Several pictures of
+    # Bob Hair still draw the tip of one spike above the hair, at the far side; it is left out.)
+    "LEAVES": NO_CROWN,
+    # The curls of the hairline take the place of the teeth of hair the base draws on the brow.
+    "FRINGE": False,
 }
 
 
 def build_curly_wig(maker):
     numbers = maker.numbers(CURLY_WIG)
     part, surface = maker.part(), maker.surface
-    count, depth = numbers.CURLS
     sides, rows = numbers.SIDES, numbers.ROWS
     angles = [2.0 * math.pi * index / sides for index in range(sides)]
     rims = [math.radians(interpolate(numbers.RIM, from_front(angle))) for angle in angles]
 
-    def size_at(angle, polar, row):
-        """The mass of curls: rounded lobes with narrow valleys between them (a scallop), so the
-        outline of the wig reads as curls; less deep near the top, where the rows close in."""
-        big = interpolate(numbers.SIZE, from_front(angle))
-        lobe = abs(math.sin(count * angle * 0.5 + (row % 2) * math.pi * 0.5))
-        fade = 0.45 + 0.55 * math.sin(polar)
-        return big * (1.0 - depth * fade * (1.0 - lobe ** 0.5))
+    def mass_size(angle):
+        return 1.0 + (interpolate(numbers.SIZE, from_front(angle)) - 1.0) * numbers.MASS
 
+    # The mass: a smooth shell from inside the head under the rim to the top.
     loops = [[on_head(surface, angle, polar, 0.90) for angle, polar in zip(angles, rims)]]
     for row in range(rows):
         share = row / rows
-        loops.append([on_head(surface, angle, polar * (1.0 - share), size_at(angle, polar * (1.0 - share), row))
-                      for angle, polar in zip(angles, rims)])
-    loops.append([on_head(surface, 0.0, 0.0, interpolate(numbers.SIZE, 90.0))])
+        loops.append([on_head(surface, angle, polar * (1.0 - share), mass_size(angle)) for angle, polar in
+                      zip(angles, rims)])
+    loops.append([on_head(surface, 0.0, 0.0, mass_size(math.radians(0.0)))])
     shares = [(0.0,) * sides] + [(1.0,) * sides] * rows + [(1.0,)]
     colours = maker.entry["colours"]
-    first = "Curl" if "Curl" in colours else maker.entry["sweep"][0]
-    bands, _ = KIT.add_loops(part, loops, part.named(first), numbers.OUTLINE_THICKNESS, shares=shares)
-    faces = [face for band in bands for face in band]
-    middle = surface.middle
-    if "Top" in colours:
-        def rule(centre):
-            away = centre - middle
-            polar = math.degrees(math.acos(max(-1.0, min(1.0, away.z / max(away.length, 1e-9)))))
-            return "Top" if polar < numbers.TOP_POLAR else None
-        paint_where(part, faces, rule)
     sweep = maker.entry.get("sweep")
-    if sweep:
-        def rule(centre):
-            away = centre - middle
+    first = "Curl" if "Curl" in colours else sweep[0]
+    bands, _ = KIT.add_loops(part, loops, part.named(first), numbers.OUTLINE_THICKNESS, shares=shares)
+    middle = surface.middle
+
+    def colour_at(centre):
+        away = centre - middle
+        if "Top" in colours:
+            polar = math.degrees(math.acos(max(-1.0, min(1.0, away.z / max(away.length, 1e-9)))))
+            return "Top" if polar < numbers.TOP_POLAR else "Curl"
+        if sweep:
             arch = math.degrees(math.atan2(away.z, away.x))      # 0: left of the character, 90: top
             share = (205.0 - min(max(arch, -25.0), 205.0)) / 230.0
             return sweep[min(int(share * len(sweep)), len(sweep) - 1)]
-        paint_where(part, faces, rule)
+        return first
+
+    paint_where(part, [face for band in bands for face in band], colour_at)
+
+    # The curls, on the mass.
+    hairline_polar, hairline_radius, hairline_places = numbers.HAIRLINE
+    rows_of_curls = list(numbers.CURL_ROWS) + [(hairline_polar, hairline_radius, hairline_places)]
+    for polar_deg, radius, places in rows_of_curls:
+        for degrees in places:
+            for side in ((1.0,) if degrees in (0.0, 180.0) else (1.0, -1.0)):
+                angle = math.radians(270.0 + side * degrees)
+                polar = math.radians(polar_deg)
+                out = head_normal(surface, angle, polar)
+                centre = on_head(surface, angle, polar, mass_size(angle)) - out * radius * numbers.CURL_SUNK
+                stacks = 4 if radius > 0.08 else 3
+                part.shell(base.ball_rings(centre, out, Z if abs(out.z) < 0.9 else X, radius, radius, radius, stacks),
+                           numbers.CURL_SIDES, part.named(colour_at(centre)), numbers.OUTLINE_THICKNESS)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -333,7 +436,9 @@ def build_curly_wig(maker):
 # ---------------------------------------------------------------------------------------------
 DURAG = {
     "SIDES": 18,
-    "RIM": ((0.0, 66.0), (50.0, 72.0), (110.0, 100.0), (180.0, 110.0)),
+    # (Until 15 October 2026 the sides came down to 100 degrees, 110 at the back: every leaf of the
+    # crown went through the cloth. The pictures draw the spikes of the far side from the cloth down.)
+    "RIM": ((0.0, 66.0), (50.0, 72.0), (95.0, 82.0), (140.0, 98.0), (180.0, 106.0)),
     # (1.06 and 1.085 until 15 October 2026: the teeth of hair the base draws on the brow came through
     # the cloth as small triangles of skin.)
     "SIZE": 1.10,
@@ -343,7 +448,31 @@ DURAG = {
     # width, half thickness, how far it leans back.
     "TAIL": (13.0, 104.0, 0.20, 0.034, 0.010, 0.55),
     "OUTLINE_THICKNESS": 0.018,
+    # Points of hair in the skin colour along the front, coming out under the cloth onto the brow (asked
+    # by the owner on 15 October 2026): how many, degrees from the front to the outermost, polar degrees
+    # of their roots (under the cloth) and of their tips, half width (degrees), how far off the head
+    # (above the face, 0.012, and under the cloth, about 0.027 there).
+    "HAIR_POINTS": (7, 46.0, 58.0, 79.0, 5.5, 0.020),
+    # The cloth covers the top and the back: the lowest pair of the star stays, brought under its rim at
+    # the sides, and the pair of the back row, turned to the sides beside it; the leaf straight back
+    # would go through the two tails.
+    "LEAVES": (GONE, GONE, GONE, leaf(1.35, 122.0, None, 0.45), GONE, leaf(1.35, 122.0, 30.0, 0.45), GONE),
 }
+
+
+def add_hair_points(part, surface, spec, material):
+    """Points of hair laid on the head along the front, from under a hat onto the brow (HAIR_POINTS of
+    a hat): flat triangles in "material", part of the head, without an outline."""
+    count, spread, root, tip, half_width, lift = spec
+    for index in range(count):
+        degrees = -spread + 2.0 * spread * index / max(count - 1, 1)
+        angle = math.radians(270.0 + degrees)
+        corners = []
+        for turn, polar in ((-half_width, root), (half_width, root), (0.0, tip)):
+            here_angle, here_polar = angle + math.radians(turn), math.radians(polar)
+            corners.append(on_head(surface, here_angle, here_polar, 1.0) + head_normal(surface, here_angle, here_polar)
+                           * lift)
+        full.add_skin(part, surface, [[corners[2]], corners[:2]], material, around=False)
 
 
 def build_durag(maker):
@@ -406,6 +535,10 @@ WIZARD_HAT = {
     "STAR_HOLLOW": 0.45,
     "STAR_LIFT": 0.008,
     "OUTLINE_THICKNESS": 0.020,
+    # The pictures draw big spikes beside and behind the hat, from its rim down; none comes out of the
+    # cone. Its rim sits as low as that of a cap: the same leaves stay.
+    "LEAVES": (GONE, GONE, GONE, leaf(1.3, 116.0, None, 0.35), GONE, leaf(1.3, 106.0, 40.0, 0.35),
+               leaf(1.3, None, 104.0, 0.35)),
 }
 
 
@@ -428,8 +561,11 @@ def build_wizard_hat(maker):
 SPARTAN = {
     "SIDES": 24,
     # Polar degrees of the edge by degrees from the front: over the brow just above the eyes, then
-    # down beside the eyes over the cheeks (the guards), lower at the sides than at the back.
-    "RIM": ((0.0, 60.0), (28.0, 61.0), (40.0, 114.0), (95.0, 122.0), (180.0, 106.0)),
+    # down beside the eyes over the cheeks (the guards), and up again behind the ears, where the
+    # pictures show the spikes of the back of the head coming out behind the helmet.
+    # (Until 15 October 2026 the back came down to 106 degrees and every leaf went through the shell.)
+    "RIM": ((0.0, 60.0), (28.0, 61.0), (40.0, 114.0), (95.0, 120.0), (120.0, 92.0), (150.0, 72.0),
+            (180.0, 68.0)),
     # It stands clear of everything drawn on the face (up to 0.040 off the head).
     # (First: 1.075, a rim over the eyes at 66 degrees and guards from 38 degrees. The shell then ran
     # through the cream face and the eyes: the bust showed gold patches over the face.)
@@ -441,13 +577,20 @@ SPARTAN = {
     # (First: down to 92 degrees, over the nose.)
     "NOSE_GUARD": (58.0, 84.0, 0.022, 0.012),
     # The crest: along the middle of the head, (degrees from straight up, towards the back when
-    # positive; height above the shell), and its half width. Tall enough to stand out of the leaves
-    # of the head that grow at the same place. (First: 0.145 at most and 0.034 wide: hidden in them.)
-    "CREST": ((-42.0, 0.060), (-24.0, 0.170), (0.0, 0.250), (30.0, 0.270), (62.0, 0.240), (95.0, 0.150),
-              (118.0, 0.050)),
-    "CREST_HALF_WIDTH": 0.042,
-    "CREST_SIDES": 6,
+    # positive; height above the shell; half width). A brush of horsehair from the brow over the top,
+    # as wide on the pictures as a quarter of the helmet. It stops at the top of the back, where the
+    # leaf straight back comes out under the rim.
+    # (First: 0.145 at most and 0.034 wide, hidden in the leaves. Then up to 0.270 tall and 0.042 wide:
+    # from the camera of the game a thin red stick, said the owner on 15 October 2026.)
+    "CREST": ((-46.0, 0.050, 0.046), (-30.0, 0.170, 0.066), (-8.0, 0.265, 0.078), (18.0, 0.300, 0.082),
+              (38.0, 0.270, 0.080), (54.0, 0.190, 0.070), (64.0, 0.090, 0.056), (70.0, 0.030, 0.044)),
+    "CREST_SIDES": 8,
     "OUTLINE_THICKNESS": 0.020,
+    # The helmet covers the top, the brow and the cheeks: the spikes the pictures show come out behind
+    # it, from the back of the head. The back row stays, brought under the rim at the back.
+    "LEAVES": (GONE, GONE, GONE, GONE, GONE, leaf(1.35, 126.0, 55.0, 0.40), leaf(1.35, None, 96.0, 0.40)),
+    # The pictures show no teeth of hair on the brow inside the helmet.
+    "FRINGE": False,
 }
 
 
@@ -487,16 +630,174 @@ def build_spartan(maker):
 
     # The crest: rings across the middle of the head, each from inside the shell to its height.
     path, wide, thick = [], [], []
-    for pitch_deg, height in numbers.CREST:
+    for pitch_deg, height, half_width in numbers.CREST:
         pitch = math.radians(pitch_deg)
         angle = math.radians(90.0 if pitch_deg >= 0.0 else 270.0)
         polar = abs(pitch)
         out = head_normal(surface, angle, polar)
         foot = on_head(surface, angle, polar, numbers.SIZE) - out * 0.02
         path.append(foot + out * (height + 0.02) * 0.5)
-        wide.append(X * numbers.CREST_HALF_WIDTH)
+        wide.append(X * half_width)
         thick.append(out * (height + 0.02) * 0.5)
     slab(part, path, wide, thick, part.named("Crest"), outline, sides=numbers.CREST_SIDES)
+
+
+# ---------------------------------------------------------------------------------------------
+# Three values of "Head" that are not hats (15 October 2026): Clown Nose (31 Genesis on the base
+# Origin), Plumber (23: a plunger stuck on the head), Robber (24: a knitted balaclava).
+# ---------------------------------------------------------------------------------------------
+CLOWN_NOSE = {
+    # A red ball on the nose: where on the face (to the side, above its middle), how far its middle
+    # stands off the face, its radius, its sides and stacks, and the glint on its upper side (degrees
+    # up from straight out, its radius).
+    "AT": (0.004, -0.040),
+    "OFF": 0.022,
+    "RADIUS": 0.050,
+    "SIDES": 10,
+    "STACKS": 5,
+    "GLINT": (38.0, 0.013),
+    "OUTLINE_THICKNESS": 0.014,
+    # Nothing on the head: the whole crown stays, as the pictures show it.
+    "LEAVES": FULL_CROWN,
+}
+
+
+def build_clown_nose(maker):
+    numbers = maker.numbers(CLOWN_NOSE)
+    part, surface = maker.part(), maker.surface
+    side, up = numbers.AT
+    out = KIT.outward(surface, side, up)
+    centre = surface.front(side, up, 0.0) + out * numbers.OFF
+    radius = numbers.RADIUS
+    part.shell(base.ball_rings(centre, out, Z, radius, radius, radius, numbers.STACKS), numbers.SIDES,
+               part.named("Ball"), numbers.OUTLINE_THICKNESS)
+    degrees, glint = numbers.GLINT
+    upward = (Z - out * Z.dot(out)).normalized()
+    towards = (out * math.cos(math.radians(degrees)) + upward * math.sin(math.radians(degrees))).normalized()
+    disc_on(part, surface, centre + towards * (radius + 0.002), towards, glint, part.named("Glint"), segments=8)
+
+
+PLUNGER = {
+    # The cup: where it stands on the head (degrees from the front, towards the left of the character;
+    # polar degrees), then from its rim on the head up its axis: (height, radius) of each ring.
+    "AT": (-18.0, 22.0),
+    "CUP": ((-0.030, 0.104), (0.006, 0.118), (0.040, 0.116), (0.078, 0.094), (0.104, 0.056), (0.114, 0.0)),
+    "LIP": 1,                    # the rings of the cup up to this one are its darker lip
+    "SIDES": 12,
+    # The stick: its radius, its length, and the way it leans (towards the left of the character, back).
+    "FERRULE": (0.026, 0.034),   # the red collar where the stick enters the cup: radius, length
+    "STICK": (0.014, 0.30, 0.95, 0.30),
+    "OUTLINE_THICKNESS": 0.016,
+    # The cup sits on the top of the head: the leaf on top and the upper pair would go through it.
+    "LEAVES": (GONE, GONE, WHOLE, WHOLE, WHOLE, WHOLE, WHOLE),
+}
+
+
+def build_plunger(maker):
+    numbers = maker.numbers(PLUNGER)
+    part, surface = maker.part(), maker.surface
+    degrees, polar_deg = numbers.AT
+    angle, polar = math.radians(270.0 + degrees), math.radians(polar_deg)
+    axis = head_normal(surface, angle, polar)
+    foot = on_head(surface, angle, polar, 1.0)
+    first, second = base.frame_across(axis, X)
+    rings = [(foot + axis * height, first * radius, second * radius) for height, radius in numbers.CUP]
+    rings[-1] = (rings[-1][0], NOWHERE, NOWHERE)
+    _, faces = part.shell(rings, numbers.SIDES, part.named("Cup"), numbers.OUTLINE_THICKNESS)
+    lip_top = foot + axis * numbers.CUP[numbers.LIP][0]
+    part.paint([face for face in faces if (face.calc_center_median() - foot).dot(axis) < (lip_top - foot).dot(axis) - 1e-6],
+               part.named("Lip"))
+    top = foot + axis * numbers.CUP[-1][0]
+    radius, length = numbers.FERRULE
+    stick_radius, stick_length, to_left, to_back = numbers.STICK
+    way = (axis + X * to_left + Y * to_back).normalized()
+    part.shell(base.tube_rings(top - way * 0.01, way, X, ((0.0, radius), (length, radius * 0.7))), 8, part.named("Cup"),
+               numbers.OUTLINE_THICKNESS * 0.7)
+    part.shell(base.tube_rings(top + way * (length - 0.01), way, X, ((0.0, stick_radius), (stick_length, stick_radius))),
+               6, part.named("Stick"), numbers.OUTLINE_THICKNESS * 0.6)
+
+
+BALACLAVA = {
+    # The mask: a knitted shell over the brow, the top, the sides and the back down to the neck
+    # (polar degrees of its edge by degrees from the front: the edge runs just above the eyes, then
+    # down beside them), and a panel over the face below the eyes and between them. Two eye holes, each
+    # ringed by a rolled edge.
+    "RIM": ((0.0, 83.0), (26.0, 84.0), (40.0, 128.0), (100.0, 152.0), (180.0, 150.0)),
+    "SIZE": 1.11,
+    "ROWS": 4,
+    "SIDES": 20,
+    # The panel over the lower face and the bridge between the eyes, in the coordinates of the face (to
+    # the side, above its middle): its edges, how far off the head.
+    "LOWER": (-0.26, 0.26, -0.27, -0.072),
+    "BRIDGE": (-0.040, 0.040, -0.080, 0.090),
+    "PANEL_LIFT": 0.030,
+    "PANEL_STEPS": (8, 3),
+    # The eye holes: middle (to the side, above), half width, half height, the radius of the rolled edge.
+    "HOLE": (0.114, 0.004, 0.072, 0.084, 0.016),
+    "HOLE_STATIONS": 14,
+    # The knit: darker ribs from the edge up over the top: how many, their half width.
+    "RIBS": (14, 0.006),
+    "OUTLINE_THICKNESS": 0.020,
+    # A knitted mask, tight on the head: the pictures draw the spikes of the far side and of the back
+    # coming out of it. Those leaves stay, turned down as under a cap, and come through the knit
+    # ("THROUGH": the check of the leaves is told so). The mask covers the mouth: the 24 Robber Genesis
+    # have no value of "Mouth" in the metadata anyway; "HIDES" keeps it so if one ever had.
+    "LEAVES": (GONE, GONE, GONE, leaf(1.2, 116.0, None, 0.35), GONE, leaf(1.2, 106.0, 40.0, 0.35),
+               leaf(1.2, None, 104.0, 0.35)),
+    "THROUGH": True,
+    "HIDES": ("Mouth",),
+}
+
+
+def build_balaclava(maker):
+    numbers = maker.numbers(BALACLAVA)
+    part, surface = maker.part(), maker.surface
+    sides, rows = numbers.SIDES, numbers.ROWS
+    outline = numbers.OUTLINE_THICKNESS
+    angles = [2.0 * math.pi * index / sides for index in range(sides)]
+    rims = [math.radians(interpolate(numbers.RIM, from_front(angle))) for angle in angles]
+    loops = [[on_head(surface, angle, polar, 0.92) for angle, polar in zip(angles, rims)]]
+    for row in range(rows):
+        share = row / rows
+        loops.append([on_head(surface, angle, polar * (1.0 - share), numbers.SIZE) for angle, polar in zip(angles, rims)])
+    loops.append([on_head(surface, 0.0, 0.0, numbers.SIZE)])
+    shares = [(0.0,) * sides] + [(1.0,) * sides] * rows + [(1.0,)]
+    KIT.add_loops(part, loops, part.named("Knit"), outline, shares=shares)
+    # The ribs of the knit, from the edge up towards the top.
+    count, half = numbers.RIBS
+    for index in range(count):
+        angle = 2.0 * math.pi * (index + 0.5) / count
+        rim = math.radians(interpolate(numbers.RIM, from_front(angle)))
+        rows_of_rib = []
+        for step in range(4):
+            polar = rim * (1.0 - step / 4.0) + math.radians(8.0) * (step / 4.0)
+            across = Vector((-math.sin(angle), math.cos(angle), 0.0)) * half
+            here = on_head(surface, angle, polar, numbers.SIZE + 0.012)
+            rows_of_rib.append([here - across, here + across])
+        full.add_skin(part, surface, rows_of_rib, part.named("Rib"), around=False)
+    # The panel over the lower face and the bridge between the eyes.
+    lift = numbers.PANEL_LIFT
+    across_steps, up_steps = numbers.PANEL_STEPS
+    for left, right, low, high in (numbers.LOWER, numbers.BRIDGE):
+        grid = [[surface.front(left + (right - left) * column / across_steps, low + (high - low) * row / up_steps, lift)
+                 for column in range(across_steps + 1)] for row in range(up_steps + 1)]
+        full.add_skin(part, surface, grid, part.named("Knit"), around=False)
+    # The rolled edge of each eye hole.
+    middle_side, middle_up, half_width, half_height, radius = numbers.HOLE
+    for sign in (1.0, -1.0):
+        path, wide, thick = [], [], []
+        for index in range(numbers.HOLE_STATIONS + 1):
+            turn = 2.0 * math.pi * index / numbers.HOLE_STATIONS
+            side = sign * middle_side + half_width * math.cos(turn)
+            up = middle_up + half_height * math.sin(turn)
+            out = KIT.outward(surface, side, up)
+            point = surface.front(side, up, lift)
+            ahead = surface.front(sign * middle_side + half_width * math.cos(turn + 0.01),
+                                  middle_up + half_height * math.sin(turn + 0.01), lift) - point
+            path.append(point)
+            wide.append(out.cross(ahead.normalized()).normalized() * radius)
+            thick.append(out * radius * 0.8)
+        slab(part, path, wide, thick, part.named("Edge"), outline * 0.8, sides=6)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -528,6 +829,28 @@ def wall_bar(part, crown, material, start, stop, half_width, lift):
     edge = [(start[0] - across[0], start[1] - across[1]), (stop[0] - across[0], stop[1] - across[1]),
             (stop[0] + across[0], stop[1] + across[1]), (start[0] + across[0], start[1] + across[1])]
     wall_shape(part, crown, material, edge, lift, ((start[0] + stop[0]) * 0.5, (start[1] + stop[1]) * 0.5))
+
+
+def wall_rect(part, crown, material, left, right, low, high, lift, columns=6):
+    """A rectangle on the front of the crown, cut into columns and rows so that it follows the curve of
+    the wall (one flat piece across the panel sinks under it in its middle)."""
+    xs = [left + (right - left) * index / columns for index in range(columns + 1)]
+    rows = max(1, math.ceil((high - low) / 0.02))
+    heights = [low + (high - low) * index / rows for index in range(rows + 1)]
+    full.add_skin(part, SimpleNamespace(middle=crown.middle), [[crown.front(x, height, lift) for x in xs]
+                                                               for height in heights], material, around=False)
+
+
+def wall_band(part, crown, material, places, half_width, lift):
+    """A band on the front of the crown through "places" (across, height): a swirl, a stroke."""
+    lower, upper = [], []
+    for index, (x, h) in enumerate(places):
+        before, after = places[max(index - 1, 0)], places[min(index + 1, len(places) - 1)]
+        along = Vector((after[0] - before[0], after[1] - before[1])).normalized()
+        normal = Vector((-along.y, along.x)) * half_width
+        lower.append(crown.front(x - normal.x, h - normal.y, lift))
+        upper.append(crown.front(x + normal.x, h + normal.y, lift))
+    full.add_skin(part, SimpleNamespace(middle=crown.middle), [lower, upper], material, around=False)
 
 
 def lay_logo(part, crown, logo, material, place, lift):
@@ -579,6 +902,41 @@ def lay_logo(part, crown, logo, material, place, lift):
         wall_shape(part, crown, material, [at(0.05, 1.0), at(0.55, 1.0), at(0.15, 0.08), at(-0.38, 0.08)], lift,
                    at(0.10, 0.55))
         wall_shape(part, crown, material, [at(-0.12, 0.18), at(0.48, 0.18), at(-0.36, -1.0)], lift, at(0.0, 0.0))
+    elif logo == "heart":
+        edge = []
+        for index in range(20):
+            turn = 2.0 * math.pi * index / 20
+            edge.append(at(math.sin(turn) ** 3, (13.0 * math.cos(turn) - 5.0 * math.cos(2.0 * turn)
+                                                  - 2.0 * math.cos(3.0 * turn) - math.cos(4.0 * turn)) / 16.0 + 0.1))
+        wall_shape(part, crown, material, edge, lift, at(0.0, 0.1))
+    elif logo == "triangle":
+        # An outline of a triangle (the Squid Game mark).
+        def corners(reach):
+            return [at(reach * math.cos(math.radians(90.0 + 120.0 * index)),
+                       reach * math.sin(math.radians(90.0 + 120.0 * index)) - 0.1) for index in range(3)]
+        wall_ring(part, crown, material, corners(0.62), corners(1.0), lift)
+    elif logo == "ether":
+        # The Ether mark: a tall diamond over a chevron.
+        wall_shape(part, crown, material, [at(0.0, 1.0), at(0.56, 0.02), at(0.0, -0.30), at(-0.56, 0.02)], lift,
+                   at(0.0, 0.25))
+        wall_shape(part, crown, material, [at(0.0, -0.44), at(0.56, -0.12), at(0.0, -1.0), at(-0.56, -0.12)], lift,
+                   at(0.0, -0.5))
+    elif logo == "bow":
+        # A bow: two triangles meeting at a knot.
+        for sign in (1.0, -1.0):
+            wall_shape(part, crown, material, [at(sign * 0.15, 0.0), at(sign * 1.0, 0.55), at(sign * 1.0, -0.55)], lift,
+                       at(sign * 0.6, 0.0))
+        wall_shape(part, crown, material, [at(math.cos(2.0 * math.pi * index / 8) * 0.25,
+                                              math.sin(2.0 * math.pi * index / 8) * 0.25) for index in range(8)],
+                   lift * 1.3, at(0.0, 0.0))
+    elif logo == "chog":
+        # A small spiky head, as the jackets of Side=Left wear it on the chest.
+        edge = []
+        for index in range(18):
+            angle = math.pi * 0.5 + 2.0 * math.pi * index / 18
+            reach = 1.0 if index % 2 == 0 else 0.66
+            edge.append(at(math.cos(angle) * reach, math.sin(angle) * reach))
+        wall_shape(part, crown, material, edge, lift, at(0.0, 0.0))
     elif logo == "cloud":
         # Three round puffs on a flat base, each its own shape. (First try: one outline around the
         # whole cloud, filled from its middle: on the bust a notch of the crown showed through it.)
@@ -649,6 +1007,21 @@ HAT_SHAPES = {
     "Durag": build_durag,
     "WizardHat": build_wizard_hat,
     "SpartanHelmet": build_spartan,
+    "ClownNose": build_clown_nose,
+    "Plunger": build_plunger,
+    "Balaclava": build_balaclava,
+}
+# The numbers of each shape, where make_chog_traits.py reads its "LEAVES".
+HAT_NUMBERS = {
+    "Ushanka": USHANKA,
+    "Headband": HEADBAND,
+    "CurlyWig": CURLY_WIG,
+    "Durag": DURAG,
+    "WizardHat": WIZARD_HAT,
+    "SpartanHelmet": SPARTAN,
+    "ClownNose": CLOWN_NOSE,
+    "Plunger": PLUNGER,
+    "Balaclava": BALACLAVA,
 }
 
 
@@ -713,25 +1086,36 @@ HATS = {
     "MCGA": cap((0.65, 0.36, 0.92), (0.47, 0.26, 0.70), ("MAKE CHOG", "GREAT AGAIN"), INK_WHITE),
     "Chog Cap": cap((0.65, 0.36, 0.92), (0.47, 0.26, 0.70), ("MAKE CHOG", "GREAT AGAIN"), INK_WHITE),
     "MEGA Chog": cap((0.92, 0.93, 0.83), (0.94, 0.30, 0.07), ("MEGA", "CHOG"), INK_DARK),
-    "Buttcoin Cap": cap((0.92, 0.52, 0.10), (0.27, 0.19, 0.11), "Buttcoin", INK_WHITE, (0.55, 0.28, 0.06),
-                        missing="the bars of the Bitcoin B of its first letter"),
-    "10k TPS Cap": cap((0.93, 0.92, 0.92), (0.40, 0.40, 0.40), ("10K", "TPS"), (0.42, 0.22, 0.80),
-                       missing="the purple box around the words"),
+    # The bars of the Bitcoin B over and under its first letter (15 October 2026).
+    "Buttcoin Cap": {**cap((0.92, 0.52, 0.10), (0.27, 0.19, 0.11), "Buttcoin", INK_WHITE, (0.55, 0.28, 0.06)),
+                     "bars": True},
+    # "10K" in white on a purple band, "TPS" in purple, a purple frame around both (15 October 2026).
+    # The box stands a little higher than a word alone: its foot would hide behind the raised brim.
+    "10k TPS Cap": {**cap((0.93, 0.92, 0.92), (0.40, 0.40, 0.40), ("10K", "TPS"), (0.42, 0.22, 0.80)), "box": True,
+                    "numbers": {"BRIM_LENGTH": 0.060, "BRIM_RISE_DEG": 35.0, "PRINT_BASELINE": 0.150},
+                    "colours": {"Crown": (0.93, 0.92, 0.92), "Brim": (0.40, 0.40, 0.40), "Button": (0.93, 0.92, 0.92),
+                                "Print": (0.42, 0.22, 0.80), "Print2": (0.96, 0.95, 0.97)}},
     "JEET Cap": cap((0.12, 0.72, 0.22), (0.45, 0.84, 0.52), "JEET", INK_WHITE, INK_DARK),
     "Jeet Cap": cap((0.12, 0.72, 0.22), (0.45, 0.84, 0.52), "JEET", INK_WHITE, INK_DARK),
     "RETARD Cap": cap((0.82, 0.30, 0.95), (0.84, 0.65, 0.96), "RETARD", (0.98, 0.94, 0.80), INK_DARK),
     "WAGMI Cap": cap((0.88, 0.13, 0.55), (0.91, 0.49, 0.74), "WAGMI", INK_WHITE, INK_DARK),
     "NEET": cap((0.95, 0.91, 0.86), (0.22, 0.25, 0.76), "NEET", INK_WHITE, (0.22, 0.25, 0.76)),
     "MCGA Cap": cap((0.95, 0.07, 0.06), (0.80, 0.07, 0.06), "MCGA", (0.98, 0.72, 0.14), (0.90, 0.42, 0.08)),
-    "ETH Cap": cap((0.92, 0.92, 0.93), (0.74, 0.75, 0.78), missing="the Ether logo in grey"),
+    "ETH Cap": cap((0.92, 0.92, 0.93), (0.74, 0.75, 0.78), ink=(0.52, 0.53, 0.58), logo="ether"),
     # Bucket hats, Side=Right, with the logo of their crown (lay_logo).
     "Mon Cap": bucket((0.40, 0.28, 0.65), (0.33, 0.24, 0.60), (0.24, 0.18, 0.52), mark="monad", mark_colour=INK_WHITE),
-    "Cloud Cap": bucket((0.25, 0.36, 0.85), (0.25, 0.36, 0.85), (0.13, 0.20, 0.62), mark="cloud", mark_colour=INK_WHITE,
-                        missing="the swirls of the cloud (a plain cloud is drawn)"),
+    # A cloud of curls: a spiral in the colour of the hat on each puff (15 October 2026).
+    "Cloud Cap": {**bucket((0.25, 0.36, 0.85), (0.25, 0.36, 0.85), (0.13, 0.20, 0.62), mark="cloud",
+                           mark_colour=INK_WHITE), "swirls": True,
+                  "colours": {"Crown": (0.25, 0.36, 0.85), "Brim": (0.25, 0.36, 0.85), "Under": (0.13, 0.20, 0.62),
+                              "Mark": INK_WHITE, "Swirl": (0.25, 0.36, 0.85)}},
     "Orange Bucket Cap": bucket((0.87, 0.40, 0.19), (0.87, 0.40, 0.19), (0.70, 0.26, 0.12)),
     "Gray Bucket Cap": bucket((0.56, 0.62, 0.67), (0.58, 0.64, 0.68), (0.45, 0.50, 0.55)),
-    "Dollar Cap": bucket((0.15, 0.80, 0.94), (0.15, 0.80, 0.94), (0.09, 0.40, 0.58), mark="label",
-                         mark_colour=(0.60, 0.90, 0.95), missing="the words of its label"),
+    # Its label, edged by a dark line, says JUST A KID WITH / $1 AND A DREAM (15 October 2026).
+    "Dollar Cap": {**bucket((0.15, 0.80, 0.94), (0.15, 0.80, 0.94), (0.09, 0.40, 0.58), mark="label",
+                            mark_colour=(0.60, 0.90, 0.95)), "label_words": ("JUST A KID WITH", "$1 AND A DREAM"),
+                   "colours": {"Crown": (0.15, 0.80, 0.94), "Brim": (0.15, 0.80, 0.94), "Under": (0.09, 0.40, 0.58),
+                               "Mark": (0.60, 0.90, 0.95), "Ink": (0.07, 0.06, 0.07)}},
     "Thunder Cap": bucket((0.08, 0.57, 0.85), (0.08, 0.57, 0.85), (0.03, 0.41, 0.67), mark="bolt",
                           mark_colour=(0.98, 0.78, 0.10)),
     "Star Cap": bucket((0.40, 0.40, 0.40), (0.40, 0.40, 0.40), (0.26, 0.26, 0.26), mark="star", mark_colour=INK_WHITE),
@@ -791,6 +1175,20 @@ HATS = {
         "shape": "SpartanHelmet",
         "colours": {"Gold": (0.89, 0.64, 0.32), "Trim": (0.80, 0.47, 0.20), "Crest": (0.95, 0.06, 0.06)},
     },
+    # Values of "Head" that are not hats (15 October 2026), colours read on their layers.
+    "Clown Nose": {
+        "shape": "ClownNose",
+        "colours": {"Ball": (0.93, 0.07, 0.07), "Glint": (0.98, 0.93, 0.93)},
+        "unlit": ("Glint",),
+    },
+    "Plumber": {
+        "shape": "Plunger",
+        "colours": {"Cup": (0.89, 0.10, 0.10), "Lip": (0.56, 0.08, 0.09), "Stick": (0.52, 0.27, 0.16)},
+    },
+    "Robber": {
+        "shape": "Balaclava",
+        "colours": {"Knit": (0.39, 0.37, 0.41), "Rib": (0.26, 0.24, 0.27), "Edge": (0.46, 0.44, 0.48)},
+    },
 }
 
 # Where a Side draws a value otherwise: these entries replace those of HATS for that Side.
@@ -818,7 +1216,9 @@ HATS_OF_SIDE = {
 # float (Duck Float): see LEFT_OUT. Three cuts: the shirt of make_chog_traits.py ("Tee"), a jacket
 # open on a shirt and a tie ("Jacket"), a jacket with a zip and stripes down the sleeves ("Track").
 # What is printed on a shirt (67, CHUG LIFE, CWO, MILF, INMATE, the flowers of the Hawaiian polo) is
-# not drawn: see "print_missing".
+# not drawn: see "print_missing". (So it was in batch 2. Batch 3, 15 October 2026, draws those prints
+# and builds the costumes: see "The prints of the shirts of Side=Right" and "The costumes" below,
+# which replace these entries; LEFT_OUT is then empty.)
 # ---------------------------------------------------------------------------------------------
 LEFT_OUT = {
     "Gangster suit": "a hood over the head and a red bandana over the mouth",
@@ -838,6 +1238,12 @@ JACKET = {
     "V_HALF_WIDTH": 0.060,
     "TIE": (0.574, 0.470, 0.011, 0.017),   # top, foot, half width at the knot and at its widest
     "LIFTS": (0.006, 0.010),
+    # The lapels (15 October 2026, asked by the owner): a band along each side of the V, in the colour
+    # of the jacket, edged by the dark line of the model, as the pictures draw them. Its width at the
+    # top and at the foot of the V, its half thickness, the thickness of its outline, stations along it.
+    "LAPEL": (0.036, 0.010, 0.005, 0.006, 5),
+    # The points of the collar of the shirt, each side of the knot: how far out and how far down.
+    "COLLAR_POINTS": (0.046, 0.030),
 }
 
 TRACK = {
@@ -881,6 +1287,30 @@ def build_jacket(maker):
             tie.append([shirt_front(maker, height, side, high) for side in (-wide, wide)])
         tie.append([shirt_front(maker, foot, 0.0, high)])
         full.add_skin(torso, middle, tie, torso.named("Tie"), around=False)
+    # The lapels: thin slabs along the two edges of the V, outside it.
+    top_width, foot_width, half_thick, line, stations = numbers.LAPEL
+    for sign in (1.0, -1.0):
+        path, wide, thick = [], [], []
+        for index in range(stations):
+            share = index / (stations - 1)
+            height = numbers.V_TOP + (numbers.V_FOOT - numbers.V_TOP) * share
+            edge = numbers.V_HALF_WIDTH * (1.0 - share)
+            width = top_width + (foot_width - top_width) * share
+            centre = shirt_front(maker, height, sign * (edge + width * 0.5), low)
+            outwards = (shirt_front(maker, height, sign * (edge + width * 0.5), low + 0.01) - centre).normalized()
+            across = (shirt_front(maker, height, sign * (edge + width), low) - shirt_front(maker, height, sign * edge,
+                                                                                            low)) * 0.5
+            path.append(centre)
+            wide.append(across)
+            thick.append(outwards * half_thick)
+        slab(torso, path, wide, thick, torso.named("Main"), line, sides=4)
+    # The points of the collar of the shirt, over the top of the lapels.
+    out, down = numbers.COLLAR_POINTS
+    for sign in (1.0, -1.0):
+        corners = [shirt_front(maker, numbers.V_TOP + 0.004, sign * 0.012, high + 0.002),
+                   shirt_front(maker, numbers.V_TOP + 0.004, sign * out, high + 0.002),
+                   shirt_front(maker, numbers.V_TOP - down, sign * 0.026, high + 0.002)]
+        full.add_skin(torso, middle, [[corners[2]], corners[:2]], torso.named("Shirt"), around=False)
 
 
 def build_track(maker):
@@ -920,7 +1350,513 @@ def build_track(maker):
                           around=False)
 
 
-CLOTH_KINDS = {"Jacket": build_jacket, "Track": build_track}
+# ---------------------------------------------------------------------------------------------
+# What is laid on the front of a shirt (15 October 2026), for every cut built on the shirt of
+# make_chog_traits.py, which calls decorate_shirt(): a word or a number ("print"), a logo ("logo"),
+# the squares of a pixel pattern ("pixels"), sewn patches ("patches"). Flat shapes, no outline.
+# ---------------------------------------------------------------------------------------------
+SHIRT_PRINT = {
+    "PRINT_CUT": 0.040,          # the width of the pieces a word is cut into, to follow the torso
+    "PRINT_SPACING": 1.12,
+    "PRINT_BOLD": 0.034,         # how much the strokes are thickened (units of the font)
+    "PRINT_LINE": 0.040,         # and how much more for the dark line around them
+    "PRINT_LIFT": (0.004, 0.007),
+    "PIXEL_LIFT": 0.003,
+}
+
+
+class ShirtPanel:
+    """The front of the torso seen as the front panel of a hat, for lay_word and lay_logo of the
+    caps: front(across, height, lift) is a point of the shirt, "across" to the left of the character
+    from "offset"."""
+
+    def __init__(self, maker, offset=0.0, middle_height=0.42):
+        self.maker, self.offset = maker, offset
+        self.middle = Vector((0.0, 0.0, middle_height))
+        self.numbers = SimpleNamespace(**SHIRT_PRINT)
+
+    def front(self, side, height, lift):
+        return shirt_front(self.maker, height, side + self.offset, lift)
+
+
+def shirt_square(torso, maker, material, across, height, half, turn_deg, lift, tall=None):
+    """A square (a patch, a pixel), or a rectangle "tall" high, laid on the front of the shirt."""
+    turn = math.radians(turn_deg)
+    corners = []
+    for x, y in ((-1.0, -1.0), (1.0, -1.0), (1.0, 1.0), (-1.0, 1.0)):
+        y_half = half if tall is None else tall
+        side = across + half * x * math.cos(turn) - y_half * y * math.sin(turn)
+        up = height + half * x * math.sin(turn) + y_half * y * math.cos(turn)
+        corners.append(shirt_front(maker, up, side, lift))
+    middle = SimpleNamespace(middle=Vector((0.0, 0.0, height)))
+    full.add_skin(torso, middle, [corners[:2], [corners[3], corners[2]]], material, around=False)
+
+
+def shirt_band(torso, maker, material, places, half_width, lift):
+    """A band laid on the front of the shirt through "places" (across, height)."""
+    lower, upper = [], []
+    for index, (across, height) in enumerate(places):
+        before, after = places[max(index - 1, 0)], places[min(index + 1, len(places) - 1)]
+        along = Vector((after[0] - before[0], after[1] - before[1])).normalized()
+        normal = Vector((-along.y, along.x)) * half_width
+        lower.append(shirt_front(maker, height - normal.y, across - normal.x, lift))
+        upper.append(shirt_front(maker, height + normal.y, across + normal.x, lift))
+    middle = SimpleNamespace(middle=Vector((0.0, 0.0, sum(height for _, height in places) / len(places))))
+    full.add_skin(torso, middle, [lower, upper], material, around=False)
+
+
+def open_front(torso, maker, half_opening, fur_radius):
+    """The front of a robe left open (Kings Robe): the faces of the shirt across the middle of the front
+    are removed, so the body shows in its skin colour, and a roll of fur runs down each edge."""
+    import bmesh
+    gone = [face for face in torso.mesh.faces
+            if face.calc_center_median().y < -0.01 and abs(face.calc_center_median().x) < half_opening]
+    bmesh.ops.delete(torso.mesh, geom=gone, context="FACES")
+    numbers = maker.numbers(KIT.TEE)
+    heights = [numbers.HEM + (numbers.COLLAR[1] - numbers.HEM) * index / 5 for index in range(6)]
+    for sign in (1.0, -1.0):
+        path, wide, thick = [], [], []
+        for height in heights:
+            half_width, _ = KIT.torso_section(maker.body, height)
+            edge = min(half_opening * 1.02, half_width * 0.6)
+            centre = shirt_front(maker, height, sign * edge, fur_radius * 0.4)
+            out = (shirt_front(maker, height, sign * edge, fur_radius * 0.4 + 0.01) - centre).normalized()
+            path.append(centre)
+            wide.append(out.cross(Z).normalized() * fur_radius)
+            thick.append(out * fur_radius * 0.8)
+        slab(torso, path, wide, thick, torso.named("Fur"), 0.010, sides=6)
+
+
+def lay_flower(torso, maker, material, across, height, size, lift):
+    """A flower of five round petals, as the Hawaiian polo is printed."""
+    edge = []
+    for index in range(15):
+        turn = 2.0 * math.pi * index / 15
+        reach = size * (0.62 + 0.38 * abs(math.cos(2.5 * turn)))
+        edge.append(shirt_front(maker, height + reach * math.sin(turn), across + reach * math.cos(turn), lift))
+    middle = SimpleNamespace(middle=Vector((0.0, 0.0, height)))
+    full.add_skin(torso, middle, [[shirt_front(maker, height, across, lift)], edge], material)
+
+
+def lay_zigzag(torso, maker, material, low, high, count, lift):
+    """A band of triangles all around the shirt between two heights, points up (the cape of Wizard)."""
+    middle = SimpleNamespace(middle=Vector((0.0, 0.0, (low + high) * 0.5)))
+    numbers = maker.numbers(KIT.TEE)
+    for index in range(count):
+        corners = []
+        for share, height in ((0.0, low), (1.0, low), (0.5, high)):
+            angle = 2.0 * math.pi * (index + share) / count
+            half_width, half_depth = KIT.torso_section(maker.body, height)
+            reach = numbers.LIFT + lift
+            corners.append(Vector((math.cos(angle) * (half_width + reach), math.sin(angle) * (half_depth + reach), height)))
+        full.add_skin(torso, middle, [[corners[2]], corners[:2]], material, around=False)
+
+
+def lay_shirt_print(torso, maker, spec, colours):
+    """The word or the lines of "print" on the chest: spec is (lines, height of the middle, height of
+    a capital, widest it may be, across). Its colour is "Print", edged by "PrintLine" when given."""
+    lines, middle, capitals, widest, across = spec
+    lines = (lines,) if isinstance(lines, str) else tuple(lines)
+    panel = ShirtPanel(maker, across, middle)
+    numbers = panel.numbers
+    scale = capitals / KIT.FONT_CAPITALS
+    wide = max(KIT.word_width(line, numbers.PRINT_BOLD, numbers.PRINT_SPACING) for line in lines)
+    scale = min(scale, widest / wide)
+    step = KIT.FONT_CAPITALS * scale * 1.30
+    low, high = numbers.PRINT_LIFT
+    top = middle + (len(lines) - 1) * step * 0.5 - KIT.FONT_CAPITALS * scale * 0.5
+    for index, line in enumerate(lines):
+        baseline = top - index * step
+        if "PrintLine" in colours:
+            KIT.lay_word(torso, panel, line, torso.named("PrintLine"), numbers.PRINT_BOLD + numbers.PRINT_LINE, low,
+                         baseline, scale, resolution=1)
+        KIT.lay_word(torso, panel, line, torso.named("Print"), numbers.PRINT_BOLD, high, baseline, scale)
+
+
+def decorate_shirt(maker, torso):
+    """What the entry of a shirt lays on its front: see above. Called by make_chog_traits.build_tee."""
+    entry, colours = maker.entry, maker.entry["colours"]
+    lift = SHIRT_PRINT["PIXEL_LIFT"]
+    if entry.get("open_front"):
+        open_front(torso, maker, *entry["open_front"])
+    for across, height, half, tall in entry.get("labels", ()):
+        shirt_square(torso, maker, torso.named("Label"), across, height, half, 0.0, lift, tall=tall)
+    for across, height, half, turn in entry.get("patches", ()):
+        shirt_square(torso, maker, torso.named("Patch"), across, height, half, turn, lift)
+    if entry.get("sash"):
+        places, half_width = entry["sash"]
+        shirt_band(torso, maker, torso.named("Sash"), places, half_width, lift * 2.0)
+    for places, half_width in entry.get("swirls", ()):
+        shirt_band(torso, maker, torso.named("Swirl"), places, half_width, lift)
+    for across, height, size in entry.get("flowers", ()):
+        lay_flower(torso, maker, torso.named("Flower"), across, height, size, lift)
+    if entry.get("zigzag"):
+        low, high, count = entry["zigzag"]
+        lay_zigzag(torso, maker, torso.named("Trim"), low, high, count, lift)
+    for logo, across, height, size, key in entry.get("logos", ()):
+        lay_logo(torso, ShirtPanel(maker, across, height), logo, torso.named(key), (height, size),
+                 SHIRT_PRINT["PRINT_LIFT"][1])
+    if entry.get("pixels"):
+        # A pattern of small squares, as the "glitch" and pixel prints are drawn: the same places on
+        # every shirt (a fixed sequence), on the front of the torso.
+        count, half = entry["pixels"]
+        sequence = random.Random(20261015)
+        for _ in range(count):
+            across, height = sequence.uniform(-0.12, 0.12), sequence.uniform(0.27, 0.56)
+            shirt_square(torso, maker, torso.named("Pixel"), across, height, half * sequence.uniform(0.7, 1.3), 0.0,
+                         lift)
+    if entry.get("logo"):
+        logo, across, height, size = entry["logo"]
+        lay_logo(torso, ShirtPanel(maker, across, height), logo, torso.named("Logo"), (height, size),
+                 SHIRT_PRINT["PRINT_LIFT"][1])
+    if entry.get("print"):
+        lay_shirt_print(torso, maker, entry["print"], colours)
+
+
+# ---------------------------------------------------------------------------------------------
+# Hoodies (Side=Left, 15 October 2026). Hood down: the shirt with long sleeves, a thick roll of the
+# hood around the back of the neck and over the shoulders, and two drawstrings hanging from the front
+# of the collar, as the pictures draw them. Hood up (Yellow Hoodie): the same, and a hood over the
+# head, framing the face, in place of the crown of leaves (the entry gives "head": its LEAVES).
+# ---------------------------------------------------------------------------------------------
+HOODIE = {
+    # The roll: the height of its middle, how far it stands out of the torso at that height (to the
+    # sides, behind), its radius at its two ends and in the middle of the back, how far around the
+    # neck it goes from the back to each end (degrees), stations along it, sides of its section.
+    "ROLL_HEIGHT": 0.566,
+    "ROLL_OUT": (0.034, 0.042),
+    "ROLL_RADIUS": (0.022, 0.044),
+    "ROLL_AROUND_DEG": 140.0,
+    "ROLL_STATIONS": 9,
+    "ROLL_SIDES": 6,
+    # The drawstrings: to each side of the middle, from which height to which, half width.
+    "STRINGS": (0.030, 0.570, 0.452, 0.0055),
+    "OUTLINE_THICKNESS": 0.014,
+}
+
+# The hood up, on the head (axes of "Head", as the hats): polar degrees of the edge of its opening by
+# degrees from the front (over the brow, down beside the face to the jaw, down to the neck behind),
+# how much larger than the head it is, rows, sides, and the roll along the edge of the opening (its
+# radius, and how far around from the front it runs).
+HOOD = {
+    "RIM": ((0.0, 52.0), (35.0, 62.0), (62.0, 116.0), (110.0, 148.0), (180.0, 156.0)),
+    "SIZE": ((0.0, 1.12), (60.0, 1.20), (180.0, 1.22)),
+    "ROWS": 4,
+    "SIDES": 18,
+    "EDGE": (0.034, 74.0),
+    "EDGE_STATIONS": 11,
+    "OUTLINE_THICKNESS": 0.020,
+}
+
+
+def build_hood_up(maker):
+    """A hood over the head (a part on "Head"), its opening framing the face, a roll along the edge."""
+    numbers = SimpleNamespace(**{**HOOD, **maker.entry.get("hood_numbers", {})})
+    part, surface = maker.part(on="Head"), maker.surface
+    sides, rows = numbers.SIDES, numbers.ROWS
+    angles = [2.0 * math.pi * index / sides for index in range(sides)]
+    rims = [math.radians(interpolate(numbers.RIM, from_front(angle))) for angle in angles]
+    sizes = [interpolate(numbers.SIZE, from_front(angle)) for angle in angles]
+    loops = [[on_head(surface, angle, polar, 0.90) for angle, polar in zip(angles, rims)]]
+    for row in range(rows):
+        share = row / rows
+        loops.append([on_head(surface, angle, polar * (1.0 - share), size) for angle, polar, size in
+                      zip(angles, rims, sizes)])
+    loops.append([on_head(surface, 0.0, 0.0, interpolate(numbers.SIZE, 90.0))])
+    shares = [(0.0,) * sides] + [(1.0,) * sides] * rows + [(1.0,)]
+    KIT.add_loops(part, loops, part.named("Hood"), numbers.OUTLINE_THICKNESS, shares=shares)
+    # The roll along the edge of the opening, from the jaw on one side over the brow to the other.
+    radius, around = numbers.EDGE
+    path, wide, thick = [], [], []
+    for index in range(numbers.EDGE_STATIONS):
+        degrees = -around + 2.0 * around * index / (numbers.EDGE_STATIONS - 1)
+        angle = math.radians(270.0 + degrees)
+        polar = math.radians(interpolate(numbers.RIM, abs(degrees)))
+        out = head_normal(surface, angle, polar)
+        path.append(on_head(surface, angle, polar, interpolate(numbers.SIZE, abs(degrees))) - out * radius * 0.4)
+        along = (on_head(surface, angle + 0.01, polar, 1.0) - on_head(surface, angle - 0.01, polar, 1.0)).normalized()
+        across = out.cross(along).normalized()
+        wide.append(across * radius)
+        thick.append(out * radius)
+    rim_colour = "Rim" if "Rim" in maker.entry["colours"] else "Hood"
+    slab(part, path, wide, thick, part.named(rim_colour), numbers.OUTLINE_THICKNESS, sides=6)
+
+
+def build_hoodie(maker):
+    """A hoodie: the cut "Track" (long sleeves; stripes down them when the entry gives "Stripe"), the
+    roll of the hood around the neck and two drawstrings, or the hood up when the entry says "hood": "up"."""
+    build_track(maker)
+    numbers = SimpleNamespace(**HOODIE)
+    torso, body = maker.parts[0][0], maker.body
+    if maker.entry.get("hood") == "up":
+        build_hood_up(maker)
+    else:
+        height = numbers.ROLL_HEIGHT
+        half_width, half_depth = KIT.torso_section(body, height)
+        out_side, out_back = numbers.ROLL_OUT
+        thin, thick_radius = numbers.ROLL_RADIUS
+        path, wide, thick = [], [], []
+        for index in range(numbers.ROLL_STATIONS):
+            share = -1.0 + 2.0 * index / (numbers.ROLL_STATIONS - 1)
+            angle = math.radians(share * numbers.ROLL_AROUND_DEG)     # 0: the back, + to the left
+            middle = Vector((math.sin(angle) * (half_width + out_side), math.cos(angle) * (half_depth + out_back),
+                             height + 0.012 * math.cos(angle)))
+            radius = thin + (thick_radius - thin) * math.cos(share * math.pi * 0.5) ** 2
+            outward = Vector((math.sin(angle) / (half_width + out_side), math.cos(angle) / (half_depth + out_back),
+                              0.0)).normalized()
+            path.append(middle)
+            wide.append(outward * radius)
+            thick.append(Z * radius * 0.85)
+        slab(torso, path, wide, thick, torso.named("Main"), numbers.OUTLINE_THICKNESS, sides=numbers.ROLL_SIDES)
+    # The drawstrings.
+    across, top, foot, half = numbers.STRINGS
+    string = torso.named("String") if "String" in maker.entry["colours"] else torso.named("Collar")
+    for side in (1.0, -1.0):
+        rows = [[shirt_front(maker, height, side * across + edge, 0.006) for edge in (-half, half)]
+                for height in (top, (top + foot) * 0.5, foot)]
+        full.add_skin(torso, SimpleNamespace(middle=Vector((0.0, 0.0, 0.5))), rows, string, around=False)
+
+
+# ---------------------------------------------------------------------------------------------
+# Costumes (15 October 2026): a suit with long sleeves and a hood up over the head (Gangster suit,
+# Shark Suit, Banana suit, Dragon suit), a space suit with the ring of its helmet (Astro Suit), and a
+# rubber duck float around the body (Duck Float). These Genesis wear no value of "Head": the hood
+# replaces the crown of leaves (the entry gives "head": its LEAVES), as the pictures show.
+# ---------------------------------------------------------------------------------------------
+COSTUME = {
+    # The belly in another colour (shark, dragon): half its width, its lower and upper edge.
+    "BELLY": (0.085, 0.300, 0.540),
+    # The teeth of the shark along the edge of the hood: how many, from how far round on each side
+    # (degrees from the front), how long, how wide at their foot (degrees).
+    "TEETH": (11, 70.0, 0.050, 6.0),
+    # The fin on the back of the hood: polar degrees where it starts and ends, its height, half thickness.
+    "FIN": (24.0, 96.0, 0.150, 0.016),
+    # The horns of the dragon: degrees from the front, polar degrees, length, radius at the foot.
+    "HORNS": (34.0, 40.0, 0.130, 0.040),
+    # The tip of the banana: how far the top of the hood rises, then the stalk (length, radius).
+    "PEAK": 0.32,
+    "STALK": (0.080, 0.030),
+    # The bandana over the lower face: in the coordinates of the face, its upper corners (to the side,
+    # above), its point below the chin, how far off the head, its dots.
+    "BANDANA": (0.27, -0.040, -0.300, 0.032),
+    "BANDANA_DOTS": ((-0.12, -0.085), (0.0, -0.090), (0.12, -0.085), (-0.06, -0.150), (0.06, -0.150),
+                     (0.0, -0.210), (-0.17, -0.060), (0.17, -0.060)),
+    # The wings of the dragon, on the back: the shoulder they leave from (to the side, height), their
+    # span, their height, their thickness, and the way they spread (to the side, back, up).
+    # (First: 0.20 spread mostly to the sides, in the red of the suit: hidden behind the arms.)
+    "WINGS": (0.06, 0.54, 0.27, 0.20, 0.010),
+    "WING_WAY": (0.75, 0.95, 0.45),
+    "OUTLINE_THICKNESS": 0.014,
+}
+
+
+def build_costume(maker):
+    """A costume with a hood up: the suit ("Track" with long sleeves), its belly, the hood over the head,
+    and what the entry adds ("teeth", "fin", "horns", "peak", "bandana", "wings")."""
+    entry = maker.entry
+    numbers = SimpleNamespace(**COSTUME)
+    build_track(maker)
+    torso = maker.parts[0][0]
+    colours = entry["colours"]
+    if "Belly" in colours:
+        half, low, high = numbers.BELLY
+        rows = []
+        for index in range(5):
+            height = low + (high - low) * index / 4
+            wide = half * math.sin(math.pi * (0.15 + 0.7 * index / 4))
+            rows.append([shirt_front(maker, height, side, 0.004) for side in (-wide, -wide * 0.33, wide * 0.33, wide)])
+        full.add_skin(torso, SimpleNamespace(middle=Vector((0.0, 0.0, (low + high) * 0.5))), rows, torso.named("Belly"),
+                      around=False)
+    if entry.get("wings"):
+        side_at, height, span, tall, thick = numbers.WINGS
+        to_side, to_back, to_up = numbers.WING_WAY
+        for sign in (1.0, -1.0):
+            root = Vector((sign * side_at, 0.10, height))
+            out = Vector((sign * to_side, to_back, to_up)).normalized()
+            up = Vector((0.0, 0.25, 1.0)).normalized()
+            # A bat wing: its top edge, then three points along its lower edge, scalloped.
+            outline_points = [root, root + out * span + up * tall * 0.6, root + out * span * 0.95,
+                              root + out * span * 0.62 + up * tall * 0.05, root + out * span * 0.45 - up * tall * 0.15,
+                              root + out * span * 0.28 - up * tall * 0.02, root + out * span * 0.12 - up * tall * 0.22]
+            normal = out.cross(up).normalized()
+            front = [point + normal * thick for point in outline_points]
+            back = [point - normal * thick for point in outline_points]
+            KIT.add_loops(torso, [back, front], torso.named("Wing"), numbers.OUTLINE_THICKNESS)
+    build_hood_up(maker)
+    hood = maker.parts[-1][0]
+    surface = maker.surface
+    hood_numbers = SimpleNamespace(**{**HOOD, **entry.get("hood_numbers", {})})
+    if entry.get("teeth"):
+        count, around, length, half_deg = numbers.TEETH
+        for index in range(count):
+            degrees = -around + 2.0 * around * index / (count - 1)
+            angle = math.radians(270.0 + degrees)
+            polar = math.radians(interpolate(hood_numbers.RIM, abs(degrees)))
+            size = interpolate(hood_numbers.SIZE, abs(degrees))
+            corners = [on_head(surface, angle + math.radians(turn), polar, size * 0.99) for turn in (-half_deg, half_deg)]
+            # The point of a tooth: towards the middle of the face, along the head.
+            middle_of_face = surface.front(0.0, 0.0, 0.0)
+            foot = (corners[0] + corners[1]) * 0.5
+            tip = foot + (middle_of_face - foot).normalized() * length + head_normal(surface, angle, polar) * 0.004
+            full.add_skin(hood, surface, [[tip], corners], hood.named("Tooth"), around=False)
+    if entry.get("fin"):
+        start, end, height, half_thick = numbers.FIN
+        angle = math.radians(90.0)
+        path, wide, thick = [], [], []
+        for index in range(5):
+            share = index / 4
+            polar = math.radians(start + (end - start) * share)
+            out = head_normal(surface, angle, polar)
+            rise = height * math.sin(math.pi * min(1.0, share * 1.25)) ** 0.8 * (1.0 - 0.6 * share)
+            foot = on_head(surface, angle, polar, interpolate(hood_numbers.SIZE, 180.0)) - out * 0.02
+            path.append(foot + out * (rise + 0.02) * 0.5)
+            wide.append(X * half_thick)
+            thick.append(out * (rise + 0.02) * 0.5)
+        slab(hood, path, wide, thick, hood.named("Hood"), numbers.OUTLINE_THICKNESS, sides=4)
+    if entry.get("horns"):
+        degrees, polar_deg, length, radius = numbers.HORNS
+        for sign in (1.0, -1.0):
+            angle, polar = math.radians(270.0 + sign * degrees), math.radians(polar_deg)
+            out = head_normal(surface, angle, polar)
+            foot = on_head(surface, angle, polar, interpolate(hood_numbers.SIZE, degrees)) - out * 0.02
+            way = (out + Z * 0.6).normalized()
+            hood.shell(base.tube_rings(foot, way, X, ((0.0, radius), (length * 0.5, radius * 0.75), (length, radius * 0.15))),
+                       7, hood.named("Horn"), numbers.OUTLINE_THICKNESS)
+    if entry.get("peak"):
+        # The banana: a tall point rising from the top of the hood, its stalk at the tip.
+        length, radius = numbers.STALK
+        top = on_head(surface, 0.0, 0.0, interpolate(hood_numbers.SIZE, 90.0))
+        rise = numbers.PEAK
+        hood.shell(base.tube_rings(top - Z * 0.10, Z, X, ((0.0, 0.20), (0.10, 0.17), (rise * 0.55, 0.10),
+                                                         (rise, 0.045))), 10, hood.named("Hood"), numbers.OUTLINE_THICKNESS)
+        hood.shell(base.tube_rings(top + Z * (rise - 0.01), (Z - Y * 0.3).normalized(), X,
+                                   ((0.0, radius), (length, radius * 0.8))), 6, hood.named("Tip"),
+                   numbers.OUTLINE_THICKNESS * 0.8)
+    if entry.get("bandana"):
+        # A triangle of cloth over the lower face, from below the eyes to a point under the chin, with
+        # white dots: it covers the mouth ("HIDES" in "head").
+        half, top, point, lift = numbers.BANDANA
+        rows = []
+        for index in range(5):
+            share = index / 4
+            height = top + (point - top) * share
+            wide = half * (1.0 - share) + 0.012
+            rows.append([surface.front(side, height, lift) for side in (-wide, -wide * 0.5, 0.0, wide * 0.5, wide)])
+        full.add_skin(hood, surface, rows, hood.named("Bandana"), around=False)
+        for side, height in numbers.BANDANA_DOTS:
+            full.add_skin(hood, surface, full.patch_loops(surface, (side, height), 0.010, 0.010, 2.0, 0.0, lift + 0.003, 1, 6),
+                          hood.named("Dot"))
+
+
+ASTRO = {
+    # The ring of the helmet around the face: polar degrees of the opening by degrees from the front
+    # (it goes all round the face), how much larger than the head, its radius.
+    "RING": ((0.0, 50.0), (45.0, 66.0), (75.0, 110.0), (110.0, 160.0), (180.0, 170.0)),
+    "RING_SIZE": 1.12,
+    "RING_RADIUS": 0.040,
+    "RING_STATIONS": 18,
+    "RING_AROUND_DEG": 118.0,
+    # The collar of the suit around the neck: height, how far it stands out, its radius.
+    "COLLAR": (0.585, 0.030, 0.034),
+    "OUTLINE_THICKNESS": 0.016,
+}
+
+
+def build_astro(maker):
+    """The space suit: white suit with long sleeves (grey stripes down them), a thick collar, and the
+    ring of the helmet around the face. The glass of the helmet is not drawn: the face and the crown
+    show as through it."""
+    numbers = SimpleNamespace(**ASTRO)
+    build_track(maker)
+    torso, body = maker.parts[0][0], maker.body
+    height, out_by, radius = numbers.COLLAR
+    half_width, half_depth = KIT.torso_section(body, height)
+    path, wide, thick = [], [], []
+    for index in range(17):
+        angle = 2.0 * math.pi * index / 16
+        outward = Vector((math.cos(angle) / (half_width + out_by), math.sin(angle) / (half_depth + out_by), 0.0)).normalized()
+        path.append(Vector((math.cos(angle) * (half_width + out_by), math.sin(angle) * (half_depth + out_by), height)))
+        wide.append(outward * radius)
+        thick.append(Z * radius)
+    slab(torso, path, wide, thick, torso.named("Ring"), numbers.OUTLINE_THICKNESS, sides=6)
+    ring = maker.part(on="Head")
+    surface = maker.surface
+    path, wide, thick = [], [], []
+    for index in range(numbers.RING_STATIONS + 1):
+        degrees = -numbers.RING_AROUND_DEG + 2.0 * numbers.RING_AROUND_DEG * index / numbers.RING_STATIONS
+        angle = math.radians(270.0 + degrees)
+        polar = math.radians(interpolate(numbers.RING, abs(degrees)))
+        out = head_normal(surface, angle, polar)
+        point = on_head(surface, angle, polar, numbers.RING_SIZE)
+        ahead = on_head(surface, angle + 0.01, polar, numbers.RING_SIZE) - on_head(surface, angle - 0.01, polar,
+                                                                                    numbers.RING_SIZE)
+        path.append(point)
+        wide.append(out.cross(ahead.normalized()).normalized() * numbers.RING_RADIUS)
+        thick.append(out * numbers.RING_RADIUS)
+    slab(ring, path, wide, thick, ring.named("Ring"), numbers.OUTLINE_THICKNESS, sides=6)
+
+
+DUCK = {
+    # The float: a ring around the body (height, how far its middle stands out of the torso, the radius
+    # of its tube), and the head of the duck on it (degrees round from the front towards the left of the
+    # character, its radius, the beak: length, radius).
+    "RING": (0.300, 0.060, 0.062),
+    "RING_SIDES": (18, 8),
+    "HEAD": (-42.0, 0.085),
+    "BEAK": (0.075, 0.034),
+    "EYE": 0.014,
+    "OUTLINE_THICKNESS": 0.016,
+}
+
+
+def build_duck_float(maker):
+    """A rubber duck float around the waist: a yellow ring, the head of the duck with its beak and eyes.
+    No clothing: the body is bare, as drawn."""
+    numbers = SimpleNamespace(**DUCK)
+    float_part, body = maker.part(on="Body"), maker.body
+    height, out_by, radius = numbers.RING
+    around, sides = numbers.RING_SIDES
+    half_width, half_depth = KIT.torso_section(body, height)
+    loops = []
+    for index in range(around):
+        angle = 2.0 * math.pi * index / around
+        middle = Vector((math.cos(angle) * (half_width + out_by), math.sin(angle) * (half_depth + out_by), height))
+        outward = Vector((math.cos(angle), math.sin(angle), 0.0))
+        loops.append([middle + (outward * math.cos(2.0 * math.pi * step / sides) + Z * math.sin(2.0 * math.pi * step / sides))
+                      * radius for step in range(sides)])
+    # A torus: the rings joined round, the last to the first.
+    mesh = float_part.mesh
+    rows = [[mesh.verts.new(point) for point in loop] for loop in loops]
+    faces = []
+    for index in range(around):
+        lower, upper = rows[index], rows[(index + 1) % around]
+        for step in range(sides):
+            after = (step + 1) % sides
+            faces.append(mesh.faces.new((lower[step], lower[after], upper[after], upper[step])))
+    for face in faces:
+        face.smooth = True
+    float_part.paint(faces, float_part.named("Duck"))
+    float_part.outlined.append((faces, numbers.OUTLINE_THICKNESS, None))
+    degrees, head_radius = numbers.HEAD
+    angle = math.radians(270.0 + degrees)
+    way = Vector((math.cos(angle), math.sin(angle), 0.0))
+    centre = Vector((way.x * (half_width + out_by + radius * 0.4), way.y * (half_depth + out_by + radius * 0.4),
+                     height + radius + head_radius * 0.75))
+    float_part.shell(base.ball_rings(centre, Z, X, head_radius, head_radius, head_radius, 5), 10, float_part.named("Duck"),
+                     numbers.OUTLINE_THICKNESS)
+    length, beak = numbers.BEAK
+    float_part.shell(base.tube_rings(centre + way * head_radius * 0.75, way, Z, ((0.0, beak), (length * 0.6, beak * 0.8),
+                                                                              (length, beak * 0.3))), 8,
+                     float_part.named("Beak"), numbers.OUTLINE_THICKNESS * 0.8)
+    across = Z.cross(way).normalized()
+    for sign in (1.0, -1.0):
+        eye = centre + way * head_radius * 0.55 + across * sign * head_radius * 0.55 + Z * head_radius * 0.40
+        disc_on(float_part, SimpleNamespace(middle=centre), eye + (eye - centre).normalized() * 0.004,
+                (eye - centre).normalized(), numbers.EYE, float_part.named("Eye"), segments=8)
+
+
+CLOTH_KINDS = {"Jacket": build_jacket, "Track": build_track, "Hoodie": build_hoodie, "Costume": build_costume,
+               "Astro": build_astro, "DuckFloat": build_duck_float}
 
 
 def shade(colour, amount=0.68):
@@ -966,6 +1902,8 @@ CLOTHES = {
     "Pink Tuxedo": jacket((0.90, 0.62, 0.83), WHITE, (0.80, 0.48, 0.72)),
     "Aqua Tuxedo": jacket((0.51, 0.81, 0.96), WHITE, (0.38, 0.70, 0.88)),
     "Blue tuxedo": jacket((0.05, 0.12, 0.64), (0.95, 0.91, 0.65), (0.06, 0.10, 0.48)),
+    # (Added 15 October 2026: 18 Genesis, missed by the first pass. Tie read darker than the jacket.)
+    "Cyan tuxedo": jacket((0.06, 0.89, 0.90), WHITE, (0.06, 0.55, 0.56)),
     # Track jackets: white stripes down long sleeves and a zip.
     "Black Trackset": track((0.22, 0.22, 0.24), stripe=WHITE, zip_colour=(0.85, 0.85, 0.86), SLEEVE=LONG_SLEEVE),
     "Red Trackset": track((0.89, 0.21, 0.14), stripe=WHITE, zip_colour=WHITE, SLEEVE=LONG_SLEEVE),
@@ -1011,6 +1949,194 @@ CLOTHES = {
                                               "Collar": (0.19, 0.21, 0.26)},
                    "stripes": True, "numbers": {"SLEEVE": 0.0, "STEP": 0.046}},
 }
+
+def with_(entry, colours=None, **keys):
+    """An entry of CLOTHES with more colours and more keys (a print, a logo, pixels, patches, a hood)."""
+    return {**entry, **keys, "colours": {**entry["colours"], **(colours or {})}}
+
+
+def hoodie(main, string=(0.91, 0.89, 0.87), hood="down", **keys):
+    """A hoodie of Side=Left: long sleeves, the hood down (or up), drawstrings. "keys" go to the entry."""
+    entry = {"kind": "Hoodie", "colours": {"Main": main, "Collar": shade(main), "String": string},
+             "numbers": {"STEP": 0.076, "SLEEVE": LONG_SLEEVE}, "hood": hood}
+    return {**entry, **keys}
+
+
+def jersey(main):
+    """A basketball jersey of Side=Left: no sleeves, a white collar, the number 143 on the chest."""
+    return with_(tee(main, collar=WHITE, SLEEVE=0.0, COLLAR=(0.566, 0.593)),
+                 colours={"Print": WHITE, "PrintLine": INK_DARK}, print=("143", 0.430, 0.085, 0.200, 0.0))
+
+
+# Side=Left (15 October 2026): the shirts, hoodies, tops without sleeves, jerseys and jackets worn by
+# 6 to 18 Genesis each, that only the pictures of Side=Left draw. Colours read on the layer of each value
+# rebuilt from all its pictures (as above). The pictures are framed on the face: what shows is the
+# collar, the chest and the top of the sleeves.
+WORDS_THAT_CHANGE = "a word that changes from one Genesis to another (HODL, IDGAF, purple-pilled...)"
+SLEEVELESS = {"SLEEVE": 0.0, "COLLAR": (0.566, 0.593)}
+PATCHES = ((0.050, 0.405, 0.030, 12.0), (-0.085, 0.500, 0.022, -10.0))
+CLOTHES.update({
+    # Hoodies, the hood down: a roll around the neck, white drawstrings.
+    "Orange Hoodie": hoodie((0.91, 0.33, 0.12)),
+    # The Monad mark in white on the chest, on the right of the character (the left of the pictures).
+    "Mon Hoodie": with_(hoodie((0.50, 0.40, 0.87)), colours={"Collar": (0.34, 0.27, 0.72), "Logo": (0.97, 0.97, 0.98)},
+                        logo=("monad", -0.085, 0.500, 0.030)),
+    # Dark grey, two yellow stripes down the sleeves.
+    "Electro Hoodie": with_(hoodie((0.34, 0.38, 0.43), string=(0.80, 0.92, 0.95)), colours={"Stripe": (0.94, 0.76, 0.18)}),
+    # Cyan and pink cloth printed with squares, as pixels.
+    "Glitch Hoodie": with_(hoodie((0.07, 0.82, 0.96)), colours={"Pixel": (0.05, 0.50, 0.88)}, pixels=(26, 0.010)),
+    "Sky Hoodie": hoodie((0.06, 0.70, 0.92)),
+    "Peach Hoodie": with_(hoodie((0.96, 0.75, 0.70)), colours={"Pixel": (0.88, 0.57, 0.52)}, pixels=(26, 0.010)),
+    # The hood up, over the head: no leaf comes out of it (the pictures show none); the teeth of hair
+    # of the brow show under its edge, as drawn.
+    "Yellow Hoodie": with_(hoodie((0.95, 0.75, 0.19), hood="up"), colours={"Hood": (0.95, 0.75, 0.19),
+                                                                        "Rim": (0.84, 0.55, 0.12)},
+                           head={"LEAVES": NO_CROWN}),
+    # Tops without sleeves.
+    "Red Sleeveless": tee((0.80, 0.29, 0.24), **SLEEVELESS),
+    "Orange Sleeveless": tee((0.95, 0.54, 0.17), **SLEEVELESS),
+    "White Sleeveless": tee((0.95, 0.95, 0.95), collar=(0.78, 0.78, 0.80), **SLEEVELESS),
+    "Blue Sleeveless": tee((0.50, 0.64, 0.95), **SLEEVELESS),
+    # Jerseys: 143 on the chest.
+    "Yellow 143 Jersey": jersey((0.95, 0.83, 0.49)),
+    "Blue 143 Jersey": jersey((0.51, 0.64, 0.95)),
+    "Red 143 Jersey": jersey((0.83, 0.30, 0.26)),
+    # Tees and shirts in one colour. The tees carry a word that is not the same on every Genesis.
+    "blue tee": tee((0.37, 0.61, 0.92), missing=WORDS_THAT_CHANGE),
+    "red tee": tee((0.95, 0.32, 0.12), missing=WORDS_THAT_CHANGE),
+    "dark tee": tee((0.25, 0.25, 0.28), collar=(0.16, 0.16, 0.18), missing=WORDS_THAT_CHANGE),
+    "white tee": tee((0.95, 0.95, 0.95), collar=(0.80, 0.80, 0.82), missing=WORDS_THAT_CHANGE),
+    "Grey Shirt": tee((0.74, 0.80, 0.83)),
+    "Purple Shirt": tee((0.88, 0.67, 0.92)),
+    "White Shirt": tee((0.95, 0.95, 0.95), collar=(0.80, 0.80, 0.82)),
+    "Pink Shirt": tee((0.95, 0.57, 0.57)),
+    "Cyan Shirt": tee((0.49, 0.92, 0.87)),
+    # Tees with their word.
+    "Zero THOTS": with_(tee((0.71, 0.51, 0.90)), colours={"Print": (0.97, 0.93, 0.99)},
+                        print=(("ZERO", "THOTS"), 0.425, 0.050, 0.200, 0.0)),
+    "Virgin": with_(tee((0.92, 0.56, 0.41)), colours={"Print": (0.99, 0.93, 0.88)},
+                    print=("VIRGIN", 0.420, 0.055, 0.210, 0.0)),
+    "BBC": with_(tee((0.42, 0.68, 0.95)), colours={"Print": (0.97, 0.97, 0.97), "PrintLine": (0.12, 0.18, 0.25)},
+                 print=("BBC", 0.420, 0.075, 0.200, 0.0)),
+    # Worn shirts with sewn patches.
+    "Brown Homeless Shirt": with_(tee((0.76, 0.59, 0.44)), colours={"Patch": (0.54, 0.66, 0.75)}, patches=PATCHES),
+    "Grey Homeless Shirt": with_(tee((0.58, 0.64, 0.69)), colours={"Patch": (0.40, 0.45, 0.50)}, patches=PATCHES),
+    "Blue Homeless Shirt": with_(tee((0.55, 0.61, 0.86)), colours={"Patch": (0.40, 0.47, 0.70)}, patches=PATCHES),
+    # Track jackets: two stripes down each sleeve, a zip, a small spiky head on the chest.
+    "dark jacket": with_(track((0.24, 0.21, 0.40), stripe=(0.97, 0.97, 0.99), zip_colour=(0.90, 0.89, 0.88),
+                               SLEEVE=LONG_SLEEVE), colours={"Logo": (0.97, 0.97, 0.99)},
+                         logo=("chog", 0.075, 0.480, 0.020)),
+    "Red jacket": with_(track((0.79, 0.13, 0.13), stripe=(0.97, 0.70, 0.27), zip_colour=(0.92, 0.91, 0.89),
+                              SLEEVE=LONG_SLEEVE), colours={"Logo": (0.97, 0.70, 0.27)},
+                        logo=("chog", 0.075, 0.480, 0.020)),
+    "Blue jacket": with_(track((0.21, 0.27, 0.70), stripe=(0.96, 0.97, 0.99), zip_colour=(0.92, 0.90, 0.85),
+                               SLEEVE=LONG_SLEEVE), colours={"Logo": (0.96, 0.97, 0.99)},
+                         logo=("chog", 0.075, 0.480, 0.020)),
+    # Padded vests: no sleeves, the padding as darker bands.
+    "pink vest": {"kind": "Tee", "colours": {"Main": (0.81, 0.43, 0.91), "Stripe": (0.70, 0.36, 0.82),
+                                             "Collar": (0.44, 0.23, 0.51)},
+                  "stripes": True, "numbers": {"SLEEVE": 0.0, "STEP": 0.046}},
+    "purple vest": {"kind": "Tee", "colours": {"Main": (0.68, 0.54, 0.90), "Stripe": (0.45, 0.78, 0.93),
+                                               "Collar": (0.45, 0.36, 0.70)},
+                    "stripes": True, "numbers": {"SLEEVE": 0.0, "STEP": 0.046}},
+    "dark vest": {"kind": "Tee", "colours": {"Main": (0.28, 0.25, 0.33), "Stripe": (0.22, 0.20, 0.27),
+                                             "Collar": (0.17, 0.15, 0.21)},
+                  "stripes": True, "numbers": {"SLEEVE": 0.0, "STEP": 0.046}},
+    "Army Vest": {**tee((0.50, 0.53, 0.33), collar=(0.36, 0.37, 0.22), **SLEEVELESS),
+                  "print_missing": "the camouflage and the flag patch"},
+})
+
+def printed(name, colours=None, **keys):
+    """An entry of CLOTHES given what was missing on it (a print, a logo...): "print_missing" is dropped."""
+    entry = {key: value for key, value in CLOTHES[name].items() if key != "print_missing"}
+    return with_(entry, colours, **keys)
+
+
+def arc(across, height, radius, start_deg, stop_deg, steps=6):
+    """Places along an arc of a circle on the front of a shirt (for swirls)."""
+    return [(across + radius * math.cos(math.radians(start_deg + (stop_deg - start_deg) * index / steps)),
+             height + radius * math.sin(math.radians(start_deg + (stop_deg - start_deg) * index / steps)))
+            for index in range(steps + 1)]
+
+
+# The prints of the shirts of Side=Right (15 October 2026), placed as the pictures draw them on the
+# chest; the pictures of Side=Right show the left of the character at their right.
+INK_BLACK = (0.08, 0.06, 0.07)
+CLOTHES.update({
+    "Inmate": printed("Inmate", {"Label": (0.83, 0.39, 0.10), "Print": (0.30, 0.15, 0.06)},
+                      labels=((0.060, 0.330, 0.062, 0.020),), print=("INMATE", 0.326, 0.026, 0.110, 0.060)),
+    "Six Seven": printed("Six Seven", {"Print": INK_BLACK, "PrintLine": WHITE}, print=("67", 0.395, 0.110, 0.200, 0.0)),
+    "Chug Life": printed("Chug Life", {"Print": INK_BLACK}, print=("CHUG LIFE", 0.420, 0.046, 0.250, 0.0)),
+    "CWO": printed("CWO", {"Print": (0.96, 0.67, 0.25), "PrintLine": INK_DARK}, print=("CWO", 0.410, 0.075, 0.220, 0.0)),
+    "MILF Lover": printed("MILF Lover", {"Print": (0.97, 0.97, 0.97), "PrintLine": INK_DARK, "Heart": (0.95, 0.09, 0.09)},
+                          print=("MILF", 0.420, 0.054, 0.150, -0.030),
+                          logos=(("heart", 0.088, 0.422, 0.024, "Heart"),)),
+    "Hawaiian Polo": printed("Hawaiian Polo", {"Flower": (0.98, 0.88, 0.88)},
+                             flowers=((-0.090, 0.505, 0.026), (0.050, 0.535, 0.024), (0.105, 0.425, 0.026),
+                                      (-0.025, 0.410, 0.025), (-0.110, 0.330, 0.023), (0.040, 0.305, 0.026),
+                                      (0.125, 0.285, 0.020))),
+    "Yellow Yukata": printed("Yellow Yukata", {"Swirl": (0.99, 0.75, 0.38)},
+                             swirls=((arc(-0.07, 0.48, 0.035, 0.0, 270.0), 0.006), (arc(0.06, 0.52, 0.030, 90.0, 360.0), 0.006),
+                                     (arc(0.09, 0.38, 0.035, 180.0, 450.0), 0.006),
+                                     (arc(-0.06, 0.34, 0.032, -90.0, 180.0), 0.006),
+                                     (arc(0.00, 0.43, 0.022, 0.0, 300.0), 0.005))),
+    "Squid Game Guard": printed("Squid Game Guard", {"Logo": (0.97, 0.97, 0.97)},
+                                logos=(("triangle", 0.075, 0.395, 0.030, "Logo"),)),
+    "Jesus": printed("Jesus", {"Sash": (0.80, 0.22, 0.14)},
+                     sash=(((0.118, 0.565), (0.055, 0.485), (-0.020, 0.405), (-0.100, 0.310)), 0.034)),
+    # Its front is open: the body shows in its skin colour between two rolls of white fur.
+    "Kings Robe": printed("Kings Robe", {"Fur": (0.96, 0.91, 0.89)}, open_front=(0.058, 0.022)),
+    # Yellow triangles along the edge of the cape and a dark bow at the neck.
+    "Wizard": printed("Wizard", {"Trim": (0.92, 0.68, 0.10), "Bow": (0.09, 0.11, 0.27)}, zigzag=(0.442, 0.478, 16),
+                      logos=(("bow", 0.0, 0.552, 0.030, "Bow"),)),
+    # The green track suit of the players, its number on the chest (18 Genesis).
+    "Squid Game": with_(track((0.12, 0.53, 0.43), zip_colour=(0.96, 0.97, 0.97), SLEEVE=LONG_SLEEVE),
+                        {"Print": (0.96, 0.97, 0.97)}, print=("069", 0.400, 0.060, 0.200, 0.030)),
+})
+
+def costume(main, hood_colours, head=None, **keys):
+    """A costume of COSTUME: the suit in "main" with long sleeves, the hood in "hood_colours" (Hood, and
+    Rim for the edge of its opening), what replaces the leaves and the teeth of hair under the hood."""
+    entry = {"kind": "Costume", "colours": {"Main": main, "Collar": shade(main), **hood_colours},
+             "numbers": {"STEP": 0.076, "SLEEVE": LONG_SLEEVE},
+             "head": head or {"LEAVES": NO_CROWN, "FRINGE": False}}
+    return {**entry, **keys}
+
+
+# The costumes (15 October 2026), colours read on their layers. None of their Genesis wears a value of
+# "Head". (Until then: LEFT_OUT.)
+CLOTHES.update({
+    # A dark hood up and a red bandana with white dots over the mouth and the chin (its 41 Genesis have
+    # no value of "Mouth" in the metadata).
+    "Gangster suit": costume((0.23, 0.23, 0.36), {"Hood": (0.25, 0.25, 0.38), "Rim": (0.32, 0.30, 0.40),
+                                                  "Bandana": (0.88, 0.07, 0.07), "Dot": (0.96, 0.91, 0.86)},
+                             head={"LEAVES": NO_CROWN, "FRINGE": False, "HIDES": ("Mouth",)}, bandana=True,
+                             hood_numbers={"SIZE": ((0.0, 1.14), (60.0, 1.24), (180.0, 1.26))}),
+    # A blue shark: white belly, white teeth all round the face, a fin on the back of the hood.
+    "Shark Suit": costume((0.27, 0.71, 0.92), {"Hood": (0.27, 0.71, 0.92), "Rim": (0.23, 0.55, 0.80),
+                                               "Belly": (0.92, 0.95, 0.97), "Tooth": (0.97, 0.97, 0.97)},
+                          teeth=True, fin=True),
+    # A banana: yellow, its point rising over the head, a green stalk at the tip.
+    "Banana suit": costume((0.95, 0.67, 0.06), {"Hood": (0.95, 0.67, 0.06), "Rim": (0.89, 0.53, 0.05),
+                                                "Tip": (0.55, 0.72, 0.12)}, peak=True),
+    # A red dragon: tan belly and horns, small wings on the back.
+    "Dragon suit": costume((0.92, 0.27, 0.17), {"Hood": (0.92, 0.27, 0.17), "Rim": (0.76, 0.19, 0.11),
+                                                "Belly": (0.95, 0.70, 0.46), "Horn": (0.95, 0.76, 0.50),
+                                                "Wing": (0.66, 0.13, 0.10)}, horns=True, wings=True),
+    # The space suit: white, grey stripes down the sleeves, the ring of the helmet around the face. Its
+    # glass is not drawn; the pictures show the crown inside it, so the crown stays.
+    "Astro Suit": {"kind": "Astro", "colours": {"Main": (0.90, 0.88, 0.84), "Collar": (0.70, 0.70, 0.72),
+                                                "Stripe": (0.52, 0.56, 0.69), "Ring": (0.72, 0.73, 0.76)},
+                   "numbers": {"STEP": 0.076, "SLEEVE": LONG_SLEEVE},
+                   # The ring passes beside the face where the lowest pair of leaves grows: that pair is
+                   # removed (the pictures show the spikes of the top inside the helmet).
+                   "head": {"LEAVES": (WHOLE, WHOLE, WHOLE, GONE, WHOLE, WHOLE, WHOLE)},
+                   "print_missing": "the glass of the helmet and the flag patch"},
+    "Duck Float": {"kind": "DuckFloat", "colours": {"Duck": (0.93, 0.68, 0.20), "Beak": (0.92, 0.48, 0.12),
+                                                    "Eye": (0.10, 0.07, 0.04)}},
+})
+for name in ("Gangster suit", "Shark Suit", "Banana suit", "Astro Suit", "Dragon suit", "Duck Float"):
+    LEFT_OUT.pop(name, None)
 
 CLOTHES_OF_SIDE = {
     "Left": {

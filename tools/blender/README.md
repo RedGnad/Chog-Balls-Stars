@@ -201,6 +201,67 @@ The sheets are in `.artifacts/chog-body/traits/batch-2/` (`hats_sheet_part*.png`
 phone size the hats, the beams, visors, goggles, headsets, glasses, the bubble and the rainbow show;
 eyes and mouths drawn on the face mostly do not (head H3 and the camera are unchanged).
 
+## Batch 3: spikes under hats, Side=Left clothing, prints, costumes (15 October 2026, pictures only)
+
+What the owner asked after batch 2, in their order. **Nothing of this is in the game.**
+
+- **No leaf goes through a hat.** Each hat shape says, in its numbers, what becomes of each line of
+  `SPIKES` (`LEAVES`, items made by `leaf(share, turn, back, bend)` in `chog_trait_hats.py`): removed,
+  kept, or brought out under the rim (longer, turned down, bent back up). Read on the pictures: they draw
+  spikes beside and behind a hat, under its rim. Cap, bucket hat, beanie, crown, wizard hat: the lowest
+  pair of the star, the pair of the back row and the leaf straight back stay. Ushanka: the same, lower.
+  Headband (lowered onto the brow): the top leaf and the upper pair stand above it too. Durag: two pairs
+  beside it. Spartan helmet (its back raised): the back row only. Plumber: all but the top and the upper
+  pair. Robber: the knit lets the far and back leaves through, as drawn. `leaf_crossings()` in
+  `make_chog_traits.py` checks every build and fails a Genesis whose leaves cross its hat.
+- **Hair replaces the crown.** Bob Hair and Rainbow Wig (`CurlyWig`), a hood up (Yellow Hoodie, the
+  costumes): no leaf and no teeth of hair on the brow (`FRINGE`). Durag and Spartan Helmet are headwear
+  with spikes behind them on the pictures. No hat (or a hat not modelled): the whole crown. A removed
+  leaf takes its outline shell with it: `Head` is 2,633 triangles (1,298 of outline) with the whole crown,
+  1,793 (878) under a cap, 1,088 (528) under hair.
+- **Fixes**: ushanka flaps longer, wider and splayed (leather ones of Side=Left get a fur rim); wigs are a
+  mass covered with round curls; the Spartan crest is a brush 0.16 wide and 0.30 tall; seven points of
+  hair in the skin colour along the front of the durag; tuxedo lapels and shirt collar points.
+- **New**: Clown Nose, Plumber (a plunger), Robber (a balaclava); the clothing of Side=Left (hoodies hood
+  down and up, tops without sleeves, the three 143 jerseys, tees, shirts, worn shirts with patches,
+  track jackets, vests); prints (INMATE, 67, CHUG LIFE, CWO, MILF and its heart, Hawaiian flowers, yukata
+  swirls, the Squid Game triangle, the Jesus sash, the open Kings Robe with its fur, the Wizard cape
+  triangles and bow, Cloud Cap swirls, the Dollar Cap label, the ETH mark, the 10K TPS box, the bars of
+  the Buttcoin B; long cap words kept on the flat front, `PRINT_FIT` 0.34); costumes (Gangster, Shark,
+  Banana, Astro, Dragon, Duck Float); Squid Game and Cyan tuxedo, missed before.
+
+Numbers (`-- --coverage`, `-- --budget`, base Origin, 1,869 Genesis): hat 1,869, eyes 1,869, mouth
+1,869, all three 1,869, clothing too 1,789 (batch 2: 1,791, 1,869, 1,869, 1,791, 1,110). Not modelled:
+Accessory, Aura, and 21 Body values worn by 1 to 17 Genesis each (Golden Armor, the toad suits, Sci Fi,
+White Yukata...). Largest dressed hero #470 (Bob Hair) 7,940 triangles, median 6,527, none over 8,000.
+One dressed hero is 6 to 10 mesh objects (the four parts and up to 6 trait parts, plus the root, an
+empty) and, among the heroes built here, 9 to 24 distinct materials: #470 10 and 22, a typical one
+(#97, cap, jacket) 10 and 17, #1209 8 and 24, #75 (no hat, no clothing) 6 and 9 (`parts.json` keeps
+`mesh_objects` and `materials` per Genesis). Not restructured: that is for the import decision.
+
+```sh
+# build and render, waits for no Blender and for .artifacts/heavy-job.lock not saying "busy"
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_batch.py \
+    --out .artifacts/chog-body/traits/batch-3 --genesis 97,19 --only bust,studio,towards
+# coverage and budget, with the same waits
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_batch.py --run make_chog_traits.py -- --coverage
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_batch.py --run make_chog_traits.py -- --budget
+# before and after, and sheets laid one under the other
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_review.py compare \
+    --batch .artifacts/chog-body/traits/batch-3 --before .artifacts/chog-body/traits/batch-2 \
+    --genesis 97,19,4,39,12,43,1241,51,10,21,75 --out .artifacts/chog-body/traits/batch-3/spikes_before_after.png
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_review.py stack --sheets a.png,b.png --out FILE.png
+```
+
+Sheets in `.artifacts/chog-body/traits/batch-3/`: `spikes_before_after.png`, `hair_sheet.png`,
+`clothes_left_sheet.png`, `fixes_sheet.png`, `new_hats_sheet.png`, `prints_sheet.png`,
+`costumes_sheet.png`, `random_twelve.png` (seed 20261016). Still wrong on them: the curls are faceted
+(7 sides, for the budget); the leaves brought out under a brim splay like wings seen from the front and
+the back; inside the open crown the bare top of the head shows from above; the lapels and most shirt
+prints are lost at the game camera and on the busts of Side=Left, framed on the face; the Buttcoin
+bars are barely visible; the 10K of the box reads like "1OK"; the tees whose word changes per Genesis
+carry none.
+
 The sections below describe the first body, which `make_chog_body.py` still builds.
 
 ## Commands

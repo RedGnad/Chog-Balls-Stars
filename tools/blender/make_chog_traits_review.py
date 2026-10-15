@@ -13,6 +13,10 @@ Plain Python with Pillow. Run it with the private environment of the tools:
     # the Genesis drawn at random among those on the base Origin, then their sheet
     ... pick --count 12 --seed 20261015
     ... rows --batch ... --random 12 --seed 20261015 --missing --out .../random_twelve.png
+    # before and after: the bust and the game camera of an earlier batch beside those of this one
+    ... compare --batch .../batch-3 --before .../batch-2 --genesis 97,19 --out .../spikes_before_after.png
+    # several sheets laid one under the other
+    ... stack --sheets a.png,b.png --title "Prints" --out .../prints_sheet.png
 
 A sheet taller than --max-height (4,000 points) is cut into parts: <name>_part1.png, <name>_part2.png.
 The captions are read from parts.json, written by make_chog_traits.py: the part built for the trait,
@@ -90,8 +94,10 @@ def part_for(built, trait):
 
 
 def missing_lines(built):
-    """What of this Genesis is not in 3D: values with no part, prints not drawn, traits never modelled."""
+    """What of this Genesis is not in 3D: values with no part, prints not drawn, traits never modelled,
+    and traits its hat covers (not built, as the pictures do not show them)."""
     lines = [f"no part: {value}" for value in built["left_out"]]
+    lines += [f"under the hat, not built: {value}" for value in built.get("hidden", [])]
     for name, part in built["parts"].items():
         if part.get("missing") and not part["on"].startswith("arm"):
             lines.append(f"not drawn on {name}: {part['missing']}")
@@ -263,9 +269,84 @@ def grid_sheet(arguments, numbers):
     return save_parts(blocks, width, header, os.path.abspath(arguments.out), arguments.max_height)
 
 
+def compare_sheet(arguments, numbers):
+    """One row per Genesis: its picture, then the bust and the game camera of an earlier batch
+    (--before) and of this one, then the phone size of this one (added 15 October 2026)."""
+    batch, before = os.path.abspath(arguments.batch), os.path.abspath(arguments.before)
+    size, label = arguments.size, arguments.label
+    phone = opened(os.path.join(batch, numbers[0], f"chog_{numbers[0]}_game_front_phone.png")).width
+    columns = (("The picture of the Genesis", size), ("Before: bust", size), ("After: bust", size),
+               ("Before: game camera", size), ("After: game camera", size), ("After, phone size 2x", phone * 2))
+    width = GAP + label + sum(column + GAP for _, column in columns)
+    big, normal, small = font(26), font(16), font(14)
+    blocks = []
+    for number in numbers:
+        built, earlier = read_built(batch, number), read_built(before, number)
+        traits = built["traits"]
+        block = Image.new("RGB", (width, size), BACKGROUND)
+        draw = ImageDraw.Draw(block)
+        draw.text((GAP + 4, 2), f"CHOG #{number}", font=big, fill=INK)
+        line = 36
+        draw.text((GAP + 4, line), f"Side {traits.get('Side', '?')}, skin {traits.get('Skin', '?')}", font=small,
+                  fill=QUIET)
+        line += 22
+        draw.text((GAP + 4, line), f"Head: {traits.get('Head', 'none')}", font=normal, fill=INK)
+        line += 22
+        kept = sum(1 for item in built.get("leaves", []) if item[0] > 0.0)
+        for text in wrapped(f"leaves kept: {kept} lines of 7 (" + ", ".join(
+                f"{index}" + ("" if item[1] is None and item[2] is None else " moved")
+                for index, item in enumerate(built.get("leaves", [])) if item[0] > 0.0) + ")", label - 10, draw, small):
+            draw.text((GAP + 4, line), text, font=small, fill=QUIET)
+            line += 17
+        draw.text((GAP + 4, size - 40), f"before {earlier['triangles_total']} triangles", font=small, fill=QUIET)
+        draw.text((GAP + 4, size - 20), f"after {built['triangles_total']} triangles", font=small, fill=QUIET)
+        left = GAP + label
+        for path in (portrait(number), os.path.join(before, number, f"chog_{number}_bust.png"),
+                     os.path.join(batch, number, f"chog_{number}_bust.png"),
+                     os.path.join(before, number, f"chog_{number}_game_front.png"),
+                     os.path.join(batch, number, f"chog_{number}_game_front.png")):
+            block.paste(opened(path).resize((size, size), Image.LANCZOS), (left, 0))
+            left += size + GAP
+        small_picture = opened(os.path.join(batch, number, f"chog_{number}_game_front_phone.png"))
+        block.paste(small_picture.resize((phone * 2, phone * 2), Image.NEAREST), (left, (size - phone * 2) // 2))
+        blocks.append(block)
+
+    def header(draw, part, parts):
+        title = arguments.title + (f" (part {part} of {parts})" if parts > 1 else "")
+        draw.text((GAP + 4, 8), title, font=font(30), fill=INK)
+        place = draw_notes(draw, arguments.note, width)
+        left = GAP + label
+        for caption, column in columns:
+            draw.text((left + 2, place + 6), caption, font=font(14), fill=INK)
+            left += column + GAP
+        return place + 30
+
+    return save_parts(blocks, width, header, os.path.abspath(arguments.out), arguments.max_height)
+
+
+def stack_sheet(arguments):
+    """Sheets laid one under the other (--sheets a.png,b.png), cut into parts under --max-height."""
+    pictures = [opened(path) for path in arguments.sheets.split(",")]
+    width = max(picture.width for picture in pictures)
+    blocks = []
+    for picture in pictures:
+        block = Image.new("RGB", (width, picture.height), BACKGROUND)
+        block.paste(picture, (0, 0))
+        blocks.append(block)
+
+    def header(draw, part, parts):
+        title = arguments.title + (f" (part {part} of {parts})" if parts > 1 else "")
+        draw.text((GAP + 4, 8), title, font=font(30), fill=INK)
+        return draw_notes(draw, arguments.note, width) + 8
+
+    return save_parts(blocks, width, header, os.path.abspath(arguments.out), arguments.max_height)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Review sheets of a batch of dressed Genesis.")
-    parser.add_argument("mode", choices=("rows", "grid", "pick"))
+    parser.add_argument("mode", choices=("rows", "grid", "pick", "compare", "stack"))
+    parser.add_argument("--before", default=None, help="compare: the folder of the earlier batch")
+    parser.add_argument("--sheets", default="", help="stack: the sheets to lay one under the other, separated by commas")
     parser.add_argument("--batch", default=None, help="the folder of make_chog_traits_batch.py")
     parser.add_argument("--genesis", default="", help="numbers shown in the names, separated by commas")
     parser.add_argument("--random", type=int, default=0, help="this many Genesis drawn at random on the base Origin")
@@ -287,6 +368,11 @@ def main():
     if arguments.mode == "pick":
         print(",".join(drawn_at_random(arguments.count, arguments.seed)))
         return
+    if arguments.mode == "stack":
+        if not arguments.sheets or not arguments.out:
+            raise SystemExit("CHOG_REVIEW stack: give --sheets and --out")
+        stack_sheet(arguments)
+        return
     numbers = [number for number in arguments.genesis.split(",") if number]
     if arguments.random:
         numbers = drawn_at_random(arguments.random, arguments.seed)
@@ -294,6 +380,10 @@ def main():
         raise SystemExit("CHOG_REVIEW give --batch, --out and --genesis (or --random)")
     if arguments.mode == "rows":
         rows_sheet(arguments, numbers)
+    elif arguments.mode == "compare":
+        if not arguments.before:
+            raise SystemExit("CHOG_REVIEW compare: give --before")
+        compare_sheet(arguments, numbers)
     else:
         grid_sheet(arguments, numbers)
 

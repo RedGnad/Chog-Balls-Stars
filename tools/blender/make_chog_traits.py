@@ -48,6 +48,12 @@ its materials carry the name of its trait:
 The traits of a Genesis are read from research/evidence/genesis-metadata.jsonl; a value with no entry
 below is said (NOT MODELLED) and left out.
 
+The crown of leaves follows the hat (15 October 2026): the numbers of each hat shape say which leaves
+stay, which are moved out from under its rim, and which are removed ("LEAVES", chog_trait_hats.leaf);
+hair and hoods replace the whole crown. A removed leaf takes its outline shell with it. With no hat, or
+a hat that is not modelled, the crown is whole. leaf_crossings() checks every build: a leaf that goes
+through its hat fails it.
+
 Things that have volume (hats, glasses, a visor, a bubble, a stream, beams) are shells with the dark
 outline of the model, the shared material "ChogOutline". Things that are drawn (eyes, mouths) are
 flat coloured shapes laid on the curved face, made of geometry, never of an image.
@@ -119,6 +125,12 @@ POLISH = {
     "FRINGE_WIDTH": 0.088,
     "FRINGE_DROP": 0.050,
 }
+
+# The leaves a hat leaves: each hat shape says it in its numbers ("LEAVES"); what an item means is
+# said at leaf() in chog_trait_hats.py (15 October 2026). leaf_crossings() below checks the result.
+import chog_trait_hats as hats_and_clothes  # noqa: E402
+leaf, WHOLE, GONE = hats_and_clothes.leaf, hats_and_clothes.WHOLE, hats_and_clothes.GONE
+FULL_CROWN, NO_CROWN = hats_and_clothes.FULL_CROWN, hats_and_clothes.NO_CROWN
 
 # What a Genesis looks like besides its parts. The colour of each value of "Skin", and of the face
 # when it is not the cream of the collection (less yellow than the cream of the official drawings).
@@ -212,12 +224,21 @@ CAP = {
     # together than PRINT_BLOCK, the baselines of two lines PRINT_LEADING capitals apart.
     # (Added 15 October 2026 for the words of the other caps: "BUTTCOIN" or "MAKE CHOG / GREAT AGAIN" at
     # the size of "TISM" ran round the sides of the crown.)
-    "PRINT_FIT": 0.44,
+    # (0.44 until 15 October 2026: Buttcoin, RETARD, NEET ran round the corners of the crown, said the
+    # owner; the flat front of the crown is about 0.34 wide where the word stands.)
+    "PRINT_FIT": 0.34,
     "PRINT_BLOCK": 0.150,
     "PRINT_LEADING": 1.35,
     # A logo in place of a word (chog_trait_hats.py, lay_logo): the height of its middle, half its size.
     "LOGO": (0.185, 0.060),
     "OUTLINE_THICKNESS": 0.020,
+    # The leaves under the cap (chog_trait_hats.py, leaf()). The pictures of Side=Right draw two or three
+    # spikes beside and behind the cap, under the line of its rim, none above it; those of Side=Left are
+    # framed on the face and show none. The crown covers the head above 81 degrees: the top, the upper
+    # pairs and the top of the back row are removed; the lowest pair of the star, the pair of the back
+    # row and the leaf straight back stay, each turned down just enough to come out under the rim.
+    "LEAVES": (GONE, GONE, GONE, leaf(1.3, 116.0, None, 0.35), GONE, leaf(1.3, 106.0, 40.0, 0.35),
+               leaf(1.3, None, 104.0, 0.35)),
 }
 FONT_CAPITALS = 0.70             # height of a capital of "Bfont Regular" at size 1, measured
 
@@ -251,10 +272,16 @@ BUCKET = {
     "MARK_HALF_WIDTH": 0.060,
     "MARK_LIFT": 0.005,
     "OUTLINE_THICKNESS": 0.020,
+    # The pictures draw two or three spikes under the brim, beside and behind the hat. Its crown covers
+    # the head as the cap does: the same leaves stay, under the brim that dips at the sides and back.
+    "LEAVES": (GONE, GONE, GONE, leaf(1.3, 116.0, None, 0.35), GONE, leaf(1.3, 106.0, 40.0, 0.35),
+               leaf(1.3, None, 104.0, 0.35)),
 }
 
 # The crown: a band around the top of the head that flares, eight points, gems on the band. It is
-# open: the leaves of the head stand inside it, as the pictures show the skin through its arches.
+# open at the top. (Until 15 October 2026 the leaves of the head stood inside it and came out above
+# its points: from the camera of the game, a crown pierced by spikes. The pictures show the crown on
+# the top of the head and the spikes beside and behind it, below its band.)
 CROWN = {
     "RIM_HALF_WIDTH": 0.318,
     "RIM_HALF_DEPTH": 0.283,
@@ -287,6 +314,10 @@ CROWN = {
     ),
     "GEM_LIFT": (0.005, 0.010),  # the rim of a gem and its middle, off the band
     "OUTLINE_THICKNESS": 0.020,
+    # No leaf inside the crown; the lowest pair of the star, the pair of the back row and the leaf
+    # straight back stay, turned down to come out under its rim (which is higher than that of a cap).
+    "LEAVES": (GONE, GONE, GONE, leaf(1.3, 110.0, None, 0.30), GONE, leaf(1.3, 96.0, 40.0, 0.30),
+               leaf(1.3, None, 96.0, 0.30)),
 }
 
 # The beanie: a dome and a thick cuff around the brow, rings printed on the dome.
@@ -319,6 +350,11 @@ BEANIE = {
     "PRINT_INSIDE": 0.56,        # the hole of a ring, against its radius
     "PRINT_LIFT": 0.005,
     "OUTLINE_THICKNESS": 0.020,
+    # The beanies are worn on Side=Left only, whose pictures show no spike: the beanie covers the head to
+    # the brow. In 3D the leaves left are those under a cap, out under the cuff (the hero is seen from
+    # above in the game, where a head with no spike at all no longer reads as a Chog).
+    "LEAVES": (GONE, GONE, GONE, leaf(1.3, 116.0, None, 0.35), GONE, leaf(1.3, 106.0, 40.0, 0.35),
+               leaf(1.3, None, 104.0, 0.35)),
 }
 
 # value of the trait "Head": shape, colours of its materials, print or mark, numbers it replaces.
@@ -390,8 +426,7 @@ HATS = {
     },
 }
 # Every other value of "Head" whose shape is built, the shapes added after these four, and the
-# clothing beyond the first three shirts: chog_trait_hats.py (its folder is on the path above).
-import chog_trait_hats as hats_and_clothes  # noqa: E402
+# clothing beyond the first three shirts: chog_trait_hats.py (imported above).
 HATS.update(hats_and_clothes.HATS)
 
 # ---------------------------------------------------------------------------------------------
@@ -707,10 +742,24 @@ def head_numbers():
 # The polished base.
 # ---------------------------------------------------------------------------------------------
 
-def add_leaf_crown(part, numbers, surface):
-    """The crown of add_crown of make_chog_full.py, blade for blade, each one a leaf."""
-    for turn_deg, back_deg, length, width, thickness, flat in numbers.SPIKES:
+def add_leaf_crown(part, numbers, surface, leaves=FULL_CROWN):
+    """The crown of add_crown of make_chog_full.py, blade for blade, each one a leaf, as "leaves" (one
+    item per line of SPIKES, see leaf()) leaves it. Returns each leaf built, for leaf_crossings(): its
+    name and its rings (middle, half width, half thickness), from inside the head to its point."""
+    if len(leaves) != len(numbers.SPIKES):
+        raise SystemExit(f"CHOG_TRAITS LEAVES has {len(leaves)} items for {len(numbers.SPIKES)} lines of SPIKES")
+    built = []
+    # Up as the ground has it, in the axes of the head before it is turned up: where a leaf bends to.
+    upwards = -level_axes(numbers)[1]
+    for line, ((turn_deg, back_deg, length, width, thickness, flat), item) in enumerate(zip(numbers.SPIKES, leaves)):
+        share, turn_to, back_to = item[:3]
+        bend = item[3] if len(item) > 3 else 0.0
+        if share <= 0.0:
+            continue
         mirrored = turn_deg not in (0.0, 180.0)
+        length *= share
+        turn_deg = turn_deg if turn_to is None else turn_to
+        back_deg = back_deg if back_to is None else back_to
         for side in ((1.0, -1.0) if mirrored else (1.0,)):
             turn, back = math.radians(turn_deg) * side, math.radians(back_deg)
             away = Vector((math.sin(turn) * math.cos(back), math.sin(back), math.cos(turn) * math.cos(back)))
@@ -722,6 +771,10 @@ def add_leaf_crown(part, numbers, surface):
             thick = away.cross(wide)
             half_wide, half_thick = width * 0.5, thickness * 0.5
             curl = -thick * length * numbers.LEAF_CURL
+            # A leaf brought down under a brim bends back up along its length ("bend" of leaf()).
+            rise = upwards - away * upwards.dot(away)
+            if bend and rise.length > 1e-6:
+                curl = curl + rise.normalized() * length * bend
 
             profile = numbers.LEAF_PROFILE
             rings = [(root - away * numbers.SPIKE_SUNK, wide * half_wide * profile[0][1],
@@ -731,6 +784,67 @@ def add_leaf_crown(part, numbers, surface):
                               thick * half_thick * thicker))
             rings.append((root + away * length + curl, NOWHERE, NOWHERE))
             part.shell(rings, numbers.LEAF_SIDES, SKIN, numbers.OUTLINE_THICKNESS, smooth=True)
+            where = "" if not mirrored else (" left" if side > 0.0 else " right")
+            built.append((f"leaf {line}{where}", rings))
+    return built
+
+
+def leaf_crossings(leaves, hat_shapes, numbers, surface):
+    """The leaves (from add_leaf_crown) that go through a hat, or that a thin part of the hat (a band, a
+    brim) goes through: an edge of a leaf, made thicker by its outline, crosses a face of the hat, or an
+    edge of the hat crosses a face of that leaf. Only the faces of the hat that lie outside the head
+    count (the rows of a hat tucked inside the head and the face that closes it there are not seen).
+    Both are in the axes of "Head" before the head is turned up. Returns the names of those leaves."""
+    from mathutils.bvhtree import BVHTree
+
+    def cut(tree, segments):
+        for start, stop in segments:
+            way = stop - start
+            if way.length > 1e-9 and tree.ray_cast(start, way.normalized(), way.length)[0] is not None:
+                return True
+        return False
+
+    points, polygons, hat_edges = [], [], []
+    for shapes in hat_shapes:
+        for face in shapes.mesh.faces:
+            centre = face.calc_center_median() - surface.middle
+            if sum((centre[index] / surface.half[index]) ** 2 for index in range(3)) <= 1.02 ** 2:
+                continue
+            corners = [point.co.copy() for point in face.verts]
+            polygons.append([len(points) + index for index in range(len(corners))])
+            points.extend(corners)
+            hat_edges.extend((corners[index], corners[(index + 1) % len(corners)]) for index in range(len(corners)))
+    if not polygons:
+        return []
+    hat_tree = BVHTree.FromPolygons(points, polygons)
+    grow, sides = numbers.OUTLINE_THICKNESS, numbers.LEAF_SIDES
+    crossing = []
+    for name, rings in leaves:
+        loops = []
+        for index, (centre, half_wide, half_thick) in enumerate(rings):
+            if half_wide.length < 1e-9:
+                along = (centre - rings[index - 1][0]).normalized()
+                loops.append([centre + along * grow])
+                continue
+            wide = half_wide.normalized() * (half_wide.length + grow)
+            thick = half_thick.normalized() * (half_thick.length + grow)
+            loops.append([centre + wide * math.cos(2.0 * math.pi * step / sides)
+                          + thick * math.sin(2.0 * math.pi * step / sides) for step in range(sides)])
+        segments, leaf_points, leaf_polygons = [], [], []
+        for lower, upper in zip(loops, loops[1:]):
+            for step in range(sides):
+                after = (step + 1) % sides
+                segments.append((lower[step % len(lower)], upper[step % len(upper)]))
+                if len(upper) > 1:
+                    segments.append((upper[step], upper[after]))
+                corners = [lower[step], lower[after]] + ([upper[after], upper[step]] if len(upper) > 1 else [upper[0]])
+                leaf_polygons.append([len(leaf_points) + index for index in range(len(corners))])
+                leaf_points.extend(corners)
+        leaf_polygons.append([len(leaf_points) + index for index in range(sides)])
+        leaf_points.extend(loops[0])
+        if cut(hat_tree, segments) or cut(BVHTree.FromPolygons(leaf_points, leaf_polygons), hat_edges):
+            crossing.append(name)
+    return crossing
 
 
 # ---------------------------------------------------------------------------------------------
@@ -1103,6 +1217,7 @@ def build_cap(maker):
         lines = (word,) if isinstance(word, str) else tuple(word)
         low, high = numbers.PRINT_LIFT
         lined = "PrintLine" in maker.entry["colours"]
+        boxed = bool(maker.entry.get("box"))
         scale = numbers.PRINT_CAPITALS / FONT_CAPITALS
         widest = max(word_width(line, numbers.PRINT_BOLD, numbers.PRINT_SPACING) for line in lines)
         scale = min(scale, numbers.PRINT_FIT / widest,
@@ -1111,6 +1226,7 @@ def build_cap(maker):
         step = capitals * numbers.PRINT_LEADING
         middle = numbers.PRINT_BASELINE + numbers.PRINT_CAPITALS * 0.5
         top = middle + (len(lines) - 1) * step * 0.5 - capitals * 0.5
+        widths = []
         for index, line in enumerate(lines):
             baseline = top - index * step
             if lined:
@@ -1118,9 +1234,36 @@ def build_cap(maker):
                 # are hidden under the letters (it saved 30 to 90 triangles a cap).
                 lay_word(part, crown, line, part.named("PrintLine"), numbers.PRINT_BOLD + numbers.PRINT_LINE, low,
                          baseline, scale, resolution=1)
-            wide = lay_word(part, crown, line, part.named("Print"), numbers.PRINT_BOLD, high, baseline, scale)
+            # In a box (10k TPS), the first line is drawn light on a band of the colour of the print.
+            ink = part.named("Print2") if boxed and index == 0 else part.named("Print")
+            wide = lay_word(part, crown, line, ink, numbers.PRINT_BOLD, high, baseline, scale)
+            widths.append(wide)
             print(f"CHOG_TRAITS the word {line!r} is {wide:.3f} wide, capitals {capitals:.3f}, on a front panel "
                   f"{2.0 * crown.at_height(baseline)[0]:.3f} wide")
+        if boxed:
+            # The box of "10k TPS" (15 October 2026): a band behind the first line, a frame around both.
+            margin, frame = capitals * 0.30, capitals * 0.16
+            half = max(widths) * 0.5 + margin
+            first_low, block_low = top - capitals * 0.28, top - (len(lines) - 1) * step - margin
+            block_high = top + capitals + margin
+            rect = hats_and_clothes.wall_rect
+            rect(part, crown, part.named("Print"), -half, half, first_low, block_high, low * 0.6)
+            rect(part, crown, part.named("Print"), -half - frame, half + frame, block_low - frame, block_low, low * 0.6)
+            rect(part, crown, part.named("Print"), -half - frame, half + frame, block_high, block_high + frame, low * 0.6)
+            for side in (-1.0, 1.0):
+                x = side * (half + frame * 0.5)
+                rect(part, crown, part.named("Print"), x - frame * 0.5, x + frame * 0.5, block_low, block_high, low * 0.6,
+                     columns=1)
+        if maker.entry.get("bars"):
+            # The two bars of the Bitcoin B over and under the first letter (Buttcoin, 15 October 2026).
+            letter = word_width(lines[0][0], numbers.PRINT_BOLD, numbers.PRINT_SPACING) * scale
+            left = -widths[0] * 0.5
+            for share in (0.36, 0.66):
+                x = left + letter * share
+                for low_end, high_end in ((top + capitals * 0.92, top + capitals * 1.22), (top - capitals * 0.22,
+                                                                                         top + capitals * 0.08)):
+                    hats_and_clothes.wall_bar(part, crown, part.named("Print"), (x, low_end), (x, high_end),
+                                              capitals * 0.075, high)
     logo = maker.entry.get("logo")
     if logo:
         hats_and_clothes.lay_logo(part, crown, logo, part.named("Print"), numbers.LOGO, numbers.PRINT_LIFT[1])
@@ -1164,12 +1307,29 @@ def build_bucket(maker):
     mark = maker.entry.get("mark")
     wide, lift = numbers.MARK_HALF_WIDTH, numbers.MARK_LIFT
     if mark == "label":
-        # A sewn label: a rectangle.
-        low, high = numbers.MARK_HEIGHT - 0.022, numbers.MARK_HEIGHT + 0.022
-        columns = [-wide * 0.8, 0.0, wide * 0.8]
+        # A sewn label: a rectangle. With words (Dollar Cap, 15 October 2026), larger, edged by a dark
+        # line, the words in two lines.
+        words = maker.entry.get("label_words")
+        half_wide, half_tall = (0.108, 0.042) if words else (wide * 0.8, 0.022)
+        low, high = numbers.MARK_HEIGHT - half_tall, numbers.MARK_HEIGHT + half_tall
+        columns = [-half_wide + 2.0 * half_wide * index / 4 for index in range(5)]
         full.add_skin(part, surface, [[crown.front(side, low, lift) for side in columns],
                                       [crown.front(side, high, lift) for side in columns]], part.named("Mark"),
                       around=False)
+        if words:
+            edge = 0.006
+            inner = [(-half_wide, low), (half_wide, low), (half_wide, high), (-half_wide, high)]
+            outer = [(-half_wide - edge, low - edge), (half_wide + edge, low - edge), (half_wide + edge, high + edge),
+                     (-half_wide - edge, high + edge)]
+            hats_and_clothes.wall_ring(part, crown, part.named("Ink"), inner, outer, lift)
+            panel = SimpleNamespace(front=crown.front, middle=crown.middle,
+                                    numbers=SimpleNamespace(PRINT_CUT=0.07, PRINT_SPACING=1.08))
+            widest = max(word_width(line, 0.02, 1.08) for line in words)
+            scale = min(0.026 / FONT_CAPITALS, half_wide * 1.8 / widest)
+            capitals = FONT_CAPITALS * scale
+            for index, line in enumerate(words):
+                baseline = numbers.MARK_HEIGHT + half_tall * 0.18 - index * capitals * 1.45
+                lay_word(part, panel, line, part.named("Ink"), 0.02, lift + 0.002, baseline, scale, resolution=1)
     elif mark == "wave":
         # A stitched drawing, kept to its lower edge: a line of three humps.
         steps = 12
@@ -1186,6 +1346,17 @@ def build_bucket(maker):
         # leaves, where the pictures draw a logo half as tall as the crown.)
         hats_and_clothes.lay_logo(part, crown, mark, part.named("Mark"), (numbers.MARK_HEIGHT + 0.018, wide * 1.45),
                                   lift)
+        if mark == "cloud" and maker.entry.get("swirls"):
+            # The curls of the cloud of Cloud Cap (15 October 2026): a spiral in the colour of the hat
+            # on each puff, as the pictures draw a cloud of curls.
+            height, size = numbers.MARK_HEIGHT + 0.018, wide * 1.45
+            for x, y, radius in ((-0.55, -0.05, 0.42), (0.05, 0.18, 0.55), (0.60, -0.02, 0.40)):
+                places = []
+                for index in range(9):
+                    turn = math.radians(90.0 + 300.0 * index / 8)
+                    reach = radius * (0.62 - 0.42 * index / 8)
+                    places.append(((x + reach * math.cos(turn)) * size, height + (y + reach * math.sin(turn)) * size))
+                hats_and_clothes.wall_band(part, crown, part.named("Swirl"), places, size * 0.06, lift + 0.002)
 
 
 def build_crown(maker):
@@ -1671,6 +1842,8 @@ def build_tee(maker):
         for band in bands[1:-1:2]:
             torso.paint(band, torso.named("Stripe"))
     torso.paint(bands[-1], torso.named("Collar"))
+    # A word, a logo, a pattern, patches on the front (chog_trait_hats.py, 15 October 2026).
+    hats_and_clothes.decorate_shirt(maker, torso)
 
     if numbers.SLEEVE <= 0.0:
         return
@@ -1697,6 +1870,43 @@ def build_tee(maker):
 hats_and_clothes.bind(sys.modules[__name__])
 HAT_SHAPES = {"Cap": build_cap, "BucketCap": build_bucket, "Crown": build_crown, "Beanie": build_beanie,
               **hats_and_clothes.HAT_SHAPES}
+# The numbers of each hat shape: where its "LEAVES" are.
+HAT_NUMBERS = {"Cap": CAP, "BucketCap": BUCKET, "Crown": CROWN, "Beanie": BEANIE, **hats_and_clothes.HAT_NUMBERS}
+
+
+def hat_numbers_of(entry, replaced=None):
+    """The numbers of the hat of an entry of HATS (those of its shape, those it replaces), or {}."""
+    if not isinstance(entry, dict) or entry.get("shape") not in HAT_NUMBERS:
+        return {}
+    return {**HAT_NUMBERS[entry["shape"]], **entry.get("numbers", {}), **(replaced or {})}
+
+
+def face_numbers(head, hat_numbers):
+    """The numbers of the head for its face: without the teeth of hair on the brow under a hat whose
+    numbers say "FRINGE": False."""
+    if hat_numbers.get("FRINGE", True):
+        return head
+    return SimpleNamespace(**{**vars(head), "FRINGE_TEETH": 0})
+
+
+def crown_of(entry, replaced=None):
+    """The leaves a Genesis keeps (see leaf() in chog_trait_hats.py): those its hat leaves, the whole
+    crown when it has no hat or a hat that is not modelled."""
+    return hat_numbers_of(entry, replaced).get("LEAVES", FULL_CROWN)
+
+
+def head_look(traits, replaced=None):
+    """What decides the leaves, the points of hair and the teeth of hair on the brow of a Genesis
+    ("LEAVES", "HAIR_POINTS", "FRINGE"): the numbers of its hat; with no hat, what a hooded Body entry
+    (a hood up, a costume) gives in its "head"; else nothing (the whole crown)."""
+    if not traits:
+        return {}
+    numbers = hat_numbers_of(entry_for("Head", traits), replaced)
+    if not numbers:
+        body = entry_for("Body", traits)
+        if isinstance(body, dict):
+            numbers = dict(body.get("head", {}))
+    return numbers
 # The eyes and mouths of chog_trait_faces.py use the helpers of this file. Its "Laser" draws the
 # lasers of Side=Left and hands those of Side=Right to build_laser above.
 faces.attach(sys.modules[__name__])
@@ -1818,6 +2028,27 @@ def budget():
     shared = {OUTLINE: next(material for material in bpy.data.materials if material.name == OUTLINE)}
     surface = full.HeadSurface(head_n)
     counted = {}
+    # The head is not the same under every hat: it keeps the leaves its hat leaves (crown_of).
+    without_head = base_total - sum(len(part.data.polygons) for part in parts if part.name == "Head")
+    base_materials = {material.name: material for material in bpy.data.materials}
+    heads = {}
+
+    def base_of(traits):
+        hat_numbers = head_look(traits)
+        key = (hat_numbers.get("LEAVES", FULL_CROWN), hat_numbers.get("HAIR_POINTS"), hat_numbers.get("FRINGE", True))
+        if key not in heads:
+            head = variants.PartShapes(full.MATERIAL_ORDER)
+            full.add_head(head, head_n)
+            add_leaf_crown(head, head_n, surface, key[0])
+            if key[1]:
+                hats_and_clothes.add_hair_points(head, surface, key[1], SKIN)
+            full.add_face(head, face_numbers(head_n, hat_numbers), surface, eyes=False, mouth=False)
+            thing = head.finish("ChogBudgetHead", Vector((0.0, 0.0, 0.0)), None, base_materials)
+            heads[key] = without_head + len(thing.data.polygons)
+            data = thing.data
+            bpy.data.objects.remove(thing)
+            bpy.data.meshes.remove(data)
+        return heads[key]
 
     def triangles_of(trait, entry, traits):
         key = (trait, id(entry))
@@ -1838,20 +2069,23 @@ def budget():
 
     totals, worn = [], {}
     for traits in tokens:
-        total = base_total
+        total = base_of(traits)
+        worn.setdefault(traits["number"], []).append(f"base {total}")
+        hidden = set(head_look(traits).get("HIDES", ()))
         for trait in TRAIT_PARTS:
             entry = entry_for(trait, traits)
-            if isinstance(entry, dict):
+            if isinstance(entry, dict) and trait not in hidden:
                 count = triangles_of(trait, entry, traits)
                 total += count
                 worn.setdefault(traits["number"], []).append(f"{traits[trait]} {count}")
         totals.append((total, traits["number"]))
     totals.sort(reverse=True)
     for total, number in totals[:3]:
-        print(f"CHOG_BUDGET #{number} {total}: base {base_total} + " + ", ".join(worn[number]))
+        print(f"CHOG_BUDGET #{number} {total}: " + ", ".join(worn[number]))
     over = [(total, number) for total, number in totals if total > TRIANGLE_LIMIT]
-    print(f"CHOG_BUDGET base {base_total} triangles; {len(counted)} entries built once; {len(totals)} heroes on the "
-          f"base Origin")
+    print(f"CHOG_BUDGET base {base_total} triangles with the whole crown, "
+          f"{min(heads.values())} to {max(heads.values())} under the hats ({len(heads)} sets of leaves); "
+          f"{len(counted)} entries built once; {len(totals)} heroes on the base Origin")
     print(f"CHOG_BUDGET largest dressed heroes: " + ", ".join(f"#{number} {total}" for total, number in totals[:8]))
     print(f"CHOG_BUDGET median {totals[len(totals) // 2][0]}, smallest {totals[-1][0]}; over {TRIANGLE_LIMIT}: "
           f"{len(over)} " + ", ".join(f"#{number} {total}" for total, number in over[:20]))
@@ -1879,8 +2113,12 @@ def build(traits=None, replaced=None):
     head = variants.PartShapes(full.MATERIAL_ORDER)
     surface = full.HeadSurface(head_n)
     full.add_head(head, head_n)
-    add_leaf_crown(head, head_n, surface)
-    full.add_face(head, head_n, surface, eyes=False, mouth=False)
+    hat_numbers = head_look(traits, replaced)
+    leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN))
+    # Points of hair that a hat lets out on the brow (the durag), in the skin colour: part of the head.
+    if hat_numbers.get("HAIR_POINTS"):
+        hats_and_clothes.add_hair_points(head, surface, hat_numbers["HAIR_POINTS"], SKIN)
+    full.add_face(head, face_numbers(head_n, hat_numbers), surface, eyes=False, mouth=False)
     full.turn_head_up(head, head_n)
 
     arms = {}
@@ -1898,9 +2136,17 @@ def build(traits=None, replaced=None):
     by_name = {part.name: part for part in parts}
 
     trait_parts, left_out = [], []
+    # A hat that covers a trait (the balaclava over the mouth) says it in "HIDES": that part is not
+    # built, as the pictures do not show it. One whose leaves come through it (a knitted mask, as the
+    # pictures draw it) says "THROUGH": its crossings are kept in parts.json, not refused.
+    hidden = set(hat_numbers.get("HIDES", ()))
+    through = bool(hat_numbers.get("THROUGH"))
     for trait, (start, table, word, builders) in TRAIT_PARTS.items():
         value = (traits or {}).get(trait)
         if value is None:
+            continue
+        if trait in hidden:
+            print(f"CHOG_TRAITS {trait}={value} is under the hat: not built")
             continue
         entry = OF_SIDE.get(trait, {}).get((traits or {}).get("Side"), {}).get(value) or table.get(value)
         if entry is None or entry[word] not in builders:
@@ -1910,6 +2156,12 @@ def build(traits=None, replaced=None):
             entry = {**entry, "numbers": {**entry.get("numbers", {}), **replaced}}
         maker = Maker(f"{start}_{entry[word]}", entry, head_n, body_n, surface)
         builders[entry[word]](maker)
+        crossing = []
+        worn_on_head = [shapes for shapes, on in maker.parts if on == "Head"]
+        if trait in ("Head", "Body") and worn_on_head:
+            # A hat, or the hood of a costume. Before the head and the part are turned up: both are
+            # still in the axes of add_leaf_crown.
+            crossing = leaf_crossings(leaves, worn_on_head, head_n, surface)
         trait_made = trait_materials(maker.prefix, entry["colours"], entry.get("unlit", ()), materials)
         for shapes, on in maker.parts:
             if on == "Head":
@@ -1919,6 +2171,11 @@ def build(traits=None, replaced=None):
             made["prefix"] = maker.prefix
             # What the pictures show on this value that its part does not draw yet (a word, a logo).
             made["missing"] = entry.get("print_missing", "")
+            # The leaves of the crown that go through this part (a hat): none is allowed, but where the
+            # hat says the pictures draw them through it.
+            on_the_head = crossing if on == "Head" else []
+            made["leaves_crossing"] = "" if through else ", ".join(on_the_head)
+            made["leaves_through"] = ", ".join(on_the_head) if through else ""
             trait_parts.append(made)
 
     for material in list(bpy.data.materials):
@@ -1952,6 +2209,8 @@ def report(label, parts, trait_parts, body_n, head_n):
             failures.append(f"{part.name} has faces that are not triangles")
         if any(not name.startswith(part["prefix"] + "_") and name != OUTLINE for name in names):
             failures.append(f"{part.name} has a material that is not named after its trait: {names}")
+        if part.get("leaves_crossing"):
+            failures.append(f"leaves of the crown go through {part.name}: {part['leaves_crossing']}")
     print(f"CHOG_TRAITS {label} dressed: {total} triangles (limit {TRIANGLE_LIMIT})")
     if total > TRIANGLE_LIMIT:
         failures.append(f"{total} triangles, the limit is {TRIANGLE_LIMIT}")
@@ -2005,6 +2264,9 @@ def main():
 
     root, parts, trait_parts, body_n, head_n, left_out = build(traits, replaced)
     counts = report(label, parts, trait_parts, body_n, head_n)
+    distinct = sorted({slot.material.name for part in parts + trait_parts for slot in part.material_slots})
+    print(f"CHOG_TRAITS {label} {len(parts) + len(trait_parts)} mesh objects (and the root, an empty), "
+          f"{len(distinct)} distinct materials: {distinct}")
     for value in left_out:
         print(f"CHOG_TRAITS {label} NOT MODELLED, left out: {value}")
 
@@ -2036,11 +2298,21 @@ def main():
         "parts": {part.name: {"trait": part["trait"], "on": part.parent.name,
                               "triangles": counts["parts"][part.name],
                               "missing": part.get("missing", ""),
+                              "leaves_through": part.get("leaves_through", ""),
                               "materials": [slot.material.name for slot in part.material_slots]}
                   for part in trait_parts},
         "triangles_base": counts["base"],
         "triangles_total": counts["total"],
         "left_out": left_out,
+        # Traits that a hat covers (the mouth under a balaclava): not built, not missing.
+        "hidden": [f"{trait}={traits[trait]}" for trait in head_look(traits, replaced).get("HIDES", ())
+                   if traits and trait in traits],
+        # What became of each line of SPIKES under the hat: share kept, turn, lean back (None: its own).
+        "leaves": [list(item) for item in head_look(traits, replaced).get("LEAVES", FULL_CROWN)],
+        # For a later choice (one mesh and one material per hero at import, or not): the mesh objects
+        # (the four parts and the trait parts; the root is an empty besides) and the distinct materials.
+        "mesh_objects": len(parts) + len(trait_parts),
+        "materials": len({slot.material.name for part in parts + trait_parts for slot in part.material_slots}),
     }
     with open(os.path.join(folder, "parts.json"), "w", encoding="utf-8") as target:
         json.dump(built, target, indent=1)
