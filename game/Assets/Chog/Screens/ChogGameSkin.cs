@@ -72,10 +72,13 @@ namespace Chog.Screens
                         ChogTheme.Style(button, ChogTheme.ButtonKind.Quiet);
                         break;
                     default:
-                        // A class: its own colour, dark letters on it.
+                        // A class: its own colour, dark letters on it, the name this game gives it.
                         ChogTheme.Shape(button);
                         foreach (var label in button.GetComponentsInChildren<TMP_Text>(true))
+                        {
                             label.color = ChogTheme.Night;
+                            label.text = ChogTheme.ClassName(label.text);
+                        }
                         break;
                 }
             }

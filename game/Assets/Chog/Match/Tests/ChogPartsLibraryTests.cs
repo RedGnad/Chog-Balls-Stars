@@ -126,6 +126,11 @@ namespace Chog.Match.Tests
             Assert.IsTrue(Library.TryGetHero(75, out var bare));
             Assert.AreEqual("Attack_Leaf", Library.Pieces[bare.Attack].Name);
             Assert.AreEqual(ChogPartsLibrary.AttackPart, Library.Pieces[bare.Attack].On);
+
+            // And the line a player reads about it.
+            Assert.AreEqual("THROWS SNOWBALLS FROM ITS RUSSIAN HAT", russian.AttackLine);
+            Assert.AreEqual("THROWS ITS TISM CAP", owner.AttackLine);
+            Assert.AreEqual("THROWS THE SPIKES OF ITS CROWN", bare.AttackLine);
         }
 
         [Test]

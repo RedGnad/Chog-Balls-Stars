@@ -63,6 +63,27 @@ ATTACK_OF_HEAD = {
 HAT_THROWN = ("HAT", SPIN)
 
 
+# What a player reads under the hero: the object, in words.
+WORDS = {
+    "Leaf": "SPIKES", "Snowball": "SNOWBALLS", "StarYellow": "STARS", "StarWhite": "STARS", "Cloud": "CLOUDS",
+    "Ribbon": "ITS DURAG", "Curl": "CURLS", "CoinDollar": "DOLLAR COINS", "CoinBitcoin": "BITCOINS",
+    "CoinButtcoin": "BUTTCOINS", "Bolt": "LIGHTNING", "Peace": "PEACE SIGNS", "SunDisc": "RISING SUNS",
+    "RedRing": "ITS HEADBAND", "YellowRing": "MAGIC RINGS", "Spear": "SPEARS", "Arrow": "ARROWS",
+    "MoneyBag": "MONEY BAGS", "Pizza": "PIZZA", "MiniChog": "LITTLE CHOGS", "Yarn": "BALLS OF YARN",
+    "RainbowBall": "RAINBOWS", "Nose": "CLOWN NOSES",
+}
+
+
+def label_of(head_value):
+    """The line under a hero: what it throws, and from which trait."""
+    key, _ = attack_of(head_value)
+    if not head_value:
+        return "THROWS THE SPIKES OF ITS CROWN"
+    if key == "HAT":
+        return "THROWS ITS " + head_value.upper()
+    return "THROWS " + WORDS[key] + " FROM ITS " + head_value.upper()
+
+
 def attack_of(head_value):
     """(object key, style) of a value of "Head" ("" or None for no hat)."""
     return ATTACK_OF_HEAD.get(head_value or "", HAT_THROWN)

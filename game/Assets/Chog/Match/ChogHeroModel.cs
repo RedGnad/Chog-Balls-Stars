@@ -85,6 +85,12 @@ namespace Chog.Match
             }
         }
 
+        /// <summary>What a player reads about the basic attack of this Genesis; empty when unknown.</summary>
+        public static string AttackLine(int metadataId)
+        {
+            return !Off && Library != null && Library.TryGetHero(metadataId, out var hero) ? hero.AttackLine ?? "" : "";
+        }
+
         /// <summary>Whether this Genesis (by the number shown in its name) has its 3D hero.</summary>
         public static bool Has(int metadataId)
         {

@@ -30,6 +30,7 @@ namespace Chog.Screens
 
         private ChogHeroStage _stage;
         private TextMeshProUGUI _name;
+        private TextMeshProUGUI _line;
         private int _named = -1;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -209,15 +210,9 @@ namespace Chog.Screens
             Stretch(heroArea, area, new Vector2(0f, 0.10f), Vector2.one);
             _stage = ChogHeroStage.Create(heroArea);
 
-            _name = new GameObject("Name", typeof(RectTransform)).AddComponent<TextMeshProUGUI>();
-            Stretch(_name.rectTransform, area, new Vector2(0f, -0.02f), new Vector2(1f, 0.12f));
-            _name.alignment = TextAlignmentOptions.Center;
-            _name.enableAutoSizing = true;
-            _name.fontSizeMin = 18f;
-            _name.fontSizeMax = 56f;
-            _name.raycastTarget = false;
-            ChogTheme.AsTitle(_name);
-            _name.color = ChogTheme.Cream;
+            _name = Label(area, new Vector2(-0.05f, 0.02f), new Vector2(1.05f, 0.14f), 56f, ChogTheme.Cream);
+            // Under the name, what its basic attack throws and which trait gives it.
+            _line = Label(area, new Vector2(-0.10f, -0.07f), new Vector2(1.10f, 0.03f), 30f, ChogTheme.PurpleSoft);
         }
 
         private void Update()
@@ -231,7 +226,22 @@ namespace Chog.Screens
             {
                 _named = played;
                 _name.text = played > 0 ? "CHOG #" + played : "RECRUIT";
+                _line.text = ChogHeroModel.AttackLine(played > 0 ? played : ChogHeroModel.Recruit);
             }
+        }
+
+        private static TextMeshProUGUI Label(Transform parent, Vector2 min, Vector2 max, float largest, Color colour)
+        {
+            var text = new GameObject("Label", typeof(RectTransform)).AddComponent<TextMeshProUGUI>();
+            Stretch(text.rectTransform, parent, min, max);
+            text.alignment = TextAlignmentOptions.Center;
+            text.enableAutoSizing = true;
+            text.fontSizeMin = 14f;
+            text.fontSizeMax = largest;
+            text.raycastTarget = false;
+            ChogTheme.AsTitle(text);
+            text.color = colour;
+            return text;
         }
 
         private static bool IsOurs(Transform part)

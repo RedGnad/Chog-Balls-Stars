@@ -191,6 +191,21 @@ namespace Chog.Screens
             }
         }
 
+        /// <summary>
+        /// The class of a hero as this game names it (the role of its Genesis), for a character of the
+        /// sample: the knight plays the brute, the archer the ranger, the spellcaster the controller.
+        /// </summary>
+        public static string ClassName(string sampleName)
+        {
+            switch ((sampleName ?? "").Trim().ToUpperInvariant())
+            {
+                case "KNIGHT": return "BRUTE";
+                case "ARCHER": return "RANGER";
+                case "SPELLCASTER": return "CONTROLLER";
+                default: return sampleName;
+            }
+        }
+
         public static Color Hex(string rgb)
         {
             ColorUtility.TryParseHtmlString("#" + rgb, out var colour);

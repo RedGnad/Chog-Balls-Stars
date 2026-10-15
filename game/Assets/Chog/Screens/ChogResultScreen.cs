@@ -60,7 +60,9 @@ namespace Chog.Screens
                 var name = Text("Name", card.transform, new Vector2(0.02f, 0.02f), new Vector2(0.48f, 0.12f), 52f);
                 ChogTheme.AsTitle(name);
                 name.color = ChogTheme.Cream;
-                name.text = metadataId == ChogHeroModel.Recruit ? "RECRUIT" : "CHOG #" + metadataId;
+                var attack = ChogHeroModel.AttackLine(metadataId);
+                name.text = (metadataId == ChogHeroModel.Recruit ? "RECRUIT" : "CHOG #" + metadataId)
+                            + (attack.Length > 0 ? "\n<size=45%><color=#A99BFC>" + attack + "</color></size>" : "");
                 textLeft = 0.50f;
             }
 

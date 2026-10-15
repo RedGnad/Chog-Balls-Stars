@@ -84,3 +84,22 @@ Read with the limits above: eight repositories out of 311 applications, read on 
   the window opened; so was ours. The deliverables ask for it.
 
 No ranking is attempted: the sample is too small and the judges' real weights are not known.
+
+## Again on 15 October 2026, 22:01 Paris: the submission form is open
+
+Read with `python3 -I research/scripts/census_chogathon_gallery.py`
+([result](../evidence/chogathon-gallery-2026-10-15.json)): the page counts 451 applications and the
+table of submitted projects has **4 rows**. The form takes a banner, a description, a demo video and
+links; judges score after 23 October (facts in
+[chogathon-site-facts-2026-10-15.json](../evidence/chogathon-site-facts-2026-10-15.json)).
+
+| Project | What its description says | Same category as ours? |
+| --- | --- | --- |
+| Chog World (chognftgame.netlify.app) | a small multiplayer social island: players enter as their Chog, explore, chat; traits shape the in-game identity | yes, the nearest: Chogs as characters in real time. Its description names no combat, no stakes, no trait that changes play |
+| ChogWorks (chogworks.fun) | community quests and a reward pool; Genesis holders unlock an upgradeable points miner; a burn of 10% | no (quests, rewards) |
+| Chog Wallet Tracker (gchog.xyz) | alerts on smart-money wallets, gated to Chog NFT and $CHOG holders | no (tool) |
+| Do Not Buy | a meme token on a testnet launchpad | no |
+
+Not done: opening the four apps and their code. The field is a sample again: 447 applicants have not
+submitted, and the playbook says the field fills near the deadline. A census is due again on 22 and
+23 October.

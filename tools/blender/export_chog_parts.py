@@ -24,7 +24,7 @@ How the library is made:
 
 The file (written to game/Assets/Chog/Resources/ChogParts.bytes by default), little endian:
 
-    "CHOGPARTS3"
+    "CHOGPARTS4"
     materials: count, then name, colour (3 floats, as on screen), role (0 its colour, 1 the skin of the
                Genesis, 2 its face), light (0 lit, 1 unlit, 2 outline: unlit and seen from inside)
     skins:     count, then name, skin (3 floats), face (3 floats)
@@ -36,6 +36,8 @@ The file (written to game/Assets/Chog/Resources/ChogParts.bytes by default), lit
     genesis:   count, then the number shown in the name (2 bytes; 0 is the grey Chog of a recruit), skin
                (1 byte), piece count (1 byte), pieces (2 bytes each), the piece its basic attack throws
                (2 bytes, 65535 for none) and how that piece moves (1 byte, chog_attack_objects.SPIN...)
+    lines:     count, then each line a player reads about a basic attack (string), and for every Genesis
+               in the order above, the line of its own (2 bytes)
 
 The objects of the basic attacks (chog_attack_objects.py) are pieces too, on the rest part "Attack": what a
 hero throws comes from its value of "Head" (docs/ATTACKS-FROM-THE-ART.md); a hero that throws its hat
@@ -70,7 +72,7 @@ from mathutils import Vector  # noqa: E402
 REST_PARTS = ("Body", "Head", "armLeft", "armRight")
 DEFAULT_OUT = os.path.join(traits.REPOSITORY, "game", "Assets", "Chog", "Resources", "ChogParts.bytes")
 SUMMARY = os.path.join(traits.REPOSITORY, ".artifacts", "chog-body", "parts-export.json")
-MAGIC = b"CHOGPARTS3"
+MAGIC = b"CHOGPARTS4"
 NO_ATTACK = 0xFFFF
 
 # The colours of the base, as render_chog_traits.py draws them (the skin and face are per Genesis).
@@ -259,7 +261,7 @@ def write_string(out, text):
     out.write(data)
 
 
-def write_library(path, materials, rest, pieces, heroes):
+def write_library(path, materials, rest, pieces, heroes, labels):
     """Writes the file described at the top."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     temporary = path + ".writing"
@@ -297,6 +299,12 @@ def write_library(path, materials, rest, pieces, heroes):
             out.write(struct.pack("<HBB", number, skins.index(skin), len(worn)))
             out.write(struct.pack(f"<{len(worn)}H", *worn))
             out.write(struct.pack("<HB", attack, style))
+        lines = sorted(set(labels.values()))
+        out.write(struct.pack("<I", len(lines)))
+        for line in lines:
+            write_string(out, line)
+        for number in sorted(heroes):
+            out.write(struct.pack("<H", lines.index(labels[number])))
     os.replace(temporary, path)
 
 
@@ -428,7 +436,9 @@ def main():
     heroes[RECRUIT] = ("Recruit", [index for key in (("rest", "Body"), bare, ("rest", "armLeft"), ("rest", "armRight"))
                                    for index in by_key[key]], attack_pieces["Leaf"], attacks.TUMBLE)
 
-    write_library(arguments.out, materials, rest, pieces, heroes)
+    labels = {number: attacks.label_of(everyone[number].get("Head")) if number in everyone else
+              "THROWS THE SPIKES OF ITS CROWN" for number in heroes}
+    write_library(arguments.out, materials, rest, pieces, heroes, labels)
     size = os.path.getsize(arguments.out)
     triangles = sum(len(piece["indices"]) // 3 for piece in pieces)
     summary = {

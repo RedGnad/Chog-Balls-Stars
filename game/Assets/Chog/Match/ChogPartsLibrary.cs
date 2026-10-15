@@ -13,7 +13,7 @@ namespace Chog.Match
     /// </summary>
     public sealed class ChogPartsLibrary
     {
-        public const string Magic = "CHOGPARTS3";
+        public const string Magic = "CHOGPARTS4";
 
         /// <summary>The rest part of the objects of the basic attacks, which no hero wears.</summary>
         public const string AttackPart = "Attack";
@@ -74,6 +74,8 @@ namespace Chog.Match
             /// <summary>The piece its basic attack throws (NoAttack for none), and how it moves.</summary>
             public ushort Attack;
             public byte AttackStyle;
+            /// <summary>What a player reads about its basic attack ("THROWS SNOWBALLS FROM ITS RUSSIAN HAT").</summary>
+            public string AttackLine;
         }
 
         public PartMaterial[] Materials;
@@ -168,6 +170,7 @@ namespace Chog.Match
 
             var heroes = (int)reader.ReadUInt32();
             library.Heroes = new Dictionary<int, Hero>(heroes);
+            var order = new int[heroes];
             for (var i = 0; i < heroes; i++)
             {
                 var number = (int)reader.ReadUInt16();
@@ -185,6 +188,20 @@ namespace Chog.Match
                     throw new InvalidDataException("CHOG #" + number + " throws a piece that is not in the library");
                 if (hero.Skin >= library.Skins.Length)
                     throw new InvalidDataException("CHOG #" + number + " has a skin that is not in the library");
+                library.Heroes[number] = hero;
+                order[i] = number;
+            }
+
+            var lines = new string[reader.ReadUInt32()];
+            for (var i = 0; i < lines.Length; i++)
+                lines[i] = ReadString(reader);
+            foreach (var number in order)
+            {
+                var line = reader.ReadUInt16();
+                if (line >= lines.Length)
+                    throw new InvalidDataException("CHOG #" + number + " has a line that is not in the library");
+                var hero = library.Heroes[number];
+                hero.AttackLine = lines[line];
                 library.Heroes[number] = hero;
             }
 

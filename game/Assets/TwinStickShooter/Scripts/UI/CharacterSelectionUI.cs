@@ -127,7 +127,7 @@ namespace TwinStickShooter
         // effect from the aura.
         Teams[team.Index].TeamCharacters[characterIndex].text =
           genesisName == null
-            ? characterInfo.Name
+            ? Chog.Screens.ChogTheme.ClassName(characterInfo.Name)
             : Chog.Screens.GenesisHeroCard.CleanName(genesisName) + "\n" + GenesisCast.KitLabel(VerifiedFrame, entityRef);
         Teams[team.Index].TeamCharacters[characterIndex].color = characterInfo.NameColor;
 
