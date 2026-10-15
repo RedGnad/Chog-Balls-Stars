@@ -117,17 +117,17 @@ def add_ribs(part, numbers, material):
         half_w, half_d = torso_section(numbers, height)
         points = []
         spread = math.radians(RIBS["SPREAD_DEG"] + 6.0 * index)
-        for step in range(11):
+        for step in range(8):
             # Around the front (-Y), from one side to the other, dipping a little at the middle.
-            angle = -spread + 2.0 * spread * step / 10
+            angle = -spread + 2.0 * spread * step / 7
             dip = 0.018 * math.cos(angle * math.pi / (2.0 * spread))
             points.append(Vector((math.sin(angle) * half_w * 1.03, -math.cos(angle) * half_d * 1.03, height - dip)))
         rings_of = []
         for step, point in enumerate(points):
-            ahead = points[min(step + 1, 10)] - points[max(step - 1, 0)]
+            ahead = points[min(step + 1, 7)] - points[max(step - 1, 0)]
             first, second = base.frame_across(ahead, Z)
             rings_of.append((point, first * thick, second * thick))
-        part.shell(rings_of, 6, material, 0.0)
+        part.shell(rings_of, 4, material, 0.0)
     # The breastbone, down the middle of the front.
     low, high = bottom + (top - bottom) * (RIBS["FROM"] - 0.05), bottom + (top - bottom) * (RIBS["TO"] + 0.04)
     stations = []

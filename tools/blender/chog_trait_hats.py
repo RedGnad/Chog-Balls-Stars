@@ -818,7 +818,9 @@ BALACLAVA = {
     "RIM": ((0.0, 83.0), (26.0, 84.0), (40.0, 128.0), (100.0, 152.0), (180.0, 150.0)),
     "SIZE": 1.11,
     "ROWS": 4,
-    "SIDES": 20,
+    # 20 around and 14 ribs until batch 7: with the whole crown through it, a robber in a heavy robe went
+    # over 8,000 triangles.
+    "SIDES": 14,
     # The panel over the lower face and the bridge between the eyes, in the coordinates of the face (to
     # the side, above its middle): its edges, how far off the head.
     "LOWER": (-0.26, 0.26, -0.27, -0.072),
@@ -827,9 +829,9 @@ BALACLAVA = {
     "PANEL_STEPS": (8, 3),
     # The eye holes: middle (to the side, above), half width, half height, the radius of the rolled edge.
     "HOLE": (0.114, 0.004, 0.072, 0.084, 0.016),
-    "HOLE_STATIONS": 14,
+    "HOLE_STATIONS": 12,
     # The knit: darker ribs from the edge up over the top: how many, their half width.
-    "RIBS": (14, 0.006),
+    "RIBS": (10, 0.006),
     "OUTLINE_THICKNESS": 0.020,
     # A knitted mask, tight on the head: the pictures draw the spikes of the far side and of the back
     # coming out of it. Those leaves stay, turned down as under a cap, and come through the knit

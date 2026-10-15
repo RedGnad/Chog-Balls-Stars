@@ -67,6 +67,7 @@ import bpy  # noqa: E402
 import make_chog_traits as traits  # noqa: E402  (the folder of this file must be on the path first)
 import render_chog_full as shots  # noqa: E402
 import chog_attack_objects as attacks  # noqa: E402
+import chog_trait_bases as bases  # noqa: E402
 from mathutils import Vector  # noqa: E402
 
 REST_PARTS = ("Body", "Head", "armLeft", "armRight")
@@ -88,6 +89,15 @@ ROLE_FIXED, ROLE_SKIN, ROLE_FACE = 0, 1, 2
 RECRUIT = 0
 RECRUIT_SKIN = {"skin": (0.62, 0.62, 0.66), "face": traits.GENESIS_FACE}
 SKINS = {**traits.SKINS, "Recruit": RECRUIT_SKIN}
+# The Skull base (batch 7): its own bone colours, by "Skin", under names that do not meet those of Origin.
+SKINS.update({"Skull " + name: {"skin": colour, "face": colour} for name, colour in bases.SKULL_SKINS.items()})
+BASES = ("Origin", "Skull")
+
+
+def skin_key(genesis_traits):
+    """The name of a Genesis's colours in SKINS."""
+    skull = bases.is_skull(genesis_traits)
+    return ("Skull " if skull else "") + genesis_traits.get("Skin", "")
 LIGHT_LIT, LIGHT_UNLIT, LIGHT_OUTLINE = 0, 1, 2
 
 
@@ -103,7 +113,7 @@ def all_genesis():
             record = json.loads(line)
             genesis_traits = {str(item["trait_type"]): str(item["value"])
                               for item in json.loads(record["raw_json"]).get("attributes", [])}
-            if genesis_traits.get("Base") == "Origin":
+            if genesis_traits.get("Base") in BASES:
                 found[int(record["metadata_id"])] = genesis_traits
     return found
 
@@ -112,6 +122,14 @@ def keys_of(genesis_traits):
     """The keys of the parts a Genesis wears: what each part is built from, and nothing else."""
     side = genesis_traits.get("Side", "Right")
     keys = {("rest", name) for name in ("Body", "armLeft", "armRight")}
+    if bases.is_skull(genesis_traits):
+        # A skull: its own head (no leaf, whatever the hat), and the ribs on its body.
+        keys = {("rest", "Body", "Skull"), ("rest", "armLeft"), ("rest", "armRight"), ("head", "Skull")}
+        for trait in traits.TRAIT_PARTS:
+            value = genesis_traits.get(trait)
+            if value is not None and isinstance(traits.entry_for(trait, genesis_traits), dict):
+                keys.add(("trait", trait, value, side))
+        return keys
     # The head: its leaves follow the hat when the hat is modelled, else a hood (head_look).
     hat = traits.entry_for("Head", genesis_traits)
     hat_value = genesis_traits.get("Head") if isinstance(hat, dict) else None
@@ -135,6 +153,8 @@ def key_of_object(thing, genesis_traits):
     if thing.name in REST_PARTS:
         if thing.name == "Head":
             return next(key for key in keys_of(genesis_traits) if key[0] == "head")
+        if thing.name == "Body" and bases.is_skull(genesis_traits):
+            return ("rest", "Body", "Skull")
         return ("rest", thing.name)
     trait, value = thing["trait"].split("=", 1)
     return ("trait", trait, value, genesis_traits.get("Side", "Right"))
@@ -321,7 +341,7 @@ def main():
         wanted = {int(number) for number in arguments.genesis.split(",") if number.strip()}
         everyone = {number: found for number, found in everyone.items() if number in wanted}
     worn_keys = {number: keys_of(found) for number, found in everyone.items()}
-    unknown_skins = sorted({found.get("Skin") for found in everyone.values()} - set(traits.SKINS))
+    unknown_skins = sorted({skin_key(found) for found in everyone.values()} - set(SKINS))
     if unknown_skins:
         raise SystemExit(f"CHOG_PARTS no colour recorded for Skin {unknown_skins}")
     chosen = cover(worn_keys)
@@ -407,6 +427,8 @@ def main():
     def attack_for(found, worn):
         """The piece a hero's basic attack throws and how it moves (see chog_attack_objects)."""
         key, style = attacks.attack_of(found.get("Head"))
+        if bases.is_skull(found) and not found.get("Head"):
+            key, style = "Bone", attacks.TUMBLE
         if key == "HAT":
             hat = by_key.get(("trait", "Head", found.get("Head"), found.get("Side", "Right")))
             if hat:
@@ -427,7 +449,7 @@ def main():
             continue
         if lacking:
             incomplete[number] = lacking
-        heroes[number] = (found["Skin"], worn, *attack_for(found, worn))
+        heroes[number] = (skin_key(found), worn, *attack_for(found, worn))
 
     # The recruit: the body, the arms and the head of a Genesis without hat or hood.
     bare = ("head", None, None, None)
@@ -436,7 +458,7 @@ def main():
     heroes[RECRUIT] = ("Recruit", [index for key in (("rest", "Body"), bare, ("rest", "armLeft"), ("rest", "armRight"))
                                    for index in by_key[key]], attack_pieces["Leaf"], attacks.TUMBLE)
 
-    labels = {number: attacks.label_of(everyone[number].get("Head")) if number in everyone else
+    labels = {number: attacks.label_of(everyone[number].get("Head"), bases.is_skull(everyone[number])) if number in everyone else
               "THROWS THE SPIKES OF ITS CROWN" for number in heroes}
     write_library(arguments.out, materials, rest, pieces, heroes, labels)
     size = os.path.getsize(arguments.out)
