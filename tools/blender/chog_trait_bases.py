@@ -1,4 +1,4 @@
-"""The bases other than Origin (batch 7, 16 October 2026, pictures only): the Skull base first.
+"""The bases other than Origin (batch 7, 15 October 2026, pictures only): the Skull base first.
 
 What the pictures of the 60 Skull Genesis show (sheets of .artifacts/chog-body/special/, made with
 tools/genesis-art/trait_sheet.py Base Skull and Skin ...): a skull in the place of the head, bald and

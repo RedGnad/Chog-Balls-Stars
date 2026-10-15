@@ -1364,7 +1364,7 @@ HATS_OF_SIDE = {
 # of the back row went through the band); under it, the row under the rim of every hat (RIM_ROW), at the
 # sides and the back (until batch 6 the pairs of a cap: nothing seen at the sides from above).
 BAND_POINTS = (WHOLE, leaf(1.0, 24.0), GONE, GONE, GONE, GONE, GONE)
-# Through the knitted mask, as drawn ("THROUGH"). Until batch 7 (16 October 2026) four leaves placed by hand
+# Through the knitted mask, as drawn ("THROUGH"). Until batch 7 (15 October 2026) four leaves placed by hand
 # from the one angle of the pictures (2 or 3 points near the top of the far side), made longer and turned
 # out to pass the check of the tips all around: from behind they read as a collar at mid height, unlike the
 # bare head the owner compared them with (#17, Plumber). A knitted mask is pulled over the spiky head, so the

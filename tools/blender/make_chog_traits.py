@@ -87,7 +87,7 @@ sys.dont_write_bytecode = True   # no __pycache__ folder beside the scripts
 import make_chog_full as full  # noqa: E402  (the folder of this file must be on the path first)
 from render_chog_body import linear  # noqa: E402
 import chog_trait_faces as faces  # noqa: E402  (eyes and mouths added on 14 October 2026, registered below)
-import chog_trait_bases as bases  # noqa: E402  (the Skull base, batch 7, 16 October 2026)
+import chog_trait_bases as bases  # noqa: E402  (the Skull base, batch 7, 15 October 2026)
 
 variants, base = full.variants, full.base
 X, Y, Z, NOWHERE = base.X, base.Y, base.Z, base.NOWHERE

@@ -402,7 +402,7 @@ wig; from the game camera the row under a bucket hat shows only its points; the 
 keeps the whole star where the pictures draw a row of points over the top; the durag's row stands out
 like ears from the front; the Spartan helmet's cheek guards and eye holes (batch 4).
 
-## Into the game: the library of parts (16 October 2026)
+## Into the game: the library of parts (15 October 2026)
 
 After batch 6 the owner said yes to the 3D in the game. `export_chog_parts.py` writes
 `game/Assets/Chog/Resources/ChogParts.bytes` (2.1 MB), which the game assembles every hero from
@@ -417,7 +417,7 @@ Each part depends on one trait (and the Side): the head with its leaves on the h
 on `Head`, the eyes on `Eyes`, the mouth on `Mouth`, the clothing on `Body`. The script names the parts
 each Genesis wears by those keys, builds the 79 Genesis that wear all 324 parts between them (with the
 checks of `make_chog_traits.py`), and with `--check N` builds N more and fails if any of their objects
-differs from the one kept under its key. Run with `--check 5000` on 16 October: the 1,790 other Genesis of
+differs from the one kept under its key. Run with `--check 5000` on 15 October: the 1,790 other Genesis of
 the base Origin were all built and all matched, so a hero assembled in the game is the hero this folder
 builds. The 100 Genesis on another base are not exported (no head of their own yet). It also writes the
 bare Chog in grey, under the number 0, for the recruits. Summary in `.artifacts/chog-body/parts-export.json`.
@@ -581,7 +581,7 @@ wide, under a picture 1.2 units wide.
   <https://devtalk.blender.org/t/fbx-exporter-apply-transform/26640>. Checked here: the file keeps
   each part at its place under the root (see the "file:" lines of the check).
 
-## Batch 7: the robber, the Skull and Radioactive bases (16 October 2026, night, pictures only, branch `3d-batch-7`)
+## Batch 7: the robber, the Skull and Radioactive bases (15 October 2026, night, pictures only, branch `3d-batch-7`)
 
 Nothing of this is in the game: the game's library of parts was not written again (the export of this
 branch writes to a scratch file). The owner says yes or no first.
@@ -590,13 +590,13 @@ branch writes to a scratch file). The owner says yes or no first.
   collar at mid height, unlike the bare head and the plumber the owner compared them with. A knitted mask
   is pulled over the spiky head, so the whole crown of a bare head now comes through it, each leaf where it
   grows (`ROBBER_POINTS = FULL_CROWN`). The mask is lighter (14 sides, 10 ribs) so a robber in a heavy robe
-  stays under 8,000 triangles. Sheet: `research/evidence/chog-traits-batch7-robber-before-after-2026-10-16.png`.
+  stays under 8,000 triangles. Sheet: `research/evidence/chog-traits-batch7-robber-before-after-2026-10-15.png`.
 - **The Skull base** (60 Genesis, `chog_trait_bases.py`): a bald skull in the bone colour of its Skin (ten
   colours read on the pictures), no leaf, no cream face, the pink cheeks, a nose hole, a row of teeth in
   place of the mouth (no Skull Genesis has a Mouth), ribs and breastbone on the body. Hats and eyes are
   those of the other Genesis. It is in the export of this branch: all 1,929 Genesis of Origin and Skull
   built, all matching their parts (`--check 5000`), none over 8,000 triangles; a bare skull throws bones.
-  Sheet: `research/evidence/chog-traits-batch7-skull-2026-10-16.png`.
+  Sheet: `research/evidence/chog-traits-batch7-skull-2026-10-15.png`.
 - **The Radioactive base** (30 Genesis): the spiky Chog in a gradient from a deep colour at the feet to a
   light one at the top (four Skins), no cream face, the skull's teeth and nose showing, no cheek, the ribs,
   and its own eyes: the eyes of Side=Left in a glowing tint of the skin (17 values). Its values of Head are
@@ -604,7 +604,7 @@ branch writes to a scratch file). The owner says yes or no first.
   third eye, a gem (Diamond), a gold seal (Holy Seal), a beam (Blue Laser), mushrooms (Poison Shroom). Not
   yet in the export: the game draws one colour per material; the gradient needs a colour role that the game
   computes from the height of each point (a change of `ChogPartsLibrary` and `ChogHeroModel`).
-  Sheets: `research/evidence/chog-traits-batch7-radioactive-2026-10-16.png`.
+  Sheets: `research/evidence/chog-traits-batch7-radioactive-2026-10-15.png`.
 - **Still wrong:** the ram horns are smaller than drawn; the skull keeps the round head of a Chog where the
   pictures draw a skull with a narrower jaw; Red Bandana is not modelled; the ten 1:1 Genesis keep the
   earlier look.

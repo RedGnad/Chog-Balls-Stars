@@ -1,4 +1,4 @@
-# The basic attack drawn from the hat (design, 16 October 2026)
+# The basic attack drawn from the hat (design, 15 October 2026)
 
 The owner said yes on 15 October to the basic attack showing the Genesis, and asked that it be done
 "bien beau, accurate, et optimisé", as one of the hero moments of the game. This page is the design;
@@ -63,7 +63,7 @@ The 100 Genesis on another base (Skull, Radioactive, 1:1) get theirs with their 
   thrown out and faded, drawn the same way.
 - Measured on the owner's phone with `?perf=1`, six heroes attacking, before and after.
 
-## Built and seen (16 October 2026, night)
+## Built and seen (15 October 2026, night)
 
 - **Built:** the 22 objects of the table in `tools/blender/chog_attack_objects.py` (40 triangles for the
   bolt, 1,680 for the cloud), exported with the heroes into the library of parts

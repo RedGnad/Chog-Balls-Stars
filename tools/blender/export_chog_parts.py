@@ -1,5 +1,5 @@
 """Exports the 3D heroes for the game: one library of parts from which the game assembles the hero of
-any of the 1,969 Genesis (16 October 2026, after the owner said yes to batch 6).
+any of the 1,969 Genesis (15 October 2026, after the owner said yes to batch 6).
 
 One file per Genesis would weigh about 200 KB each, 400 MB in all: too much for a phone. But the parts a
 hero is made of depend on one trait each (the head and its leaves on the hat, or on a hood; the hat on
