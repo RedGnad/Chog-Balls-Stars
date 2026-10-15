@@ -395,6 +395,19 @@ and served by the public address (build `20261015T210119927Z`):
   gem, third eye, seal, laser, mushrooms; the gradient needs a change of the game before it can go in).
 **Waiting on the user:** yes or no on batch 7 (robber, skulls, radioactive); the rest unchanged.
 
+**16 October 2026, 00:30.** The library of the game is in format 5 (a skin may run to another colour at the
+top; nothing changes for the heroes of today), so the Radioactive base can go in. On the branch
+`3d-batch-7` the export covers 1,959 Genesis (Origin, Skull, Radioactive; only the ten 1:1 left), all
+checked; a preview build made with it on the local network drew skulls, gradients, horns and the robber's
+crown as the pictures do (`research/evidence/chog-traits-batch7-in-game-preview-headless-2026-10-15.png` on
+the branch); the game's own library was put back and the main build served again. To put batch 7 in
+the game after a yes: merge the branch, run `export_chog_parts.py`, build. `tools/release/check_all.sh`
+passed (29 simulation, 80 view, services, 58 contracts). The public address serves build
+`20261015T221411009Z`. Learned: with the user's Chrome open (about 5 GB) the Mac swapped 7 GB after many
+builds; the Editor was restarted (memory note `unity-isolated-compile`).
+**Next action (dev):** the user's eye on the night's work, the phone with `?perf=1`, then batch 7 or
+its corrections; the Genesis leaderboard (`GET /api/career/top` exists, no screen shows it yet).
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a
