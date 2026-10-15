@@ -25,6 +25,8 @@ namespace TwinStickShooter
 
     public void Activate(int damage, Vector2 directionHint)
     {
+      // The numbers of the game's look (Chog.Screens.ChogTheme).
+      Chog.Screens.ChogTheme.AsTitle(TextElement);
       TextElement.text = damage.ToString();
       TextElement.enabled = true;
       enabled = true;

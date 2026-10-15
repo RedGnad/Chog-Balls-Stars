@@ -113,7 +113,16 @@ namespace Chog.Match
                 return;
 
             if (_noticeStyle == null)
+            {
                 _noticeStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
+                // The title font of the game's look (Koulen), when the project has it.
+                var koulen = Resources.Load<Font>("Fonts/Koulen-Regular");
+                if (koulen != null)
+                {
+                    _noticeStyle.font = koulen;
+                    _noticeStyle.fontStyle = FontStyle.Normal;
+                }
+            }
             _noticeStyle.fontSize = Mathf.Max(fell ? 14 : 11, Mathf.RoundToInt(Screen.height * (fell ? 0.065f : 0.045f)));
             var colour = fell ? _noticeColour : Theirs;
             if (!fell)

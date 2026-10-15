@@ -38,6 +38,12 @@ namespace Chog.Screens
                     if (found != null)
                         DressTexts(found);
                 }
+
+                // The sticks of the touch controls, in the colours of the game: moving in lavender, the
+                // basic attack in cheek pink, the special in gold. Their transparency is kept.
+                Tint(Find(root.transform, "MoveJoystick"), ChogTheme.PurpleSoft);
+                Tint(Find(root.transform, "AimBasicJoystick"), ChogTheme.Cheek);
+                Tint(Find(root.transform, "AimSpecialJoystick"), ChogTheme.Gold);
             }
         }
 
@@ -103,6 +109,14 @@ namespace Chog.Screens
                 else
                     ChogTheme.AsBody(text);
             }
+        }
+
+        private static void Tint(Transform stick, Color colour)
+        {
+            if (stick == null)
+                return;
+            foreach (var image in stick.GetComponentsInChildren<Image>(true))
+                image.color = new Color(colour.r, colour.g, colour.b, image.color.a);
         }
 
         private static bool IsOurs(Transform part)

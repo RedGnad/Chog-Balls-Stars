@@ -18,6 +18,7 @@ namespace TwinStickShooter
     public override void OnActivate(Frame frame)
     {
       base.OnActivate(frame);
+      Chog.Screens.ChogTheme.AsTitle(NameText);
       // A Genesis shows its own name and wears its own face, whether a player or a bot controls it.
       var genesisName = GenesisCast.DisplayName(PredictedFrame, _characterFollow.EntityView.EntityRef);
       if (genesisName != null)
