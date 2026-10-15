@@ -170,8 +170,14 @@ prints on clothing and some cap prints (listed in orange on each sheet). From th
 at phone size: the hats, beams, visors, goggles, headsets, glasses, the bubble and the rainbow
 show; the drawn eyes and mouths do not. **Nothing of it is in the game**; the older renders of
 #1287 and `overview_six.png` are out of date (shared numbers were lowered for the budget).
-**Next action (dev):** the sheets to the user for their yes before any import in Unity; the
-fall of a structure seen on screen; numbers tuned by playing.
+**A match played in a browser was ended by a fallen core, seen on screen** (09:23 to 09:27,
+headless browser on the local test server, through Photon's cloud): the player's tower fell,
+then its core, and the game showed "YOUR CORE FELL" and "Defeat"; the judge's verdict on the
+record from Photon agrees (tower at tick 2,599, core at 3,644, team 1 wins 9 to 6, not void).
+Pictures in [game/README.md](../game/README.md), "A tower and a core for each team".
+**Next action (dev):** the sheets to the user for their yes before any import in Unity;
+numbers tuned by playing (the player's team, a hero short since the player stood still, lost
+its core in under two minutes, as `watch_bots.py` predicted).
 **Waiting on the user:** their yes on the 3D batch; CONNECT WALLET tried on their phone through
 `https://a6c8-92-88-170-244.ngrok-free.app`; Render; testnet or mainnet for the contracts, and
 the wallet that deploys them.

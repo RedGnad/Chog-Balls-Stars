@@ -710,11 +710,19 @@ structures seen standing in a headless match
 towers shooting in whole matches played there (hits of exactly 500 in the damage log), and
 the bots of the other team attacking the tower of an idle player's team in a headless match
 ([capture](../research/evidence/bots-push-a-tower-headless-2026-10-12.png); that tower hit
-them 20 times and the core behind it lost 875 health). **Not seen:** a structure destroyed
-in a match played in a browser (only in replays), so neither the line that says so nor a
-match ended by a core there; the bots coming back to defend (the rule is tested, nobody
-watched it happen). **Not done:** a bot slides along a structure that is in its way; no
-sound.
+them 20 times and the core behind it lost 875 health). **Seen on 15 October:** a whole match
+played in the headless browser (`browser_check.sh respawn http://127.0.0.1:8084 ... 150 60`,
+build `20261012T041344613Z`, through Photon's cloud, the player as a visitor who walks into
+the middle and then stands still) ended by a fallen core: "YOUR TOWER IS UNDER ATTACK", then
+"YOUR TOWER FELL" (picture 25), "YOUR CORE IS UNDER ATTACK", then "YOUR CORE FELL" and
+"Defeat" (picture 39) ([sheet of the 60
+pictures](../research/evidence/match-ended-by-core-headless-sheet-2026-10-15.png),
+[tower](../research/evidence/your-tower-fell-headless-2026-10-15.png),
+[core](../research/evidence/your-core-fell-defeat-headless-2026-10-15.png)). The judge, on the
+record Photon sent, agrees: team 0's tower fell at tick 2,599 and its core at 3,644, the match
+ended at 3,645, team 1 won 9 to 6, a verdict that is not void. **Not seen:** the bots coming
+back to defend (the rule is tested, nobody watched it happen); the ruin of a structure at full
+size on a phone. **Not done:** a bot slides along a structure that is in its way; no sound.
 
 ### The page the game is served in (10 October)
 
