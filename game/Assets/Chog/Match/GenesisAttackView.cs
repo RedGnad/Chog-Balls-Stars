@@ -68,6 +68,11 @@ namespace Chog.Match
             if (data == null || !GenesisEffects.Enabled)
                 return;
 
+            // The moment of the special: the eyes it comes from, large above the hero (ChogSignatureFlash).
+            if (data.IsGenesisSignature && frame.TryGet<GenesisHero>(attack->Source, out var caster)
+                && frame.TryGet<Transform2D>(attack->Source, out var casterAt))
+                ChogSignatureFlash.ShowOnce(attack->Source, casterAt.Position.ToUnityVector3(), caster.MetadataId);
+
             if (data.VisualKind == GenesisVisualKind.Effect || data.ShapeMaterial == null)
             {
                 _visual = GenesisEffects.Spawn(data.Visual, transform, Vector3.zero, data.VisualScale, data.VisualTint);

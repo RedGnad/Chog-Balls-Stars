@@ -41,7 +41,7 @@ namespace Chog.Match
         public const float AttackSize = 0.8f;
 
         // The meshes of the attack objects, made once for each piece and skin: attacks come often.
-        private static readonly Dictionary<int, (Mesh Mesh, Color Impact)> s_attacks = new Dictionary<int, (Mesh, Color)>();
+        private static readonly Dictionary<long, (Mesh Mesh, Color Impact)> s_attacks = new Dictionary<long, (Mesh, Color)>();
 
         private static ChogPartsLibrary s_library;
         private static bool s_loaded;
@@ -178,14 +178,39 @@ namespace Chog.Match
             if (Off || library == null || !library.TryGetHero(metadataId, out var hero) || hero.Attack == ChogPartsLibrary.NoAttack)
                 return null;
             style = (AttackStyle)hero.AttackStyle;
-            var key = hero.Attack * 64 + hero.Skin;
+            return Alone(library, hero.Attack, hero.Skin, AttackSize, parent, "ChogAttackObject", out impact);
+        }
+
+        /// <summary>
+        /// The eyes this Genesis wears (its glasses, visor, headset, lasers or drawn eyes), alone, centred,
+        /// "size" across, under "parent": what its special attack comes from. Null when it has no eyes in
+        /// the library.
+        /// </summary>
+        public static Transform BuildEyes(int metadataId, Transform parent, float size, out Color colour)
+        {
+            colour = Color.white;
+            var library = Library;
+            if (Off || library == null || !library.TryGetHero(metadataId, out var hero))
+                return null;
+            foreach (var index in hero.Pieces)
+                if (library.Pieces[index].Name.StartsWith("Eyes_", System.StringComparison.Ordinal))
+                    return Alone(library, index, hero.Skin, size, parent, "ChogEyesObject", out colour);
+            return null;
+        }
+
+        // One piece of the library alone, centred, its largest side "size", in a new object under
+        // "parent"; "colour" is the colour most of it is drawn in. Meshes are kept for each piece, skin and size.
+        private static Transform Alone(ChogPartsLibrary library, int piece, int skin, float size, Transform parent,
+                                       string name, out Color colour)
+        {
+            var key = ((long)piece * 64 + skin) * 1000 + Mathf.RoundToInt(size * 100f);
             if (!s_attacks.TryGetValue(key, out var made) || made.Mesh == null)
             {
-                made = AttackMesh(library, library.Pieces[hero.Attack], hero.Skin);
+                made = AttackMesh(library, library.Pieces[piece], skin, size);
                 s_attacks[key] = made;
             }
-            impact = made.Impact;
-            var thing = new GameObject("ChogAttackObject", typeof(MeshFilter), typeof(MeshRenderer));
+            colour = made.Impact;
+            var thing = new GameObject(name, typeof(MeshFilter), typeof(MeshRenderer));
             thing.transform.SetParent(parent, false);
             thing.GetComponent<MeshFilter>().sharedMesh = made.Mesh;
             var renderer = thing.GetComponent<MeshRenderer>();
@@ -195,8 +220,8 @@ namespace Chog.Match
             return thing.transform;
         }
 
-        // One piece alone, centred and brought to AttackSize; the colour most of its vertices take.
-        private static (Mesh, Color) AttackMesh(ChogPartsLibrary library, ChogPartsLibrary.Piece piece, int skin)
+        // One piece alone, centred and brought to "size"; the colour most of its vertices take.
+        private static (Mesh, Color) AttackMesh(ChogPartsLibrary library, ChogPartsLibrary.Piece piece, int skin, float size)
         {
             var count = piece.VertexCount;
             var low = Vector3.one * float.MaxValue;
@@ -209,7 +234,7 @@ namespace Chog.Match
             }
             var centre = (low + high) * 0.5f;
             var extent = high - low;
-            var scale = AttackSize / Mathf.Max(0.001f, Mathf.Max(extent.x, Mathf.Max(extent.y, extent.z)));
+            var scale = size / Mathf.Max(0.001f, Mathf.Max(extent.x, Mathf.Max(extent.y, extent.z)));
 
             var vertices = new Vector3[count];
             var normals = new Vector3[count];
