@@ -11,6 +11,10 @@
 #       (the window of the wallet apps is loaded from the network and opens over the game),
 #       then a tap beside it, which closes it. No wallet app answers here: this shows that the
 #       window comes and goes and that the game hears of both.
+#   browser_check.sh phone-connector <https base url> <label> [x y of a tap that closes the window]
+#       the same on an HTTPS address, where the page posing as a phone browser offers OPEN IN
+#       METAMASK (not tapped: it leaves for MetaMask's site) and, beside it, OTHER WALLET, which
+#       is tapped and opens the window of wallet apps.
 #   browser_check.sh signed <base url> <label> [seconds to wait for the end of the match, default 420]
 #       connect, SIGN IN, play a match to its end, see the career credited. The stand-in wallet
 #       really signs with the private key published in the web3.js documentation, a public test
@@ -90,6 +94,8 @@ CHANGE_TEAM="480 327"
 STAKE="242 510"
 CLAIM="693 27"
 CONNECT="629 434"
+# Beside it on a phone without a wallet: the window of wallet apps.
+OTHER_WALLET="840 434"
 SIGN_IN="490 451"
 LEND="840 451"
 RENT_OUT="704 451"
@@ -114,6 +120,11 @@ case "$MODE" in
   connector)
     export CHOG_BROWSER_URL="$BASE/?perf=1" CHOG_BROWSER_SETTLE_MS=8000
     tap 1 $CONNECT 15000
+    tap 2 "${4:-30}" "${5:-30}" 5000
+    ;;
+  phone-connector)
+    export CHOG_BROWSER_URL="$BASE/?perf=1" CHOG_BROWSER_SETTLE_MS=8000
+    tap 1 $OTHER_WALLET 15000
     tap 2 "${4:-30}" "${5:-30}" 5000
     ;;
   signed)

@@ -51,6 +51,8 @@ namespace Chog.Match
         private const string SessionExpiryKey = "chog.wallet.sessionExpiry";
 
         private static PlayerWallet s_host;
+        // Whether the browser itself gives the page a wallet (an extension, a wallet's own browser).
+        private static bool s_pageHasWallet;
         private static readonly int[] NoTokens = new int[0];
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -214,7 +216,8 @@ namespace Chog.Match
             GenesisRental.Begin();
             GenesisWager.Begin();
 
-            if (ChogWalletHasProvider() == 0)
+            s_pageHasWallet = ChogWalletHasProvider() != 0;
+            if (!s_pageHasWallet)
             {
                 // No wallet in this browser: the page may still be able to connect a wallet app
                 // (a phone's normal browser). It says so, and gives back a connection made that
@@ -288,9 +291,21 @@ namespace Chog.Match
         {
             get
             {
-                return State == WalletState.NoProvider && Application.isMobilePlatform
-                    && MetaMaskLink(Application.absoluteURL).Length > 0;
+                return OffersWalletBrowser(s_pageHasWallet, Application.isMobilePlatform, MetaMaskLink(Application.absoluteURL), State);
             }
+        }
+
+        /// <summary>
+        /// Whether to offer reopening the game in MetaMask's browser: on a phone, for a page served
+        /// over HTTPS (a link exists), in a browser without a wallet of its own, while no wallet app
+        /// is connected or being connected. It stays offered beside the window of wallet apps: on a
+        /// phone the game page is often reloaded while the player approves in the wallet app, which
+        /// loses a connection under way, and inside the wallet's browser nobody leaves the page.
+        /// </summary>
+        public static bool OffersWalletBrowser(bool pageHasWallet, bool phone, string link, WalletState state)
+        {
+            return !pageHasWallet && phone && !string.IsNullOrEmpty(link)
+                && (state == WalletState.NoProvider || state == WalletState.Disconnected || state == WalletState.Failed);
         }
 
         /// <summary>Leaves this page for the same one in the browser of the MetaMask mobile app.</summary>

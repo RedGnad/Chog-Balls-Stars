@@ -50,6 +50,23 @@ namespace Chog.Match.Tests
         }
 
         [Test]
+        public void APhoneWithoutAWalletIsOfferedMetaMasksBrowserBesideTheWalletApps()
+        {
+            const string link = "https://link.metamask.io/dapp/game.example/";
+            // The window of wallet apps is available (Disconnected): the browser of MetaMask stays offered.
+            Assert.IsTrue(PlayerWallet.OffersWalletBrowser(false, true, link, WalletState.Disconnected));
+            Assert.IsTrue(PlayerWallet.OffersWalletBrowser(false, true, link, WalletState.NoProvider));
+            Assert.IsTrue(PlayerWallet.OffersWalletBrowser(false, true, link, WalletState.Failed));
+            // Not while a wallet app is being connected or once one is.
+            Assert.IsFalse(PlayerWallet.OffersWalletBrowser(false, true, link, WalletState.Connecting));
+            Assert.IsFalse(PlayerWallet.OffersWalletBrowser(false, true, link, WalletState.Ready));
+            // Not in a browser that has its own wallet, not on a computer, not without HTTPS.
+            Assert.IsFalse(PlayerWallet.OffersWalletBrowser(true, true, link, WalletState.Disconnected));
+            Assert.IsFalse(PlayerWallet.OffersWalletBrowser(false, false, link, WalletState.Disconnected));
+            Assert.IsFalse(PlayerWallet.OffersWalletBrowser(false, true, "", WalletState.Disconnected));
+        }
+
+        [Test]
         public void AKeptSessionIsOnlyGoodForItsAddressAndUntilItsEnd()
         {
             const string holder = "0x80fb079237af2a634ba9b95263ba0bd53d20cd64";

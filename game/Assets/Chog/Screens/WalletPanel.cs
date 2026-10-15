@@ -77,6 +77,8 @@ namespace Chog.Screens
         private TextMeshProUGUI _pageLabel;
         private Button _connect;
         private TextMeshProUGUI _connectLabel;
+        // On a phone, beside OPEN IN METAMASK: the window where any other wallet app is picked.
+        private Button _otherApp;
         private Button _signIn;
         private TextMeshProUGUI _signInLabel;
         private Button _lookUp;
@@ -195,6 +197,10 @@ namespace Chog.Screens
 
             _connect = MakeButton("Connect", new Vector2(0.27f, 0.06f), new Vector2(0.73f, 0.25f), out _connectLabel);
             _connect.onClick.AddListener(OnMainButton);
+            _otherApp = MakeButton("OtherApp", new Vector2(0.74f, 0.06f), new Vector2(0.96f, 0.25f), out var otherAppLabel);
+            _otherApp.GetComponent<Image>().color = QuietColor;
+            otherAppLabel.text = "OTHER WALLET";
+            _otherApp.onClick.AddListener(PlayerWallet.Connect);
             _signIn = MakeButton("SignIn", SignInMin, SignInMax, out _signInLabel);
             _signIn.onClick.AddListener(PlayerWallet.StartSignIn);
 
@@ -303,6 +309,7 @@ namespace Chog.Screens
             var canOpen = PlayerWallet.CanOpenInWalletBrowser;
             _connectLabel.text = canOpen ? "OPEN IN METAMASK" : state == WalletState.Failed ? "TRY AGAIN" : "CONNECT WALLET";
             _connect.gameObject.SetActive(!guest && !checkingPass && (canOpen || state == WalletState.Disconnected || state == WalletState.Failed));
+            _otherApp.gameObject.SetActive(!guest && !checkingPass && canOpen && PlayerWallet.ThroughApp);
             _lookUp.gameObject.SetActive(!holds && !guest && !checkingPass && state != WalletState.Connecting && state != WalletState.Reading);
 
             // A connected wallet can rent a Genesis that is offered: a large button when it has
@@ -515,7 +522,10 @@ namespace Chog.Screens
                 case WalletState.Disconnected:
                     return "Connect the wallet that holds your Chog Genesis: each one is a hero, with the class, the attack " +
                            "and the effect its traits give it." +
-                           (PlayerWallet.ThroughApp ? " You pick your wallet app, approve there, then come back here." : "") +
+                           (PlayerWallet.CanOpenInWalletBrowser
+                               ? " OPEN IN METAMASK plays inside the MetaMask app, where your wallet answers without leaving the game." +
+                                 (PlayerWallet.ThroughApp ? " OTHER WALLET: pick your app, approve there, then come back here." : "")
+                               : PlayerWallet.ThroughApp ? " You pick your wallet app, approve there, then come back here." : "") +
                            "\n\n" + RecruitNote;
                 case WalletState.Connecting:
                     return PlayerWallet.ThroughApp ? "Pick your wallet app and approve there, then come back here..."

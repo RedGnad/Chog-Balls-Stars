@@ -182,6 +182,28 @@ its core in under two minutes, as `watch_bots.py` predicted).
 `https://a6c8-92-88-170-244.ngrok-free.app`; Render; testnet or mainnet for the contracts, and
 the wallet that deploys them.
 
+**15 October 2026, 11:15.** The user answered:
+- **3D:** yes, to be improved. Hats must hide the spikes (today the leaves go through them);
+  some Head values are hair or something else and replace the spikes; the weak points listed
+  (Side=Left clothing, costumes, Ushanka, wigs, Spartan crest, prints) are to be done. Mouths
+  and clothing stay in the game if they cost nothing, else only on the close views. One agent,
+  one Blender at a time, works on it (batch 3, `.artifacts/chog-body/traits/batch-3/`); it
+  waits while `.artifacts/heavy-job.lock` says `busy` (written during Unity builds).
+- **Their phone:** CONNECT WALLET through Reown opened MetaMask, they approved, and back in the
+  browser the game still said CONNECT WALLET. Cause found and the fix built: see
+  [game/README.md](../game/README.md), "Tried on the user's phone on 15 October". Build
+  `20261015T085635226Z` (assembled in `site/`, served by the public instance): on a phone
+  without a wallet, OPEN IN METAMASK is the main button again and OTHER WALLET opens Reown's
+  window. Their Genesis sits on a Ledger, reachable from a computer; Ledger documents the Nano X
+  with MetaMask mobile over Bluetooth, not the Nano S Plus.
+- **Contracts:** testnet first, deployed with a development wallet of theirs whose key stays on
+  their machine (see [contracts/README.md](../contracts/README.md), top).
+**Next action (dev):** the user tries OPEN IN METAMASK on the phone; a deployment script for the
+testnet (test token, a stand-in for the collection, the wager first) and the game and services
+told which chain to use; the 3D batch 3 sheets to the user.
+**Waiting on the user:** the phone try; the public address of the development wallet, testnet
+MON from `https://faucet.monad.xyz` on it, and the keystore made in their own terminal.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a

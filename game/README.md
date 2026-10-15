@@ -244,9 +244,25 @@ behaves as before.
 
 Everything after the connection is unchanged: signing in, a purchase, a rental and a stake
 speak to the wallet object through the same four calls. Sign-in by e-mail or a social account
-is switched off in that window: a Genesis lives in a wallet the player already has. Not known
-until a phone tries it: whether the wallet app brings the player back to the browser by
-itself, and whether the game page survives the trip.
+is switched off in that window: a Genesis lives in a wallet the player already has.
+
+**Tried on the user's phone on 15 October, through the public address: it did not connect.**
+MetaMask opened, the user approved, MetaMask said they could go back to the site, and back in
+the browser the game still showed CONNECT WALLET. The public instance's log shows three loads
+of the page in four minutes (10:40, 10:42, 10:44) and never a read of the Genesis of an
+address: the phone's browser had dropped the game page while MetaMask was in front and loaded
+it again on the way back. A connection under way does not survive that: in the AppKit bundle
+used here (`appkit-DSMu6gPS.js` of `@reown/appkit-cdn@1.8.24`) the sessions waiting for the
+wallet's answer are kept only in memory (`pendingSessions`, a `Map`), and the wallet's answer
+reaching a reloaded page finds none ("Pending session not found"). The wallet cannot bring
+the player back by itself either: WalletConnect's documentation says automatic redirection to
+a browser-based app after a wallet interaction is not possible from iOS 17 onwards
+(`https://docs.walletconnect.com/wallets/ios/mobile-linking.md`). Signing in and every
+transaction take the same trip. **Since that day** a phone browser without a wallet, on an
+HTTPS address, shows OPEN IN METAMASK as its main button even when the window of wallet apps
+is offered, and OTHER WALLET beside it for that window (`PlayerWallet.OffersWalletBrowser`,
+seen through the public address with `browse_public.sh ... phone-connector`). Inside the
+wallet's own browser nobody leaves the page; that browser may hold the game upright (above).
 
 In the first three cases the panel also shows SEE EVERY HERO, which leaves the game for the
 hero page next to it (`hero/`, see [`web/README.md`](../web/README.md)): the place where a

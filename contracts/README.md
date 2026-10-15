@@ -1,5 +1,17 @@
 # The three contracts paid in $CHOG
 
+**Decided by the user on 15 October 2026: the contracts go to Monad's testnet first**, deployed
+with a development wallet of theirs (its key never leaves their machine: an encrypted Foundry
+keystore, `cast wallet import <name> --interactive`, and a deployment they start themselves).
+Monad testnet, read on `https://docs.monad.xyz/developer-essentials/testnet.md` that day:
+chain id `10143` (`0x279f`), RPC `https://testnet-rpc.monad.xyz` (also
+`https://rpc-testnet.monadinfra.com`, `https://rpc.ankr.com/monad_testnet`), faucet
+`https://faucet.monad.xyz`, explorers `https://testnet.monadvision.com` and
+`https://testnet.monadscan.com`; the testnet was reset from genesis on 2025-12-16. Neither
+$CHOG nor the Genesis collection is on the testnet: a test token and a stand-in for the
+collection have to be deployed beside the three contracts. The game asks the wallet for chain
+`0x8f` (mainnet) in `MonadTransactions.cs` today.
+
 | Contract | What it is for | State |
 | --- | --- | --- |
 | `src/ChogShop.sol` | an item bought for a Genesis (today: the second form of its attack) | not deployed; rehearsed on a local copy of the chain |
