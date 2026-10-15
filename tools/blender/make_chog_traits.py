@@ -115,6 +115,14 @@ POLISH = {
     ),
     "LEAF_SIDES": 6,             # points around a leaf: its section is an oval
     "LEAF_CURL": 0.07,           # how far the point bends back, against the length
+    # Every leaf of the crown against the length H3 gives it (SPIKES), and against its width and
+    # thickness. (1.0 until batch 4, 15 October 2026: the owner found the spikes a little long. Tried on
+    # the busts of bare heads beside their pictures, #75, #112 and #76, at 1.0, 0.85, 0.75, 0.70 and
+    # 0.65: the pictures draw shorter spikes still, small points down the far side; 0.70 makes those
+    # points and keeps a crown that reads from the camera of the game. A leaf starts 0.10 inside the
+    # head (SPIKE_SUNK), so what stands out of it is 0.08 to 0.15 long in place of 0.16 to 0.26.)
+    "LEAF_LENGTH": 0.70,
+    "LEAF_WIDTH": 1.0,
     # The nose is a little smaller than on H3: it has to show between a pair of glasses and a grin.
     "NOSE": (0.0, -0.042, 0.018, 0.012),
     # The face spans the head as the pictures draw it, more so at the brow; the cheeks and the teeth
@@ -298,7 +306,13 @@ CROWN = {
     ),
     "SIDES": 16,                 # twice the number of points
     "VALLEY": 0.208,             # height of the dips between the points
-    "FLOOR": (0.150, 0.80),      # the floor inside the crown, hidden by the head: height, size
+    # The floor inside the crown, a low dome just above the top of the head (0.25 above its middle):
+    # the height and size of the ring where it meets the inside of the band, of its middle ring, and the
+    # height of its top. In the darker gold of the trim. (Until batch 4, 15 October 2026, a flat floor at
+    # 0.150, hidden in the head: from the camera of the game the bare top of the head showed inside the
+    # crown, as a pink or yellow bowl. The pictures never show the inside of the crown: the floor is
+    # gold, the colour of the crown, to show nothing that is not drawn.)
+    "FLOOR": (0.200, 0.97, 0.248, 0.60, 0.266),
     # The gems: where around the crown (degrees from the front, towards the left of the character),
     # at which height, half width, half height, and which material.
     "GEMS": (
@@ -734,8 +748,13 @@ CLOTHES = {
 CLOTHES.update(hats_and_clothes.CLOTHES)
 
 
-def head_numbers():
-    return SimpleNamespace(**{**full.HEAD, **full.STYLES["H3"]["head"], **POLISH})
+def head_numbers(replaced=None):
+    """The numbers of the head: H3, polished, and those "replaced" gives (to try some: --head-set)."""
+    numbers = {**full.HEAD, **full.STYLES["H3"]["head"], **POLISH}
+    unknown = set(replaced or {}) - set(numbers)
+    if unknown:
+        raise SystemExit(f"CHOG_TRAITS no number of the head named {sorted(unknown)}")
+    return SimpleNamespace(**{**numbers, **(replaced or {})})
 
 
 # ---------------------------------------------------------------------------------------------
@@ -754,10 +773,12 @@ def add_leaf_crown(part, numbers, surface, leaves=FULL_CROWN):
     for line, ((turn_deg, back_deg, length, width, thickness, flat), item) in enumerate(zip(numbers.SPIKES, leaves)):
         share, turn_to, back_to = item[:3]
         bend = item[3] if len(item) > 3 else 0.0
+        wider = (item[4] if len(item) > 4 else 1.0) * numbers.LEAF_WIDTH
         if share <= 0.0:
             continue
         mirrored = turn_deg not in (0.0, 180.0)
-        length *= share
+        length *= share * numbers.LEAF_LENGTH
+        width, thickness = width * wider, thickness * wider
         turn_deg = turn_deg if turn_to is None else turn_to
         back_deg = back_deg if back_to is None else back_to
         for side in ((1.0, -1.0) if mirrored else (1.0,)):
@@ -1128,6 +1149,16 @@ def lay_word(part, crown, word, material, thicker, lift, baseline=None, scale=No
         bmesh.ops.bisect_plane(pieces, geom=pieces.verts[:] + pieces.edges[:] + pieces.faces[:], dist=1e-6,
                                plane_co=Vector((cut, 0.0, 0.0)), plane_no=X)
         cut += step
+    # Cut it across too where the wall of the hat bends (the heights of its rings): a straight stroke has
+    # points only at its ends, and laid across a bend its middle sank under the panel. (Batch 4: the 1 of
+    # "10K", whose box stands higher, crossed the ring at 0.236 and showed as "!".)
+    low = min(point.co.y for point in pieces.verts)
+    high = max(point.co.y for point in pieces.verts)
+    for height, _, _ in getattr(numbers, "RINGS", ()):
+        across = (height - baseline) / scale
+        if low < across < high:
+            bmesh.ops.bisect_plane(pieces, geom=pieces.verts[:] + pieces.edges[:] + pieces.faces[:], dist=1e-6,
+                                   plane_co=Vector((0.0, across, 0.0)), plane_no=Y)
     bmesh.ops.triangulate(pieces, faces=pieces.faces[:])
 
     mesh = part.mesh
@@ -1238,6 +1269,21 @@ def build_cap(maker):
             ink = part.named("Print2") if boxed and index == 0 else part.named("Print")
             wide = lay_word(part, crown, line, ink, numbers.PRINT_BOLD, high, baseline, scale)
             widths.append(wide)
+            if maker.entry.get("zero_bar"):
+                # A short upright bar inside each 0, as the pictures of "10k TPS Cap" draw it: the round 0
+                # of the font beside the 1 read "1OK" (batch 3). Its middle: the left end of the word, plus
+                # the width of the word up to that 0, less half the width of a 0. (The font does not centre
+                # a word on 0 exactly: "10K" runs from -0.78 to 1.04 of its units.)
+                pieces = word_pieces(line, numbers.PRINT_BOLD, numbers.PRINT_SPACING)
+                left = min(point.co.x for point in pieces.verts)
+                pieces.free()
+                zero = word_width("0", numbers.PRINT_BOLD, numbers.PRINT_SPACING)
+                for place, letter in enumerate(line):
+                    if letter == "0":
+                        upto = word_width(line[:place + 1], numbers.PRINT_BOLD, numbers.PRINT_SPACING)
+                        x = (left + upto - zero * 0.5) * scale
+                        hats_and_clothes.wall_bar(part, crown, ink, (x, baseline + capitals * 0.26),
+                                                  (x, baseline + capitals * 0.74), capitals * 0.075, high + 0.001)
             print(f"CHOG_TRAITS the word {line!r} is {wide:.3f} wide, capitals {capitals:.3f}, on a front panel "
                   f"{2.0 * crown.at_height(baseline)[0]:.3f} wide")
         if boxed:
@@ -1366,16 +1412,23 @@ def build_crown(maker):
     wall = CapCrown(numbers, surface.middle)
     sides = numbers.SIDES
     rim, trim, band, tips = (ring[0] for ring in numbers.RINGS)
-    floor_height, floor_size = numbers.FLOOR
+    edge_height, edge_size, middle_height, middle_size, top_height = numbers.FLOOR
     # The points: every other place of the last ring is a tip, the others a dip. A tip stands in
     # the middle of the front.
     points = [wall.around(tips if index % 2 == 0 else numbers.VALLEY, 2.0 * math.pi * index / sides)
               for index in range(sides)]
     whole, none = (1.0,) * sides, (0.0,) * sides
+    # The middle ring of the floor and its top follow the crown as it leans back.
+    lean = Vector((0.0, wall.at_height(middle_height)[2], 0.0))
     bands, _ = add_loops(part, [wall.loop(rim), wall.loop(trim), wall.loop(band), points,
-                                wall.loop(floor_height, floor_size)], part.named("Gold"),
-                         numbers.OUTLINE_THICKNESS, smooth=False, shares=[whole, whole, whole, whole, none])
+                                wall.loop(edge_height, edge_size),
+                                [point + Vector((0.0, 0.0, middle_height - edge_height)) for point in
+                                 wall.loop(edge_height, middle_size)],
+                                [surface.middle + lean + Vector((0.0, 0.0, top_height))]], part.named("Gold"),
+                         numbers.OUTLINE_THICKNESS, smooth=False,
+                         shares=[whole, whole, whole, whole, none, none, (0.0,)])
     part.paint(bands[0], part.named("Trim"))
+    part.paint(bands[4] + bands[5], part.named("Trim"))
     for degrees, height, half_width, half_height, material in numbers.GEMS:
         low, high = numbers.GEM_LIFT
         if material == "Trim":
@@ -1927,6 +1980,18 @@ TRAIT_PARTS = {
 }
 # Hats and clothing that a Side draws otherwise (Mon Cap, Russian Hat, Tuxedo): chog_trait_hats.py.
 OF_SIDE.update({"Head": hats_and_clothes.HATS_OF_SIDE, "Body": hats_and_clothes.CLOTHES_OF_SIDE})
+# Batch 4: every value of "Head" (on each Side) gets the leaves and the numbers its pictures ask for
+# (HEAD_VALUES of chog_trait_hats.py), which replace those of its shape.
+OF_SIDE["Head"] = hats_and_clothes.from_the_art(HATS, OF_SIDE["Head"])
+
+
+def head_from_the_art(traits):
+    """What HEAD_VALUES says of the value of "Head" of a Genesis on its Side: the CHOG numbers looked
+    at and what their pictures show; {} when it has no line there (or no hat)."""
+    if not traits or "Head" not in traits:
+        return {}
+    entry = OF_SIDE["Head"].get(traits.get("Side"), {}).get(traits["Head"])
+    return dict(entry.get("from_the_art", {})) if entry else {}
 
 
 # ---------------------------------------------------------------------------------------------
@@ -1994,6 +2059,21 @@ def coverage():
         if missing:
             shown = ", ".join(f"{label} {count}" for label, count in sorted(missing.items(), key=lambda item: -item[1]))
             print(f"CHOG_COVERAGE   {trait} with no part: {shown}")
+
+    # Batch 4: which value of "Head", on its Side, has its leaves from its pictures (HEAD_VALUES), and
+    # which is still decided by its shape alone.
+    per_value, by_shape = {}, {}
+    for traits in tokens:
+        entry = entry_for("Head", traits)
+        if isinstance(entry, dict):
+            label = f"{traits['Head']} [{traits.get('Side')}]"
+            chosen = per_value if entry.get("from_the_art") else by_shape
+            chosen[label] = chosen.get(label, 0) + 1
+    print(f"CHOG_COVERAGE   leaves from the pictures of the value (HEAD_VALUES): {len(per_value)} values, "
+          f"{sum(per_value.values())} Genesis")
+    print(f"CHOG_COVERAGE   leaves from the hat shape only: {len(by_shape)} values, {sum(by_shape.values())} Genesis"
+          + (": " + ", ".join(f"{label} {count}" for label, count in sorted(by_shape.items(), key=lambda item: -item[1]))
+             if by_shape else ""))
 
     def right(traits, trait):
         return entry_for(trait, traits) is not None
@@ -2093,12 +2173,12 @@ def budget():
         print(f"CHOG_BUDGET heaviest part: {label} {total}")
 
 
-def build(traits=None, replaced=None):
+def build(traits=None, replaced=None, head_replaced=None):
     """Empties the scene and builds the polished base, then the parts of each trait that has an
-    entry. "replaced" gives numbers put in place of those of the hat, to try some. Returns the root,
-    the four parts, the trait parts, the numbers of the body and of the head, and the trait values
-    left out."""
-    body_n, head_n = full.body_numbers(), head_numbers()
+    entry. "replaced" gives numbers put in place of those of the hat, "head_replaced" of the head, to
+    try some. Returns the root, the four parts, the trait parts, the numbers of the body and of the
+    head, and the trait values left out."""
+    body_n, head_n = full.body_numbers(), head_numbers(head_replaced)
     bpy.ops.wm.read_factory_settings(use_empty=True)
     materials = full.make_materials()
 
@@ -2220,6 +2300,15 @@ def report(label, parts, trait_parts, body_n, head_n):
     return counts
 
 
+def numbers_given(items):
+    """The numbers of NAME=VALUE words (--set, --head-set)."""
+    given = {}
+    for item in items:
+        name, value = item.split("=", 1)
+        given[name] = ast.literal_eval(value)
+    return given
+
+
 def main():
     parser = argparse.ArgumentParser(description="Builds a Chog dressed with the traits of one Genesis.")
     parser.add_argument("--genesis", default=None, help="the number shown in the name of the Genesis (CHOG #n)")
@@ -2232,6 +2321,8 @@ def main():
                                                     f"{sorted(HATS)}")
     parser.add_argument("--set", action="append", default=[], metavar="NAME=VALUE", help="a number of the hat put "
                         "in place of its own, for instance BRIM_LENGTH=0.06 (may be given several times)")
+    parser.add_argument("--head-set", action="append", default=[], metavar="NAME=VALUE", help="a number of the head "
+                        "put in place of its own, for instance LEAF_LENGTH=0.85 (may be given several times)")
     parser.add_argument("--out", default=None, help="folder for ChogBody.fbx and ChogBody.blend (default: "
                                                     ".artifacts/chog-body/traits/<number>, or traits/base)")
     arguments = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
@@ -2243,26 +2334,31 @@ def main():
         return
     if bool(arguments.genesis) == arguments.base:
         raise SystemExit("CHOG_TRAITS give either --genesis NUMBER or --base")
+    make_one(None if arguments.base else arguments.genesis, arguments.out, arguments.hat,
+             numbers_given(arguments.set), numbers_given(arguments.head_set))
 
-    replaced = {}
-    for item in arguments.set:
-        name, value = item.split("=", 1)
-        replaced[name] = ast.literal_eval(value)
-    if arguments.base:
+
+def make_one(number, out=None, hat=None, replaced=None, head_replaced=None):
+    """Builds one dressed Genesis (or the base when "number" is None) and writes ChogBody.blend,
+    ChogBody.fbx and parts.json into "out" (default: .artifacts/chog-body/traits/<number>). Returns
+    the folder. make_chog_traits_many.py calls it for many Genesis in one run of Blender."""
+    replaced, head_replaced = replaced or {}, head_replaced or {}
+    if number is None:
         label, traits = "base", None
     else:
-        label, traits = arguments.genesis, traits_of(arguments.genesis)
+        label, traits = str(number), traits_of(number)
         print(f"CHOG_TRAITS CHOG #{label}: " + ", ".join(f"{key}={value}" for key, value in traits.items()))
-        if arguments.hat:
-            if arguments.hat not in HATS:
-                raise SystemExit(f"CHOG_TRAITS no hat named {arguments.hat!r} in HATS")
-            traits["Head"] = arguments.hat
-            label = f"{label}_{arguments.hat.replace(' ', '')}"
-    if replaced and not arguments.out:
-        raise SystemExit("CHOG_TRAITS with --set, give --out: a try does not replace the model of the Genesis")
-    folder = os.path.abspath(arguments.out or os.path.join(TRAITS_FOLDER, label))
+        if hat:
+            if hat not in HATS:
+                raise SystemExit(f"CHOG_TRAITS no hat named {hat!r} in HATS")
+            traits["Head"] = hat
+            label = f"{label}_{hat.replace(' ', '')}"
+    if (replaced or head_replaced) and not out:
+        raise SystemExit("CHOG_TRAITS with --set or --head-set, give --out: a try does not replace the model of "
+                         "the Genesis")
+    folder = os.path.abspath(out or os.path.join(TRAITS_FOLDER, label))
 
-    root, parts, trait_parts, body_n, head_n, left_out = build(traits, replaced)
+    root, parts, trait_parts, body_n, head_n, left_out = build(traits, replaced, head_replaced)
     counts = report(label, parts, trait_parts, body_n, head_n)
     distinct = sorted({slot.material.name for part in parts + trait_parts for slot in part.material_slots})
     print(f"CHOG_TRAITS {label} {len(parts) + len(trait_parts)} mesh objects (and the root, an empty), "
@@ -2275,7 +2371,7 @@ def main():
         skin = SKINS.get(traits.get("Skin"))
         if skin is None:
             raise SystemExit(f"CHOG_TRAITS no colour recorded for Skin={traits.get('Skin')}")
-        root["chog_genesis"] = str(arguments.genesis)
+        root["chog_genesis"] = str(number)
         root["chog_skin"] = list(skin["skin"])
         root["chog_face"] = list(skin.get("face", GENESIS_FACE))
         root["chog_blush"] = list(GENESIS_BLUSH)
@@ -2295,6 +2391,10 @@ def main():
         "label": label,
         "traits": traits or {},
         "replaced": replaced,
+        "head_replaced": head_replaced,
+        # What the pictures of its value of "Head" show, on its Side, and which were looked at
+        # (HEAD_VALUES of chog_trait_hats.py, batch 4); empty when the value has no line there.
+        "head_from_the_art": head_from_the_art(traits),
         "parts": {part.name: {"trait": part["trait"], "on": part.parent.name,
                               "triangles": counts["parts"][part.name],
                               "missing": part.get("missing", ""),
@@ -2317,6 +2417,7 @@ def main():
     with open(os.path.join(folder, "parts.json"), "w", encoding="utf-8") as target:
         json.dump(built, target, indent=1)
     print(f"CHOG_TRAITS saved {os.path.join(folder, 'parts.json')}")
+    return folder
 
 
 if __name__ == "__main__":

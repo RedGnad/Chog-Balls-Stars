@@ -292,6 +292,28 @@ judged and paid on the testnet; then the user stakes from MetaMask.
 **Waiting on the user:** their eye on the batch 4 sheets; the testnet deployment (unchanged);
 the phone try of OPEN IN METAMASK.
 
+**15 October 2026, 15:05.** 3D batch 4 is drawn, as pictures only: every Head value decided
+from its own pictures (`HEAD_VALUES` in `tools/blender/chog_trait_hats.py`, 53 lines of value
+and Side; what each picture shows in `tools/blender/head-values-from-the-art.md`); on Side=Left
+no cap, beanie or Russian Hat shows a spike; on Side=Right caps keep a few short points on the
+far side, no longer bent like wings; spikes 30% shorter; Bob Hair is yellow curls under a red
+band; the Spartan helmet has a brow, a nose guard, cheek guards and a taller plume; the Crown
+has a floor seen from above; "10K" reads 10K. Recounted by me: on the base Origin hat, eyes
+and mouth 1,869 of 1,869, clothing too 1,789; largest dressed hero 7,924 triangles (#470),
+median 6,569, none over 8,000. Looked at on every sheet
+([before and after](../research/evidence/chog-traits-batch4-before-after-2026-10-15.jpg),
+per value [1](../research/evidence/chog-traits-batch4-per-value-1-2026-10-15.jpg),
+[2](../research/evidence/chog-traits-batch4-per-value-2-2026-10-15.jpg),
+[3](../research/evidence/chog-traits-batch4-per-value-3-2026-10-15.jpg),
+[4](../research/evidence/chog-traits-batch4-per-value-4-2026-10-15.jpg)). Still wrong: the
+points of Side=Left heads are in the skin colour where the art draws them cream (Plumber, Clown
+Nose of Side=Left), under caps 1 or 2 points where the art shows 2 to 4, the Spartan's cheek
+guards narrower than drawn and its eyes not cut, the Bob Hair band less frilled than drawn,
+the Durag keeps seven points of hair the art does not show (asked in batch 3), no glass on the
+astronaut helmet; 17 rare Head values (37 Genesis, all on Skull and Radioactive heads) not
+modelled. Details: [tools/blender/README.md](../tools/blender/README.md), "Batch 4".
+**Next action (dev):** the sheets to the user; on their yes, the import into Unity.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a

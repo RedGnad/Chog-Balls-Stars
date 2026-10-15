@@ -9,15 +9,16 @@ Plain Python, no Blender needed to start it. Run it with the private environment
     .artifacts/tools-venv/bin/python tools/blender/make_chog_traits_batch.py \
         --run make_chog_traits.py -- --budget
 
-For each Genesis it runs make_chog_traits.py (the model, into <out>/<number>/) then
-render_chog_traits.py (by default the bust and the game angle coming towards the camera, with its
-phone-size copy). The two run one after the other and never beside another heavy job: before each
-start it waits until no Blender process is left on the machine and until the lock file
-.artifacts/heavy-job.lock no longer says "busy" (another heavy job, a Unity build for instance, writes
-it). Blender is started lowered ("nice -n 10") and with 4 threads ("-t 4"): this Mac has 8 GB of
-memory and Unity stays open beside it.
+It starts ONE Blender for many Genesis (make_chog_traits_many.py, up to --per-run of them, 40 by
+default; until batch 4 it started Blender twice per Genesis, and the owner saw it open and close in a
+loop): for each Genesis the model (make_chog_traits.py, into <out>/<number>/) then its pictures
+(render_chog_traits.py: by default the bust and the game angle coming towards the camera, with its
+phone-size copy). A run never starts beside another heavy job: before it, the script waits until no
+Blender process is left on the machine and until the lock file .artifacts/heavy-job.lock no longer
+says "busy" (another heavy job, a Unity build for instance, writes it). Blender is started lowered
+("nice -n 10") and with 4 threads ("-t 4"): this Mac has 8 GB of memory and Unity stays open beside it.
 
-It prints one line per Genesis (triangles, parts, values left out) and stops at the first failure.
+It prints one line per Genesis (triangles, parts, values left out), and every Genesis that failed.
 """
 
 import argparse
@@ -70,17 +71,23 @@ def wait_until_free():
         waited += 5.0
 
 
-def blender(script, *arguments):
-    """Runs one Blender script without its window, once nothing heavy runs. Returns its output."""
+def blender(script, *arguments, stop_on_failure=True):
+    """Runs one Blender script without its window, once nothing heavy runs. Returns its output and
+    whether it went through."""
     wait_until_free()
     words = ["nice", "-n", NICENESS, BLENDER, "--background", "--factory-startup", "-t", THREADS,
              "--python", os.path.join(HERE, script), "--", *arguments]
     done = subprocess.run(words, capture_output=True, text=True)
     output = done.stdout + done.stderr
-    if done.returncode != 0 or "Traceback" in output or "FAILED" in output:
-        print(output[-4000:])
-        raise SystemExit(f"CHOG_BATCH stopped: {' '.join(words)}")
-    return output
+    through = not (done.returncode != 0 or "Traceback" in output or "FAILED" in output)
+    if not through:
+        for line in output.splitlines():
+            if "FAILED" in line or "Traceback" in line or "Error" in line:
+                print(line[:2000])
+        if stop_on_failure:
+            print(output[-4000:])
+            raise SystemExit(f"CHOG_BATCH stopped: {' '.join(words)}")
+    return output, through
 
 
 def main():
@@ -89,35 +96,49 @@ def main():
     parser.add_argument("--genesis", help="numbers shown in the names (CHOG #n), separated by commas")
     parser.add_argument("--only", default="bust,towards", help="the families of pictures of render_chog_traits.py")
     parser.add_argument("--skip-done", action="store_true", help="leave out a Genesis whose pictures are all there")
+    parser.add_argument("--per-run", type=int, default=40, help="how many Genesis one Blender builds and renders")
+    parser.add_argument("--no-render", action="store_true", help="build only (to check the leaves and triangles)")
     parser.add_argument("--run", default=None, help="in place of a batch: one script of this folder, the words "
                         "after -- given to it, its output printed")
     words = sys.argv[1:]
     passed = words[words.index("--") + 1:] if "--" in words else []
     arguments = parser.parse_args(words[:words.index("--")] if "--" in words else words)
     if arguments.run:
-        print(blender(arguments.run, *passed))
+        print(blender(arguments.run, *passed)[0])
         return
     if not arguments.out or not arguments.genesis:
         raise SystemExit("CHOG_BATCH give --out and --genesis, or --run SCRIPT -- WORDS")
     out = os.path.abspath(arguments.out)
     numbers = [number.strip() for number in arguments.genesis.split(",") if number.strip()]
+    if arguments.skip_done:
+        def done(number):
+            folder = os.path.join(out, number)
+            return all(os.path.isfile(os.path.join(folder, f"chog_{number}_{name}.png"))
+                       for name in ("bust", "game_front_phone"))
+        print(f"CHOG_BATCH already done: {', '.join(number for number in numbers if done(number)) or 'none'}")
+        numbers = [number for number in numbers if not done(number)]
     started = time.monotonic()
-    for index, number in enumerate(numbers):
-        folder = os.path.join(out, number)
-        wanted = [os.path.join(folder, f"chog_{number}_{name}.png") for name in ("bust", "game_front_phone")]
-        if arguments.skip_done and all(os.path.isfile(path) for path in wanted):
-            print(f"CHOG_BATCH {index + 1}/{len(numbers)} #{number}: already done", flush=True)
-            continue
-        blender("make_chog_traits.py", "--genesis", number, "--out", folder)
-        blender("render_chog_traits.py", "--name", number, "--blend", os.path.join(folder, "ChogBody.blend"),
-                "--out", folder, "--only", arguments.only)
-        with open(os.path.join(folder, "parts.json"), encoding="utf-8") as source:
-            built = json.load(source)
-        parts = ", ".join(name for name, part in built["parts"].items() if not part["on"].startswith("arm"))
-        left_out = f"  NOT MODELLED: {', '.join(built['left_out'])}" if built["left_out"] else ""
-        print(f"CHOG_BATCH {index + 1}/{len(numbers)} #{number}: {built['triangles_total']} triangles, {parts}{left_out}",
-              flush=True)
+    failed = False
+    for start in range(0, len(numbers), max(1, arguments.per_run)):
+        chunk = numbers[start:start + max(1, arguments.per_run)]
+        print(f"CHOG_BATCH one Blender for {len(chunk)} Genesis: {', '.join(chunk)}", flush=True)
+        extra = ["--no-render"] if arguments.no_render else []
+        output, through = blender("make_chog_traits_many.py", "--genesis", ",".join(chunk), "--into", out,
+                                  "--only", arguments.only, *extra, *passed, stop_on_failure=False)
+        failed = failed or not through
+        for number in chunk:
+            path = os.path.join(out, number, "parts.json")
+            if f"#{number} FAILED" in output or not os.path.isfile(path):
+                print(f"CHOG_BATCH #{number}: FAILED (see above)", flush=True)
+                continue
+            with open(path, encoding="utf-8") as source:
+                built = json.load(source)
+            parts = ", ".join(name for name, part in built["parts"].items() if not part["on"].startswith("arm"))
+            left_out = f"  NOT MODELLED: {', '.join(built['left_out'])}" if built["left_out"] else ""
+            print(f"CHOG_BATCH #{number}: {built['triangles_total']} triangles, {parts}{left_out}", flush=True)
     print(f"CHOG_BATCH done: {len(numbers)} Genesis in {time.monotonic() - started:.0f} s, into {out}")
+    if failed:
+        raise SystemExit("CHOG_BATCH some Genesis failed: see the FAILED lines")
 
 
 if __name__ == "__main__":

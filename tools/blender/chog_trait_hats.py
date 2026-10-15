@@ -76,11 +76,17 @@ def bind(kit):
 #
 # "FRINGE": False in the numbers of a hat removes the teeth of hair the base draws on the brow, where
 # the pictures show none under that hat (hair, a helmet).
+#
+# Batch 4 (15 October 2026): an item may also say how wide and thick the leaf is against the leaf of
+# SPIKES ("width", fifth). The spikes the pictures draw beside a hat are small points, about as wide as
+# they are long: a leaf as wide as on the bare head does not fit under a rim without being turned down
+# (the wings of batch 3). And the leaves a Genesis keeps are decided per value of "Head", from its
+# pictures (HEAD_VALUES below), no longer per hat shape: the "LEAVES" of a shape is only the default.
 # ---------------------------------------------------------------------------------------------
 
-def leaf(share=1.0, turn=None, back=None, bend=0.0):
+def leaf(share=1.0, turn=None, back=None, bend=0.0, width=1.0):
     """What becomes of one line of SPIKES under a hat: see above."""
-    return (share, turn, back, bend)
+    return (share, turn, back, bend, width)
 
 
 WHOLE, GONE = leaf(), leaf(0.0)
@@ -336,9 +342,10 @@ def build_headband(maker):
 
 # ---------------------------------------------------------------------------------------------
 # Curly wig (Bob Hair, Rainbow Wig): curls over the top, the sides and the back of the head,
-# leaving the face open. Its colour is laid by place: "Top" over "Curl" (Bob Hair: a red top over
-# yellow curls), or the colours of "sweep" in an arch from the right of the character over the top
-# to its left (Rainbow Wig).
+# leaving the face open. Its colour is laid by place: "Top" over "Curl" (Bob Hair in batch 3: a red
+# top over yellow curls, which the pictures do not draw), or the colours of "sweep" in an arch from the
+# right of the character over the top to its left (Rainbow Wig). Bob Hair is now yellow curls and a red
+# band tied around them ("BAND", batch 4).
 # ---------------------------------------------------------------------------------------------
 CURLY_WIG = {
     "SIDES": 16,
@@ -369,6 +376,11 @@ CURLY_WIG = {
     # How far a curl is sunk into the mass, against its radius.
     "CURL_SUNK": 0.35,
     "TOP_POLAR": 40.0,           # with "Top": what is nearer the top than this takes it
+    # A band tied around the hair (Bob Hair, batch 4), when the colours give "Band": polar degrees of
+    # its lower and upper edge by degrees from the front; how far it stands off the hair (or the head
+    # where there is no hair); how many waves its two edges make around the head and how deep they are
+    # (degrees); the share of it, from its lower edge, in the colour "Line"; points around the head.
+    "BAND": None,
     "OUTLINE_THICKNESS": 0.020,
     # Hair, not a hat: it replaces the crown of leaves (the owner, 15 October 2026). (Several pictures of
     # Bob Hair still draw the tip of one spike above the hair, at the far side; it is left out.)
@@ -376,6 +388,45 @@ CURLY_WIG = {
     # The curls of the hairline take the place of the teeth of hair the base draws on the brow.
     "FRINGE": False,
 }
+
+
+def add_hair_band(part, surface, numbers, mass_size, rims, lined):
+    """The band tied around the hair (BAND of CURLY_WIG): a closed strip whose two edges wave, lying on
+    the hair where there is hair and on the brow where the hair stops, a darker line along its lower
+    edge."""
+    lower, upper, lift, waves, depth, line, sides = numbers.BAND
+    hair_sides = numbers.SIDES
+
+    def hair_edge(angle):
+        """The polar angle of the edge of the hair at this angle seen from above (the rims of the mass
+        are given at its own points: straight lines between them)."""
+        place = (angle % (2.0 * math.pi)) / (2.0 * math.pi) * hair_sides
+        first = int(place) % hair_sides
+        return rims[first] + (rims[(first + 1) % hair_sides] - rims[first]) * (place - int(place))
+
+    def size_at(angle, polar):
+        """How far from the middle the band lies: on the hair down to its edge, then down onto the head
+        over 8 degrees. (First: half way down at the edge itself; the rim of the hair, as large as the
+        hair, came through the band as yellow streaks.)"""
+        amount = max(0.0, min(1.0, (hair_edge(angle) + math.radians(8.0) - polar) / math.radians(8.0)))
+        return 1.0 + (mass_size(angle) - 1.0) * amount + lift
+
+    rows = [[], [], [], [], []]
+    for index in range(sides):
+        angle = 2.0 * math.pi * index / sides
+        front = from_front(angle)
+        wave = 0.5 + 0.5 * math.cos(waves * angle)
+        low = math.radians(interpolate(lower, front) + depth * wave)
+        high = math.radians(interpolate(upper, front) - depth * (1.0 - wave))
+        middle = low + (high - low) * line
+        for row, (polar, extra) in enumerate(((low, -lift - 0.04), (low, 0.0), (middle, 0.012), (high, 0.0),
+                                              (high, -lift - 0.04))):
+            rows[row].append(on_head(surface, angle, polar, size_at(angle, polar) + extra))
+    none, whole = (0.0,) * sides, (1.0,) * sides
+    bands, _ = KIT.add_loops(part, rows, part.named("Band"), numbers.OUTLINE_THICKNESS,
+                             shares=[none, whole, whole, whole, none])
+    if lined:
+        part.paint(bands[0] + bands[1], part.named("Line"))
 
 
 def build_curly_wig(maker):
@@ -415,9 +466,13 @@ def build_curly_wig(maker):
 
     paint_where(part, [face for band in bands for face in band], colour_at)
 
+    if numbers.BAND:
+        add_hair_band(part, surface, numbers, mass_size, rims, "Line" in colours)
+
     # The curls, on the mass.
-    hairline_polar, hairline_radius, hairline_places = numbers.HAIRLINE
-    rows_of_curls = list(numbers.CURL_ROWS) + [(hairline_polar, hairline_radius, hairline_places)]
+    rows_of_curls = list(numbers.CURL_ROWS)
+    if numbers.HAIRLINE:
+        rows_of_curls.append(numbers.HAIRLINE)
     for polar_deg, radius, places in rows_of_curls:
         for degrees in places:
             for side in ((1.0,) if degrees in (0.0, 180.0) else (1.0, -1.0)):
@@ -438,7 +493,9 @@ DURAG = {
     "SIDES": 18,
     # (Until 15 October 2026 the sides came down to 100 degrees, 110 at the back: every leaf of the
     # crown went through the cloth. The pictures draw the spikes of the far side from the cloth down.)
-    "RIM": ((0.0, 66.0), (50.0, 72.0), (95.0, 82.0), (140.0, 98.0), (180.0, 106.0)),
+    # (Batch 4: lower at the back, 98 and 106 degrees until then, so that the pair of the back row comes
+    # out under it beside the tails, as the pictures draw three spikes down the far side.)
+    "RIM": ((0.0, 66.0), (50.0, 72.0), (95.0, 82.0), (135.0, 86.0), (160.0, 94.0), (180.0, 100.0)),
     # (1.06 and 1.085 until 15 October 2026: the teeth of hair the base draws on the brow came through
     # the cloth as small triangles of skin.)
     "SIZE": 1.10,
@@ -446,7 +503,7 @@ DURAG = {
     "ROWS": 2,
     # A tail: degrees from the back to each side, polar degrees where it starts, length, half
     # width, half thickness, how far it leans back.
-    "TAIL": (13.0, 104.0, 0.20, 0.034, 0.010, 0.55),
+    "TAIL": (13.0, 98.0, 0.20, 0.034, 0.010, 0.55),   # (104 degrees until batch 4, with the lower rim)
     "OUTLINE_THICKNESS": 0.018,
     # Points of hair in the skin colour along the front, coming out under the cloth onto the brow (asked
     # by the owner on 15 October 2026): how many, degrees from the front to the outermost, polar degrees
@@ -554,41 +611,47 @@ def build_wizard_hat(maker):
 
 
 # ---------------------------------------------------------------------------------------------
-# Spartan helmet: a gold shell over the head, open in front of the eyes, the nose and the mouth,
-# with cheek guards down the sides of the face, a nose guard between the eyes and a red crest from
-# the brow over the top to the back.
+# Spartan helmet (rebuilt in batch 4, 15 October 2026). The pictures of all 40 Genesis that wear it
+# (#21, #331, #1903 and the others looked at) draw a full helmet: it covers the head and comes down to
+# the jaw on both sides of the face (the cheek guards), a nose guard comes down the middle between the
+# eyes, the eyes look out of two openings under its brow, the mouth and the chin show between the
+# guards, a light trim runs along every edge, a tall red plume runs from the brow over the top to the
+# back, and the spikes of the head come out behind it, on the far side, from the top to the cheek.
+# (Batch 3 was a cap whose edge stood far above the eyes, with a slit and a thin crest: "badly made",
+# said the owner.)
 # ---------------------------------------------------------------------------------------------
 SPARTAN = {
-    "SIDES": 24,
-    # Polar degrees of the edge by degrees from the front: over the brow just above the eyes, then
-    # down beside the eyes over the cheeks (the guards), and up again behind the ears, where the
-    # pictures show the spikes of the back of the head coming out behind the helmet.
-    # (Until 15 October 2026 the back came down to 106 degrees and every leaf went through the shell.)
-    "RIM": ((0.0, 60.0), (28.0, 61.0), (40.0, 114.0), (95.0, 120.0), (120.0, 92.0), (150.0, 72.0),
-            (180.0, 68.0)),
-    # It stands clear of everything drawn on the face (up to 0.040 off the head).
-    # (First: 1.075, a rim over the eyes at 66 degrees and guards from 38 degrees. The shell then ran
-    # through the cream face and the eyes: the bust showed gold patches over the face.)
-    "SIZE": 1.17,
-    "ROWS": 3,
-    # The trim along the opening, in its own colour: how far up from the rim, against the first row.
-    "TRIM": 0.30,
-    # The nose guard: polar degrees where it starts and ends, half width, half thickness.
-    # (First: down to 92 degrees, over the nose.)
-    "NOSE_GUARD": (58.0, 84.0, 0.022, 0.012),
-    # The crest: along the middle of the head, (degrees from straight up, towards the back when
-    # positive; height above the shell; half width). A brush of horsehair from the brow over the top,
-    # as wide on the pictures as a quarter of the helmet. It stops at the top of the back, where the
-    # leaf straight back comes out under the rim.
-    # (First: 0.145 at most and 0.034 wide, hidden in the leaves. Then up to 0.270 tall and 0.042 wide:
-    # from the camera of the game a thin red stick, said the owner on 15 October 2026.)
-    "CREST": ((-46.0, 0.050, 0.046), (-30.0, 0.170, 0.066), (-8.0, 0.265, 0.078), (18.0, 0.300, 0.082),
-              (38.0, 0.270, 0.080), (54.0, 0.190, 0.070), (64.0, 0.090, 0.056), (70.0, 0.030, 0.044)),
+    # Where the shell has its points around the head, seen from above: degrees from the front, the same
+    # on both sides; finer at the front, where the openings are. The lower edge of the shell at each:
+    # polar degrees (0 is the top of the head). Over the eyes it lies just above them (their top is at
+    # about 85 degrees); between them it comes down as the nose guard to the middle of the eyes; beside
+    # them it drops to the jaw (the cheek guards, from the outer corner of the eyes, 35 degrees, to the
+    # ears); behind the ears it rises again, so the back of the head is open, where the leaves come out
+    # and stand beside the helmet on the busts. (The cheek guards first went on to 118 degrees: the
+    # leaves then hid behind them.)
+    "EDGE": ((0.0, 103.0), (5.0, 102.0), (9.0, 96.0), (13.0, 80.0), (20.0, 78.0), (27.0, 79.0), (32.0, 84.0),
+             (35.0, 126.0), (40.0, 142.0), (58.0, 148.0), (80.0, 146.0), (92.0, 138.0), (102.0, 112.0),
+             (112.0, 84.0), (124.0, 68.0), (140.0, 62.0), (160.0, 58.0), (180.0, 56.0)),
+    # It stands clear of everything drawn on the face (up to 0.040 off the head): a thick, round helmet.
+    "SIZE": 1.16,
+    # The trim along every edge: a band this many degrees wide above the edge, in its own colour.
+    "TRIM_DEG": 6.0,
+    # The rows of the shell above the trim, up to the top: the share of the polar angle of the edge.
+    "ROWS": (0.78, 0.55, 0.32, 0.12),
+    # The crest: along the middle of the head, (degrees from straight up, towards the back when positive;
+    # height above the shell; half width). Wider and taller than in batch 3, and it ends where the back
+    # of the helmet ends.
+    "CREST": ((-50.0, 0.060, 0.052), (-36.0, 0.190, 0.074), (-14.0, 0.290, 0.088), (12.0, 0.330, 0.092),
+              (28.0, 0.290, 0.088), (40.0, 0.190, 0.078), (48.0, 0.080, 0.060), (53.0, 0.020, 0.046)),
     "CREST_SIDES": 8,
     "OUTLINE_THICKNESS": 0.020,
-    # The helmet covers the top, the brow and the cheeks: the spikes the pictures show come out behind
-    # it, from the back of the head. The back row stays, brought under the rim at the back.
-    "LEAVES": (GONE, GONE, GONE, GONE, GONE, leaf(1.35, 126.0, 55.0, 0.40), leaf(1.35, None, 96.0, 0.40)),
+    # The back of the head is open: the pair of the back row and the leaf straight back stand there,
+    # the lowest pair of the star (which would go through a cheek guard) is turned back beside them.
+    # Short and narrow, as the points drawn behind the helmet.
+    # (They are longer than on a bare head: the helmet stands 0.05 off the head, and the pictures draw them
+    # large beside it.)
+    "LEAVES": (GONE, GONE, GONE, leaf(1.60, 118.0, 26.0, 0.0, 0.58), GONE, leaf(1.60, 94.0, 40.0, 0.0, 0.55),
+               leaf(1.30, None, 100.0, 0.0, 0.62)),
     # The pictures show no teeth of hair on the brow inside the helmet.
     "FRINGE": False,
 }
@@ -598,35 +661,25 @@ def build_spartan(maker):
     numbers = maker.numbers(SPARTAN)
     part, surface = maker.part(), maker.surface
     outline = numbers.OUTLINE_THICKNESS
-    sides = numbers.SIDES
-    angles = [2.0 * math.pi * index / sides for index in range(sides)]
-    rims = [math.radians(interpolate(numbers.RIM, from_front(angle))) for angle in angles]
-    # The shell: tucked inside the head under the rim, the rim, a row just above it (the trim), then
-    # rows up to the top.
+    # The points around the head: the degrees of EDGE on both sides (0 to 180, then on round to 360), as
+    # angles seen from above.
+    degrees = [value for value, _ in numbers.EDGE] + [360.0 - value for value, _ in reversed(numbers.EDGE[1:-1])]
+    edge = {value: polar for value, polar in numbers.EDGE}
+    angles = [math.radians(270.0 + value) for value in degrees]
+    rims = [math.radians(edge[value if value <= 180.0 else 360.0 - value]) for value in degrees]
+    count = len(angles)
+    # The shell: tucked inside the head under the edge, the edge, the line of trim, the rows, the top.
     loops = [[on_head(surface, angle, polar, 0.92) for angle, polar in zip(angles, rims)],
-             [on_head(surface, angle, polar, numbers.SIZE) for angle, polar in zip(angles, rims)]]
-    trim_row = [on_head(surface, angle, polar * (1.0 - numbers.TRIM / numbers.ROWS), numbers.SIZE)
-                for angle, polar in zip(angles, rims)]
-    loops.append(trim_row)
-    for row in range(1, numbers.ROWS):
-        share = row / numbers.ROWS
-        loops.append([on_head(surface, angle, polar * (1.0 - share), numbers.SIZE) for angle, polar in zip(angles, rims)])
+             [on_head(surface, angle, polar, numbers.SIZE) for angle, polar in zip(angles, rims)],
+             [on_head(surface, angle, polar - math.radians(numbers.TRIM_DEG), numbers.SIZE)
+              for angle, polar in zip(angles, rims)]]
+    for share in numbers.ROWS:
+        loops.append([on_head(surface, angle, polar * share, numbers.SIZE) for angle, polar in zip(angles, rims)])
     loops.append([on_head(surface, 0.0, 0.0, numbers.SIZE)])
-    shares = [(0.0,) * sides] + [(1.0,) * sides] * (len(loops) - 2) + [(1.0,)]
+    shares = [(0.0,) * count] + [(1.0,) * count] * (len(loops) - 2) + [(1.0,)]
     bands, _ = KIT.add_loops(part, loops, part.named("Gold"), outline, shares=shares)
     if "Trim" in maker.entry["colours"]:
         part.paint(bands[1], part.named("Trim"))
-
-    start, end, half_wide, half_thick = numbers.NOSE_GUARD
-    front = math.radians(270.0)
-    path, wide, thick = [], [], []
-    for index, polar_deg in enumerate((start, (start + end) * 0.5, end)):
-        polar = math.radians(polar_deg)
-        out = head_normal(surface, front, polar)
-        path.append(on_head(surface, front, polar, numbers.SIZE) - out * (0.01 if index == 0 else 0.0))
-        wide.append(X * half_wide * (1.0 if index < 2 else 0.8))
-        thick.append(out * half_thick)
-    slab(part, path, wide, thick, part.named("Gold"), outline * 0.7, sides=4)
 
     # The crest: rings across the middle of the head, each from inside the shell to its height.
     path, wide, thick = [], [], []
@@ -1091,7 +1144,9 @@ HATS = {
                      "bars": True},
     # "10K" in white on a purple band, "TPS" in purple, a purple frame around both (15 October 2026).
     # The box stands a little higher than a word alone: its foot would hide behind the raised brim.
+    # Its 0 carries a short upright bar, as drawn ("zero_bar", batch 4: the round 0 read "1OK").
     "10k TPS Cap": {**cap((0.93, 0.92, 0.92), (0.40, 0.40, 0.40), ("10K", "TPS"), (0.42, 0.22, 0.80)), "box": True,
+                    "zero_bar": True,
                     "numbers": {"BRIM_LENGTH": 0.060, "BRIM_RISE_DEG": 35.0, "PRINT_BASELINE": 0.150},
                     "colours": {"Crown": (0.93, 0.92, 0.92), "Brim": (0.40, 0.40, 0.40), "Button": (0.93, 0.92, 0.92),
                                 "Print": (0.42, 0.22, 0.80), "Print2": (0.96, 0.95, 0.97)}},
@@ -1148,12 +1203,26 @@ HATS = {
         "shape": "Headband",
         "colours": {"Band": (0.96, 0.96, 0.96), "Line": (0.74, 0.74, 0.77), "Sun": (0.91, 0.19, 0.18)},
     },
-    # Yellow curls framing the face down to the chin, a red top over the crown.
+    # Yellow curls over the top and in big puffs beside the face, and a red band tied around the hair
+    # over the brow, both its edges waving (batch 4: batch 3 drew a red top over the curls; "it is hair
+    # with a headband", said the owner). The 45 Genesis that wear it, all looked at, draw the same yellow
+    # and the same red whatever their skin. The band is above the eyes, so a visor stays under it.
     "Bob Hair": {
         "shape": "CurlyWig",
-        "colours": {"Curl": (0.95, 0.76, 0.10), "Top": (0.93, 0.14, 0.11)},
-        "numbers": {"RIM": ((0.0, 54.0), (30.0, 64.0), (55.0, 112.0), (180.0, 116.0)),
-                    "SIZE": ((0.0, 1.16), (40.0, 1.42), (90.0, 1.58), (180.0, 1.52))},
+        "colours": {"Curl": (0.95, 0.74, 0.10), "Band": (0.92, 0.16, 0.12), "Line": (0.64, 0.07, 0.07)},
+        # (First try of batch 4: the band from 53 to 79 degrees over the brow, the hair stopping at 54
+        # under it. On the bust a thick red shelf hid the hair above it, where the pictures show a big
+        # yellow top over a narrow band.)
+        "numbers": {"RIM": ((0.0, 66.0), (30.0, 70.0), (55.0, 112.0), (180.0, 116.0)),
+                    "SIZE": ((0.0, 1.18), (40.0, 1.36), (90.0, 1.48), (180.0, 1.44)),
+                    # Curls above the band (on top, two over the brow) and below it (the puffs beside the
+                    # face and behind); none where the band lies, which would hide it.
+                    "CURL_ROWS": ((22.0, 0.115, (40.0, 104.0, 160.0)), (44.0, 0.100, (18.0,)),
+                                  (104.0, 0.120, (62.0, 96.0, 132.0, 180.0))),
+                    "HAIRLINE": None,
+                    "BAND": (((0.0, 81.0), (40.0, 81.0), (90.0, 84.0), (180.0, 86.0)),
+                             ((0.0, 64.0), (40.0, 65.0), (90.0, 67.0), (180.0, 69.0)),
+                             0.10, 9, 3.0, 0.24, 36)},
     },
     # A big afro in six colours, from the right of the character over the top to its left.
     "Rainbow Wig": {
@@ -1171,9 +1240,11 @@ HATS = {
         "shape": "WizardHat",
         "colours": {"Cloth": (0.08, 0.14, 0.47), "Star": (0.95, 0.68, 0.07)},
     },
+    # (Batch 4: the trim is the light yellow line the pictures draw along every edge; it was a darker
+    # brown, which did not show.)
     "Spartan Helmet": {
         "shape": "SpartanHelmet",
-        "colours": {"Gold": (0.89, 0.64, 0.32), "Trim": (0.80, 0.47, 0.20), "Crest": (0.95, 0.06, 0.06)},
+        "colours": {"Gold": (0.89, 0.62, 0.30), "Trim": (0.98, 0.82, 0.42), "Crest": (0.95, 0.06, 0.06)},
     },
     # Values of "Head" that are not hats (15 October 2026), colours read on their layers.
     "Clown Nose": {
@@ -1206,8 +1277,194 @@ HATS_OF_SIDE = {
     "Right": {
         # On the three Skull Genesis of Side=Right the brim is orange, not brown.
         "BTC Cap": cap((0.92, 0.53, 0.10), (0.85, 0.45, 0.10), ink=INK_WHITE, logo="bitcoin"),
+        # The one Genesis of Side=Right (#1324, Skull) wears the white CHOG cap with a pink brim of
+        # "Choggie Cap", not the purple MAKE CHOG GREAT AGAIN cap of Side=Left (batch 4).
+        "Chog Cap": cap((0.92, 0.90, 0.84), (0.83, 0.25, 0.49), "CHOG", (0.42, 0.22, 0.74), INK_DARK),
     },
 }
+
+
+# ---------------------------------------------------------------------------------------------
+# Batch 4 (15 October 2026): what the pictures of each value of "Head" show, value by value and Side
+# by Side, and so which leaves of the crown it keeps and how they stand. The owner, after batch 3: "you
+# did not do it case by case: some beanies do not let the spikes through at the back". Every value
+# below was looked at on the 256-point pictures of five Genesis per Side (all of them when fewer),
+# and on the 1000-point pictures of those; the CHOG numbers are in "looked_at". The full notes, with
+# what each line builds, are in tools/blender/head-values-from-the-art.md.
+#
+# What the pictures show, in short:
+# - Side=Left is framed on the face and its head is drawn all in the cream of the face, its spikes
+#   too (a row of cream points on top of a bare head, #15, #17). Under a cap or a beanie of Side=Left
+#   NO spike shows anywhere: not beside the hat, not behind it. So these keep no leaf.
+# - Side=Right draws the head in the skin colour behind the cream face: the spikes stand out on the
+#   far side of the head (the left of the picture). Under a cap or a bucket hat: two to four SHORT
+#   points stacked down the far side from under the rim to the cheek, pointing out sideways, about as
+#   wide as long; the uppermost often shows behind the crown of the hat. Never through the hat, never
+#   turned down like an ear, never above the hat.
+# - The skull and radioactive bases (Skull: BOOB Cap, ETH Cap, Peace Cap, 8 Ball Beanie, Jeet Cap, the
+#   Right BTC Cap and Chog Cap) draw no spike at all; those bases are not built (the head is Origin's).
+# ---------------------------------------------------------------------------------------------
+
+# The leaves under a cap or a bucket hat of Side=Right: the lowest pair of the star (sideways, a little
+# back and down), the pair of the back row turned to the sides and lowered, the leaf straight back,
+# narrow, none bent, about as long as the leaves of a bare head (LEAF_LENGTH of make_chog_traits.py
+# shortens them all). (Batch 3: 1.3 times as long, as wide as on the bare head, turned down by 116
+# degrees and bent up: wings seen from the front and the back.)
+# (First try of batch 4: only the lowest pair, the back pair and the leaf straight back, 0.62 wide. On the
+# busts one small point showed at the cheek, where the pictures stack two or three from the rim down: the
+# middle pair now comes out just under the rim, the lowest pair at the cheek, the back pair behind them.)
+# (The middle pair at 100 degrees touched the crown of some caps: 104, tried under each shape.)
+# (Second try: the lowest pair turned back by 26 degrees hid behind the cheek on the busts; it now points
+# out sideways, under the middle pair.)
+SIDE_POINTS = (GONE, GONE, leaf(1.10, 104.0, 4.0, 0.0, 0.50), leaf(1.15, 126.0, 10.0, 0.0, 0.52), GONE,
+               leaf(1.10, 112.0, 58.0, 0.0, 0.52), leaf(1.05, None, 106.0, 0.0, 0.56))
+# The same, larger, where the pictures draw them so (wizard hat).
+BIG_SIDE_POINTS = (GONE, GONE, leaf(1.25, 104.0, 4.0, 0.0, 0.54), leaf(1.30, 126.0, 10.0, 0.0, 0.58), GONE,
+                   leaf(1.25, 112.0, 58.0, 0.0, 0.58), leaf(1.15, None, 106.0, 0.0, 0.60))
+# Under the crown, whose band is higher than the rim of a cap.
+CROWN_POINTS = (GONE, GONE, leaf(1.15, 100.0, 4.0, 0.0, 0.50), leaf(1.20, 122.0, 10.0, 0.0, 0.55), GONE,
+                leaf(1.15, 106.0, 56.0, 0.0, 0.55), leaf(1.10, None, 100.0, 0.0, 0.60))
+# Beside the durag: the two tails at the back take the place of the leaf straight back.
+DURAG_POINTS = (GONE, GONE, leaf(1.25, 104.0, 4.0, 0.0, 0.54), leaf(1.25, 124.0, 10.0, 0.0, 0.60), GONE,
+                leaf(1.20, 124.0, 46.0, 0.0, 0.60), GONE)
+# Under the fur of the ushanka (Side=Right), which comes low at the back: two short points behind the
+# flaps, narrow as drawn, the first out to the side behind the flap. (At 1.30 long it stayed hidden behind
+# the flap on the busts, where the pictures show its tip.)
+USHANKA_POINTS = (GONE, GONE, GONE, GONE, GONE, leaf(1.70, 106.0, 28.0, 0.0, 0.52), leaf(1.10, None, 112.0, 0.0, 0.56))
+# Above and below a headband: the leaf on top and the upper pair (raised a little) stand above it, the
+# middle pair would grow out of the band, the rest stand under it as under a cap.
+BAND_POINTS = (WHOLE, leaf(1.0, 24.0), GONE, leaf(1.10, 112.0, 22.0, 0.0, 0.75), GONE,
+               leaf(1.10, 104.0, 62.0, 0.0, 0.75), leaf(1.10, None, 104.0, 0.0, 0.75))
+# Through the knitted mask, as drawn ("THROUGH"): the middle pair near the top, and those of a cap.
+ROBBER_POINTS = (GONE, GONE, leaf(1.0, 80.0, 30.0, 0.0, 0.66), leaf(1.10, 112.0, 24.0, 0.0, 0.70), GONE,
+                 leaf(1.10, 104.0, 62.0, 0.0, 0.70), leaf(1.10, None, 104.0, 0.0, 0.70))
+
+
+def seen(looked_at, art, leaves, **numbers):
+    """One line of HEAD_VALUES: the CHOG numbers whose pictures were looked at, what they show, the
+    leaves kept (see leaf()), and other numbers of the shape this value replaces."""
+    return {"looked_at": tuple(looked_at), "art": art, "numbers": {"LEAVES": leaves, **numbers}}
+
+
+# (value of "Head", Side): what its pictures show. The numbers given replace those of the entry of HATS
+# for that Side, so the leaves of a value no longer follow its shape: from_the_art() below.
+HEAD_VALUES = {
+    # Caps and bucket hats of Side=Right.
+    ("TISM Cap", "Right"): seen((3, 412, 991, 1467, 1946), "2 to 4 short spikes on the far side, from beside "
+                                "the crown down to the cheek, under the rim", SIDE_POINTS),
+    ("MMGA Cap", "Right"): seen((5, 211, 678, 1576, 1936), "2 or 3 short spikes on the far side under the "
+                                "rim, down to the cheek", SIDE_POINTS),
+    ("Horny Cap", "Right"): seen((97, 644, 1033, 1438, 1947), "2 or 3 short spikes stacked on the far side, "
+                                 "the first just under the brim", SIDE_POINTS),
+    ("Choggie Cap", "Right"): seen((123, 295, 667, 1329, 1922), "2 or 3 short spikes on the far side under "
+                                   "the brim", SIDE_POINTS),
+    ("Boob Cap", "Right"): seen((114, 633, 1021, 1569, 1939), "2 or 3 short spikes on the far side under the "
+                                "brim, down to the cheek", SIDE_POINTS),
+    ("Blue Bucket Cap", "Right"): seen((80, 574, 966, 1347, 1961), "2 or 3 short spikes on the far side under "
+                                       "the brim", SIDE_POINTS),
+    ("Orange Bucket Cap", "Right"): seen((107, 666, 1178, 1711, 1956), "2 or 3 short spikes on the far side "
+                                         "under the brim", SIDE_POINTS),
+    ("Gray Bucket Cap", "Right"): seen((62, 620, 1003, 1511, 1958), "2 or 3 short spikes on the far side under "
+                                       "the brim", SIDE_POINTS),
+    ("Balls Cap", "Right"): seen((19, 676, 1195, 1557, 1942), "3 short spikes stacked on the far side from "
+                                 "under the brim to the cheek", SIDE_POINTS),
+    ("Cloud Cap", "Right"): seen((35, 564, 896, 1321, 1872), "1 or 2 short spikes on the far side under the "
+                                 "brim (dark skins: hard to see)", SIDE_POINTS),
+    ("Dollar Cap", "Right"): seen((6, 329, 943, 1404, 1888), "2 or 3 short spikes on the far side under the "
+                                  "brim", SIDE_POINTS),
+    ("Thunder Cap", "Right"): seen((56, 525, 962, 1454, 1964), "2 or 3 short spikes on the far side under the "
+                                   "brim; the bolt is on the top front of the crown", SIDE_POINTS),
+    ("Star Cap", "Right"): seen((24, 520, 1140, 1542, 1965), "2 short spikes on the far side under the brim",
+                                SIDE_POINTS),
+    ("Peace hat", "Right"): seen((1, 550, 793, 1546, 1940), "2 or 3 short spikes on the far side under the brim",
+                                 SIDE_POINTS),
+    ("Red Peace Cap", "Right"): seen((60, 489, 843, 1478, 1762), "2 or 3 short spikes on the far side under the "
+                                     "brim", SIDE_POINTS),
+    ("Mon Cap", "Right"): seen((8, 461, 792, 1309, 1934), "a purple bucket hat; 1 or 2 short spikes on the far "
+                               "side under the brim", SIDE_POINTS),
+    # Caps of Side=Left: no spike at all.
+    ("Mon Cap", "Left"): seen((361, 864, 1065, 1423, 1761), "a white cap, purple brim; no spike anywhere",
+                              NO_CROWN),
+    ("BTC Cap", "Left"): seen((162, 492, 702, 1579, 1954), "no spike anywhere", NO_CROWN),
+    ("MCGA", "Left"): seen((103, 568, 1028, 1472, 1951), "no spike anywhere", NO_CROWN),
+    ("Chog Cap", "Left"): seen((142, 578, 1129, 1362, 1882), "the MAKE CHOG GREAT AGAIN cap of MCGA; no spike",
+                               NO_CROWN),
+    ("Buttcoin Cap", "Left"): seen((203, 516, 970, 1378, 1930), "no spike anywhere", NO_CROWN),
+    ("MEGA Chog", "Left"): seen((45, 426, 714, 1406, 1891), "no spike anywhere", NO_CROWN),
+    ("10k TPS Cap", "Left"): seen((26, 575, 980, 1538, 1823), "no spike anywhere", NO_CROWN),
+    ("JEET Cap", "Left"): seen((63, 563, 1029, 1555, 1963), "no spike anywhere", NO_CROWN),
+    ("RETARD Cap", "Left"): seen((46, 379, 929, 1505, 1871), "no spike anywhere", NO_CROWN),
+    ("WAGMI Cap", "Left"): seen((59, 485, 1025, 1528, 1929), "no spike anywhere", NO_CROWN),
+    ("NEET", "Left"): seen((7, 396, 562, 1022, 1949), "no spike anywhere", NO_CROWN),
+    ("MCGA Cap", "Left"): seen((36, 528, 677, 1149, 1900), "no spike anywhere", NO_CROWN),
+    # Beanies of Side=Left: the beanie covers the head to the brow, no spike shows, behind it either.
+    ("Wizard Beanie", "Left"): seen((70, 565, 969, 1314, 1948), "no spike anywhere", NO_CROWN),
+    ("Choggie Beanie", "Left"): seen((4, 271, 841, 1422, 1968), "no spike anywhere", NO_CROWN),
+    ("BTC Beanie", "Left"): seen((2, 517, 1182, 1392, 1604), "no spike anywhere", NO_CROWN),
+    ("RH Beanie", "Left"): seen((191, 510, 1017, 1602, 1919), "no spike anywhere", NO_CROWN),
+    ("Mon Beanie", "Left"): seen((71, 765, 1002, 1351, 1801), "no spike anywhere", NO_CROWN),
+    # The other headwear of Side=Right.
+    ("Crown", "Right"): seen((44, 858, 1127, 1358, 1899), "3 or 4 short spikes on the far side, from beside the "
+                             "band of the crown down to the cheek; none inside the crown", CROWN_POINTS),
+    ("Wizard Hat", "Right"): seen((10, 472, 872, 1495, 1809), "2 or 3 spikes on the far side, from under the hat "
+                                  "down to the cheek, larger than under a cap", BIG_SIDE_POINTS),
+    ("Durag", "Right"): seen((51, 570, 1001, 1563, 1884), "3 large spikes on the far side, from the height of "
+                             "the top of the durag down to the cheek; no point of hair on the brow", DURAG_POINTS),
+    ("Spartan Helmet", "Right"): seen((21, 331, 1081, 1536, 1903), "a full helmet down to the jaw, nose guard, "
+                                      "red plume; 3 or 4 spikes behind it on the far side", SPARTAN["LEAVES"]),
+    ("Russian Hat", "Right"): seen((39, 322, 830, 1177, 1785), "tan fur hat, fur flaps; 1 or 2 small spikes on "
+                                   "the far side, behind the flap, near the top", USHANKA_POINTS),
+    ("Russian Hat", "Left"): seen((34, 504, 982, 1518, 1876), "cream fur, dark leather flaps with snaps; no spike "
+                                  "anywhere", NO_CROWN),
+    ("Red Headband", "Right"): seen((12, 686, 1014, 1790, 1957), "the whole crown above the band and down the far "
+                                    "side; a darker line along its lower edge", BAND_POINTS),
+    ("Japan Headband", "Right"): seen((65, 523, 891, 1435, 1962), "the whole crown above the white band, a red "
+                                      "sun on its front", BAND_POINTS),
+    ("Bob Hair", "Right"): seen((43, 48, 159, 470, 482, 1137, 1380), "yellow curly hair, a red band with waving "
+                                "edges tied over the brow; the tip of one spike above the band, far side",
+                                NO_CROWN),
+    ("Rainbow Wig", "Left"): seen((29, 346, 1276, 1469, 1967), "an afro in blocks of colour behind a face with a "
+                                  "curly edge; no spike", NO_CROWN),
+    ("Clown Nose", "Right"): seen((18, 406, 920, 1553, 1926), "a red ball on the nose; the whole crown, as on a "
+                                  "bare head", FULL_CROWN),
+    ("Plumber", "Left"): seen((17, 531, 1325, 1601, 1885), "a red plunger cup on the top; the points of the "
+                              "head around it (drawn in cream, as Side=Left draws a head)",
+                              (GONE, GONE, WHOLE, WHOLE, WHOLE, WHOLE, WHOLE)),
+    ("Robber", "Right"): seen((14, 652, 927, 1692, 1960), "a grey knitted mask over the whole head; 2 or 3 "
+                              "spikes come out of it on the far side, near the top", ROBBER_POINTS,
+                              THROUGH=True),
+    # Skull Genesis (a base not built): skull heads, no spike.
+    ("BOOB Cap", "Right"): seen((846, 1079, 1522), "skull heads: no spike", NO_CROWN),
+    ("ETH Cap", "Right"): seen((1313, 1889), "skull heads: no spike", NO_CROWN),
+    ("Peace Cap", "Right"): seen((1642,), "a skull head: no spike", NO_CROWN),
+    ("8 Ball Beanie", "Right"): seen((388,), "a skull head: no spike; an 8 ball on the side of the beanie",
+                                     NO_CROWN),
+    ("Jeet Cap", "Left"): seen((1221,), "a skull head: no spike", NO_CROWN),
+    ("BTC Cap", "Right"): seen((729, 972, 1372), "skull heads: no spike", NO_CROWN),
+    ("Chog Cap", "Right"): seen((1324,), "a skull head under the white CHOG cap of Choggie Cap: no spike",
+                                NO_CROWN),
+}
+
+
+def from_the_art(hats, hats_of_side):
+    """The entries of "Head" by Side with the numbers of HEAD_VALUES put in: a new table like
+    HATS_OF_SIDE, which make_chog_traits.py uses in its place. Each (value, Side) gets its own entry, so
+    a value worn on both Sides can keep other leaves on each."""
+    by_side = {side: dict(entries) for side, entries in hats_of_side.items()}
+    for (value, side), look in HEAD_VALUES.items():
+        entry = hats_of_side.get(side, {}).get(value) or hats.get(value)
+        if entry is None:
+            raise SystemExit(f"CHOG_TRAITS HEAD_VALUES names {value!r}, which has no entry in HATS")
+        known = KIT.HAT_NUMBERS[entry["shape"]]
+        unknown = set(look["numbers"]) - set(known)
+        if unknown:
+            raise SystemExit(f"CHOG_TRAITS HEAD_VALUES gives {value!r} numbers its shape has not: {sorted(unknown)}")
+        if len(look["numbers"]["LEAVES"]) != len(known["LEAVES"]):
+            raise SystemExit(f"CHOG_TRAITS HEAD_VALUES gives {value!r} {len(look['numbers']['LEAVES'])} leaves")
+        merged = {**entry, "numbers": {**entry.get("numbers", {}), **look["numbers"]},
+                  "from_the_art": {"looked_at": list(look["looked_at"]), "art": look["art"]}}
+        by_side.setdefault(side, {})[value] = merged
+    return by_side
 
 
 # ---------------------------------------------------------------------------------------------

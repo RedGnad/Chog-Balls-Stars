@@ -17,6 +17,10 @@ Plain Python with Pillow. Run it with the private environment of the tools:
     ... compare --batch .../batch-3 --before .../batch-2 --genesis 97,19 --out .../spikes_before_after.png
     # several sheets laid one under the other
     ... stack --sheets a.png,b.png --title "Prints" --out .../prints_sheet.png
+    # one row per value of "Head" and Side (batch 4): what its pictures show, picture and bust of each
+    # Genesis given, the game camera of the first; 12 rows per sheet: <out>_1.png, <out>_2.png...
+    ... values --batch .../batch-4 --genesis 3,991,1946,5,678,1936 --size 200 --label 320 \
+        --rows-per-sheet 12 --out .../per_value.png [--art-only "BOOB Cap|Right|846,1079|skull heads"]
 
 A sheet taller than --max-height (4,000 points) is cut into parts: <name>_part1.png, <name>_part2.png.
 The captions are read from parts.json, written by make_chog_traits.py: the part built for the trait,
@@ -324,6 +328,96 @@ def compare_sheet(arguments, numbers):
     return save_parts(blocks, width, header, os.path.abspath(arguments.out), arguments.max_height)
 
 
+def values_sheet(arguments, numbers):
+    """One row per value of "Head" and Side (batch 4): what its pictures show (parts.json,
+    "head_from_the_art", from HEAD_VALUES of chog_trait_hats.py), then for each of its Genesis given the
+    real picture beside the 3D bust, then the game camera of the first. The Genesis are grouped by the
+    value and Side read in their parts.json, in the order given. --art-only adds rows of values that are
+    not built (VALUE|SIDE|n,n,n|what the pictures show): their pictures only."""
+    batch = os.path.abspath(arguments.batch)
+    size, label = arguments.size, arguments.label
+    groups = []
+    for number in numbers:
+        built = read_built(batch, number)
+        key = (built["traits"].get("Head", "no Head"), built["traits"].get("Side", "?"))
+        for group in groups:
+            if group[0] == key:
+                group[1].append((number, built))
+                break
+        else:
+            groups.append((key, [(number, built)]))
+    for item in arguments.art_only:
+        value, side, chosen, note = item.split("|", 3)
+        groups.append(((value, side), [(number, None) for number in chosen.split(",")], note))
+    # What the pictures show for a group with no line in HEAD_VALUES (the bare heads): --value-note.
+    notes = {}
+    for item in arguments.value_note:
+        value, side, text = item.split("|", 2)
+        notes[(value, side)] = text
+    per_row = max(len(group[1]) for group in groups)
+    caption = 22
+    width = GAP + label + per_row * (2 * size + 4 + GAP) + size + GAP
+    big, normal, small = font(22), font(15), font(14)
+    blocks = []
+    for group in groups:
+        (value, side), members = group[0], group[1]
+        block = Image.new("RGB", (width, caption + size), BACKGROUND)
+        draw = ImageDraw.Draw(block)
+        draw.text((GAP + 4, 2), value, font=big, fill=INK)
+        line = 30
+        draw.text((GAP + 4, line), f"Side {side}", font=small, fill=QUIET)
+        line += 18
+        first = members[0][1]
+        seen = (first or {}).get("head_from_the_art", {}) if first else {}
+        note = group[2] if len(group) > 2 else seen.get("art", "") or notes.get((value, side), "")
+        looked = seen.get("looked_at") or [int(number) for number, _ in members]
+        texts = [f"art looked at: " + ", ".join(f"#{number}" for number in looked)]
+        texts.append(f"art: {note}" if note else "art: (no line in HEAD_VALUES)")
+        if first:
+            kept = sum(1 for leaf in first.get("leaves", []) if leaf[0] > 0.0)
+            texts.append(f"built: {kept} of 7 lines of leaves kept; hero #{members[0][0]} "
+                         f"{first['triangles_total']} triangles")
+        else:
+            texts.append("not built: the builder makes the Origin head only")
+        for text in texts:
+            for piece in wrapped(text, label - 14, draw, small):
+                if line < caption + size - 16:
+                    draw.text((GAP + 4, line), piece, font=small, fill=QUIET if not text.startswith("art:") else INK)
+                    line += 17
+            line += 3
+        left = GAP + label
+        for number, built in members:
+            draw.text((left + 2, 2), f"CHOG #{number}: the picture, then the 3D bust" if built else
+                      f"CHOG #{number}", font=small, fill=INK)
+            block.paste(opened(portrait(number)).resize((size, size), Image.LANCZOS), (left, caption))
+            if built:
+                bust = os.path.join(batch, number, f"chog_{number}_bust.png")
+                block.paste(opened(bust).resize((size, size), Image.LANCZOS), (left + size + 4, caption))
+            left += 2 * size + 4 + GAP
+        if first:
+            number = members[0][0]
+            left = GAP + label + per_row * (2 * size + 4 + GAP)
+            draw.text((left + 2, 2), f"#{number}, game camera", font=small, fill=INK)
+            game = os.path.join(batch, number, f"chog_{number}_game_front.png")
+            block.paste(opened(game).resize((size, size), Image.LANCZOS), (left, caption))
+        blocks.append(block)
+
+    def header(draw, part, parts):
+        title = arguments.title + (f" (part {part} of {parts})" if parts > 1 else "")
+        draw.text((GAP + 4, 8), title, font=font(30), fill=INK)
+        return draw_notes(draw, arguments.note, width) + 8
+
+    if arguments.rows_per_sheet:
+        # Sheets of a fixed number of rows, named <out>_1.png, <out>_2.png... (per_value_N.png).
+        stem, extension = os.path.splitext(os.path.abspath(arguments.out))
+        written = []
+        for index in range(0, len(blocks), arguments.rows_per_sheet):
+            target = f"{stem}_{index // arguments.rows_per_sheet + 1}{extension}"
+            written += save_parts(blocks[index:index + arguments.rows_per_sheet], width, header, target, 100000)
+        return written
+    return save_parts(blocks, width, header, os.path.abspath(arguments.out), arguments.max_height)
+
+
 def stack_sheet(arguments):
     """Sheets laid one under the other (--sheets a.png,b.png), cut into parts under --max-height."""
     pictures = [opened(path) for path in arguments.sheets.split(",")]
@@ -344,7 +438,13 @@ def stack_sheet(arguments):
 
 def main():
     parser = argparse.ArgumentParser(description="Review sheets of a batch of dressed Genesis.")
-    parser.add_argument("mode", choices=("rows", "grid", "pick", "compare", "stack"))
+    parser.add_argument("mode", choices=("rows", "grid", "pick", "compare", "stack", "values"))
+    parser.add_argument("--art-only", action="append", default=[], help="values: a row of pictures only, "
+                        "VALUE|SIDE|n,n,n|what the pictures show (may be repeated)")
+    parser.add_argument("--rows-per-sheet", type=int, default=0, help="values: this many rows per sheet, the "
+                        "sheets named <out>_1, <out>_2...")
+    parser.add_argument("--value-note", action="append", default=[], help="values: what the pictures show for a "
+                        "value with no line in HEAD_VALUES (the bare heads), VALUE|SIDE|text (may be repeated)")
     parser.add_argument("--before", default=None, help="compare: the folder of the earlier batch")
     parser.add_argument("--sheets", default="", help="stack: the sheets to lay one under the other, separated by commas")
     parser.add_argument("--batch", default=None, help="the folder of make_chog_traits_batch.py")
@@ -376,7 +476,8 @@ def main():
     numbers = [number for number in arguments.genesis.split(",") if number]
     if arguments.random:
         numbers = drawn_at_random(arguments.random, arguments.seed)
-    if not numbers or not arguments.batch or not arguments.out:
+    only_pictures = arguments.mode == "values" and arguments.art_only
+    if (not numbers and not only_pictures) or not arguments.batch or not arguments.out:
         raise SystemExit("CHOG_REVIEW give --batch, --out and --genesis (or --random)")
     if arguments.mode == "rows":
         rows_sheet(arguments, numbers)
@@ -384,6 +485,8 @@ def main():
         if not arguments.before:
             raise SystemExit("CHOG_REVIEW compare: give --before")
         compare_sheet(arguments, numbers)
+    elif arguments.mode == "values":
+        values_sheet(arguments, numbers)
     else:
         grid_sheet(arguments, numbers)
 

@@ -155,23 +155,28 @@ def main():
     parser.add_argument("--blend", default=None, help="the file to render (default: the one of the folder)")
     parser.add_argument("--out", default=None, help="folder for the pictures (default: the one of the file)")
     arguments = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
+    render_one(arguments.name, arguments.blend, arguments.out, arguments.only, arguments.colour, arguments.size,
+               arguments.bust_size)
 
-    name = arguments.name
+
+def render_one(name, blend=None, out=None, only=None, colour=None, size=504, bust_size=1008):
+    """Renders the pictures of one built Chog (see the top of this file). make_chog_traits_many.py calls
+    it for many Genesis in one run of Blender."""
     folder = os.path.join(traits.TRAITS_FOLDER, name)
-    blend = os.path.abspath(arguments.blend) if arguments.blend else os.path.join(folder, "ChogBody.blend")
+    blend = os.path.abspath(blend) if blend else os.path.join(folder, "ChogBody.blend")
     if not os.path.isfile(blend):
         raise SystemExit(f"CHOG_RENDER no file at {blend}: run make_chog_traits.py first")
-    folder = os.path.abspath(arguments.out or folder)
+    folder = os.path.abspath(out or folder)
     os.makedirs(folder, exist_ok=True)
-    size = max(1, arguments.size // shots.PHONE_POINTS) * shots.PHONE_POINTS
+    size = max(1, size // shots.PHONE_POINTS) * shots.PHONE_POINTS
 
     bpy.ops.wm.open_mainfile(filepath=blend)
     root = bpy.data.objects[traits.base.ROOT_NAME]
     genesis = root.get("chog_genesis")
     remembered = flat.remember_materials(MAIN_PARTS)
 
-    if arguments.colour:
-        skin = shots.SKINS[arguments.colour] if arguments.colour in shots.SKINS else render.parse_colour(arguments.colour)
+    if colour:
+        skin = shots.SKINS[colour] if colour in shots.SKINS else render.parse_colour(colour)
     elif genesis:
         skin = tuple(root["chog_skin"])
     else:
@@ -231,7 +236,7 @@ def main():
             flat.write_small(path, path[:-4] + "_phone.png", size // shots.PHONE_POINTS)
 
     families = {"bust", "studio", "game", "towards"}
-    wanted = set(arguments.only.split(",")) if arguments.only else {"bust", "studio", "game"}
+    wanted = set(only.split(",")) if only else {"bust", "studio", "game"}
     if wanted - families:
         raise SystemExit(f"CHOG_RENDER unknown families {sorted(wanted - families)}: use {sorted(families)}")
     if "bust" in wanted:
@@ -240,7 +245,7 @@ def main():
         for disc in ring:
             disc.hide_render = True
         sky.inputs["Color"].default_value = render.linear(background)
-        scene.render.resolution_x = scene.render.resolution_y = arguments.bust_size
+        scene.render.resolution_x = scene.render.resolution_y = bust_size
         place_bust(camera, lights, side)
         lights[0].data.energy = BUST_KEY_LIGHT
         front.hide_render = False
