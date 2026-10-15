@@ -256,6 +256,42 @@ testnet MON on it, and the one command of `contracts/README.md` ("On Monad testn
 headless pages staking against each other through the public address and Photon's real cloud,
 judged and paid on the testnet; then the user stakes from MetaMask.
 
+**15 October 2026, 14:20.** The user answered:
+- **3D:** better, but not done case by case: some beanies hide every spike in the art (seen on
+  #4 Choggie Beanie and #39 Russian Hat, where batch 3 shows spikes all around), the spikes are
+  a little long, Bob Hair is hair under a red headband (not hair with a red top), the Spartan
+  helmet is badly made, and others. One agent (one Blender at a time) draws batch 4: each of
+  the 67 Head values decided from the pictures of its own Genesis, not from its shape family,
+  in `.artifacts/chog-body/traits/batch-4/`. Still pictures only.
+- **Next big work after the 3D:** the attacks must show what the Genesis shows, in 3D where it
+  does not cost performance. Today the special is drawn from the Eyes (flat shapes, one unlit
+  material), while the basic attack and the class move of each class still use the sample's
+  effects (`brute.strike`, `ranger.shot`, `controller.bolt`, and the charge, dash, slow zone)
+  and represent no trait; the Head, the trait seen most from the game camera, decides nothing.
+- **Testnet:** fine if moving to mainnet is trivial, otherwise straight to mainnet. For the
+  wager it is: the same contract, and the mainnet path still works with today's build. **Seen**
+  on a local copy of Monad mainnet (`wager_bench.sh`, the real $CHOG contract copied, build
+  `20261015T103308125Z`, Photon's real cloud): the services name Monad (`chainId` 143,
+  `test: false`), the wallet is asked for `0x8f`, the panel says STAKE 10 $CHOG with no test
+  tap ([capture](../research/evidence/wager-mainnet-copy-staked-2026-10-15.png)), the stake
+  is made and locked at START, the judge calls the match off, GET IT BACK pays it back and the
+  wallet holds its 10,000 $CHOG again
+  ([capture](../research/evidence/wager-mainnet-copy-given-back-2026-10-15.png)). The match
+  was called off because on this bench Photon's custom authentication and webhooks reach the
+  public instance, which reads the real chain, where the bench wallet holds no Genesis: the
+  page plays as a recruit while the stand-in declared Genesis 1795. A paid win between two
+  wallets was last seen on 11 October. For the rental and the shop the testnet is not a short
+  way: the collection is not on it, and a stand-in collection plus services reading two chains
+  would be thrown away; they stay rehearsed on local copies of mainnet and go to mainnet.
+- **Phone:** they asked whether the earlier failure is fixed: the cause and the change are in
+  [game/README.md](../game/README.md) ("Tried on the user's phone on 15 October"); the page
+  posing as a phone was seen offering OPEN IN METAMASK, never MetaMask itself.
+- This Mac's local address changed to `10.159.150.151` (another network); the public address
+  answers. `wager_bench.sh` now passes extra arguments to the services and takes a `DATA`
+  folder, and gives the second test wallet $CHOG too.
+**Waiting on the user:** their eye on the batch 4 sheets; the testnet deployment (unchanged);
+the phone try of OPEN IN METAMASK.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a

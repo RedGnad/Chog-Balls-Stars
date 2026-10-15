@@ -168,7 +168,14 @@ have to sit above these, and a settlement costs more with every winner to pay.
 
 ## Deploying on mainnet (not done)
 
-For the testnet, see "On Monad testnet" at the top.
+For the testnet, see "On Monad testnet" at the top. Moving the wager from the testnet to mainnet
+changes no code: the same contract, deployed with the real $CHOG token, and the services started
+without `WAGER_NETWORK` (mainnet is the default) and with the new `WAGER_ADDRESS`; the game then
+asks the wallet for Monad (`0x8f`), says $CHOG and offers no test tap. Seen on 15 October with
+build `20261015T103308125Z` on a local copy of mainnet (`tools/contracts/wager_bench.sh`): a
+stake of 10 $CHOG, locked at START, given back after the judge called the match off. With the
+development wallet's keystore the command below can take `--account chog-dev` in place of
+`--interactive`.
 
 ```sh
 forge create contracts/src/ChogWager.sol:ChogWager --root contracts --rpc-url https://rpc.monad.xyz \
