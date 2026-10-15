@@ -314,6 +314,24 @@ astronaut helmet; 17 rare Head values (37 Genesis, all on Skull and Radioactive 
 modelled. Details: [tools/blender/README.md](../tools/blender/README.md), "Batch 4".
 **Next action (dev):** the sheets to the user; on their yes, the import into Unity.
 
+**15 October 2026, 16:00.** The user judged batch 4 not coherent (long spikes on some, two on each
+side, none behind, some spikes and hair unlike the pictures, the crown worse) and the work done from
+one angle, without reasoning in 3D. Batch 5, pictures only: every head is now judged turned around
+(`render_chog_traits.py --only turnaround`: eight turns, from above, the game's two angles; sheets by
+`make_chog_traits_review.py turnaround`). Seen that way, batch 4 kept pairs of the crown's lines under
+each hat: from behind and above, two spikes on each side, none at the back, a collar at the neck. Now a
+hat is treated as a volume on a spiky head: under every hat of Side=Right that lets the spikes out, one
+row of nine leaves is planted under the rim of the hat as built (found by rays out of the head), the
+same for all, longer under bucket hats; the heads of Side=Left are cream, as drawn; the crown is an open
+band with the head and a short top leaf inside. 48 Genesis (one per value and Side) built, none failed;
+coverage unchanged; largest hero 7,924 triangles, median 6,180. Details:
+[tools/blender/README.md](../tools/blender/README.md), "Batch 5";
+[before and after, turned around](../research/evidence/chog-traits-batch5-before-after-turned-2026-10-15.jpg).
+Still wrong: Bob Hair and Rainbow Wig as puffs instead of one wavy mass in blocks of colour; the
+bucket hats' row shows only its points from the game camera; the bare head of Side=Left keeps the
+whole star; the durag's row looks like ears from the front; the Spartan helmet.
+**Next action (dev):** the sheets to the user; the hair; on their yes, the import into Unity.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a

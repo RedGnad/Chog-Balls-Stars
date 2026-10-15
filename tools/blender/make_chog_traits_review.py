@@ -21,6 +21,9 @@ Plain Python with Pillow. Run it with the private environment of the tools:
     # Genesis given, the game camera of the first; 12 rows per sheet: <out>_1.png, <out>_2.png...
     ... values --batch .../batch-4 --genesis 3,991,1946,5,678,1936 --size 200 --label 320 \
         --rows-per-sheet 12 --out .../per_value.png [--art-only "BOOB Cap|Right|846,1079|skull heads"]
+    # the head turned all around (render_chog_traits.py --only bust,turnaround): picture, bust, eight
+    # turns, from above, the game behind and in front
+    ... turnaround --batch .../batch-5 --genesis 75,97,4 --size 200 --label 220 --out .../turnaround.png
 
 A sheet taller than --max-height (4,000 points) is cut into parts: <name>_part1.png, <name>_part2.png.
 The captions are read from parts.json, written by make_chog_traits.py: the part built for the trait,
@@ -328,6 +331,56 @@ def compare_sheet(arguments, numbers):
     return save_parts(blocks, width, header, os.path.abspath(arguments.out), arguments.max_height)
 
 
+TURN_COLUMNS = (("front", "turn_000"), ("45", "turn_045"), ("left side", "turn_090"), ("135", "turn_135"),
+                ("back", "turn_180"), ("225", "turn_225"), ("right side", "turn_270"), ("315", "turn_315"),
+                ("from above", "turn_top"), ("game, behind", "turn_game"), ("game, in front", "turn_game_front"))
+
+
+def turnaround_sheet(arguments, numbers):
+    """One row per Genesis: its picture, the bust framed like it, then the head turned all around it
+    (render_chog_traits.py --only turnaround): the sides and the back the pictures never show, the top,
+    and the two angles of the game (added 15 October 2026)."""
+    batch = os.path.abspath(arguments.batch)
+    size, label = arguments.size, arguments.label
+    columns = [("The picture", "picture"), ("Bust", "bust")] + list(TURN_COLUMNS)
+    width = GAP + label + len(columns) * (size + GAP)
+    big, normal, small = font(24), font(16), font(14)
+    blocks = []
+    for number in numbers:
+        built = read_built(batch, number)
+        traits = built["traits"]
+        block = Image.new("RGB", (width, size), BACKGROUND)
+        draw = ImageDraw.Draw(block)
+        draw.text((GAP + 4, 2), f"CHOG #{number}", font=big, fill=INK)
+        line = 34
+        for text in (f"Side {traits.get('Side', '?')}, skin {traits.get('Skin', '?')}",
+                     f"Head: {traits.get('Head', 'none')}", f"Body: {traits.get('Body', 'none')}"):
+            draw.text((GAP + 4, line), text, font=normal if text.startswith("Head") else small, fill=INK)
+            line += 21
+        draw.text((GAP + 4, size - 20), f"{built['triangles_total']} triangles", font=small, fill=QUIET)
+        left = GAP + label
+        for _, view in columns:
+            if view == "picture":
+                path = portrait(number)
+            else:
+                path = os.path.join(batch, number, f"chog_{number}_{view}.png")
+            block.paste(opened(path).resize((size, size), Image.LANCZOS), (left, 0))
+            left += size + GAP
+        blocks.append(block)
+
+    def header(draw, part, parts):
+        title = arguments.title + (f" (part {part} of {parts})" if parts > 1 else "")
+        draw.text((GAP + 4, 8), title, font=font(30), fill=INK)
+        place = draw_notes(draw, arguments.note, width)
+        left = GAP + label
+        for caption, _ in columns:
+            draw.text((left + 2, place + 6), caption, font=font(14), fill=INK)
+            left += size + GAP
+        return place + 30
+
+    return save_parts(blocks, width, header, os.path.abspath(arguments.out), arguments.max_height)
+
+
 def values_sheet(arguments, numbers):
     """One row per value of "Head" and Side (batch 4): what its pictures show (parts.json,
     "head_from_the_art", from HEAD_VALUES of chog_trait_hats.py), then for each of its Genesis given the
@@ -438,7 +491,7 @@ def stack_sheet(arguments):
 
 def main():
     parser = argparse.ArgumentParser(description="Review sheets of a batch of dressed Genesis.")
-    parser.add_argument("mode", choices=("rows", "grid", "pick", "compare", "stack", "values"))
+    parser.add_argument("mode", choices=("rows", "grid", "pick", "compare", "stack", "values", "turnaround"))
     parser.add_argument("--art-only", action="append", default=[], help="values: a row of pictures only, "
                         "VALUE|SIDE|n,n,n|what the pictures show (may be repeated)")
     parser.add_argument("--rows-per-sheet", type=int, default=0, help="values: this many rows per sheet, the "
@@ -487,6 +540,8 @@ def main():
         compare_sheet(arguments, numbers)
     elif arguments.mode == "values":
         values_sheet(arguments, numbers)
+    elif arguments.mode == "turnaround":
+        turnaround_sheet(arguments, numbers)
     else:
         grid_sheet(arguments, numbers)
 

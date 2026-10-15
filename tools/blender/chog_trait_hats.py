@@ -1305,32 +1305,10 @@ HATS_OF_SIDE = {
 #   Right BTC Cap and Chog Cap) draw no spike at all; those bases are not built (the head is Origin's).
 # ---------------------------------------------------------------------------------------------
 
-# The leaves under a cap or a bucket hat of Side=Right: the lowest pair of the star (sideways, a little
-# back and down), the pair of the back row turned to the sides and lowered, the leaf straight back,
-# narrow, none bent, about as long as the leaves of a bare head (LEAF_LENGTH of make_chog_traits.py
-# shortens them all). (Batch 3: 1.3 times as long, as wide as on the bare head, turned down by 116
-# degrees and bent up: wings seen from the front and the back.)
-# (First try of batch 4: only the lowest pair, the back pair and the leaf straight back, 0.62 wide. On the
-# busts one small point showed at the cheek, where the pictures stack two or three from the rim down: the
-# middle pair now comes out just under the rim, the lowest pair at the cheek, the back pair behind them.)
-# (The middle pair at 100 degrees touched the crown of some caps: 104, tried under each shape.)
-# (Second try: the lowest pair turned back by 26 degrees hid behind the cheek on the busts; it now points
-# out sideways, under the middle pair.)
-SIDE_POINTS = (GONE, GONE, leaf(1.10, 104.0, 4.0, 0.0, 0.50), leaf(1.15, 126.0, 10.0, 0.0, 0.52), GONE,
-               leaf(1.10, 112.0, 58.0, 0.0, 0.52), leaf(1.05, None, 106.0, 0.0, 0.56))
-# The same, larger, where the pictures draw them so (wizard hat).
-BIG_SIDE_POINTS = (GONE, GONE, leaf(1.25, 104.0, 4.0, 0.0, 0.54), leaf(1.30, 126.0, 10.0, 0.0, 0.58), GONE,
-                   leaf(1.25, 112.0, 58.0, 0.0, 0.58), leaf(1.15, None, 106.0, 0.0, 0.60))
-# Under the crown, whose band is higher than the rim of a cap.
-CROWN_POINTS = (GONE, GONE, leaf(1.15, 100.0, 4.0, 0.0, 0.50), leaf(1.20, 122.0, 10.0, 0.0, 0.55), GONE,
-                leaf(1.15, 106.0, 56.0, 0.0, 0.55), leaf(1.10, None, 100.0, 0.0, 0.60))
-# Beside the durag: the two tails at the back take the place of the leaf straight back.
-DURAG_POINTS = (GONE, GONE, leaf(1.25, 104.0, 4.0, 0.0, 0.54), leaf(1.25, 124.0, 10.0, 0.0, 0.60), GONE,
-                leaf(1.20, 124.0, 46.0, 0.0, 0.60), GONE)
-# Under the fur of the ushanka (Side=Right), which comes low at the back: two short points behind the
-# flaps, narrow as drawn, the first out to the side behind the flap. (At 1.30 long it stayed hidden behind
-# the flap on the busts, where the pictures show its tip.)
-USHANKA_POINTS = (GONE, GONE, GONE, GONE, GONE, leaf(1.70, 106.0, 28.0, 0.0, 0.52), leaf(1.10, None, 112.0, 0.0, 0.56))
+# Until the row under the rim (15 October 2026, after batch 4), the hats of Side=Right kept or moved pairs
+# of the seven lines of the crown (SIDE_POINTS, BIG_SIDE_POINTS, CROWN_POINTS, DURAG_POINTS, USHANKA_POINTS,
+# in the history of this file): from behind and from above that made two spikes on each side and none at
+# the back. They now take RIM_ROW and its kin (below), planted under the real rim of each hat.
 # Above and below a headband: the leaf on top and the upper pair (raised a little) stand above it, the
 # middle pair would grow out of the band, the rest stand under it as under a cap.
 BAND_POINTS = (WHOLE, leaf(1.0, 24.0), GONE, leaf(1.10, 112.0, 22.0, 0.0, 0.75), GONE,
@@ -1340,10 +1318,32 @@ ROBBER_POINTS = (GONE, GONE, leaf(1.0, 80.0, 30.0, 0.0, 0.66), leaf(1.10, 112.0,
                  leaf(1.10, 104.0, 62.0, 0.0, 0.70), leaf(1.10, None, 104.0, 0.0, 0.70))
 
 
-def seen(looked_at, art, leaves, **numbers):
+def seen(looked_at, art, leaves, under_rim=None, **numbers):
     """One line of HEAD_VALUES: the CHOG numbers whose pictures were looked at, what they show, the
-    leaves kept (see leaf()), and other numbers of the shape this value replaces."""
-    return {"looked_at": tuple(looked_at), "art": art, "numbers": {"LEAVES": leaves, **numbers}}
+    leaves kept (see leaf()), the row of leaves planted under the rim of the hat (UNDER_RIM of
+    make_chog_traits.py: {} for its numbers, a dict for some of them replaced, None for none), and other
+    numbers of the shape this value replaces."""
+    return {"looked_at": tuple(looked_at), "art": art, "numbers": {"LEAVES": leaves, **numbers},
+            "under_rim": under_rim}
+
+
+# The row under the rim (15 October 2026, after batch 4): every hat of Side=Right that leaves the
+# spikes out under it takes it in place of the leaves of SIDE_POINTS and the like below, which kept
+# pairs of the seven lines of the crown: from behind and from above, two spikes on each side and none
+# at the back, or a collar of spikes at the neck. The same row for all, its length and its span changed
+# only where the pictures draw them otherwise.
+RIM_ROW = {}
+BIG_RIM_ROW = {"LENGTH": 1.10, "WIDTH": 0.90}
+# Under a bucket hat the brim goes all around and dips: a row as long as under a cap stays under it, from
+# the camera of the game and from behind (seen on batch 5, 15 October 2026), where the pictures draw two
+# or three spikes out from under the brim. Longer, so their points pass its edge.
+BUCKET_RIM_ROW = {"LENGTH": 1.40, "WIDTH": 0.70, "SWEEP_DEG": 30.0}
+# Under the fur of the ushanka: a few short ones at the back only, behind the flaps.
+USHANKA_RIM_ROW = {"ANGLES": (138.0, 162.0), "LENGTH": 0.80, "WIDTH": 0.70}
+# Inside the open band of the crown: the leaf on top, short enough to stand at the height of its points
+# (the head is a spiky head with a crown on it, not a bald dome nor a gold floor). The upper pair and
+# the top of the back row went through the band (first try, 15 October 2026).
+CROWN_TOP = (leaf(0.60), GONE, GONE, GONE, GONE, GONE, GONE)
 
 
 # (value of "Head", Side): what its pictures show. The numbers given replace those of the entry of HATS
@@ -1351,37 +1351,37 @@ def seen(looked_at, art, leaves, **numbers):
 HEAD_VALUES = {
     # Caps and bucket hats of Side=Right.
     ("TISM Cap", "Right"): seen((3, 412, 991, 1467, 1946), "2 to 4 short spikes on the far side, from beside "
-                                "the crown down to the cheek, under the rim", SIDE_POINTS),
+                                "the crown down to the cheek, under the rim", NO_CROWN, RIM_ROW),
     ("MMGA Cap", "Right"): seen((5, 211, 678, 1576, 1936), "2 or 3 short spikes on the far side under the "
-                                "rim, down to the cheek", SIDE_POINTS),
+                                "rim, down to the cheek", NO_CROWN, RIM_ROW),
     ("Horny Cap", "Right"): seen((97, 644, 1033, 1438, 1947), "2 or 3 short spikes stacked on the far side, "
-                                 "the first just under the brim", SIDE_POINTS),
+                                 "the first just under the brim", NO_CROWN, RIM_ROW),
     ("Choggie Cap", "Right"): seen((123, 295, 667, 1329, 1922), "2 or 3 short spikes on the far side under "
-                                   "the brim", SIDE_POINTS),
+                                   "the brim", NO_CROWN, RIM_ROW),
     ("Boob Cap", "Right"): seen((114, 633, 1021, 1569, 1939), "2 or 3 short spikes on the far side under the "
-                                "brim, down to the cheek", SIDE_POINTS),
+                                "brim, down to the cheek", NO_CROWN, RIM_ROW),
     ("Blue Bucket Cap", "Right"): seen((80, 574, 966, 1347, 1961), "2 or 3 short spikes on the far side under "
-                                       "the brim", SIDE_POINTS),
+                                       "the brim", NO_CROWN, BUCKET_RIM_ROW),
     ("Orange Bucket Cap", "Right"): seen((107, 666, 1178, 1711, 1956), "2 or 3 short spikes on the far side "
-                                         "under the brim", SIDE_POINTS),
+                                         "under the brim", NO_CROWN, BUCKET_RIM_ROW),
     ("Gray Bucket Cap", "Right"): seen((62, 620, 1003, 1511, 1958), "2 or 3 short spikes on the far side under "
-                                       "the brim", SIDE_POINTS),
+                                       "the brim", NO_CROWN, BUCKET_RIM_ROW),
     ("Balls Cap", "Right"): seen((19, 676, 1195, 1557, 1942), "3 short spikes stacked on the far side from "
-                                 "under the brim to the cheek", SIDE_POINTS),
+                                 "under the brim to the cheek", NO_CROWN, BUCKET_RIM_ROW),
     ("Cloud Cap", "Right"): seen((35, 564, 896, 1321, 1872), "1 or 2 short spikes on the far side under the "
-                                 "brim (dark skins: hard to see)", SIDE_POINTS),
+                                 "brim (dark skins: hard to see)", NO_CROWN, BUCKET_RIM_ROW),
     ("Dollar Cap", "Right"): seen((6, 329, 943, 1404, 1888), "2 or 3 short spikes on the far side under the "
-                                  "brim", SIDE_POINTS),
+                                  "brim", NO_CROWN, BUCKET_RIM_ROW),
     ("Thunder Cap", "Right"): seen((56, 525, 962, 1454, 1964), "2 or 3 short spikes on the far side under the "
-                                   "brim; the bolt is on the top front of the crown", SIDE_POINTS),
+                                   "brim; the bolt is on the top front of the crown", NO_CROWN, BUCKET_RIM_ROW),
     ("Star Cap", "Right"): seen((24, 520, 1140, 1542, 1965), "2 short spikes on the far side under the brim",
-                                SIDE_POINTS),
+                                NO_CROWN, BUCKET_RIM_ROW),
     ("Peace hat", "Right"): seen((1, 550, 793, 1546, 1940), "2 or 3 short spikes on the far side under the brim",
-                                 SIDE_POINTS),
+                                 NO_CROWN, BUCKET_RIM_ROW),
     ("Red Peace Cap", "Right"): seen((60, 489, 843, 1478, 1762), "2 or 3 short spikes on the far side under the "
-                                     "brim", SIDE_POINTS),
+                                     "brim", NO_CROWN, BUCKET_RIM_ROW),
     ("Mon Cap", "Right"): seen((8, 461, 792, 1309, 1934), "a purple bucket hat; 1 or 2 short spikes on the far "
-                               "side under the brim", SIDE_POINTS),
+                               "side under the brim", NO_CROWN, BUCKET_RIM_ROW),
     # Caps of Side=Left: no spike at all.
     ("Mon Cap", "Left"): seen((361, 864, 1065, 1423, 1761), "a white cap, purple brim; no spike anywhere",
                               NO_CROWN),
@@ -1405,15 +1405,16 @@ HEAD_VALUES = {
     ("Mon Beanie", "Left"): seen((71, 765, 1002, 1351, 1801), "no spike anywhere", NO_CROWN),
     # The other headwear of Side=Right.
     ("Crown", "Right"): seen((44, 858, 1127, 1358, 1899), "3 or 4 short spikes on the far side, from beside the "
-                             "band of the crown down to the cheek; none inside the crown", CROWN_POINTS),
+                             "band of the crown down to the cheek; spikes behind its points at the top",
+                             CROWN_TOP, RIM_ROW),
     ("Wizard Hat", "Right"): seen((10, 472, 872, 1495, 1809), "2 or 3 spikes on the far side, from under the hat "
-                                  "down to the cheek, larger than under a cap", BIG_SIDE_POINTS),
+                                  "down to the cheek, larger than under a cap", NO_CROWN, BIG_RIM_ROW),
     ("Durag", "Right"): seen((51, 570, 1001, 1563, 1884), "3 large spikes on the far side, from the height of "
-                             "the top of the durag down to the cheek; no point of hair on the brow", DURAG_POINTS),
+                             "the top of the durag down to the cheek; no point of hair on the brow", NO_CROWN, BIG_RIM_ROW),
     ("Spartan Helmet", "Right"): seen((21, 331, 1081, 1536, 1903), "a full helmet down to the jaw, nose guard, "
-                                      "red plume; 3 or 4 spikes behind it on the far side", SPARTAN["LEAVES"]),
+                                      "red plume; 3 or 4 spikes behind it on the far side", NO_CROWN, RIM_ROW),
     ("Russian Hat", "Right"): seen((39, 322, 830, 1177, 1785), "tan fur hat, fur flaps; 1 or 2 small spikes on "
-                                   "the far side, behind the flap, near the top", USHANKA_POINTS),
+                                   "the far side, behind the flap, near the top", NO_CROWN, USHANKA_RIM_ROW),
     ("Russian Hat", "Left"): seen((34, 504, 982, 1518, 1876), "cream fur, dark leather flaps with snaps; no spike "
                                   "anywhere", NO_CROWN),
     ("Red Headband", "Right"): seen((12, 686, 1014, 1790, 1957), "the whole crown above the band and down the far "
@@ -1462,7 +1463,8 @@ def from_the_art(hats, hats_of_side):
         if len(look["numbers"]["LEAVES"]) != len(known["LEAVES"]):
             raise SystemExit(f"CHOG_TRAITS HEAD_VALUES gives {value!r} {len(look['numbers']['LEAVES'])} leaves")
         merged = {**entry, "numbers": {**entry.get("numbers", {}), **look["numbers"]},
-                  "from_the_art": {"looked_at": list(look["looked_at"]), "art": look["art"]}}
+                  "from_the_art": {"looked_at": list(look["looked_at"]), "art": look["art"]},
+                  "under_rim": look["under_rim"]}
         by_side.setdefault(side, {})[value] = merged
     return by_side
 

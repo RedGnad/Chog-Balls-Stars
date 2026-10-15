@@ -311,8 +311,12 @@ CROWN = {
     # height of its top. In the darker gold of the trim. (Until batch 4, 15 October 2026, a flat floor at
     # 0.150, hidden in the head: from the camera of the game the bare top of the head showed inside the
     # crown, as a pink or yellow bowl. The pictures never show the inside of the crown: the floor is
-    # gold, the colour of the crown, to show nothing that is not drawn.)
-    "FLOOR": (0.200, 0.97, 0.248, 0.60, 0.266),
+    # gold, the colour of the crown, to show nothing that is not drawn.) None: no floor. (Since 15 October
+    # 2026, after batch 4: from above the gold floor made the crown a pie. The crown is a band on a spiky
+    # head: inside it stand the short tips of the leaves of the top, as the pictures draw spikes behind
+    # its points.)
+    "FLOOR": None,
+    "BAND_INSIDE": 0.95,         # with no floor: how large the inside of the band is against its outside
     # The gems: where around the crown (degrees from the front, towards the left of the character),
     # at which height, half width, half height, and which material.
     "GEMS": (
@@ -808,6 +812,178 @@ def add_leaf_crown(part, numbers, surface, leaves=FULL_CROWN):
             where = "" if not mirrored else (" left" if side > 0.0 else " right")
             built.append((f"leaf {line}{where}", rings))
     return built
+
+
+# The spikes under the rim of a hat (15 October 2026, after batch 4 was seen turned around). Keeping or
+# moving some of the seven lines of SPIKES under each hat gave, from behind and from above, a pair of
+# spikes on each side and none behind, or a collar of spikes at the neck. A hat is a volume put on a
+# spiky head: what it covers is pressed under it, and the spikes rooted just under its rim stick out all
+# around, at the sides and at the back alike. So, for a hat whose entry says "under_rim", the leaves of
+# the crown are removed and one row of leaves is planted under the real rim of the built hat: at each
+# angle the rim is found by casting rays out of the head and seeing where the hat stops covering it.
+# The pictures (three quarter, from the front left) then show two to four of them stacked down the far
+# side under the rim, as they draw them, and the game camera (above, behind) sees the row fan out
+# behind the hat. "ANGLES": degrees from the front where a leaf stands, on both sides (180 once, at the
+# back); "BELOW_DEG": how far under the rim its root is (degrees down the head); "LENGTH", "WIDTH", "THICK":
+# against the leaf of the back row of a bare head (LEAF_LENGTH included); "SWEEP_DEG": how far it leans
+# to the back; "DROOP_DEG": how far down from straight out of the head; "LIFT": how far its point bends
+# up, against its length.
+UNDER_RIM = {
+    "ANGLES": (78.0, 104.0, 130.0, 156.0, 180.0),
+    "BELOW_DEG": 9.0,
+    "LENGTH": 0.95,
+    "WIDTH": 0.62,
+    "THICK": 0.60,
+    "SWEEP_DEG": 38.0,
+    "DROOP_DEG": 0.0,
+    "LIFT": 0.22,
+}
+RIM_REACH = 0.10                 # a ray out of the head that meets the hat within this is covered
+RIM_SCAN = (6.0, 160.0, 1.0)     # polar degrees scanned from the top down, and the step
+
+
+def hat_tree(hat_shapes, surface):
+    """A tree of the faces of the hat that lie outside the head (as leaf_crossings counts them)."""
+    from mathutils.bvhtree import BVHTree
+    points, polygons = [], []
+    for shapes in hat_shapes:
+        for face in shapes.mesh.faces:
+            centre = face.calc_center_median() - surface.middle
+            if sum((centre[index] / surface.half[index]) ** 2 for index in range(3)) <= 1.02 ** 2:
+                continue
+            polygons.append([len(points) + index for index in range(len(face.verts))])
+            points.extend(point.co.copy() for point in face.verts)
+    return BVHTree.FromPolygons(points, polygons) if polygons else None
+
+
+def rim_polar(tree, surface, angle):
+    """The polar degrees of the lower edge of the hat at an angle seen from above: the last covered
+    place of the run of covered places that starts nearest the top (gaps of 3 degrees bridged), or None
+    when the hat covers nothing there."""
+    first, last, gap = None, None, 0.0
+    polar = RIM_SCAN[0]
+    while polar <= RIM_SCAN[1]:
+        rad = math.radians(polar)
+        point = hats_and_clothes.on_head(surface, angle, rad, 1.0)
+        out = hats_and_clothes.head_normal(surface, angle, rad)
+        covered = tree.ray_cast(point + out * 0.002, out, RIM_REACH)[0] is not None
+        if covered:
+            first = polar if first is None else first
+            last, gap = polar, 0.0
+        elif first is not None:
+            gap += RIM_SCAN[2]
+            if gap > 3.0:
+                break
+        polar += RIM_SCAN[2]
+    return last
+
+
+def add_rim_leaves(part, numbers, surface, hat_shapes, under):
+    """The row of leaves under the rim of a hat (see UNDER_RIM). Returns them as add_leaf_crown does,
+    for leaf_crossings(); a leaf that would cross the hat is lowered, and dropped if it still does."""
+    under = {**UNDER_RIM, **under}
+    tree = hat_tree(hat_shapes, surface)
+    if tree is None:
+        return []
+    _, _, length, width, thickness, _ = numbers.SPIKES[-2]      # the pair of the back row of H3
+    length *= under["LENGTH"] * numbers.LEAF_LENGTH
+    width *= under["WIDTH"] * numbers.LEAF_WIDTH
+    thickness *= under["THICK"] * numbers.LEAF_WIDTH
+    ahead, down = level_axes(numbers)
+    back, up = -ahead, -down
+    profile = numbers.LEAF_PROFILE
+
+    def rings_of(angle, below, droop):
+        """The rings of one leaf rooted "below" degrees under the rim at that angle, leaning down by
+        "droop" degrees from straight out of the head."""
+        polar = math.radians(rim + below)
+        root = hats_and_clothes.on_head(surface, angle, polar, 1.0)
+        out = hats_and_clothes.head_normal(surface, angle, polar)
+        away = out.copy()
+        backwards, downwards = back - out * back.dot(out), down - out * down.dot(out)
+        if backwards.length > 1e-6:
+            away += backwards.normalized() * math.tan(math.radians(under["SWEEP_DEG"]))
+        if downwards.length > 1e-6:
+            away += downwards.normalized() * math.tan(math.radians(droop))
+        away.normalize()
+        wide = up.cross(away)
+        wide = wide.normalized() if wide.length > 1e-6 else X.copy()
+        thick = away.cross(wide)
+        rise = up - away * up.dot(away)
+        curl = rise.normalized() * length * under["LIFT"] if rise.length > 1e-6 else Vector()
+        rings = [(root - away * numbers.SPIKE_SUNK, wide * width * 0.5 * profile[0][1],
+                  thick * thickness * 0.5 * profile[0][2])]
+        for along, wider, thicker in profile[1:]:
+            rings.append((root + away * length * along + curl * along * along, wide * width * 0.5 * wider,
+                          thick * thickness * 0.5 * thicker))
+        rings.append((root + away * length + curl, NOWHERE, NOWHERE))
+        return rings
+
+    built, rims = [], []
+    for degrees in under["ANGLES"]:
+        for side in ((1.0,) if degrees in (0.0, 180.0) else (1.0, -1.0)):
+            angle = math.radians(270.0 + side * degrees)
+            rim = rim_polar(tree, surface, angle)
+            if rim is None:
+                continue
+            where = "" if degrees in (0.0, 180.0) else (" left" if side > 0.0 else " right")
+            name = f"rim leaf {degrees:.0f}{where}"
+            # Lowered, then rooted further down, until it no longer crosses the hat (as leaf_crossings
+            # judges it, outline included); dropped when nothing fits.
+            placed = None
+            for below in (under["BELOW_DEG"], under["BELOW_DEG"] + 6.0, under["BELOW_DEG"] + 12.0):
+                for droop in (under["DROOP_DEG"], under["DROOP_DEG"] + 12.0, under["DROOP_DEG"] + 24.0):
+                    rings = rings_of(angle, below, droop)
+                    if not leaf_crossings([(name, rings)], hat_shapes, numbers, surface):
+                        placed = rings
+                        break
+                if placed:
+                    break
+            if placed is None:
+                print(f"CHOG_TRAITS {name}: no place under the rim that does not cross the hat, left out")
+                continue
+            part.shell(placed, numbers.LEAF_SIDES, SKIN, numbers.OUTLINE_THICKNESS, smooth=True)
+            built.append((name, placed))
+            rims.append(f"{degrees:.0f}{where[:2]} {rim:.0f}")
+    print(f"CHOG_TRAITS rim row: {len(built)} leaves; rim (polar degrees) at " + ", ".join(rims))
+    return built
+
+
+def head_entry(traits, replaced=None):
+    """The entry of "Head" a Genesis gets on its Side, with the numbers "replaced" puts in, or None."""
+    entry = entry_for("Head", traits) if traits else None
+    if not isinstance(entry, dict):
+        return None
+    if replaced:
+        entry = {**entry, "numbers": {**entry.get("numbers", {}), **replaced}}
+    return entry
+
+
+def rim_leaves_for(part, traits, replaced, numbers, body_n, surface):
+    """Plants the row of leaves under the rim of the hat of a Genesis, when its entry asks for it: the
+    hat is built once aside (not kept) to find its rim. Returns the leaves, as add_leaf_crown does."""
+    entry = head_entry(traits, replaced)
+    if entry is None or entry.get("under_rim") is None:
+        return []
+    _, _, word, builders = TRAIT_PARTS["Head"]
+    probe = Maker(f"Probe_{entry[word]}", entry, numbers, body_n, surface)
+    builders[entry[word]](probe)
+    shapes = [shapes for shapes, on in probe.parts if on == "Head"]
+    try:
+        return add_rim_leaves(part, numbers, surface, shapes, entry["under_rim"])
+    finally:
+        for made, _ in probe.parts:
+            made.mesh.free()
+
+
+def cream_head(part):
+    """Side=Left draws the whole head in the cream of the face, its points too: the skin colour of the
+    head (skull and leaves, so far) becomes the cream. Points of hair under a hood are added after and
+    keep the skin colour."""
+    skin, cream = part.order.index(SKIN), part.order.index(full.FACE)
+    for face in part.mesh.faces:
+        if face.material_index == skin:
+            face.material_index = cream
 
 
 def leaf_crossings(leaves, hat_shapes, numbers, surface):
@@ -1412,23 +1588,35 @@ def build_crown(maker):
     wall = CapCrown(numbers, surface.middle)
     sides = numbers.SIDES
     rim, trim, band, tips = (ring[0] for ring in numbers.RINGS)
-    edge_height, edge_size, middle_height, middle_size, top_height = numbers.FLOOR
     # The points: every other place of the last ring is a tip, the others a dip. A tip stands in
     # the middle of the front.
     points = [wall.around(tips if index % 2 == 0 else numbers.VALLEY, 2.0 * math.pi * index / sides)
               for index in range(sides)]
     whole, none = (1.0,) * sides, (0.0,) * sides
-    # The middle ring of the floor and its top follow the crown as it leans back.
-    lean = Vector((0.0, wall.at_height(middle_height)[2], 0.0))
-    bands, _ = add_loops(part, [wall.loop(rim), wall.loop(trim), wall.loop(band), points,
-                                wall.loop(edge_height, edge_size),
-                                [point + Vector((0.0, 0.0, middle_height - edge_height)) for point in
-                                 wall.loop(edge_height, middle_size)],
-                                [surface.middle + lean + Vector((0.0, 0.0, top_height))]], part.named("Gold"),
-                         numbers.OUTLINE_THICKNESS, smooth=False,
-                         shares=[whole, whole, whole, whole, none, none, (0.0,)])
-    part.paint(bands[0], part.named("Trim"))
-    part.paint(bands[4] + bands[5], part.named("Trim"))
+    if numbers.FLOOR is None:
+        # An open band: up the outside to the points, down the inside (BAND_INSIDE as large) into the
+        # head, so nothing closes it at the top; what is inside it is the head and its leaves.
+        inside = numbers.BAND_INSIDE
+        inner_points = [wall.around(tips if index % 2 == 0 else numbers.VALLEY, 2.0 * math.pi * index / sides, inside)
+                        for index in range(sides)]
+        bands, _ = add_loops(part, [wall.loop(rim), wall.loop(trim), wall.loop(band), points, inner_points,
+                                    wall.loop(band, inside), wall.loop(rim, inside)], part.named("Gold"),
+                             numbers.OUTLINE_THICKNESS, smooth=False,
+                             shares=[whole, whole, whole, whole, none, none, none])
+        part.paint(bands[0], part.named("Trim"))
+    else:
+        edge_height, edge_size, middle_height, middle_size, top_height = numbers.FLOOR
+        # The middle ring of the floor and its top follow the crown as it leans back.
+        lean = Vector((0.0, wall.at_height(middle_height)[2], 0.0))
+        bands, _ = add_loops(part, [wall.loop(rim), wall.loop(trim), wall.loop(band), points,
+                                    wall.loop(edge_height, edge_size),
+                                    [point + Vector((0.0, 0.0, middle_height - edge_height)) for point in
+                                     wall.loop(edge_height, middle_size)],
+                                    [surface.middle + lean + Vector((0.0, 0.0, top_height))]], part.named("Gold"),
+                             numbers.OUTLINE_THICKNESS, smooth=False,
+                             shares=[whole, whole, whole, whole, none, none, (0.0,)])
+        part.paint(bands[0], part.named("Trim"))
+        part.paint(bands[4] + bands[5], part.named("Trim"))
     for degrees, height, half_width, half_height, material in numbers.GEMS:
         low, high = numbers.GEM_LIFT
         if material == "Trim":
@@ -1934,10 +2122,10 @@ def hat_numbers_of(entry, replaced=None):
     return {**HAT_NUMBERS[entry["shape"]], **entry.get("numbers", {}), **(replaced or {})}
 
 
-def face_numbers(head, hat_numbers):
+def face_numbers(head, hat_numbers, left=False):
     """The numbers of the head for its face: without the teeth of hair on the brow under a hat whose
-    numbers say "FRINGE": False."""
-    if hat_numbers.get("FRINGE", True):
+    numbers say "FRINGE": False, and on Side=Left, whose head is all cream (cream_head)."""
+    if hat_numbers.get("FRINGE", True) and not left:
         return head
     return SimpleNamespace(**{**vars(head), "FRINGE_TEETH": 0})
 
@@ -2115,11 +2303,15 @@ def budget():
 
     def base_of(traits):
         hat_numbers = head_look(traits)
-        key = (hat_numbers.get("LEAVES", FULL_CROWN), hat_numbers.get("HAIR_POINTS"), hat_numbers.get("FRINGE", True))
+        entry = head_entry(traits)
+        rim = id(entry) if entry is not None and entry.get("under_rim") is not None else None
+        key = (hat_numbers.get("LEAVES", FULL_CROWN), hat_numbers.get("HAIR_POINTS"), hat_numbers.get("FRINGE", True),
+               rim)
         if key not in heads:
             head = variants.PartShapes(full.MATERIAL_ORDER)
             full.add_head(head, head_n)
             add_leaf_crown(head, head_n, surface, key[0])
+            rim_leaves_for(head, traits, None, head_n, body_n, surface)
             if key[1]:
                 hats_and_clothes.add_hair_points(head, surface, key[1], SKIN)
             full.add_face(head, face_numbers(head_n, hat_numbers), surface, eyes=False, mouth=False)
@@ -2195,10 +2387,14 @@ def build(traits=None, replaced=None, head_replaced=None):
     full.add_head(head, head_n)
     hat_numbers = head_look(traits, replaced)
     leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN))
+    leaves += rim_leaves_for(head, traits, replaced, head_n, body_n, surface)
+    left = (traits or {}).get("Side") == "Left"
+    if left:
+        cream_head(head)
     # Points of hair that a hat lets out on the brow (the durag), in the skin colour: part of the head.
     if hat_numbers.get("HAIR_POINTS"):
         hats_and_clothes.add_hair_points(head, surface, hat_numbers["HAIR_POINTS"], SKIN)
-    full.add_face(head, face_numbers(head_n, hat_numbers), surface, eyes=False, mouth=False)
+    full.add_face(head, face_numbers(head_n, hat_numbers, left), surface, eyes=False, mouth=False)
     full.turn_head_up(head, head_n)
 
     arms = {}

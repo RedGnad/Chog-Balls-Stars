@@ -353,6 +353,55 @@ Still wrong, or not done:
 - Not modelled: the 17 values of Head worn only on the Skull and Radioactive bases (37 Genesis), listed with
   what their art shows at the end of `head-values-from-the-art.md`; those bases themselves are not built.
 
+## Batch 5: the head judged turned around, a row under the real rim of each hat (15 October 2026, pictures only)
+
+What the owner said after batch 4: still not coherent (long spikes on some, only two on each side, spikes
+that do not show behind), some spikes and hair do not look like the pictures at all, the crown is worse,
+and the work was judged from one angle. **Nothing of this is in the game.**
+
+- **The turnaround.** `render_chog_traits.py --only turnaround` renders the head alone, without
+  perspective, from eight turns around it (front, 45, left side, 135, back, 225, right side, 315), from
+  straight above, and from the game's angle behind and in front; `make_chog_traits_review.py turnaround`
+  lays them beside the picture and the bust, one row per Genesis. Seen that way, batch 4 had under every
+  hat of Side=Right a pair of spikes on each side, none at the back, and a collar of spikes at the neck;
+  the heads of Side=Left were in the skin colour where the pictures draw them cream; the crown had a gold
+  floor that read as a pie from above.
+- **A row under the real rim** (`UNDER_RIM`, `add_rim_leaves` in `make_chog_traits.py`). A hat is a volume
+  on a spiky head: under every hat of Side=Right that lets the spikes out, the seven lines of the crown are
+  removed and one row of leaves is planted just under the rim of the hat as built. At each angle the rim
+  is found by casting rays out of the head and seeing where the hat stops covering it; each leaf is
+  checked with `leaf_crossings()` and lowered until it does not cross the hat. Nine leaves (degrees from
+  the front 78, 104, 130, 156 on both sides, 180), the same for every hat, leaning back and bent up a
+  little at the point: from the pictures' angle two to four stack down the far side under the rim, as
+  drawn; from behind and from above they fan out all around. The line of `HEAD_VALUES` says which row:
+  `RIM_ROW` (caps), `BUCKET_RIM_ROW` (longer, so their points pass the brim that goes all around),
+  `BIG_RIM_ROW` (wizard hat, durag), `USHANKA_RIM_ROW` (a few short ones at the back), none (Side=Left,
+  hair, hoods). The pairs of batch 3 and 4 (`SIDE_POINTS` and the like) are gone.
+- **Side=Left heads are cream** (`cream_head`): skull and leaves in the cream of the face, no teeth of
+  hair on the brow; points of hair under a hood keep the skin colour.
+- **The crown is an open band** (`FLOOR`: None, `BAND_INSIDE`): up the outside, down the inside, nothing
+  over the top; inside it the head and its top leaf, short (`CROWN_TOP`), and the row under its band.
+  (The first try closed the band with a flat face, which add_loops puts on an end row: a gold lid.)
+
+Numbers (`-- --coverage`, `-- --budget`, base Origin): hat, eyes, mouth 1,869 of 1,869, clothing too
+1,789 (unchanged); largest dressed hero #470 7,924 triangles, median 6,180, none over 8,000. One Genesis
+per value and Side (48) built with the turnaround, none failed.
+
+```sh
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_batch.py \
+    --out .artifacts/chog-body/traits/batch-5 --genesis 97,19,1241 --only bust,turnaround
+.artifacts/tools-venv/bin/python tools/blender/make_chog_traits_review.py turnaround \
+    --batch .artifacts/chog-body/traits/batch-5 --genesis 97,19,1241 --size 150 --label 180 --out FILE.png
+```
+
+Sheets in `.artifacts/chog-body/traits/batch-5/`: `before_after_turned.png` (seven heroes, batch 4 above
+batch 5), `turn_caps_right_1.png`, `turn_caps_right_2.png`, `turn_caps_left_1.png`, `turn_caps_left_2.png`,
+`turn_beanies_left.png`, `turn_other_1.png`, `turn_other_2.png`. Still wrong: Bob Hair and Rainbow Wig are
+masses of round puffs where the pictures draw one mass with a wavy edge, in large blocks of colour for the
+wig; from the game camera the row under a bucket hat shows only its points; the bare head of Side=Left
+keeps the whole star where the pictures draw a row of points over the top; the durag's row stands out
+like ears from the front; the Spartan helmet's cheek guards and eye holes (batch 4).
+
 The sections below describe the first body, which `make_chog_body.py` still builds.
 
 ## Commands

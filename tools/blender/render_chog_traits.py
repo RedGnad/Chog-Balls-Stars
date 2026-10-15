@@ -5,7 +5,7 @@ Run it without the interface of Blender (5.2), after make_chog_traits.py:
 
     /Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup \
         --python tools/blender/render_chog_traits.py -- --name 1287
-        [--colour red|RRGGBB] [--size 504] [--bust-size 1008] [--only bust,studio,game,towards]
+        [--colour red|RRGGBB] [--size 504] [--bust-size 1008] [--only bust,studio,game,towards,turnaround]
         [--blend FILE --out FOLDER]
 
 "--name" is the folder under .artifacts/chog-body/traits/ that holds ChogBody.blend: the number of a
@@ -77,6 +77,17 @@ BUST_PLAIN = (0.62, 0.62, 0.62)      # behind the base, which has no Genesis
 # keep the light of render_chog_body.py, to be set beside the earlier pictures.
 BUST_KEY_LIGHT = 1.7
 BUST_FRONT_LIGHT = 1.1
+# The turnaround (added 15 October 2026, after batch 4 was judged on one angle only): the head alone,
+# without perspective, from eight turns around it at TURN_ELEVATION_DEG above the horizon (0 is the
+# front, 90 the character's left, 180 the back), then from straight above, then from the game's angle
+# behind and in front of it. What the pictures of the collection never show (the back, the other side,
+# the top) is judged here: chog_<name>_turn_<turn>.png, chog_<name>_turn_top.png,
+# chog_<name>_turn_game.png, chog_<name>_turn_game_front.png.
+TURN_TURNS = (0, 45, 90, 135, 180, 225, 270, 315)
+TURN_ELEVATION_DEG = 12.0
+TURN_HEIGHT = 0.9
+TURN_FRAME = 0.95
+TURN_SIZE = 360
 
 
 def unlit_material(name, colour):
@@ -235,7 +246,7 @@ def render_one(name, blend=None, out=None, only=None, colour=None, size=504, bus
         if in_game:
             flat.write_small(path, path[:-4] + "_phone.png", size // shots.PHONE_POINTS)
 
-    families = {"bust", "studio", "game", "towards"}
+    families = {"bust", "studio", "game", "towards", "turnaround"}
     wanted = set(only.split(",")) if only else {"bust", "studio", "game"}
     if wanted - families:
         raise SystemExit(f"CHOG_RENDER unknown families {sorted(wanted - families)}: use {sorted(families)}")
@@ -257,6 +268,20 @@ def render_one(name, blend=None, out=None, only=None, colour=None, size=504, bus
     for view_name in shots.GAME_VIEWS:
         if "game" in wanted or ("towards" in wanted and view_name == "game_front"):
             shoot(view_name, True)
+    if "turnaround" in wanted:
+        ground.hide_render = True
+        for disc in ring:
+            disc.hide_render = True
+        front.hide_render = True
+        lights[0].data.energy = render.KEY_LIGHT
+        sky.inputs["Color"].default_value = grey
+        scene.render.resolution_x = scene.render.resolution_y = TURN_SIZE
+        turns = [(f"turn_{turn:03d}", turn, TURN_ELEVATION_DEG) for turn in TURN_TURNS]
+        turns += [("turn_top", 180.0, 89.0), ("turn_game", 160.0, render.GAME_ELEVATION_DEG),
+                  ("turn_game_front", 20.0, render.GAME_ELEVATION_DEG)]
+        for view_name, turn, elevation in turns:
+            render.place_camera(camera, lights, (turn, elevation, True, TURN_HEIGHT, TURN_FRAME, False))
+            render.render(os.path.join(folder, f"chog_{name}_{view_name}.png"))
 
 
 if __name__ == "__main__":
