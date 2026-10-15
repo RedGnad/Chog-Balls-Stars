@@ -92,13 +92,16 @@ RECRUIT_SKIN = {"skin": (0.62, 0.62, 0.66), "face": traits.GENESIS_FACE}
 SKINS = {**traits.SKINS, "Recruit": RECRUIT_SKIN}
 # The Skull base (batch 7): its own bone colours, by "Skin", under names that do not meet those of Origin.
 SKINS.update({"Skull " + name: {"skin": colour, "face": colour} for name, colour in bases.SKULL_SKINS.items()})
-BASES = ("Origin", "Skull")
+# The Radioactive base: a skin that runs from its colour at the feet to a lighter one at the top (format 5).
+SKINS.update({"Radioactive " + name: {"skin": bottom, "face": bottom, "top": top}
+              for name, (bottom, top) in bases.RADIOACTIVE_SKINS.items()})
+BASES = ("Origin", "Skull", "Radioactive")
 
 
 def skin_key(genesis_traits):
     """The name of a Genesis's colours in SKINS."""
-    skull = bases.is_skull(genesis_traits)
-    return ("Skull " if skull else "") + genesis_traits.get("Skin", "")
+    base_name = genesis_traits.get("Base", "Origin")
+    return ("" if base_name == "Origin" else base_name + " ") + genesis_traits.get("Skin", "")
 LIGHT_LIT, LIGHT_UNLIT, LIGHT_OUTLINE = 0, 1, 2
 
 
@@ -123,9 +126,12 @@ def keys_of(genesis_traits):
     """The keys of the parts a Genesis wears: what each part is built from, and nothing else."""
     side = genesis_traits.get("Side", "Right")
     keys = {("rest", name) for name in ("Body", "armLeft", "armRight")}
-    if bases.is_skull(genesis_traits):
-        # A skull: its own head (no leaf, whatever the hat), and the ribs on its body.
-        keys = {("rest", "Body", "Skull"), ("rest", "armLeft"), ("rest", "armRight"), ("head", "Skull")}
+    if bases.is_skull(genesis_traits) or bases.is_radioactive(genesis_traits):
+        # A skull: its own head (no leaf, whatever the hat), and the ribs on its body. A radioactive Chog:
+        # its head with the crown its head object leaves and the skull's teeth, the ribs on its body.
+        base_name = genesis_traits["Base"]
+        head = ("head", "Skull") if base_name == "Skull" else ("head", "Radioactive", genesis_traits.get("Head"))
+        keys = {("rest", "Body", base_name), ("rest", "armLeft"), ("rest", "armRight"), head}
         for trait in traits.TRAIT_PARTS:
             value = genesis_traits.get(trait)
             if value is not None and isinstance(traits.entry_for(trait, genesis_traits), dict):
@@ -154,8 +160,8 @@ def key_of_object(thing, genesis_traits):
     if thing.name in REST_PARTS:
         if thing.name == "Head":
             return next(key for key in keys_of(genesis_traits) if key[0] == "head")
-        if thing.name == "Body" and bases.is_skull(genesis_traits):
-            return ("rest", "Body", "Skull")
+        if thing.name == "Body" and (bases.is_skull(genesis_traits) or bases.is_radioactive(genesis_traits)):
+            return ("rest", "Body", genesis_traits["Base"])
         return ("rest", thing.name)
     trait, value = thing["trait"].split("=", 1)
     return ("trait", trait, value, genesis_traits.get("Side", "Right"))

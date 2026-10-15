@@ -608,3 +608,12 @@ branch writes to a scratch file). The owner says yes or no first.
 - **Still wrong:** the ram horns are smaller than drawn; the skull keeps the round head of a Chog where the
   pictures draw a skull with a narrower jaw; Red Bandana is not modelled; the ten 1:1 Genesis keep the
   earlier look.
+
+Batch 7 in the game, as a preview only (15 October, 23:59): the export of this branch with the Radioactive
+base (format 5: its skins run from their colour at the feet to a lighter one at the top) covers 1,959
+Genesis (Origin, Skull, Radioactive), all built and matching their parts, none over 8,000 triangles; only the
+ten 1:1 Genesis keep the earlier look. A build made with that library on the local network only (the
+library of the game was put back right after; the public address was not touched) draws them as the
+Blender pictures do, the gradients included:
+`research/evidence/chog-traits-batch7-in-game-preview-headless-2026-10-15.png`. To put batch 7 in the game
+once the owner says yes: merge this branch, run `export_chog_parts.py`, build.
