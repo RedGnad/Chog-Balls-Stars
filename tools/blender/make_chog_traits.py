@@ -87,6 +87,7 @@ sys.dont_write_bytecode = True   # no __pycache__ folder beside the scripts
 import make_chog_full as full  # noqa: E402  (the folder of this file must be on the path first)
 from render_chog_body import linear  # noqa: E402
 import chog_trait_faces as faces  # noqa: E402  (eyes and mouths added on 14 October 2026, registered below)
+import chog_trait_bases as bases  # noqa: E402  (the Skull base, batch 7, 16 October 2026)
 
 variants, base = full.variants, full.base
 X, Y, Z, NOWHERE = base.X, base.Y, base.Z, base.NOWHERE
@@ -2487,17 +2488,26 @@ def build(traits=None, replaced=None, head_replaced=None):
     body = variants.PartShapes(full.MATERIAL_ORDER)
     variants.add_torso(body, body_n)
     variants.add_legs_and_feet(body, body_n)
+    if bases.is_skull(traits):
+        # The skeleton under the skull: ribs and breastbone on the torso (clothing covers them).
+        bases.add_ribs(body, body_n, full.EYE)
 
     head = variants.PartShapes(full.MATERIAL_ORDER)
     surface = full.HeadSurface(head_n)
     full.add_head(head, head_n)
     hat_numbers = head_look(traits, replaced)
-    leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN))
-    leaves += rim_leaves_for(head, traits, replaced, head_n, body_n, surface)
-    # Points of hair that a hat lets out on the brow (the durag), in the skin colour: part of the head.
-    if hat_numbers.get("HAIR_POINTS"):
-        hats_and_clothes.add_hair_points(head, surface, hat_numbers["HAIR_POINTS"], SKIN)
-    full.add_face(head, face_numbers(head_n, hat_numbers), surface, eyes=False, mouth=False)
+    skull = bases.is_skull(traits)
+    if skull:
+        # A skull: no leaf, no hair, no cream face; the bone is the face (chog_trait_bases.py).
+        leaves = []
+        bases.add_skull_face(head, head_n, surface, full, draw_shape, oval, SKIN, full.EYE, full.BLUSH, full.FACE)
+    else:
+        leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN))
+        leaves += rim_leaves_for(head, traits, replaced, head_n, body_n, surface)
+        # Points of hair that a hat lets out on the brow (the durag), in the skin colour: part of the head.
+        if hat_numbers.get("HAIR_POINTS"):
+            hats_and_clothes.add_hair_points(head, surface, hat_numbers["HAIR_POINTS"], SKIN)
+        full.add_face(head, face_numbers(head_n, hat_numbers), surface, eyes=False, mouth=False)
     full.turn_head_up(head, head_n)
 
     arms = {}
@@ -2685,7 +2695,7 @@ def make_one(number, out=None, hat=None, replaced=None, head_replaced=None):
 
     # What the renders need to know of this Genesis, kept in the file.
     if traits:
-        skin = SKINS.get(traits.get("Skin"))
+        skin = bases.skin_of(traits) if bases.is_skull(traits) else SKINS.get(traits.get("Skin"))
         if skin is None:
             raise SystemExit(f"CHOG_TRAITS no colour recorded for Skin={traits.get('Skin')}")
         root["chog_genesis"] = str(number)
