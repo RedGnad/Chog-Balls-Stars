@@ -90,8 +90,8 @@ fi
 export CHOG_BROWSER_TOUCH=1
 export CHOG_BROWSER_OUTPUT_DIR="$ROOT/.artifacts/unity/check-$LABEL"
 
-# Taps at 960 x 540.
-QUICK_PLAY="90 349"
+# Taps at 960 x 540. QUICK PLAY moved under the hero of the menu on 16 October (ChogMenuSkin).
+QUICK_PLAY="119 376"
 START="480 440"
 CHANGE_TEAM="480 327"
 # The STAKE button of the preparation screen and the button of the menu's stake strip.

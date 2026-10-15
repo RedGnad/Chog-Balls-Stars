@@ -19,9 +19,9 @@ namespace Chog.Screens
         private const string ObjectName = "ChogWagerResult";
         private const float ReadEverySeconds = 4f;
 
-        private static readonly Color PanelColor = new Color(0.12f, 0.11f, 0.16f, 0.95f);
-        private static readonly Color AccentColor = new Color(0.62f, 0.94f, 0.42f, 1f);
-        private static readonly Color ButtonTextColor = new Color(0.10f, 0.12f, 0.10f, 1f);
+        private static readonly Color PanelColor = ChogTheme.Card;
+        private static readonly Color AccentColor = ChogTheme.Cheek;
+        private static readonly Color ButtonTextColor = Color.white;
         // A strip along the top of the menu.
         private static readonly Vector2 StripMin = new Vector2(0.20f, 0.90f);
         private static readonly Vector2 StripMax = new Vector2(0.80f, 0.995f);
@@ -98,6 +98,7 @@ namespace Chog.Screens
             area.offsetMin = Vector2.zero;
             area.offsetMax = Vector2.zero;
             GetComponent<Image>().color = PanelColor;
+            ChogTheme.AsCard(GetComponent<Image>());
 
             _text = Text("Text", new Vector2(0.02f, 0.05f), new Vector2(0.74f, 0.95f), Color.white, 40f, transform);
             var buttonArea = Child("Button", transform, new Vector2(0.76f, 0.12f), new Vector2(0.98f, 0.88f));
@@ -105,9 +106,10 @@ namespace Chog.Screens
             background.color = AccentColor;
             _button = buttonArea.gameObject.AddComponent<Button>();
             _button.targetGraphic = background;
+            ChogTheme.Shape(_button);
             _button.onClick.AddListener(OnButton);
             _buttonLabel = Text("Label", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.92f), ButtonTextColor, 40f, buttonArea);
-            _buttonLabel.fontStyle = FontStyles.Bold;
+            ChogTheme.AsTitle(_buttonLabel);
             Refresh();
         }
 

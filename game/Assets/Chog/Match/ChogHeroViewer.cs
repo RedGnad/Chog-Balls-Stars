@@ -31,6 +31,8 @@ namespace Chog.Match
         private static readonly Color Background = new Color(0.16f, 0.14f, 0.2f);
 
         private readonly List<Transform> _turned = new List<Transform>();
+        private readonly List<(Transform Thing, ChogHeroModel.AttackStyle Style)> _thrown =
+            new List<(Transform, ChogHeroModel.AttackStyle)>();
         // One picture for each row: on WebGL a camera that draws into a part of a picture clears
         // the whole of it, so two cameras cannot share one.
         private readonly List<RenderTexture> _pictures = new List<RenderTexture>();
@@ -107,6 +109,19 @@ namespace Chog.Match
                 hero.localRotation = Quaternion.Euler(0f, facing, 0f);
                 ChogBodyAnimator.Attach(hero);
                 _turned.Add(hero);
+
+                // Beside the hero seen by the game camera: what its basic attack throws, turning as it does.
+                if (elevation > 45f)
+                {
+                    var thrown = ChogHeroModel.BuildAttack(numbers[column], root, out var style, out _);
+                    if (thrown != null)
+                    {
+                        // The hero is drawn at the size it was made here: its object too.
+                        thrown.localScale = Vector3.one / ChogHeroModel.Scale;
+                        thrown.localPosition = hero.localPosition + new Vector3(0.5f, 0.6f, -0.2f);
+                        _thrown.Add((thrown, style));
+                    }
+                }
             }
 
             var view = new GameObject("Viewer Camera").AddComponent<Camera>();
@@ -143,6 +158,14 @@ namespace Chog.Match
 
         private void Update()
         {
+            foreach (var (thing, style) in _thrown)
+            {
+                if (thing == null)
+                    continue;
+                var turn = style == ChogHeroModel.AttackStyle.Spin ? new Vector3(0f, 180f, 0f)
+                    : style == ChogHeroModel.AttackStyle.Tumble ? new Vector3(150f, 0f, 0f) : new Vector3(0f, 0f, 60f);
+                thing.Rotate(turn * Time.deltaTime, Space.Self);
+            }
             if (!_spin)
                 return;
             foreach (var hero in _turned)

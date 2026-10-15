@@ -356,6 +356,24 @@ mainnet with a Genesis, and the loan pass a judge without a Genesis would play w
 when its lender no longer holds the Genesis (`server/README.md`). The test benches do not depend
 on it: they take Genesis 1795 from whoever holds it on the local copy (`tools/contracts/on_copy.sh`).
 
+**15 October 2026, 21:50 (the night the user asked to go on alone).** The user said yes to the 3D
+in the game and to the attacks drawn from the Genesis ("bien beau, accurate, et optimisé"), noted the
+menu was still the sample's, and asked that the project be taken as far as possible without them,
+keeping for them what needs them. Done since, built and seen in the headless browser on this Mac's
+local address (no phone yet):
+- **The 3D heroes are in the game** for the 1,869 Genesis of the base Origin, from a library of parts
+  (`game/README.md`, "The 3D heroes"; checked against every one of those Genesis at export); a recruit
+  is a bare grey Chog; the 100 Genesis on another base keep the earlier look until their heads exist.
+- **The screens wear the Chog identity** (`game/README.md`, "The look of the screens"): the menu, our
+  panels and the team preparation; the player's hero turns in 3D on the menu.
+- **The basic attacks show what the hat gives** (`docs/ATTACKS-FROM-THE-ART.md`): 22 objects and the
+  hats themselves, seen beside their heroes and thrown in a match.
+- The user's questions of the evening were answered in the chat (why the robber's spikes differ from
+  the plumber's: a rule taken from one angle and a check too weak; the fix written down, not made; the
+  development wallet; the plan).
+**Not seen:** any of it on a phone, its cost there (`?perf=1`), a strike of the brute filmed.
+**Waiting on the user:** their eye on the menu and the heroes; the phone; the testnet deployment.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a

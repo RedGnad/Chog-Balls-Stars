@@ -80,7 +80,8 @@ namespace Chog.Screens
             title.fontSizeMin = 14f;
             title.fontSizeMax = 120f;
             title.color = Color.white;
-            title.text = "<b>" + Title + "</b>\n<size=42%><color=#B9C4E6>" + Tagline + "</color></size>";
+            ChogTheme.AsTitle(title);
+            title.text = Title + "\n<size=40%><color=#A99BFC>" + Tagline + "</color></size>";
         }
     }
 }

@@ -84,7 +84,7 @@ namespace Chog.Editor
                 File.WriteAllText(ImportedPath, "");
                 try
                 {
-                    var roster = "Genesis roster: " + GenesisRosterImporter.Import();
+                    var roster = "Genesis roster: " + GenesisRosterImporter.Import() + "; " + ChogFontAssets.Ensure();
                     // Kept in the marker so the final status says which roster the build embeds.
                     File.WriteAllText(ImportedPath, roster);
                     Write("importing", roster, null);

@@ -23,7 +23,7 @@ namespace Chog.Screens
         private const float PortraitSize = 96f;
         private const float Margin = 8f;
 
-        private static readonly Color PanelColor = new Color(0.12f, 0.11f, 0.16f, 0.92f);
+        private static readonly Color PanelColor = ChogTheme.Card;
         private const string TraitColor = "#A9A9B8";
         private const string CareerColor = "#FFD27A";
 
@@ -47,6 +47,7 @@ namespace Chog.Screens
                 card.SetParent(parent, false);
                 var background = panel.GetComponent<Image>();
                 background.color = PanelColor;
+                ChogTheme.AsCard(background);
                 background.raycastTarget = false;
 
                 text = Object.Instantiate(template, card);

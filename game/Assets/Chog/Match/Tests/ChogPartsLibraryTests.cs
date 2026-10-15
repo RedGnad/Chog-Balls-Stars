@@ -109,6 +109,26 @@ namespace Chog.Match.Tests
         }
 
         [Test]
+        public void EveryHeroThrowsWhatItsHatGivesIt()
+        {
+            foreach (var pair in Library.Heroes)
+                Assert.AreNotEqual(ChogPartsLibrary.NoAttack, pair.Value.Attack, $"CHOG #{pair.Key}");
+
+            // The owner's TISM Cap: the cap itself, turning flat.
+            Assert.IsTrue(Library.TryGetHero(1287, out var owner));
+            StringAssert.StartsWith("Hat_Cap", Library.Pieces[owner.Attack].Name);
+            Assert.AreEqual((byte)ChogHeroModel.AttackStyle.Spin, owner.AttackStyle);
+            // A Russian Hat throws a snowball, a Thunder Cap its bolt, a bare head a leaf of its crown.
+            Assert.IsTrue(Library.TryGetHero(39, out var russian));
+            Assert.AreEqual("Attack_Snowball", Library.Pieces[russian.Attack].Name);
+            Assert.IsTrue(Library.TryGetHero(56, out var thunder));
+            Assert.AreEqual("Attack_Bolt", Library.Pieces[thunder.Attack].Name);
+            Assert.IsTrue(Library.TryGetHero(75, out var bare));
+            Assert.AreEqual("Attack_Leaf", Library.Pieces[bare.Attack].Name);
+            Assert.AreEqual(ChogPartsLibrary.AttackPart, Library.Pieces[bare.Attack].On);
+        }
+
+        [Test]
         public void AFileOfAnotherLayoutIsRefused()
         {
             Assert.Throws<InvalidDataException>(() => ChogPartsLibrary.Read(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }));

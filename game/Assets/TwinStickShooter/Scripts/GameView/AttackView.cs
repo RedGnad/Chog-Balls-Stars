@@ -18,6 +18,13 @@ namespace TwinStickShooter
       Attack attack = frame.Get<Attack>(EntityRef);
       _ownerEntity = attack.Source;
       SetColors();
+
+      // The basic attack of a hero shows what the hat of its Genesis gives it (Chog.Match.ChogAttackLook);
+      // a recruit throws a leaf of its grey crown.
+      var data = frame.FindAsset<AttackData>(attack.AttackData.Id);
+      var owner = frame.TryGet<GenesisHero>(_ownerEntity, out var genesis) ? genesis.MetadataId
+        : frame.Has<PlayerLink>(_ownerEntity) ? Chog.Match.ChogHeroModel.Recruit : -1;
+      Chog.Match.ChogAttackLook.Dress(transform, data != null ? data.name : "", owner);
     }
 
     private void SetColors()

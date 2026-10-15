@@ -73,11 +73,11 @@ namespace Chog.Screens
         private void BuildOfferView()
         {
             var cover = Child("Offer", transform, Vector2.zero, Vector2.one);
-            cover.gameObject.AddComponent<Image>().color = CoverColor;
+            ChogTheme.AsCard(cover.gameObject.AddComponent<Image>());
             _offerView = cover.gameObject;
 
             _offerTitle = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.96f, 0.98f), TextAlignmentOptions.Left, Color.white, 60f, cover);
-            _offerTitle.fontStyle = FontStyles.Bold;
+            ChogTheme.AsTitle(_offerTitle);
             _offerText = Text("Text", new Vector2(0.04f, 0.50f), new Vector2(0.96f, 0.84f), TextAlignmentOptions.TopLeft, Color.white, 40f, cover);
 
             _offerLess = MakeButton("Less", new Vector2(0.04f, 0.30f), new Vector2(0.15f, 0.47f), out var lessLabel, cover);
@@ -115,11 +115,11 @@ namespace Chog.Screens
         private void BuildMarketView()
         {
             var cover = Child("Market", transform, Vector2.zero, Vector2.one);
-            cover.gameObject.AddComponent<Image>().color = CoverColor;
+            ChogTheme.AsCard(cover.gameObject.AddComponent<Image>());
             _marketView = cover.gameObject;
 
             var title = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.62f, 0.98f), TextAlignmentOptions.Left, Color.white, 60f, cover);
-            title.fontStyle = FontStyles.Bold;
+            ChogTheme.AsTitle(title);
             title.text = "RENT A HERO";
             _marketCount = Text("Count", new Vector2(0.62f, 0.86f), new Vector2(0.96f, 0.98f), TextAlignmentOptions.Right, MutedColor, 40f, cover);
 

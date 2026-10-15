@@ -13,7 +13,13 @@ namespace Chog.Match
     /// </summary>
     public sealed class ChogPartsLibrary
     {
-        public const string Magic = "CHOGPARTS2";
+        public const string Magic = "CHOGPARTS3";
+
+        /// <summary>The rest part of the objects of the basic attacks, which no hero wears.</summary>
+        public const string AttackPart = "Attack";
+
+        /// <summary>A hero whose basic attack has no object.</summary>
+        public const ushort NoAttack = 0xFFFF;
 
         /// <summary>Where a material's colour comes from.</summary>
         public const byte RoleFixed = 0, RoleSkin = 1, RoleFace = 2;
@@ -65,6 +71,9 @@ namespace Chog.Match
         {
             public int Skin;
             public ushort[] Pieces;
+            /// <summary>The piece its basic attack throws (NoAttack for none), and how it moves.</summary>
+            public ushort Attack;
+            public byte AttackStyle;
         }
 
         public PartMaterial[] Materials;
@@ -170,6 +179,10 @@ namespace Chog.Match
                         throw new InvalidDataException("CHOG #" + number + " wears a piece that is not in the library");
                 }
 
+                hero.Attack = reader.ReadUInt16();
+                hero.AttackStyle = reader.ReadByte();
+                if (hero.Attack != NoAttack && hero.Attack >= library.Pieces.Length)
+                    throw new InvalidDataException("CHOG #" + number + " throws a piece that is not in the library");
                 if (hero.Skin >= library.Skins.Length)
                     throw new InvalidDataException("CHOG #" + number + " has a skin that is not in the library");
                 library.Heroes[number] = hero;

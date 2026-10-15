@@ -34,6 +34,15 @@ namespace Chog.Match
         /// <summary>Height of the top of the crown over the feet, in units of the model.</summary>
         public const float ModelHeight = 1.15f;
 
+        /// <summary>How an attack object moves (chog_attack_objects.py: SPIN, TUMBLE, POINT, FLOAT).</summary>
+        public enum AttackStyle : byte { Spin = 0, Tumble = 1, Point = 2, Float = 3 }
+
+        /// <summary>The largest side of every attack object in the arena, in world units.</summary>
+        public const float AttackSize = 0.8f;
+
+        // The meshes of the attack objects, made once for each piece and skin: attacks come often.
+        private static readonly Dictionary<int, (Mesh Mesh, Color Impact)> s_attacks = new Dictionary<int, (Mesh, Color)>();
+
         private static ChogPartsLibrary s_library;
         private static bool s_loaded;
         private static bool? s_off;
@@ -148,6 +157,86 @@ namespace Chog.Match
             }
 
             return root;
+        }
+
+        /// <summary>
+        /// The object the basic attack of this Genesis throws (or the grey recruit's leaf), centred on its
+        /// origin, as large as every other (AttackSize), under "parent"; its style and the colour of its
+        /// impact (the colour most of it is drawn in). Null when the library has no object for it.
+        /// </summary>
+        public static Transform BuildAttack(int metadataId, Transform parent, out AttackStyle style, out Color impact)
+        {
+            style = AttackStyle.Spin;
+            impact = Color.white;
+            var library = Library;
+            if (Off || library == null || !library.TryGetHero(metadataId, out var hero) || hero.Attack == ChogPartsLibrary.NoAttack)
+                return null;
+            style = (AttackStyle)hero.AttackStyle;
+            var key = hero.Attack * 64 + hero.Skin;
+            if (!s_attacks.TryGetValue(key, out var made) || made.Mesh == null)
+            {
+                made = AttackMesh(library, library.Pieces[hero.Attack], hero.Skin);
+                s_attacks[key] = made;
+            }
+            impact = made.Impact;
+            var thing = new GameObject("ChogAttackObject", typeof(MeshFilter), typeof(MeshRenderer));
+            thing.transform.SetParent(parent, false);
+            thing.GetComponent<MeshFilter>().sharedMesh = made.Mesh;
+            var renderer = thing.GetComponent<MeshRenderer>();
+            renderer.sharedMaterial = Material;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            return thing.transform;
+        }
+
+        // One piece alone, centred and brought to AttackSize; the colour most of its vertices take.
+        private static (Mesh, Color) AttackMesh(ChogPartsLibrary library, ChogPartsLibrary.Piece piece, int skin)
+        {
+            var count = piece.VertexCount;
+            var low = Vector3.one * float.MaxValue;
+            var high = Vector3.one * float.MinValue;
+            for (var v = 0; v < count; v++)
+            {
+                var at = new Vector3(piece.Positions[v * 3], piece.Positions[v * 3 + 1], piece.Positions[v * 3 + 2]);
+                low = Vector3.Min(low, at);
+                high = Vector3.Max(high, at);
+            }
+            var centre = (low + high) * 0.5f;
+            var extent = high - low;
+            var scale = AttackSize / Mathf.Max(0.001f, Mathf.Max(extent.x, Mathf.Max(extent.y, extent.z)));
+
+            var vertices = new Vector3[count];
+            var normals = new Vector3[count];
+            var colours = new Color[count];
+            var votes = new Dictionary<ushort, int>();
+            for (var v = 0; v < count; v++)
+            {
+                vertices[v] = (new Vector3(piece.Positions[v * 3], piece.Positions[v * 3 + 1], piece.Positions[v * 3 + 2]) - centre) * scale;
+                normals[v] = new Vector3(piece.Normals[v * 3], piece.Normals[v * 3 + 1], piece.Normals[v * 3 + 2]) / 127f;
+                library.ColourOf(piece.Materials[v], skin, out var r, out var g, out var b, out var a);
+                colours[v] = new Color(r, g, b, a);
+                if (library.Materials[piece.Materials[v]].Light != ChogPartsLibrary.LightOutline)
+                    votes[piece.Materials[v]] = votes.TryGetValue(piece.Materials[v], out var n) ? n + 1 : 1;
+            }
+
+            var most = (ushort)0;
+            var best = -1;
+            foreach (var vote in votes)
+                if (vote.Value > best)
+                {
+                    best = vote.Value;
+                    most = vote.Key;
+                }
+            library.ColourOf(most, skin, out var ir, out var ig, out var ib, out _);
+
+            var mesh = new Mesh { name = "ChogAttack " + piece.Name };
+            mesh.vertices = vertices;
+            mesh.normals = normals;
+            mesh.colors = colours;
+            mesh.triangles = piece.Indices;
+            mesh.RecalculateBounds();
+            mesh.UploadMeshData(true);
+            return (mesh, new Color(ir, ig, ib, 1f));
         }
 
         /// <summary>The one material every hero is drawn with.</summary>

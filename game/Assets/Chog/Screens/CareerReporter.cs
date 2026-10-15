@@ -16,7 +16,7 @@ namespace Chog.Screens
     public sealed class CareerReporter : MonoBehaviour
     {
         private const float NoticeSeconds = 9f;
-        private static readonly Color NoticeColor = new Color(0.07f, 0.09f, 0.16f, 0.92f);
+        private static readonly Color NoticeColor = ChogTheme.Card;
         private const string CareerColor = "#FFD27A";
 
         // Name of each Genesis whose result was sent, for the notice.
@@ -86,6 +86,7 @@ namespace Chog.Screens
             band.offsetMax = Vector2.zero;
             var background = band.GetComponent<Image>();
             background.color = NoticeColor;
+            ChogTheme.AsCard(background);
             background.raycastTarget = false;
 
             var text = new GameObject("Text", typeof(RectTransform)).AddComponent<TextMeshProUGUI>();

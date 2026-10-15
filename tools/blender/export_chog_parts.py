@@ -24,7 +24,7 @@ How the library is made:
 
 The file (written to game/Assets/Chog/Resources/ChogParts.bytes by default), little endian:
 
-    "CHOGPARTS2"
+    "CHOGPARTS3"
     materials: count, then name, colour (3 floats, as on screen), role (0 its colour, 1 the skin of the
                Genesis, 2 its face), light (0 lit, 1 unlit, 2 outline: unlit and seen from inside)
     skins:     count, then name, skin (3 floats), face (3 floats)
@@ -34,7 +34,12 @@ The file (written to game/Assets/Chog/Resources/ChogParts.bytes by default), lit
                normals (3 signed bytes each), material of each vertex (2 bytes), index count, indices
                (2 bytes, or 4 when the piece has more than 65,535 vertices)
     genesis:   count, then the number shown in the name (2 bytes; 0 is the grey Chog of a recruit), skin
-               (1 byte), piece count (1 byte), pieces (2 bytes each)
+               (1 byte), piece count (1 byte), pieces (2 bytes each), the piece its basic attack throws
+               (2 bytes, 65535 for none) and how that piece moves (1 byte, chog_attack_objects.SPIN...)
+
+The objects of the basic attacks (chog_attack_objects.py) are pieces too, on the rest part "Attack": what a
+hero throws comes from its value of "Head" (docs/ATTACKS-FROM-THE-ART.md); a hero that throws its hat
+throws the very piece it wears.
 
 Strings are a 2-byte length then UTF-8. Coordinates are the game's: +Y up, the hero looking along +Z, its
 left arm on -X (Blender has +Z up and the hero looking along -Y), and each triangle is turned for
@@ -59,11 +64,14 @@ import bpy  # noqa: E402
 
 import make_chog_traits as traits  # noqa: E402  (the folder of this file must be on the path first)
 import render_chog_full as shots  # noqa: E402
+import chog_attack_objects as attacks  # noqa: E402
+from mathutils import Vector  # noqa: E402
 
 REST_PARTS = ("Body", "Head", "armLeft", "armRight")
 DEFAULT_OUT = os.path.join(traits.REPOSITORY, "game", "Assets", "Chog", "Resources", "ChogParts.bytes")
 SUMMARY = os.path.join(traits.REPOSITORY, ".artifacts", "chog-body", "parts-export.json")
-MAGIC = b"CHOGPARTS2"
+MAGIC = b"CHOGPARTS3"
+NO_ATTACK = 0xFFFF
 
 # The colours of the base, as render_chog_traits.py draws them (the skin and face are per Genesis).
 BASE_COLOURS = {
@@ -223,6 +231,28 @@ def cover(everyone):
     return chosen
 
 
+def build_attack_objects(materials):
+    """Every object of chog_attack_objects.py, made in an empty scene: key -> its piece."""
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    shared = traits.full.make_materials()
+    root = bpy.data.objects.new("ChogAttacks", None)
+    bpy.context.scene.collection.objects.link(root)
+    made = {}
+    leaf = traits.variants.PartShapes(traits.full.MATERIAL_ORDER)
+    attacks.build_leaf(leaf, traits.word_pieces)
+    thing = leaf.finish("Attack_Leaf", Vector((0.0, 0.0, 0.0)), root, shared)
+    made["Leaf"] = piece_of(thing, materials)
+    for key, (colours, unlit, builder, _) in attacks.OBJECTS.items():
+        prefix = "Attack_" + key
+        shapes = traits.TraitShapes(prefix, prefix, colours)
+        builder(shapes, traits.word_pieces)
+        own = traits.trait_materials(prefix, colours, unlit, shared)
+        thing = shapes.finish(prefix, Vector((0.0, 0.0, 0.0)), root, own)
+        made[key] = piece_of(thing, materials)
+        print(f"CHOG_PARTS attack object {key}: {len(made[key]['indices']) // 3} triangles", flush=True)
+    return made
+
+
 def write_string(out, text):
     data = text.encode("utf-8")
     out.write(struct.pack("<H", len(data)))
@@ -263,9 +293,10 @@ def write_library(path, materials, rest, pieces, heroes):
             out.write(struct.pack(f"<{len(indices)}{'H' if count <= 65535 else 'I'}", *indices))
         out.write(struct.pack("<I", len(heroes)))
         skins = list(SKINS)
-        for number, (skin, worn) in sorted(heroes.items()):
+        for number, (skin, worn, attack, style) in sorted(heroes.items()):
             out.write(struct.pack("<HBB", number, skins.index(skin), len(worn)))
             out.write(struct.pack(f"<{len(worn)}H", *worn))
+            out.write(struct.pack("<HB", attack, style))
     os.replace(temporary, path)
 
 
@@ -359,6 +390,22 @@ def main():
             failed[number] = str(stop)
     print(f"CHOG_PARTS checked {len(drawn)} more Genesis against the kept parts: all the same", flush=True)
 
+    # The objects of the basic attacks, after the heroes (each build empties the scene).
+    attack_pieces = {}
+    for key, piece in build_attack_objects(materials).items():
+        attack_pieces[key] = len(pieces)
+        pieces.append({**piece, "name": "Attack_" + key, "on": "Attack", "print": fingerprint(piece, materials)})
+
+    def attack_for(found, worn):
+        """The piece a hero's basic attack throws and how it moves (see chog_attack_objects)."""
+        key, style = attacks.attack_of(found.get("Head"))
+        if key == "HAT":
+            hat = by_key.get(("trait", "Head", found.get("Head"), found.get("Side", "Right")))
+            if hat:
+                return hat[0], style
+            key, style = attacks.attack_of("")
+        return attack_pieces[key], style
+
     heroes, incomplete = {}, {}
     for number, found in everyone.items():
         worn, lacking = [], []
@@ -372,14 +419,14 @@ def main():
             continue
         if lacking:
             incomplete[number] = lacking
-        heroes[number] = (found["Skin"], worn)
+        heroes[number] = (found["Skin"], worn, *attack_for(found, worn))
 
     # The recruit: the body, the arms and the head of a Genesis without hat or hood.
     bare = ("head", None, None, None)
     if bare not in by_key:
         raise SystemExit("CHOG_PARTS no Genesis without hat or hood was built: the recruit has no head")
     heroes[RECRUIT] = ("Recruit", [index for key in (("rest", "Body"), bare, ("rest", "armLeft"), ("rest", "armRight"))
-                                   for index in by_key[key]])
+                                   for index in by_key[key]], attack_pieces["Leaf"], attacks.TUMBLE)
 
     write_library(arguments.out, materials, rest, pieces, heroes)
     size = os.path.getsize(arguments.out)
@@ -391,6 +438,7 @@ def main():
         "pieces": len(pieces),
         "triangles_in_pieces": triangles,
         "materials": len(materials),
+        "attack_objects": {key: len(pieces[index]["indices"]) // 3 for key, index in attack_pieces.items()},
         "built": len(chosen),
         "checked": len(drawn),
         "failed": failed,

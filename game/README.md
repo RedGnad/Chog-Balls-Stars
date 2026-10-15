@@ -667,6 +667,26 @@ from inside only), from the alpha of its colour.
 `?heroes=1287,14,0` shows those (0 is the recruit), `&spin=1` turns them. On a private address
 `?hero3d=0` brings back the earlier look for a comparison.
 
+### The look of the screens (16 October)
+
+The menu was the sample's (navy blue, green buttons). It now wears the Chog identity read from the
+official sites (`research/chog-visual-identity-2026-10-15.md`): the night purple and the two halos of
+chogathon.chog.xyz, the cheek pink `#D83E7E` for the thing to do and the Monad purple `#836EF9` for the
+next, Koulen in capitals for titles, buttons and numbers, Convergence for sentences, pill buttons with a
+hard dark shadow, cards with a thin lavender line. Everything asks `Assets/Chog/Screens/ChogTheme.cs`
+for its colours, fonts and shapes (the shapes are drawn in code, `ChogSprites`: no picture imported).
+`ChogMenuSkin` dresses the sample's menu at run time (its own backdrops made transparent, its buttons
+and texts restyled, its logos away) and puts the hero the player will enter with, in 3D on a turning
+pedestal (`ChogHeroStage`), above the play buttons, its name under it (RECRUIT for a player without a
+Genesis); our own panels (wallet, stake, result, hero card) take the same theme. `ChogGameSkin` does the
+team preparation of the arena scene. The behaviour of the screens is not touched; QUICK PLAY moved under
+the hero, so the tap of `tools/unity/checks/browser_check.sh` moved with it. `?uitree=1` writes the tree
+of the menu to the console.
+
+The two fonts are under the SIL Open Font License; their licence files are beside them in
+`Assets/Chog/Resources/Fonts/` and ship with the game. `Assets/Chog/Editor/ChogFontAssets.cs` makes
+their TextMesh Pro assets once, before a build.
+
 ### A tower and a core for each team (12 October)
 
 Each team defends two structures on the sample's map, built when the match begins

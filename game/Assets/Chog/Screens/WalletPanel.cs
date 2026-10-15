@@ -51,12 +51,14 @@ namespace Chog.Screens
         private static readonly Vector2 ChosenMax = new Vector2(0.96f, 0.41f);
         private static readonly Vector2 ChosenMaxBesideForm = new Vector2(0.68f, 0.41f);
 
-        private static readonly Color PanelColor = new Color(0.07f, 0.09f, 0.16f, 0.88f);
-        private static readonly Color CoverColor = new Color(0.07f, 0.09f, 0.16f, 1f);
-        private static readonly Color AccentColor = new Color(0.33f, 0.82f, 0.56f, 1f);
-        private static readonly Color ButtonTextColor = new Color(0.05f, 0.12f, 0.16f, 1f);
-        private static readonly Color QuietColor = new Color(0.93f, 0.91f, 0.85f, 1f);
-        private static readonly Color MutedColor = new Color(0.66f, 0.68f, 0.76f, 1f);
+        // The colours of ChogTheme (the Chog identity): the cheek pink for the thing to do, a muted
+        // purple for the others, white letters on both.
+        private static readonly Color PanelColor = ChogTheme.Card;
+        private static readonly Color CoverColor = ChogTheme.Card;
+        private static readonly Color AccentColor = ChogTheme.Cheek;
+        private static readonly Color ButtonTextColor = Color.white;
+        private static readonly Color QuietColor = ChogTheme.Quiet;
+        private static readonly Color MutedColor = ChogTheme.Muted;
         private static readonly Color WaitingColor = new Color(0.25f, 0.25f, 0.3f, 0.85f);
         private static readonly Color LockedColor = new Color(0.45f, 0.47f, 0.55f, 1f);
         private const string CareerColor = "#FFD27A";
@@ -90,6 +92,12 @@ namespace Chog.Screens
         private TextMeshProUGUI _formLabel;
         // The Genesis the panel shows as the one played, 0 for none.
         private int _played;
+
+        /// <summary>
+        /// The number shown in the name of the Genesis the menu says will be played (its metadata id),
+        /// 0 when the player enters as a recruit. The menu's hero stage shows it (ChogMenuSkin).
+        /// </summary>
+        public static int PlayedMetadataId { get; private set; }
         private Button _previous;
         private Button _next;
         private readonly Slot[] _slots = new Slot[SlotsPerPage];
@@ -187,10 +195,11 @@ namespace Chog.Screens
             area.offsetMin = Vector2.zero;
             area.offsetMax = Vector2.zero;
             GetComponent<Image>().color = PanelColor;
+            ChogTheme.AsCard(GetComponent<Image>());
 
             // Sizes are in units of the menu canvas, about twice the pixels of a phone in landscape.
             _title = Text("Title", new Vector2(0.04f, 0.86f), TitleMax, TextAlignmentOptions.Left, Color.white, 60f);
-            _title.fontStyle = FontStyles.Bold;
+            ChogTheme.AsTitle(_title);
             _address = Text("Address", new Vector2(0.62f, 0.86f), new Vector2(0.96f, 0.98f), TextAlignmentOptions.Right, MutedColor, 40f);
             _message = Text("Message", new Vector2(0.04f, 0.41f), new Vector2(0.96f, 0.84f), TextAlignmentOptions.TopLeft, Color.white, 44f);
             _pageLabel = Text("Page", new Vector2(0.10f, 0.41f), new Vector2(0.90f, 0.48f), TextAlignmentOptions.Center, MutedColor, 30f);
@@ -252,11 +261,11 @@ namespace Chog.Screens
         private void BuildLoanView()
         {
             var cover = Child("Loan", transform, Vector2.zero, Vector2.one);
-            cover.gameObject.AddComponent<Image>().color = CoverColor;
+            ChogTheme.AsCard(cover.gameObject.AddComponent<Image>());
             _loanView = cover.gameObject;
 
             _loanTitle = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.96f, 0.98f), TextAlignmentOptions.Left, Color.white, 60f, cover);
-            _loanTitle.fontStyle = FontStyles.Bold;
+            ChogTheme.AsTitle(_loanTitle);
             _loanText = Text("Text", new Vector2(0.04f, 0.50f), new Vector2(0.96f, 0.84f), TextAlignmentOptions.TopLeft, Color.white, 42f, cover);
             _loanLink = Text("Link", new Vector2(0.04f, 0.35f), new Vector2(0.96f, 0.49f), TextAlignmentOptions.TopLeft, MutedColor, 26f, cover);
             _loanLink.richText = false;
@@ -356,6 +365,8 @@ namespace Chog.Screens
                 : (pages > 1 ? (_page + 1) + " / " + pages + "   " : "") + "tap a Genesis to play it";
             _chosen.text = played > 0 ? DescribeChoice(played) : "";
             _played = played;
+            var playedIndex = played > 0 && _roster != null ? _roster.IndexOf(played) : -1;
+            PlayedMetadataId = playedIndex >= 0 ? _roster.Entries[playedIndex].MetadataId : 0;
             RefreshForm(played);
 
             // Signed in, the career of the chosen Genesis and the way to lend it; otherwise the
@@ -677,7 +688,7 @@ namespace Chog.Screens
             var button = area.gameObject.AddComponent<Button>();
             button.targetGraphic = background;
             label = Text("Label", new Vector2(0.04f, 0.1f), new Vector2(0.96f, 0.9f), TextAlignmentOptions.Center, ButtonTextColor, 52f, area);
-            label.fontStyle = FontStyles.Bold;
+            ChogTheme.Shape(button);
             return button;
         }
 
@@ -693,6 +704,7 @@ namespace Chog.Screens
             text.enableAutoSizing = true;
             text.fontSizeMin = 16f;
             text.fontSizeMax = largest;
+            ChogTheme.AsBody(text);
             return text;
         }
 

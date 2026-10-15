@@ -22,9 +22,9 @@ namespace Chog.Screens
         private static readonly int[] Amounts = { 1, 5, 10, 25, 50, 100, 250, 500, 1000 };
         private const int FirstAmount = 2;
 
-        private static readonly Color PanelColor = new Color(0.12f, 0.11f, 0.16f, 0.92f);
-        private static readonly Color AccentColor = new Color(0.62f, 0.94f, 0.42f, 1f);
-        private static readonly Color ButtonTextColor = new Color(0.10f, 0.12f, 0.10f, 1f);
+        private static readonly Color PanelColor = ChogTheme.Card;
+        private static readonly Color AccentColor = ChogTheme.Cheek;
+        private static readonly Color ButtonTextColor = Color.white;
         // The free corner of the preparation screen, under the first team's slots.
         private static readonly Vector2 PanelMin = new Vector2(0.02f, 0.02f);
         private static readonly Vector2 PanelMax = new Vector2(0.38f, 0.17f);
@@ -123,6 +123,7 @@ namespace Chog.Screens
             area.offsetMax = Vector2.zero;
             var background = GetComponent<Image>();
             background.color = PanelColor;
+            ChogTheme.AsCard(background);
             // A tap on the panel puts a failed stake away.
             gameObject.AddComponent<Button>().onClick.AddListener(GenesisWager.Dismiss);
 
@@ -194,8 +195,9 @@ namespace Chog.Screens
             background.color = AccentColor;
             var button = area.gameObject.AddComponent<Button>();
             button.targetGraphic = background;
+            ChogTheme.Shape(button);
             text = Text(template, "Label", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.92f), ButtonTextColor, 34f, area);
-            text.fontStyle = FontStyles.Bold;
+            ChogTheme.AsTitle(text);
             text.text = label;
             return button;
         }
