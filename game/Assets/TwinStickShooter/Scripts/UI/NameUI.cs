@@ -39,11 +39,17 @@ namespace TwinStickShooter
         {
           NameText.text = GetNameFromFile(playerLink.PlayerRef - 1);
         }
+
+        // A player without a Genesis (a recruit) wears the bare Chog, in grey.
+        if (Chog.Match.GenesisEffects.Enabled)
+        {
+          Chog.Match.ChogHeroModel.Wear(_characterFollow.EntityView.transform, Chog.Match.ChogHeroModel.Recruit);
+        }
       }
     }
 
-    // The real image of the Genesis becomes the head of its hero, and the body takes the colour
-    // of its skin.
+    // The Genesis wears its 3D hero (its traits modelled), or, for a Genesis not modelled yet, its
+    // real image as the head and the colour of its skin on the body.
     private void DressAsGenesis()
     {
       var roster = GenesisCast.Roster(PredictedFrame);

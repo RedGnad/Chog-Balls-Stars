@@ -29,10 +29,16 @@ namespace TwinStickShooter
 
       // The image of a Genesis hero stands higher on the screen than the head of the sample's
       // models: whatever follows such a hero (name, bars, coins) moves up with it, once.
-      if (_raisedForGenesis == false && frame.Has<GenesisHero>(EntityRef))
+      if (_raisedForGenesis == false && frame.TryGet<GenesisHero>(EntityRef, out var genesis))
       {
         _raisedForGenesis = true;
-        Offset += new Vector2(0, Chog.Match.GenesisAppearance.LabelRaise(Camera.main, _entityViewTransform.position, _targetCanvas.sizeDelta.y));
+        Offset += new Vector2(0, Chog.Match.GenesisAppearance.LabelRaise(Camera.main, _entityViewTransform.position, _targetCanvas.sizeDelta.y, genesis.MetadataId));
+      }
+      // A recruit wears the bare 3D Chog (NameUI): its name and bars stand over it the same way.
+      else if (_raisedForGenesis == false && frame.Has<PlayerLink>(EntityRef) && Chog.Match.ChogHeroModel.Has(Chog.Match.ChogHeroModel.Recruit))
+      {
+        _raisedForGenesis = true;
+        Offset += new Vector2(0, Chog.Match.GenesisAppearance.LabelRaise(Camera.main, _entityViewTransform.position, _targetCanvas.sizeDelta.y, Chog.Match.ChogHeroModel.Recruit));
       }
 
       RepositionUIElement();

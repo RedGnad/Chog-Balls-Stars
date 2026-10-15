@@ -105,7 +105,26 @@ namespace Chog.Match
                 return 0f;
 
             var look = Look;
-            var higher = Mathf.Max(0f, look.FaceLift + look.FaceSize * 0.5f - SampleHeadRadius);
+            return Raise(camera, at, canvasHeight, Mathf.Max(0f, look.FaceLift + look.FaceSize * 0.5f - SampleHeadRadius));
+        }
+
+        /// <summary>
+        /// The same for a hero that wears its 3D model (ChogHeroModel), whose crown or hat stands a
+        /// little higher than the head of the sample's models; for any other Genesis, LabelRaise.
+        /// </summary>
+        public static float LabelRaise(Camera camera, Vector3 at, float canvasHeight, int metadataId)
+        {
+            if (camera == null || !GenesisEffects.Enabled)
+                return 0f;
+            return ChogHeroModel.Has(metadataId) ? Raise(camera, at, canvasHeight, HeroLabelRaise) : LabelRaise(camera, at, canvasHeight);
+        }
+
+        // How much higher than over a model of the sample the name and bars of a 3D hero stand, in
+        // world units, chosen on the captures of 16 October 2026.
+        private const float HeroLabelRaise = 0.3f;
+
+        private static float Raise(Camera camera, Vector3 at, float canvasHeight, float higher)
+        {
             var raised = camera.WorldToViewportPoint(at + camera.transform.up * higher).y - camera.WorldToViewportPoint(at).y;
             return raised * canvasHeight;
         }
@@ -117,6 +136,12 @@ namespace Chog.Match
         public static void Apply(Transform character, GenesisRoster roster, GenesisRosterEntry hero)
         {
             if (character == null || roster == null || !GenesisEffects.Enabled)
+                return;
+
+            // The 3D hero of the Genesis, when the library has it: its own head, hat, eyes, mouth and
+            // clothing in its own colours. No picture is laid on it: the owner refused the picture of a
+            // Genesis over a 3D face on 12 October 2026.
+            if (ChogHeroModel.Wear(character, hero.MetadataId) != null)
                 return;
 
             // The Chog body, when the project has one, takes the place of the class model first:

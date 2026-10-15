@@ -642,6 +642,31 @@ matches. A body put in place of the class model does not turn half transparent i
 its own team, as the class models do. The weapons of the class models go with them. A body
 drawn larger than its collision circle overlaps a wall slightly when it stands against one.
 
+### The 3D heroes (16 October)
+
+**Every Genesis of the base Origin (1,869) plays its own 3D hero**: the Chog of `tools/blender`
+(head H3, the crown of leaves its hat lets out, the hat, the eyes, the mouth and the clothing of
+that Genesis, in its skin colour), the look the owner said yes to after batch 6. No picture is laid
+on it. A recruit (a player without a Genesis) wears the same Chog bare, in grey. The 100 Genesis
+on another base (Skull, Radioactive, 1:1) need their own head and keep the earlier look (the body
+above with the picture as the head) until it is made.
+
+How it gets there. One file per Genesis would weigh 400 MB, so `tools/blender/export_chog_parts.py`
+writes a library of parts instead (`Assets/Chog/Resources/ChogParts.bytes`, 2.1 MB): each part once
+(324 in all: heads with the leaves of each hat, hats, eyes, mouths, clothes, the body and the arms)
+and, for every Genesis, the parts it wears and its skin. The export builds the 79 Genesis that wear
+every part between them, then builds every other Genesis and checks that each of its parts is the
+very one kept: a part that depended on more than its own trait would fail the export. In the game,
+`ChogPartsLibrary` reads the file (tested outside Unity) and `ChogHeroModel` makes, for each hero,
+one mesh for each of the four parts `ChogBodyAnimator` moves, its colours in the vertices, drawn with
+one material for every hero (`Resources/ChogHero.shader`): four draw calls a hero, at most 7,984
+triangles. The shader draws a vertex lit, unlit (eyes, mouths, lenses) or as the outline shell (seen
+from inside only), from the alpha of its colour.
+
+`?heroes=1` opens a page with a few heroes from close and from the angle of the game camera;
+`?heroes=1287,14,0` shows those (0 is the recruit), `&spin=1` turns them. On a private address
+`?hero3d=0` brings back the earlier look for a comparison.
+
 ### A tower and a core for each team (12 October)
 
 Each team defends two structures on the sample's map, built when the match begins
