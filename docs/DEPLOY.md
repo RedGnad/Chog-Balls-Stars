@@ -344,6 +344,22 @@ verified, `NONE` shows nothing. The game's pages on Vercel (`tools/release/verce
 address `https://chog-genesis.vercel.app`, project `chog-genesis` of the owner's account) answered `BLOCK` too
 right after their first publication.
 
+**What the verdict is, found later that evening.** The same service answers with its reasons at
+`https://dapp-scanning.api.cx.metamask.io/scan?url=https://<hostname>`: for the Render address, the Vercel
+address and a one-line text page with no script published the same evening on the owner's Vercel account
+(`plain-page-probe.vercel.app`), it answers `recommendedAction: BLOCK`, `riskFactors: [{type: "DRAINER",
+severity: "CRITICAL", message: "Domain identified as a wallet drainer."}]`, `status: COMPLETE`; `chogtanks.vercel.app`
+answers `NONE`; `app.uniswap.org`, `opensea.io` and `magiceden.io` answer `VERIFIED`; `example.com`, `wikipedia.org`,
+`chog.xyz`, `monad.xyz` and `chogathon.chog.xyz` answer `NONE`. The warning the owner saw ("Continuez à vos
+risques et périls" / `trustSignalPhishingWarning`) is the extension's connection modal, shown whenever the verdict is
+`BLOCK` (`ui/pages/permissions-connect/connection-trust-signal-gate/connection-trust-signal-gate.tsx`, added on 13
+August 2026, commit `f9c78f66`); before it, the verdict was only a note in confirmation screens. In the
+`MetaMask/eth-phishing-detect` tracker, reports of this `DRAINER` verdict on honest sites went from 5 a month in July
+and August to 18 in September and 23 in the first half of October 2026 (search "dApp scan"); several concern
+sites years old (xdao.app) or with no transaction at all (equiramarkets.com); MetaMask's AlexHerman1 answers "this is
+already unflagged" or "no longer blocked" between 1 and 123 hours later, after the owner's report at
+`https://report.blockaid.io`. So the block is Blockaid's current scanner, not this code: it is cleared on request.
+
 ## To decide (the user)
 
 | Question | Why it is open |
