@@ -60,14 +60,21 @@ namespace Chog.Match
     /// The simulation attacks when its button is let go: a finger aims first, then lifts. A mouse
     /// already aims when it is pressed, so a held mouse button is sent as a press then a release,
     /// one input tick each: the attack leaves on the press, and again for as long as it is held.
+    /// The answer belongs to the tick, not to the call: a tick asked for again gets the same one.
     /// </summary>
     public struct PressPulse
     {
         private bool _down;
+        private bool _asked;
+        private int _tick;
 
-        /// <summary>The state of the button to send for this input tick.</summary>
-        public bool Next(bool held)
+        /// <summary>The state of the button to send for that input tick.</summary>
+        public bool Next(bool held, int tick)
         {
+            if (_asked && tick == _tick)
+                return _down;
+            _asked = true;
+            _tick = tick;
             _down = held && !_down;
             return _down;
         }

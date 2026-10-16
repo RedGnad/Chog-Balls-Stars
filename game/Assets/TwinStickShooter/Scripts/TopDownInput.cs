@@ -17,6 +17,8 @@ namespace TwinStickShooter
     private PlayerInput _playerInput;
     private CombatInputReader _reader;
     private PressPulse _firePulse, _specialPulse;
+    // What a held mouse button sent, written to the console once it is let go (CHOG_INPUT).
+    private int _heldFrom, _heldTicks, _sentDown, _askedAgain, _lastTick = -1, _reports;
     private bool _focused = true;
     private bool _paused;
 
@@ -86,10 +88,11 @@ namespace TwinStickShooter
         var move = state.Move.ToFPVector2();
         input.MoveDirection = IsInverseControl ? -move : move;
         // The mouse attacks on the press (PressPulse); a stick or a pad on the release, as before.
-        bool firePulse = _firePulse.Next(state.PointerFire);
-        bool specialPulse = _specialPulse.Next(state.PointerSpecial);
+        bool firePulse = _firePulse.Next(state.PointerFire, callback.Frame);
+        bool specialPulse = _specialPulse.Next(state.PointerSpecial, callback.Frame);
         input.Fire = state.PointerFire ? firePulse : state.Fire;
         input.AltFire = state.PointerSpecial ? specialPulse : state.AltFire;
+        NoteMouse(state.PointerFire || state.PointerSpecial, callback.Frame, firePulse || specialPulse);
         showPreview = state.Fire || state.AltFire;
         previewSpecial = state.AltFire;
 
@@ -111,6 +114,28 @@ namespace TwinStickShooter
         if (show) _attackPreview.UpdateAttackPreview(input.AimDirection, previewSpecial);
       }
       callback.SetInput(input, DeterministicInputFlags.Repeatable);
+    }
+
+    private void NoteMouse(bool held, int tick, bool down)
+    {
+      if (held)
+      {
+        if (_heldTicks == 0) _heldFrom = tick;
+        if (tick == _lastTick) _askedAgain++;
+        else
+        {
+          _heldTicks++;
+          if (down) _sentDown++;
+        }
+      }
+      else if (_heldTicks > 0)
+      {
+        if (_reports++ < 20)
+          Debug.Log("CHOG_INPUT mouse held from tick " + _heldFrom + " for " + _heldTicks + " ticks, sent down " +
+                    _sentDown + ", ticks asked again " + _askedAgain);
+        _heldTicks = _sentDown = _askedAgain = 0;
+      }
+      _lastTick = tick;
     }
 
     private FPVector2 GetDirectionToMouse(Vector2 mousePosition)

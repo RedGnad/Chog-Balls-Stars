@@ -53,6 +53,11 @@
 #       connect, RENT A HERO, pick that offer and that length, pay, and see the rented Genesis
 #       chosen. With [play seconds] it then signs in and plays a match for that long, to see
 #       the career of the rented Genesis credited. Same copy of the chain as "rentout".
+#   browser_check.sh desktop <base url> <label> [token]
+#       a computer, not a phone: no touch emulation, 1280 x 720. QUICK PLAY, START, W A S D (D held),
+#       the left button held at the pointer (attacks on the press, again while held), the right
+#       button (the special; charged on a private address only). No sticks should show, and the
+#       panel of the keys (ChogDesktopControls) should; "own attacks confirmed" counts the hits.
 #   browser_check.sh stake <base url> <label> [seconds to wait for the end of the match, default 420]
 #       connect, SIGN IN, QUICK PLAY, STAKE on the preparation screen, START, play to the end
 #       and send the record of the match. Needs the bench of tools/contracts/wager_bench.sh;
@@ -144,6 +149,15 @@ case "$MODE" in
     tap 3 $QUICK_PLAY 16000
     tap 4 $START 9000
     export CHOG_BROWSER_LINGER_MS=$(( ${4:-420} * 1000 )) CHOG_BROWSER_WAIT_FOR="CHOG_CAREER"
+    ;;
+  desktop)
+    # The taps above are at 960 x 540; a desktop page is 1280 x 720, so they are scaled by 4/3.
+    export CHOG_BROWSER_TOUCH=0
+    export CHOG_BROWSER_URL="$BASE/?perf=1&charged=1${4:+&token=$4}" CHOG_BROWSER_SETTLE_MS=8000
+    tap 1 159 501 16000
+    tap 2 640 587 12000
+    export CHOG_BROWSER_HOLD_KEY=d CHOG_BROWSER_HOLD_MS=2000
+    export CHOG_BROWSER_DRAG="900,300,900,330" CHOG_BROWSER_DRAG_MS=2500 CHOG_BROWSER_SPECIAL="950,250"
     ;;
   match)
     export CHOG_BROWSER_URL="$BASE/?token=$4&charged=1&perf=1${6:+&bots=$6}"
@@ -305,4 +319,4 @@ case "$CHOG_BROWSER_URL" in
 esac
 
 node "$ROOT/tools/unity/qualify_webgl.mjs" 2>&1 | tail -2
-python3 "$HERE/summarise_log.py" "$CHOG_BROWSER_OUTPUT_DIR/touch-browser-smoke-events.json"
+python3 "$HERE/summarise_log.py" "$CHOG_BROWSER_OUTPUT_DIR/$([ "$CHOG_BROWSER_TOUCH" = 1 ] && echo touch-)browser-smoke-events.json"
