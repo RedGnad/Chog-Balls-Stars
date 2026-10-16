@@ -502,6 +502,24 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**16 October 2026, 12:15 (the owner deployed the three contracts on Monad mainnet and validated batch 9 but
+four points; they buy $CHOG and set up Render later).**
+- **Mainnet live:** wager `0xc7524a808d2b00b43a4d3e2becb8500e409b41e3`, rental
+  `0x7f1271d43b0e41e2eeddd5290f459fdc6196a19a`, shop `0xb23a3c3492b9ba83d80c8abc9a5484d2885f058a` (owner
+  `0x981F6E0Ea94f45fDB8ee7680DC862212E3C720e0`), checked on the chain (`mainnet_deployment.sh`); the public
+  instance runs on them (`serve_public.sh ... --mainnet`; its menu reads the rental open, the shop at 100 $CHOG
+  and the wager on Monad). Rehearsed from the game on a local copy of mainnet, the deployed contracts as they
+  are: a staked match paid (+22.5 / -25, 2.5 burned), a rental both ways, the second form of #1287 bought
+  (`research/evidence/mainnet-contracts-rehearsal-on-copy-2026-10-16.txt`). Neither the owner's Ledger
+  (holds #1287) nor the development wallet holds $CHOG yet: the real tests wait for it.
+- **Batch 9 merged and in the game** (build `20261016T092135229Z`). **Batch 10 on `3d-batch-10`** (not
+  pushed): costumes over the whole body (trousers, seat, sleeves into the mittens, the hood closed under the
+  chin; the dragon's snout and feet, the banana's faceted peel), the mummy in real bandages, the taped banana
+  after Cattelan's. Library exported, 85 view tests pass; sheet
+  `.artifacts/chog-body/traits/batch-10e/before_after.png`.
+- **Decided:** no loan link for the judges; Render on the free plan with a ping from cron-job.org.
+**Next action:** the owner's yes on batch 10; their real session with #1287 once they hold $CHOG; Render.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a
