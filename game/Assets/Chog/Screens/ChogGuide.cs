@@ -28,7 +28,7 @@ namespace Chog.Screens
             ("HOW TO FIGHT",
              "On a phone: the left stick moves, the pink stick throws your basic attack, the gold stick fires your " +
              "special once it is charged.\n\nOn a computer: W A S D to move, the mouse to aim, left click to " +
-             "attack, right click for the special."),
+             "attack, right click or Space for the special."),
             ("HOW TO WIN",
              "Pick the mode beside QUICK PLAY. SIEGE: each team defends a tower and a core. Bring down the enemy " +
              "core and your team wins at once; after three minutes, the team that did the most damage to the other " +

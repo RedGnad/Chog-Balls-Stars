@@ -5,6 +5,7 @@ namespace TwinStickShooter
   using UnityEngine;
   using UnityEngine.InputSystem;
   using Chog.Controls;
+  using Chog.Match;
 
   [RequireComponent(typeof(PlayerInput))]
   public class TopDownInput : MonoBehaviour
@@ -15,6 +16,7 @@ namespace TwinStickShooter
     private AttackPreview _attackPreview;
     private PlayerInput _playerInput;
     private CombatInputReader _reader;
+    private PressPulse _firePulse, _specialPulse;
     private bool _focused = true;
     private bool _paused;
 
@@ -76,13 +78,20 @@ namespace TwinStickShooter
     public void PollInput(CallbackPollInput callback)
     {
       QuantumDemoInputTopDown input = default;
+      // While a button is held, whatever the pulses send.
+      bool showPreview = false, previewSpecial = false;
       if (_reader != null && _focused && !_paused)
       {
         var state = _reader.Read(MobileButtonsManager.TouchControlsVisible);
         var move = state.Move.ToFPVector2();
         input.MoveDirection = IsInverseControl ? -move : move;
-        input.Fire = state.Fire;
-        input.AltFire = state.AltFire;
+        // The mouse attacks on the press (PressPulse); a stick or a pad on the release, as before.
+        bool firePulse = _firePulse.Next(state.PointerFire);
+        bool specialPulse = _specialPulse.Next(state.PointerSpecial);
+        input.Fire = state.PointerFire ? firePulse : state.Fire;
+        input.AltFire = state.PointerSpecial ? specialPulse : state.AltFire;
+        showPreview = state.Fire || state.AltFire;
+        previewSpecial = state.AltFire;
 
         if (state.UseStickAim)
         {
@@ -97,9 +106,9 @@ namespace TwinStickShooter
 
       if (_attackPreview != null)
       {
-        bool show = (input.Fire || input.AltFire) && input.AimDirection != FPVector2.Zero;
+        bool show = showPreview && input.AimDirection != FPVector2.Zero;
         _attackPreview.gameObject.SetActive(show);
-        if (show) _attackPreview.UpdateAttackPreview(input.AimDirection, input.AltFire);
+        if (show) _attackPreview.UpdateAttackPreview(input.AimDirection, previewSpecial);
       }
       callback.SetInput(input, DeterministicInputFlags.Repeatable);
     }

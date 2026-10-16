@@ -376,6 +376,17 @@
                     "action": "MouseSpecial",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e74f87c0-4347-47b9-89ce-555d718edb64",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MouseSpecial",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

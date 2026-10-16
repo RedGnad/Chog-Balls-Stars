@@ -297,6 +297,30 @@ Done on 16 October 2026: the service is `https://chog-genesis-game.onrender.com`
 step 4 passed from the Mac (page, build files in gzip, hero page, the three contracts on mainnet, the owner's
 Genesis read, Photon's entries refused without the secret). Photon's dashboard and the cron were still to do.
 
+## MetaMask's site scan (found 16 October 2026)
+
+MetaMask blocks `chog-genesis-game.onrender.com` with a warning page before anything is connected. The
+extension asks `https://dapp-scanning.api.cx.metamask.io/v2/scan?url=<hostname>` (constants
+`PHISHING_DETECTION_BASE_URL` and `PHISHING_DETECTION_SCAN_ENDPOINT` in
+`https://github.com/MetaMask/core/blob/main/packages/phishing-controller/src/PhishingController.ts`); the
+answer's `recommendedAction` is `BLOCK` or `NONE`. Asked that day with `curl` (header
+`x-request-source: extension`):
+
+| Answer | Hostnames |
+| --- | --- |
+| `BLOCK` | ours on `onrender.com`, and any made-up name under `onrender.com`, `vercel.app`, `netlify.app`, `pages.dev`, `github.io`, `trycloudflare.com` (names that do not exist are blocked too) |
+| `NONE` | the ngrok tunnel, made-up names under `ngrok-free.app`, `ngrok.app`, `fly.dev`, `up.railway.app`, `duckdns.org`, made-up `.xyz` and `.com` domains, `chogathon.chog.xyz` |
+
+So it is the host, not our name or our page: an unknown subdomain of those free hosts is blocked by default.
+The fix is a domain of our own pointed at the Render service (Render's Hobby plan includes two custom
+domains, `https://render.com/docs/custom-domains.md`), with `PUBLIC_ORIGIN` set to it (the sign-in message
+names it) and the domain added at Reown; Photon's two addresses can stay on `onrender.com`, since a browser
+never opens them. MetaMask's static list (`https://github.com/MetaMask/eth-phishing-detect`,
+`src/config.json`) does not list our address, but it lists 37 `onrender.com` names and two Chog look-alikes
+(`party-chog.icu`, `chog.digital`): a new domain with "chog" in it may later be taken for one. Porkbun's
+public price list (`POST https://api.porkbun.com/api/json/v3/pricing/get`) gave that day: `.xyz` 2.04 USD the
+first year, 14.21 USD a renewal; `.com` 11.08 USD.
+
 ## To decide (the user)
 
 | Question | Why it is open |

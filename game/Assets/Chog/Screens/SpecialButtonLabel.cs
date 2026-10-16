@@ -47,8 +47,8 @@ namespace Chog.Screens
         }
 
         // "WAVE" over "CHILL" in the colour of the effect; null while the local hero is unknown
-        // or is not a Genesis.
-        private static string Describe(QuantumGame game)
+        // or is not a Genesis. Also written on the desktop panel (ChogDesktopControls).
+        internal static string Describe(QuantumGame game)
         {
             var frame = game.Frames.Verified;
             var roster = GenesisCast.Roster(frame);
