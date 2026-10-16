@@ -502,6 +502,18 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**16 October 2026, 21:40 (the game is Chog Arena, at https://chogarena.vercel.app).**
+- **Name:** the owner named the game Chog Arena (menu title, page name, manifest, share text, sign-in message);
+  Chog Genesis stays the collection's name.
+- **Address:** pages on Vercel (`tools/release/vercel_site.sh`), services on Render behind `/api/`, Render's pages
+  redirect there, `PUBLIC_ORIGIN` set in `render.yaml` (DEPLOY.md, "The public address"). A scripted match from it
+  works. The trial projects `chog-genesis` and `plain-page-probe` are deleted from Vercel.
+- **MetaMask:** its dApp scan answers DRAINER (CRITICAL) for this address too, as for any new one tried that evening,
+  a blank page included; the connection modal behind it dates from 13 August 2026 (DEPLOY.md). The owner decides
+  whether to report the address to Blockaid; Rabby is an option for their own tests.
+**Next action:** the owner adds `chogarena.vercel.app` at Reown; their session with #1287 on that address
+(connect, sign, SECOND FORM, a match); whether to report the address; the video.
+
 **16 October 2026, 20:30 (desktop controls, the owner's first session with #1287 on Render, MetaMask's block).**
 - **Desktop controls on Render** (build `20261016T182139759Z`): the sticks show only while a finger is used
   (`ControlModeWatcher`, rule `ControlModeRule` in `Chog.Match`, tested); on a computer a panel names the

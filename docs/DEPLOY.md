@@ -297,6 +297,29 @@ Done on 16 October 2026: the service is `https://chog-genesis-game.onrender.com`
 step 4 passed from the Mac (page, build files in gzip, hero page, the three contracts on mainnet, the owner's
 Genesis read, Photon's entries refused without the secret). Photon's dashboard and the cron were still to do.
 
+## The public address: Vercel in front of Render (16 October 2026)
+
+The game is **Chog Arena** and its address is `https://chogarena.vercel.app` (project `chogarena` of the owner's
+Vercel account; `chog-arena.vercel.app` belonged to someone else). Vercel serves the pages: the game, the hero
+page and the portraits, laid out by `sh tools/release/vercel_site.sh` from `site/` and `web/hero`, and published
+with `sh tools/release/vercel_site.sh deploy` (the vercel CLI, logged in as the owner). Everything under `/api/`
+is passed on to Render by a rewrite of `vercel.json`, so a page and its services keep one address. Photon still
+calls Render directly, and cron-job.org keeps calling `https://chog-genesis-game.onrender.com/api/health`.
+
+- `PUBLIC_ORIGIN` is set by `render.yaml` (a value, no longer `sync: false`, which Render ignores after the first
+  creation); the Blueprint's automatic sync applied it about two minutes after the push. A page asked on Render
+  is sent to the public address (308, `movedToPublic` in `server/src/static.js`); `/api/` is not.
+- **After each build: publish both.** `game/create` refuses a page whose build differs from the one Render
+  serves, so a push that changes `site/` is followed by `vercel_site.sh deploy` as soon as Render shows the new
+  build (`/api/photon`).
+- Reown: the address must be in the project's allowed domains for a phone's wallet app to connect (the owner's
+  step). A wallet of the browser (MetaMask, Rabby) does not need it.
+- Vercel's Hobby limits (`https://vercel.com/docs/limits`): 100 MB per CLI upload (the layout is 70 MB), 15,000
+  files (3,261), 5,000 file uploads a day (only changed files are uploaded again).
+- Checked on 16 October, 21:38: `check_public.sh` on the address (page, the three `.gz` files in gzip, portrait,
+  hero page, services), the sign-in message naming `chogarena.vercel.app`, and a scripted match from it with
+  Metal drawing: same build as Render, a click attacked while W was held.
+
 ## MetaMask's site scan (found 16 October 2026)
 
 MetaMask blocks `chog-genesis-game.onrender.com` with a warning page before anything is connected. The

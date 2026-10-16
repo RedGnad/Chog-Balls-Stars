@@ -7,13 +7,13 @@ submitting. Character counts are for the 8,000-character fields.
 
 ## 01 Basics
 
-- **Project name:** Chog Genesis (working title, see `MenuTitle.Title`)
+- **Project name:** Chog Arena (chosen by the owner on 16 October 2026; Chog Genesis is the NFT collection)
 - **Banner:** to make from a capture of the menu with a hero in 3D, or of the heroes sheet
   (`research/evidence/heroes-and-attack-objects-headless-2026-10-15.png`).
 
 **Description**
 
-> Chog Genesis is a real-time 3v3 arena for phones where your Chog Genesis NFT is your hero. Connect
+> Chog Arena is a real-time 3v3 arena for phones where your Chog Genesis NFT is your hero. Connect
 > the wallet that holds it and the game builds your Chog in 3D from its own traits: its hat, its eyes,
 > its mouth, its clothes and its skin, modelled by us for all 1,969 Genesis, the skulls, the radioactive
 > Chogs and the ten 1:1 included. The
@@ -35,8 +35,10 @@ submitting. Character counts are for the 8,000-character fields.
 
 ## 02 Show it
 
-- **App link:** the public address (today a tunnel from the development Mac,
-  `https://a6c8-92-88-170-244.ngrok-free.app`; **[not yet]** a host that stays up through judging).
+- **App link:** `https://chogarena.vercel.app` (pages on Vercel, services on Render behind `/api/`, see
+  `docs/DEPLOY.md`). **Known on 16 October 2026:** MetaMask's dApp scan labels this new address a "drainer",
+  as it did a blank test page the same evening; MetaMask then shows "Continue at your own risk" when
+  connecting. The owner decides whether to report it to Blockaid.
 - **Demo video:** **[not yet]** (script below).
 - **Tech stack:** Unity 6 (WebGL, mobile first), Photon Quantum 3 (deterministic simulation,
   server-side input recording), Node.js services (wallet sign-in, Photon custom authentication and
