@@ -449,6 +449,30 @@ visit that played a few seconds of a match through the tunnel):
 **Next action (dev):** the user's yes or no on the 3D structures, batch 7 and the 1:1 (merging
 `3d-one-of-one` brings batch 7 with it); the phone with `?perf=1`; then the video's shots.
 
+**16 October 2026, 09:00 (the user tried the public address: "pour les perso 3D c'est vraiment beaucoup
+mieux", the gameplay good for a start; a new round of 3D corrections, case by case).**
+- **What stands on the head no longer takes the place of the spikes**, on `3d-one-of-one` (`7a8e198`,
+  committed, **not pushed** while the user judges the 3D): the ram horns grow from the corners of the brow and
+  curl above the head, the demon horns are five among the spikes as drawn, the plunger sits at the front of
+  the top, the holy seal is a large gold wheel over the brow, the mushrooms have the colours of #1100, the blue
+  laser leaves the brow at 45 degrees, the 1:1 devil's horns sit on its brow; every leaf of the crown is kept
+  under all of them (table in that branch's `tools/blender/README.md`). Library exported again (1,970 heroes,
+  438 pieces, all built or checked, none failed), 84 view tests pass on it, seen in a local preview build
+  (`main`'s library put back and built again: 1,870 heroes, 347 parts). Boards of every value of every base:
+  `.artifacts/chog-body/traits/batch-8/`.
+- **Answered, nothing started (the user decides):** the coins still decide most matches (a tower falls in 8 of
+  10 matches between six bots, never a core); two modes, a siege without coins and the coins of the sample,
+  would cost about half a day. The stakes and loans follow one rule (the NFT never moves, every right is read
+  by token, payments go player to player); not coherent yet: the wager goes to the testnet while the rental
+  and the shop read the real collection (proposed: a mirror of the collection on the testnet kept by the
+  services), the free link and the rental overlap, a staked match needs a human on each side, and the judges'
+  loan dies if #1287 is sold before judging ends.
+- **Found, the slower loading through the tunnel:** the build did not grow (24 MB); that morning the Mac was on
+  a phone's shared connection ("Redmi 12C"), and the tunnel gave 0.46 MB/s (one download of the program
+  timed from the Mac, 101 s for the 46 MB that ngrok unpacks for a client that does not ask for gzip): about
+  a minute for a first visit, a reload of everything after each new build. With 1 GB a month on the free
+  plan (about 40 first visits; that test took 47 MB of it), the judges need a host before 23 October.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a

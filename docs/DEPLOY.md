@@ -200,7 +200,10 @@ on 14 October 2026: `ngrok http 8087 --url 'https://'`, which ngrok's manual
 (`https://ngrok.com/docs/universal-gateway/domains/`) gives for the account's own dev domain,
 also drew a new address on this account (ngrok 3.25.1). A file
 asked without "Accept-Encoding: gzip" comes back unpacked (46 MB for the program alone):
-`check_public.sh` asks for headers only.
+`check_public.sh` asks for headers only. Everything served goes up the Mac's own connection: on
+16 October 2026, with the Mac on a phone's shared connection, the tunnel gave 0.46 MB/s (about a
+minute for a first visit of the 24 MB game); the header `ngrok-agent-ips` of any answer through the
+tunnel names the address the Mac goes out from.
 
 ## The wallet connector: a Reown project id
 
