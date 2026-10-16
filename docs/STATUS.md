@@ -408,6 +408,36 @@ builds; the Editor was restarted (memory note `unity-isolated-compile`).
 **Next action (dev):** the user's eye on the night's work, the phone with `?perf=1`, then batch 7 or
 its corrections; the Genesis leaderboard (`GET /api/career/top` exists, no screen shows it yet).
 
+**16 October 2026, 05:05 (the user said "go, do what there is to do alone"; they do their steps
+tomorrow: the phone, batch 7, the testnet, the submission draft).** Built, seen in the headless browser,
+and served by the public address (build `20261016T025947729Z`, checked with `check_public.sh` and one
+visit that played a few seconds of a match through the tunnel):
+- **The arena in the colours of the Chog night** (`ChogArenaSkin`, `game/README.md`, "The arena, the
+  leaderboard and the 3D structures"): indigo floor, lavender and deep purple crates, mint plants; five
+  palettes compared in matches (`research/evidence/arena-palettes-headless-2026-10-16.jpg`).
+- **TOP GENESIS** on the menu (`ChogHall`): the ten Genesis with the most wins from the services, with
+  picture, wins, matches and mastery. The public instance has no recorded career, so it says so
+  (`research/evidence/top-genesis-no-career-yet-headless-2026-10-16.png`); seen filled with five example
+  careers on a test bench of its own (`...-example-careers-...`).
+- **A 3D tower and core, as a proposal behind `?structures3d=1`** (a Chog head on it: held back like any new
+  hero look until the user's yes): a totem with the H3 head, glowing laser eyes and gritted teeth that turns
+  to whom it shoots and fires from its eyes, and a pink heart in a crown of Chog leaves that beats faster
+  when hit; ruins in greys. Seen turned around in Blender and in a match
+  (`research/evidence/chog-structures-3d-turn-2026-10-16.jpg`,
+  `research/evidence/structures-2d-and-3d-in-match-headless-2026-10-16.png`). To show it to everyone: make
+  `ChogStructureModel.On` true without the option and build.
+- **Batch 7, on its branch:** the ram horns made again after the pictures, thick, ridged, curling out to the
+  side (`2e46b74`, pushed; sheet on the branch). The skull's round head is still the known weak point.
+- **Seen on film, the brute's basic attack:** its impact shards fly out in front; the strike itself falls
+  in the 224 ms the headless browser takes to release the touch, twice: not caught on a frame.
+- **Found:** a scripted visit with `?token=` now always plays a recruit (the admission reads the real chain
+  through Photon and the public instance), so a Genesis's own special cannot be filmed in a match without a
+  wallet that holds one. `tools/dev/typecheck.py` takes new files with `--add` (with `--sources`, which
+  takes folders, two new screens were not checked and the build caught their errors).
+`tools/release/check_all.sh` passed (29 simulation, 84 view, services, 58 contracts).
+**Next action (dev):** the user's yes or no on the 3D structures and on batch 7; the phone with `?perf=1`;
+then the skull's head, the ten 1:1 Genesis, and the video's shots.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a

@@ -113,6 +113,33 @@ namespace Chog.Match
             }));
         }
 
+        /// <summary>How many Genesis the leaderboard asks the services for.</summary>
+        public const int TopCount = 10;
+
+        /// <summary>
+        /// Reads the Genesis with the most wins (then the most matches), best first. "done" gets them,
+        /// an empty list when no Genesis has a match yet, or null when the services did not answer.
+        /// </summary>
+        public static void ReadTop(Action<GenesisCareer[]> done)
+        {
+            PlayerWallet.Run(GameServices.Call("career/top?limit=" + TopCount, null, null, (status, text) =>
+            {
+                var answer = status == 200 ? JsonUtility.FromJson<CareerList>(text) : null;
+                if (answer == null || answer.careers == null)
+                {
+                    Debug.LogWarning("CHOG_CAREER the leaderboard could not be read: " + status);
+                    done(null);
+                    return;
+                }
+
+                foreach (var career in answer.careers)
+                    Known[career.tokenId] = career;
+                Debug.Log("CHOG_CAREER leaderboard read: " + answer.careers.Length + " Genesis");
+                done(answer.careers);
+                Changed?.Invoke();
+            }));
+        }
+
         /// <summary>
         /// How the game may report a match for a Genesis: with the session of a signed-in wallet
         /// that holds or rents it, as a guest with a pass, or not at all.
