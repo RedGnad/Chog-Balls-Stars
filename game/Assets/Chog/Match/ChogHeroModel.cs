@@ -136,9 +136,15 @@ namespace Chog.Match
         /// The 3D hero of a Genesis under "parent", standing on its origin and looking along +Z, at the
         /// size it was made; null when it is not in the library.
         /// </summary>
-        public static Transform Build(int metadataId, Transform parent)
+        public static Transform Build(int metadataId, Transform parent) => Build(Library, metadataId, parent, false);
+
+        /// <summary>
+        /// A model of "library" (the heroes', or another made the same way: ChogStructureModel) under
+        /// "parent", standing on its origin and looking along +Z; with "ruined", all in greys. Null when the
+        /// library has no such record.
+        /// </summary>
+        public static Transform Build(ChogPartsLibrary library, int metadataId, Transform parent, bool ruined)
         {
-            var library = Library;
             if (library == null || !library.TryGetHero(metadataId, out _))
                 return null;
 
@@ -153,7 +159,7 @@ namespace Chog.Match
                 var holder = string.IsNullOrEmpty(rest.Parent) || !made.TryGetValue(rest.Parent, out var found) ? root : found;
                 part.transform.SetParent(holder, false);
                 part.transform.localPosition = new Vector3(rest.X, rest.Y, rest.Z);
-                var mesh = MeshOf(library, metadataId, rest.Name);
+                var mesh = MeshOf(library, metadataId, rest.Name, ruined);
                 owned.Meshes.Add(mesh);
                 part.GetComponent<MeshFilter>().sharedMesh = mesh;
                 var renderer = part.GetComponent<MeshRenderer>();
@@ -290,7 +296,7 @@ namespace Chog.Match
 
         // The mesh of one of the four parts of a hero: every piece it wears on that part, its colours
         // (skin and face its own) in the vertices. Each hero owns its meshes (OwnedMeshes).
-        private static Mesh MeshOf(ChogPartsLibrary library, int metadataId, string restName)
+        private static Mesh MeshOf(ChogPartsLibrary library, int metadataId, string restName, bool ruined = false)
         {
             library.TryGetHero(metadataId, out var hero);
             // Where this part rests over the feet: the height a skin that runs to another colour reads.
@@ -312,6 +318,14 @@ namespace Chog.Match
                     normals.Add(new Vector3(piece.Normals[v * 3], piece.Normals[v * 3 + 1], piece.Normals[v * 3 + 2]) / 127f);
                     library.ColourOf(piece.Materials[v], hero.Skin, restHeight + piece.Positions[v * 3 + 1],
                         out var r, out var g, out var b, out var a);
+                    if (ruined)
+                    {
+                        // A ruin: the same shades in grey, darker (the alpha says how it is lit: kept).
+                        var level = (r + g + b) / 3f * 0.55f + 0.12f;
+                        r = level;
+                        g = level;
+                        b = level * 1.05f;
+                    }
                     colours.Add(new Color(r, g, b, a));
                 }
                 foreach (var corner in piece.Indices)

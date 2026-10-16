@@ -423,6 +423,31 @@ builds. The 100 Genesis on another base are not exported (no head of their own y
 bare Chog in grey, under the number 0, for the recruits. Summary in `.artifacts/chog-body/parts-export.json`.
 After any change to the 3D, run it again and build the game.
 
+## The tower and the core (16 October 2026, a proposal behind `?structures3d=1`)
+
+`make_chog_structures.py` builds what each team defends in the style of the heroes and writes
+`game/Assets/Chog/Resources/ChogStructures.bytes` in the same format (four records: each structure in
+the colour of each side, the side's colour being the "skin" of that library):
+
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup -t 4 \
+    --python tools/blender/make_chog_structures.py -- --export --render
+```
+
+- **The tower**: a column of pale lavender stone with two bands in the side's colour on a dark plinth,
+  under the H3 head of the heroes (built by `make_chog_traits.build`, scaled to 2.05 units across) with
+  the fire laser eyes of the collection cut short ("Tower laser": two glowing eyes; whole beams stuck out
+  of the face like a beak from the side) and the mouth "Grit". About 3.4 units high; a hero is 2.5.
+- **The core**: a pink heart, leaning back 35 degrees so the camera of the game (73 degrees above the
+  ground) sees its shape and not a bean, in a crown of nine Chog leaves opening outwards, on a plinth with
+  a ring in the side's colour.
+- Seen as pictures turned all around and from the game's angle (`--render`, into
+  `.artifacts/chog-body/structures/`; sheet in `research/evidence/chog-structures-3d-turn-2026-10-16.jpg`).
+  Moving parts are their own: `Head`, `Eyes` (empty: where the beam starts) and `Heart`.
+
+`export_chog_parts.py` gained two optional arguments for it (`piece_of(..., record=)`,
+`write_library(..., skins=)`); the heroes' export is unchanged.
+
 ## Batch 6: one head for all, no spike dropped, spikes checked all around, hair as big clumps (15 October 2026, pictures only)
 
 What the owner said after batch 5: some heroes are right (the caps), others show no spikes on the same

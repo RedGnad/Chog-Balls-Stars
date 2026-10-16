@@ -687,6 +687,36 @@ The two fonts are under the SIL Open Font License; their licence files are besid
 `Assets/Chog/Resources/Fonts/` and ship with the game. `Assets/Chog/Editor/ChogFontAssets.cs` makes
 their TextMesh Pro assets once, before a build.
 
+### The arena, the leaderboard and the 3D structures (16 October)
+
+**The arena** was the sample's dungeon in its own browns. `Assets/Chog/Screens/ChogArenaSkin.cs` gives
+the few shared materials of the pack (one flat colour each, found by name: `WoodDark` the floor,
+`Stone` and `StoneDark` the walls, `Metal` and `BrownDark` the crates, `Green` the plants heroes hide
+in, `Gold` and `Red` the chest) the colours of the Chog night, and the scene a violet flat light, when
+the arena scene loads. Shapes, colliders and the simulation are the sample's; the heroes, lit by their
+own shader, do not change. Five palettes were compared in matches in the headless browser (pictures
+in `research/evidence/arena-palettes-headless-2026-10-16.jpg`): bright lavender crates drew the eye away
+from the fight, cream ones read best but left the Chog colours; the one kept has lavender frames
+around deep purple planks on an indigo floor. A private option tries others without a build:
+`?arena=floor:262052,frame:a194f0,crate:3f3192,wall:2c2358,walldark:16112e,plant:2bc48f,ambient:6a62a0`.
+
+**TOP GENESIS** (`Assets/Chog/Screens/ChogHall.cs`), a button beside HOW TO PLAY, opens the ten Genesis
+with the most wins as the game services keep their careers (`GET /api/career/top`, read through
+`GenesisCareers.ReadTop`): picture, name, wins, matches and mastery, the player's own in gold. Nothing
+is shown that the services did not send; with no match recorded it says so. Seen with five example
+careers on a test bench (services started on their own port and data folder,
+`research/evidence/top-genesis-example-careers-headless-2026-10-16.png`); the public instance has no
+recorded match yet. A career still counts what the players' pages report (`server/README.md`).
+
+**The tower and the core in 3D**, a proposal not yet shown by default: `?structures3d=1` draws them from
+`Assets/Chog/Resources/ChogStructures.bytes` (`tools/blender/make_chog_structures.py`, the format of the
+heroes' library) in place of the flat pictures: a totem of pale stone with bands in the side's colour
+under the head of a Chog with glowing laser eyes and gritted teeth, and a pink heart leaning back in a
+crown of nine Chog leaves. The models face the camera; the tower turns its head to whom it shoots and
+its beam leaves its eyes; the heart beats, faster while the core is hit; a fallen one becomes a lower
+ruin in greys, without its head or its heart (`ChogStructureModel`, `StructureViews`). About 4,000
+triangles each. Four tests read the file (`ChogStructureModelTests`).
+
 ### A tower and a core for each team (12 October)
 
 Each team defends two structures on the sample's map, built when the match begins

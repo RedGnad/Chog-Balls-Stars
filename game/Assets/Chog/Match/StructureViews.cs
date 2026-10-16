@@ -48,7 +48,25 @@ namespace Chog.Match
             public Color Side;
             public bool Ruined;
             public bool Seen;
+
+            // The 3D model (ChogStructureModel), when the page draws one, and the parts that move.
+            public Transform Model;
+            public Transform Head;
+            public Transform Eyes;
+            public Transform Heart;
+            // Whom the tower's head turns to, until when; whether the structure is being hit.
+            public Vector3 AimAt;
+            public float AimUntil;
+            public bool Alarmed;
+            // Whether the bar of a 3D model was put over it, which needs the camera.
+            public bool BarPlaced;
         }
+
+        // How long the tower's head stays turned to whom it shot, and how fast it turns.
+        private const float AimSeconds = 0.9f;
+        private const float TurnRate = 12f;
+        // Above the top of a 3D model, the bar of its health.
+        private const float BarAboveModel = 0.35f;
 
         private readonly Dictionary<EntityRef, Drawing> _drawings = new Dictionary<EntityRef, Drawing>();
         private readonly List<EntityRef> _gone = new List<EntityRef>();
@@ -171,10 +189,14 @@ namespace Chog.Match
 
                     drawing.Seen = true;
                     drawing.Root.transform.position = place.Position.ToUnityVector3();
+                    drawing.Alarmed = !health.IsDead && structure.AlarmUntil > now;
                     if (health.IsDead != drawing.Ruined)
                     {
                         drawing.Ruined = health.IsDead;
-                        Replace(drawing.PictureMesh, Paint(drawing.Kind, drawing.Side, drawing.Ruined));
+                        if (drawing.Model != null)
+                            Remodel(drawing);
+                        else
+                            Replace(drawing.PictureMesh, Paint(drawing.Kind, drawing.Side, drawing.Ruined));
                         drawing.Bar.SetActive(!drawing.Ruined);
                     }
 
@@ -206,8 +228,41 @@ namespace Chog.Match
             if (_camera == null)
                 return;
 
+            // A 3D model faces the camera across the ground; the tower turns its head to whom it shoots,
+            // the heart of the core beats, faster while it is hit.
+            var toCamera = -_camera.forward;
+            toCamera.y = 0f;
+            var facing = toCamera.sqrMagnitude > 1e-4f ? Quaternion.LookRotation(toCamera.normalized) : Quaternion.identity;
+            var turn = 1f - Mathf.Exp(-TurnRate * Time.deltaTime);
             foreach (var drawing in _drawings.Values)
+            {
                 drawing.Picture.rotation = _camera.rotation;
+                if (drawing.Model == null)
+                    continue;
+
+                drawing.Model.rotation = facing;
+                if (!drawing.BarPlaced)
+                    PlaceBar(drawing);
+                if (drawing.Head != null && !drawing.Ruined)
+                {
+                    var wanted = facing;
+                    if (Time.time < drawing.AimUntil)
+                    {
+                        var toTarget = drawing.AimAt - drawing.Head.position;
+                        toTarget.y = 0f;
+                        if (toTarget.sqrMagnitude > 1e-4f)
+                            wanted = Quaternion.LookRotation(toTarget.normalized);
+                    }
+                    drawing.Head.rotation = Quaternion.Slerp(drawing.Head.rotation, wanted, turn);
+                }
+
+                if (drawing.Heart != null && !drawing.Ruined)
+                {
+                    var beats = drawing.Alarmed ? 3.2f : 1.3f;
+                    var pulse = Mathf.Pow(Mathf.Abs(Mathf.Sin(Time.time * Mathf.PI * beats)), 6f);
+                    drawing.Heart.localScale = Vector3.one * (1f + 0.08f * pulse);
+                }
+            }
         }
 
         // A tower hurt a hero: its two laser eyes draw a beam to that hero, which then fades.
@@ -219,9 +274,20 @@ namespace Chog.Match
                 || !frame.Exists(shot.Target) || !frame.TryGet<Transform2D>(shot.Target, out var target))
                 return;
 
-            // The eyes are up the picture, which leans back with the camera.
-            var up = _camera != null ? _camera.up : Vector3.up;
-            var eyes = tower.Root.transform.position + up * TowerEyes - Vector3.up * BeamLift;
+            Vector3 eyes;
+            if (tower.Eyes != null && !tower.Ruined)
+            {
+                // The 3D tower fires from its eyes and turns its head to its target.
+                eyes = tower.Eyes.position - Vector3.up * BeamLift;
+                tower.AimAt = target.Position.ToUnityVector3();
+                tower.AimUntil = Time.time + AimSeconds;
+            }
+            else
+            {
+                // The eyes are up the picture, which leans back with the camera.
+                var up = _camera != null ? _camera.up : Vector3.up;
+                eyes = tower.Root.transform.position + up * TowerEyes - Vector3.up * BeamLift;
+            }
             var beam = GenesisBeam.Create(roster.ShapeMaterial, Laser, eyes, 0.8f);
             beam.SetHead(target.Position.ToUnityVector3());
             beam.Release();
@@ -239,10 +305,29 @@ namespace Chog.Match
         private static Drawing Build(Material material, EStructureKind kind, Color side)
         {
             var root = new GameObject(kind == EStructureKind.Core ? "Chog Core" : "Chog Tower");
-            var picture = Part("Picture", root.transform, material, Paint(kind, side, false), 1);
+            var drawing = new Drawing { Root = root, Kind = kind, Side = side };
+            if (ChogStructureModel.On)
+                Remodel(drawing);
+
+            GameObject picture;
+            float top;
+            if (drawing.Model != null)
+            {
+                // The model turns by itself (LateUpdate): only the bar faces the camera, put over the top
+                // of the model as the camera sees it once there is a camera (PlaceBar).
+                picture = new GameObject("Picture");
+                picture.transform.SetParent(root.transform, false);
+                top = 0f;
+            }
+            else
+            {
+                picture = Part("Picture", root.transform, material, Paint(kind, side, false), 1);
+                drawing.PictureMesh = picture.GetComponent<MeshFilter>();
+                top = kind == EStructureKind.Core ? 2.25f : 2.95f;
+            }
+            drawing.Picture = picture.transform;
 
             // The bar: a dark back and, over it, what is left, shrinking towards its left end.
-            var top = kind == EStructureKind.Core ? 2.25f : 2.95f;
             var bar = new GameObject("Health");
             bar.transform.SetParent(picture.transform, false);
             bar.transform.localPosition = new Vector3(-BarWidth * 0.5f, top, 0f);
@@ -253,11 +338,60 @@ namespace Chog.Match
             left.Bar(new Vector2(BarWidth * 0.5f, 0f), BarWidth, BarHeight, 0f, side);
             var fill = Part("Left", bar.transform, material, left.ToMesh("StructureBarLeft"), 3);
 
-            return new Drawing
+            drawing.Fill = fill.transform;
+            drawing.Bar = bar;
+            return drawing;
+        }
+
+        // The 3D model of a structure, built again when it falls: a ruin in greys and lower, the tower
+        // without its head, the core without its heart.
+        private static void Remodel(Drawing drawing)
+        {
+            if (drawing.Model != null)
+                Destroy(drawing.Model.gameObject);
+            drawing.Model = ChogStructureModel.Build(drawing.Kind, drawing.Side == Ours, drawing.Ruined, drawing.Root.transform);
+            if (drawing.Model == null)
+                return;
+
+            drawing.Head = PartOf(drawing.Model, ChogStructureModel.HeadPart);
+            drawing.Eyes = PartOf(drawing.Model, ChogStructureModel.EyesPart);
+            drawing.Heart = PartOf(drawing.Model, ChogStructureModel.HeartPart);
+            if (!drawing.Ruined)
+                return;
+            if (drawing.Head != null)
+                drawing.Head.gameObject.SetActive(false);
+            if (drawing.Heart != null)
+                drawing.Heart.gameObject.SetActive(false);
+            drawing.Model.localScale = new Vector3(1f, 0.55f, 1f);
+        }
+
+        private static Transform PartOf(Transform model, string name)
+        {
+            foreach (var part in model.GetComponentsInChildren<Transform>(true))
+                if (part.name == name)
+                    return part;
+            return null;
+        }
+
+        // The bar of a 3D model, just over its top as the camera sees it: the camera looks down steeply,
+        // so the top of the screen is the far side of the crown, not its highest point.
+        private void PlaceBar(Drawing drawing)
+        {
+            var root = drawing.Root.transform.position;
+            var up = _camera.up;
+            var reach = 0f;
+            foreach (var drawn in drawing.Model.GetComponentsInChildren<Renderer>())
             {
-                Root = root, Picture = picture.transform, PictureMesh = picture.GetComponent<MeshFilter>(),
-                Fill = fill.transform, Bar = bar, Kind = kind, Side = side,
-            };
+                var box = drawn.bounds;
+                for (var corner = 0; corner < 8; corner++)
+                {
+                    var point = new Vector3((corner & 1) == 0 ? box.min.x : box.max.x, (corner & 2) == 0 ? box.min.y : box.max.y,
+                        (corner & 4) == 0 ? box.min.z : box.max.z);
+                    reach = Mathf.Max(reach, Vector3.Dot(point - root, up));
+                }
+            }
+            drawing.Bar.transform.localPosition = new Vector3(-BarWidth * 0.5f, reach + BarAboveModel, 0f);
+            drawing.BarPlaced = true;
         }
 
         private static GameObject Part(string name, Transform parent, Material material, Mesh mesh, int order)

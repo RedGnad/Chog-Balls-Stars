@@ -189,9 +189,11 @@ def material_record(material):
     return name, tuple(material["srgb"]), ROLE_FIXED, light
 
 
-def piece_of(thing, materials):
+def piece_of(thing, materials, record=None):
     """The mesh of one object in the axes of the game: positions, normals, material of each vertex and
-    the triangles. "materials" maps a material record to its index and grows."""
+    the triangles. "materials" maps a material record to its index and grows. "record" gives the record
+    of a material (material_record by default; make_chog_structures.py gives its own)."""
+    record_of = record or material_record
     mesh = thing.data
     mesh.calc_loop_triangles()
     normals = mesh.corner_normals
@@ -199,10 +201,10 @@ def piece_of(thing, materials):
     for slot in mesh.materials:
         # Several values share the names of their materials (every cap is "Hat_Cap_..."), each in its
         # own colours: a material of the library is a name, a colour, a role and a light together.
-        record = material_record(slot)
-        if record not in materials:
-            materials[record] = len(materials)
-        slots.append(materials[record])
+        made = record_of(slot)
+        if made not in materials:
+            materials[made] = len(materials)
+        slots.append(materials[made])
     positions, vectors, kinds, indices, seen = [], [], [], [], {}
     for triangle in mesh.loop_triangles:
         kind = slots[triangle.material_index]
@@ -288,8 +290,10 @@ def write_string(out, text):
     out.write(data)
 
 
-def write_library(path, materials, rest, pieces, heroes, labels):
-    """Writes the file described at the top."""
+def write_library(path, materials, rest, pieces, heroes, labels, skins=None):
+    """Writes the file described at the top. "skins" replaces the table of SKINS (the structures give
+    the colours of the two sides)."""
+    table = skins or SKINS
     os.makedirs(os.path.dirname(path), exist_ok=True)
     temporary = path + ".writing"
     with open(temporary, "wb") as out:
@@ -299,8 +303,8 @@ def write_library(path, materials, rest, pieces, heroes, labels):
         for (name, colour, role, light), _ in ordered:
             write_string(out, name)
             out.write(struct.pack("<3f2B", *colour, role, light))
-        out.write(struct.pack("<I", len(SKINS)))
-        for name, skin in SKINS.items():
+        out.write(struct.pack("<I", len(table)))
+        for name, skin in table.items():
             write_string(out, name)
             out.write(struct.pack("<6f", *skin["skin"], *skin.get("face", traits.GENESIS_FACE)))
             out.write(struct.pack("<B3f", 1 if "top" in skin else 0, *skin.get("top", skin["skin"])))
@@ -322,7 +326,7 @@ def write_library(path, materials, rest, pieces, heroes, labels):
             out.write(struct.pack("<I", len(indices)))
             out.write(struct.pack(f"<{len(indices)}{'H' if count <= 65535 else 'I'}", *indices))
         out.write(struct.pack("<I", len(heroes)))
-        skins = list(SKINS)
+        skins = list(table)
         for number, (skin, worn, attack, style) in sorted(heroes.items()):
             out.write(struct.pack("<HBB", number, skins.index(skin), len(worn)))
             out.write(struct.pack(f"<{len(worn)}H", *worn))
