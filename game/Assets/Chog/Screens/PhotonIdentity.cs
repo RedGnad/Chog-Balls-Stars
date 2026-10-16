@@ -21,6 +21,12 @@ namespace Chog.Screens
         public const string PassParameter = "pass";
 
         private static bool _asked;
+
+        /// <summary>
+        /// Whether the game services check who plays: then a Genesis is only played by a wallet that
+        /// signed in (or a guest with a pass), and a wallet that is only connected plays a recruit.
+        /// </summary>
+        public static bool SignInNeededToPlay => _asked;
         // What the menu was last given: null until then, so that the first frame applies it.
         private string _given;
 

@@ -110,6 +110,7 @@ namespace Chog.Diagnostics
             DontDestroyOnLoad(host);
             host.AddComponent<PerformanceHud>();
             host.AddComponent<CombatLog>();
+            host.AddComponent<InputProbe>();
         }
 
         private static void ApplyOverrides(string url)

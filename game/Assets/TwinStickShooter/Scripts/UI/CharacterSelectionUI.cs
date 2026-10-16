@@ -189,7 +189,8 @@ namespace TwinStickShooter
       _cardTokenId = hero.TokenId;
     }
 
-    // A recruit keeps the class buttons; a note above them says what a recruit is.
+    // A recruit plays one character, the one the menu shows: the class buttons go, as for a
+    // Genesis, and a note in their place says what a recruit is.
     private void ShowRecruitNote()
     {
       if (_recruitNoteShown)
@@ -215,17 +216,14 @@ namespace TwinStickShooter
           return;
         }
 
-        var top = (RectTransform)_classButtons[0].transform;
+        var center = Vector2.zero;
         foreach (var classButton in _classButtons)
         {
-          var area = (RectTransform)classButton.transform;
-          if (area.anchoredPosition.y > top.anchoredPosition.y)
-          {
-            top = area;
-          }
+          center += ((RectTransform)classButton.transform).anchoredPosition / _classButtons.Length;
+          classButton.gameObject.SetActive(false);
         }
 
-        Chog.Screens.RecruitNote.Show(top, Teams[0].TeamCharacters[0]);
+        Chog.Screens.RecruitNote.Show((RectTransform)_classButtons[0].transform, center, Teams[0].TeamCharacters[0]);
         _recruitNoteShown = true;
         return;
       }

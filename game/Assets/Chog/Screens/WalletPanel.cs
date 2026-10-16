@@ -284,9 +284,19 @@ namespace Chog.Screens
             back.onClick.AddListener(GenesisLoan.Close);
         }
 
+        // Set when the player connects a wallet on this page: once it shows a Genesis, the signature
+        // that lets the player play it is asked for at once, instead of waiting for a second button.
+        private bool _justConnected;
+        private WalletState _lastState;
+
         private void Refresh()
         {
             var state = PlayerWallet.State;
+            if (_lastState == WalletState.Connecting && state == WalletState.Ready)
+                _justConnected = true;
+            else if (state != WalletState.Ready)
+                _justConnected = false;
+            _lastState = state;
             // What the wallet may play: the Genesis it holds, then those it rents.
             var tokens = PlayerWallet.Playable;
             var holds = state == WalletState.Ready && tokens.Length > 0;
@@ -382,7 +392,13 @@ namespace Chog.Screens
             _signIn.interactable = PlayerWallet.SignIn != SignInState.Asking;
             _signInLabel.text = PlayerWallet.SignIn == SignInState.Asking ? "ANSWER IN YOUR WALLET..."
                 : PlayerWallet.SignInProblem.Length > 0 ? "SIGN-IN FAILED, TRY AGAIN"
-                : holds ? "SIGN IN TO RECORD ITS CAREER" : "SIGN IN TO STAKE " + GenesisWager.Currency;
+                : holds ? (PhotonIdentity.SignInNeededToPlay ? "SIGN IN TO PLAY IT" : "SIGN IN TO RECORD ITS CAREER")
+                : "SIGN IN TO STAKE " + GenesisWager.Currency;
+            if (_justConnected && holds && PhotonIdentity.SignInNeededToPlay && PlayerWallet.SignIn == SignInState.SignedOut)
+            {
+                _justConnected = false;
+                PlayerWallet.StartSignIn();
+            }
             var canLend = owns && signedIn && GenesisLoan.CanLend(played);
             _lend.gameObject.SetActive(canLend);
             _rentOut.gameObject.SetActive(canRentOut);
@@ -433,8 +449,10 @@ namespace Chog.Screens
             _form.GetComponent<Image>().color = unlocked ? QuietColor : canBuy ? AccentColor : LockedColor;
             if (unlocked)
             {
-                _formLabel.text = "<size=55%>FORM, TAP TO CHANGE</size>\n" +
-                                  _roster.FormName(_roster.Entries[index].Shape, GenesisForms.Picked(played)).ToUpperInvariant();
+                // Which of the two forms is equipped, said in words: the names alone do not tell.
+                var picked = GenesisForms.Picked(played);
+                _formLabel.text = "<size=55%>" + (picked == 1 ? "SECOND FORM, TAP FOR THE FIRST" : "FIRST FORM, TAP FOR THE SECOND") +
+                                  "</size>\n" + _roster.FormName(_roster.Entries[index].Shape, picked).ToUpperInvariant();
             }
             else if (buying)
             {
