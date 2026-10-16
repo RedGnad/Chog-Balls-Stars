@@ -439,8 +439,15 @@ visit that played a few seconds of a match through the tunnel):
   wallet that holds one. `tools/dev/typecheck.py` takes new files with `--add` (with `--sources`, which
   takes folders, two new screens were not checked and the build caught their errors).
 `tools/release/check_all.sh` passed (29 simulation, 84 view, services, 58 contracts).
-**Next action (dev):** the user's yes or no on the 3D structures and on batch 7; the phone with `?perf=1`;
-then the skull's head, the ten 1:1 Genesis, and the video's shots.
+- **The ten 1:1 Genesis, on the branch `3d-one-of-one`** (`dd232df`, pushed, started from batch 7): each given a
+  look read on its picture and the parts no other Genesis wears (`tools/blender/README.md` of the branch,
+  "The ten 1:1 Genesis"): fire with a cape, a skull in flames, The Scream, a zombie with its brain out, Pepe
+  in a frog suit, a manga page in greys, an angel with halo and wings, a warrior in a gold helmet, a Chog of
+  gold, a devil with horns that throws its trident. That branch's library covers all 1,969 Genesis, every
+  one built or checked; the view tests pass on it; seen in the game in a local preview build (`main`'s own
+  library put back and built again right after).
+**Next action (dev):** the user's yes or no on the 3D structures, batch 7 and the 1:1 (merging
+`3d-one-of-one` brings batch 7 with it); the phone with `?perf=1`; then the video's shots.
 
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
