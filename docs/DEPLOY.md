@@ -392,6 +392,28 @@ Vercel's price quote (`vercel domains price <name>`, no purchase): `chogarena.xy
 13 USD, `.fun` and `.lol` 1.99 then 27, `.com` 11.25, `.app` 9.99 then 15. RDAP (`https://rdap.org/domain/<name>`)
 found none of the `chogarena` names registered.
 
+**What the documentation and a wider survey add (research of 16 October 2026, late evening).**
+- No self-serve way exists to clear or verify a hostname: Blockaid's docs are behind a login (`docs.blockaid.io`
+  redirects to `docs-login.blockaid.io`); its public OpenAPI spec says positive labels such as `verified_domain` are
+  "curated and organization assertions only, never engine heuristics"; the portal `https://report.blockaid.io` offers
+  `/mistake` (false positive) and `/verifiedProject` (developer verification), both a form posting to
+  `/api/submitDappForm`. MetaMask staff send owners there ("you can relay with blockaid directly, we cannot action
+  thus here", eth-phishing-detect #298864). An allowlist entry in eth-phishing-detect is not read by the scan.
+- The extension only scans while "Security alerts" is on (`trust-signals-middleware.ts`); dismissing the modal is
+  not remembered; MetaMask Mobile uses the same verdict. Reown's domain verification does not reach MetaMask's
+  extension.
+- Survey of 456 homepages of web3 repositories: `vercel.app` 120 of 160 `BLOCK`, `github.io` 108 of 116,
+  `netlify.app` 20 of 20, `onrender.com` 4 of 4; custom domains 2 of 120 (8 of 253 for repositories created in 2026).
+  `viem.sh` and `uniswap.github.io` are `BLOCK` too. One operator moved two Render services to its own domain and the
+  warning went (#297670). In the 46 issues since August, every clearance found followed a report.
+- Rabby does not use Blockaid: its engine (`RabbyHub/rabby-security-engine`, `src/rules/connect.ts`) asks
+  `https://api.rabby.io/v1/engine/origin/{is_scam?source=rabby|metamask|scamsniffer, is_verified, popularity_level,
+  third_party_collect_list}?origin=https://<host>`; for `chogarena.vercel.app` no scam flag, popularity `very_low`, so
+  two yellow warnings to dismiss before connecting. Rabby supports Ledger (USB/WebHID) and has Monad built in
+  (`https://api.rabby.io/v1/chain/list`: `"id":"monad","community_id":143`).
+- So the way out without sending anything is a domain of our own on the Vercel project, with `PUBLIC_ORIGIN` and
+  Reown following it; then check the verdict once it is live.
+
 ## To decide (the user)
 
 | Question | Why it is open |
