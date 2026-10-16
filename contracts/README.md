@@ -1,5 +1,33 @@
 # The three contracts paid in $CHOG
 
+## On Monad mainnet: the deployment the owner starts (decided 16 October 2026)
+
+The owner chose that day to build on mainnet directly (the project has no users yet, and the owner
+builds on mainnet). `script/DeployMainnet.s.sol` deploys the three contracts in one run, paid in the
+real $CHOG (`0x350035555E10d9AfAF1566AaebfCeD5BA6C27777`, 18 decimals, read on chain) and reading the
+Genesis collection (`0xc96d31F8626c6D03Fae5dCD3d61e3FB9F4a73763`); it refuses any chain but 143. The
+deploying wallet owns the wager (it can only replace the referee) and the shop (it sets the prices);
+the rental has no owner. A tenth of each payment is burned unless `BURNED_SHARE` says otherwise; the
+shop's other $CHOG goes to `TREASURY` (default the deploying wallet), and the second form is put on
+sale at `ITEM_PRICE` whole $CHOG (default 100). The referee of the public instance on mainnet is
+`0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34` (its key in `.artifacts/services-public/mainnet-referee-key`,
+made by `tools/contracts/new_referee_key.sh`, never shown). In the owner's terminal, with the development
+wallet imported once (`~/.foundry/bin/cast wallet import chog-dev --interactive`) and about 1 MON on it:
+
+```sh
+cd contracts
+REFEREE=0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34 [ITEM_PRICE=100] [BURNED_SHARE=1000] [TREASURY=0x...] \
+  ~/.foundry/bin/forge script script/DeployMainnet.s.sol --rpc-url monad --account chog-dev --broadcast
+```
+
+Rehearsed on 16 October on a local copy of mainnet (`anvil --fork-url https://rpc.monad.xyz`, deployed
+with a public anvil test key): 4,259,178 gas in all (forge estimated 100 gwei of base fee that day, so
+about 0.43 MON, at most 0.86 at its estimated top fee); the services read the three (shop on sale at
+100 $CHOG, rental open, wager on chain 143 in $CHOG, not a test). Then, on this Mac,
+`sh tools/contracts/mainnet_deployment.sh 0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34 .artifacts/services-public/mainnet-contracts`
+checks the three on the chain and writes the settings that `tools/release/serve_public.sh ... --mainnet`
+reads. **Not deployed yet.**
+
 **Decided by the user on 15 October 2026: the contracts go to Monad's testnet first**, deployed
 with a development wallet of theirs (its key never leaves their machine: an encrypted Foundry
 keystore, `cast wallet import <name> --interactive`, and a deployment they start themselves).
