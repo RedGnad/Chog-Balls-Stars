@@ -630,8 +630,12 @@ branch writes to a scratch file). The owner says yes or no first.
   yet in the export: the game draws one colour per material; the gradient needs a colour role that the game
   computes from the height of each point (a change of `ChogPartsLibrary` and `ChogHeroModel`).
   Sheets: `research/evidence/chog-traits-batch7-radioactive-2026-10-15.png`.
-- **Still wrong:** Red Bandana is not modelled; the ten 1:1 Genesis keep the earlier look; the skull's
-  profile stays round (only its width narrows into the jaw).
+- **Still wrong:** the ten 1:1 Genesis keep the earlier look; the skull's profile stays round (only its
+  width narrows into the jaw); Red Bandana's band is the narrow headband where the pictures draw a wider
+  scarf.
+- **Red Bandana (16 October, CHOG #874 and #1192):** the band of a headband and a knot with two flaps on the
+  upper front of the head (`build_bandana`); the library has it (388 pieces, 1,959 Genesis checked).
+  `research/evidence/chog-traits-batch7-red-bandana-2026-10-16.jpg`.
 - **The skull's jaw and hands (16 October):** the skull was the round ball of the Chog with teeth drawn on it.
   Now (`JAW`, `narrow_jaw` of `chog_trait_bases.py`) the lower head narrows by 38 percent from the
   cheekbones down, the teeth and the nose with it, as on CHOG #81, #846, #1000, #1104, #1207, #1642; the

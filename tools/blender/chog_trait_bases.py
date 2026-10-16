@@ -17,6 +17,7 @@ from types import SimpleNamespace
 
 from mathutils import Vector
 
+import chog_trait_hats as hats_module
 import make_chog_body as base
 
 X, Y, Z = Vector((1.0, 0.0, 0.0)), Vector((0.0, 1.0, 0.0)), Vector((0.0, 0.0, 1.0))
@@ -344,7 +345,36 @@ def build_mushrooms(maker):
         part.shell(base.ball_rings(top + stem * cap * 0.2, stem, X, cap * 0.55, cap, cap, 6), 12, part.named("Cap"), 0.012)
 
 
-HAT_SHAPES = {"RamHorns": build_ram_horns, "RidgedHorns": build_ridged_horns, "ThirdEye": build_third_eye,
+BANDANA_KNOT = {
+    # Read on CHOG #874 and #1192 (Red Bandana): the band of a headband over the brow, tied in a knot on the
+    # upper front of the head, two short flaps standing out of the knot.
+    "WHERE": (0.42, -0.30, 0.86),     # direction from the middle of the head (side, front, up), side to the left
+    "KNOT": 0.034,                    # radius of the knot
+    "FLAP": (0.080, 0.034, 0.012),    # half length, half width, half thickness of each flap
+    "FLAP_SPREAD_DEG": 38.0,          # each flap from straight out of the head
+}
+
+
+def build_bandana(maker):
+    """Red Bandana: the band of a headband (chog_trait_hats.build_headband) and its knot with two flaps."""
+    hats_module.build_headband(maker)
+    numbers = SimpleNamespace(**BANDANA_KNOT)
+    part = maker.part()
+    out = Vector(numbers.WHERE).normalized()
+    knot = maker.surface.towards(out) + out * numbers.KNOT * 0.6
+    part.shell(base.ball_rings(knot, out, X, numbers.KNOT, numbers.KNOT * 1.15, numbers.KNOT, 6), 10,
+               part.named("Band"), 0.012)
+    sideways = out.cross(Z).normalized()
+    for side in (1.0, -1.0):
+        turn = math.radians(numbers.FLAP_SPREAD_DEG) * side
+        along = (out * math.cos(turn) + sideways * math.sin(turn)).normalized()
+        middle = knot + along * (numbers.KNOT + numbers.FLAP[0] * 0.8)
+        length, width, thick = numbers.FLAP
+        part.shell(base.ball_rings(middle, along, Z, length, width, thick, 6), 10, part.named("Band"), 0.012)
+
+
+HAT_SHAPES = {"RamHorns": build_ram_horns, "Bandana": build_bandana, "RidgedHorns": build_ridged_horns,
+              "ThirdEye": build_third_eye,
               "Gem": build_gem, "Seal": build_seal, "HeadLaser": build_head_laser, "Mushrooms": build_mushrooms}
 # The lines of the crown (make_chog_traits.SPIKES: 0 top, 1 upper pair, 2 middle pair, 3 lowest pair, 4 top of
 # the back row, 5 back pair, 6 straight back) that an object stands in the place of are left out: the
@@ -363,7 +393,10 @@ HAT_NUMBERS["RamHorns"]["LEAVES"] = _crown_without(0, 1, 2, 3)
 HAT_NUMBERS["RamHorns"]["SECTORS"] = (135, -135, 180)
 HAT_NUMBERS["Seal"]["LEAVES"] = _crown_without(0, 1)
 HAT_NUMBERS["Mushrooms"]["LEAVES"] = _crown_without(0, 1)
+# The bandana lies where a headband does, with its leaves (chog_trait_hats.HEADBAND).
+HAT_NUMBERS["Bandana"] = {**hats_module.HEADBAND}
 HATS = {
+    "Red Bandana": {"shape": "Bandana", "colours": {"Band": (0.86, 0.20, 0.18), "Line": (0.62, 0.11, 0.12)}},
     "Red Horn": {"shape": "RamHorns", "colours": {"Horn": (0.62, 0.30, 0.24)}},
     "Purple Horn": {"shape": "RamHorns", "colours": {"Horn": (0.56, 0.42, 0.86)}},
     "Demon Horn": {"shape": "RidgedHorns", "colours": {"Horn": (0.95, 0.52, 0.32)}},
