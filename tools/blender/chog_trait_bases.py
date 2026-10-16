@@ -643,16 +643,25 @@ def build_laurel(maker):
 
 
 TAPED_BANANA = {
-    # A small banana on the brow, at a slant, held by two strips of grey tape crossing over it.
-    # (First try: 0.150 long, 0.022 thick, high on the head: hidden under its tape from the front.)
-    "AT": (0.030, 0.170), "TILT_DEG": 35.0, "OFF": 0.030, "LENGTH": 0.210, "RADIUS": 0.033, "BEND": 0.034,
-    "RINGS": 9, "TIPS": 0.14,                 # the share of its length at each end in the brown of its tips
-    "TAPE": (0.120, 0.030), "TAPE_TURNS_DEG": (25.0, -30.0),
+    # The banana taped to the wall (Maurizio Cattelan's "Comedian"), on the brow, read again on #373 and #978
+    # on 16 October 2026 (the owner: a reference, to be modelled as such; until then a short banana under two
+    # crossed strips): nearly upright, its stem at the top in brown and its tip at the bottom in black, curved
+    # with its back to the right of the character, its other side in a deeper yellow, and one wide strip of
+    # grey tape across its middle, rising to the left of the character.
+    "AT": (0.030, 0.175),          # its middle, in the coordinates of the face
+    "TILT_DEG": -16.0,             # its top leans to the right of the character
+    "OFF": 0.028,                  # its axis this far off the head
+    # (First: 0.240 by 0.031 under a strip 0.092 wide: the tape hid the banana.)
+    "LENGTH": 0.290, "RADIUS": 0.037, "BEND": 0.045, "RINGS": 11, "SIDES": 6,
+    "STEM": (0.040, 0.010),        # length and radius of the stem, going on from its top
+    # Half length, half width, degrees from across the face (rising to its left). Its middle is that of the
+    # banana, where its back bulges (16 October 2026, the owner: the tape was off to the side, at AT, BEND to
+    # the left of the banana; 38 degrees until then, 24 on the pictures).
+    "TAPE": (0.165, 0.036, 28.0),
 }
 
 
 def build_taped_banana(maker):
-    import make_chog_traits as traits_module
     numbers = SimpleNamespace(**TAPED_BANANA)
     part, surface = maker.part(), maker.surface
     out = _out(surface, *numbers.AT)
@@ -660,34 +669,64 @@ def build_taped_banana(maker):
     tilt = math.radians(numbers.TILT_DEG)
     upright = X * math.sin(tilt) + Z * math.cos(tilt)
     along = (upright - out * upright.dot(out)).normalized()
-    bend = along.cross(out).normalized()
-    rings, half = [], numbers.LENGTH * 0.5
+    sideways = out.cross(along).normalized()
+    if sideways.x < 0.0:
+        sideways = -sideways             # towards the left of the character
+    half, rings = numbers.LENGTH * 0.5, []
     for step in range(numbers.RINGS):
-        s = -half + numbers.LENGTH * step / (numbers.RINGS - 1)
-        share = s / half
-        radius = numbers.RADIUS * max(0.15, 1.0 - 0.75 * share ** 4)
-        first, second = base.frame_across(along, bend)
-        rings.append((middle + along * s + bend * numbers.BEND * share * share, first * radius, second * radius))
-    _, faces = part.shell(rings, 8, part.named("Peel"), 0.008)
-    tip = half * (1.0 - 2.0 * numbers.TIPS)
-    part.paint([face for face in faces if abs((face.calc_center_median() - middle).dot(along)) > tip], part.named("Tip"))
-    half_length, half_width = numbers.TAPE
-    for turn in numbers.TAPE_TURNS_DEG:
-        angle = math.radians(90.0 - numbers.TILT_DEG + turn)
-        across = (math.cos(angle), math.sin(angle))
-        path, wide, thick = [], [], []
-        for step in range(7):
-            t = -1.0 + 2.0 * step / 6
-            side, up = numbers.AT[0] + across[0] * half_length * t, numbers.AT[1] + across[1] * half_length * t
-            lift = 0.006 + (numbers.OFF + numbers.RADIUS + 0.004) * max(0.0, 1.0 - (t * 1.7) ** 2)
-            point = surface.front(side, up, lift)
-            here = _out(surface, side, up)
-            direction = Vector((across[0], 0.0, across[1]))
-            width_way = here.cross(direction).normalized()
-            path.append(point)
-            wide.append(width_way * half_width)
-            thick.append(here * 0.004)
-        hats_module.slab(part, path, wide, thick, part.named("Tape"), 0.006, sides=4)
+        share = -1.0 + 2.0 * step / (numbers.RINGS - 1)
+        radius = numbers.RADIUS * max(0.12, 1.0 - 0.80 * share ** 4)
+        # The back of the banana bulges to the right of the character, its ends towards the left.
+        centre = middle + along * half * share - sideways * numbers.BEND * (1.0 - share * share)
+        ahead = (along + sideways * numbers.BEND * 2.0 * share / half).normalized()
+        first, second = base.frame_across(ahead, sideways)
+        rings.append((centre, first * radius, second * radius))
+    _, faces = part.shell(rings, numbers.SIDES, part.named("Peel"), 0.008, smooth=False)
+    for face in faces:
+        centre = face.calc_center_median()
+        along_here = (centre - middle).dot(along) / half
+        if along_here < -0.86:
+            part.paint([face], part.named("Tip"))
+        elif (centre - middle).dot(sideways) > numbers.RADIUS * 0.15:
+            part.paint([face], part.named("Shade"))
+    length, radius = numbers.STEM
+    top = rings[-1][0]
+    stem_way = (along - sideways * 0.35).normalized()
+    part.shell(base.tube_rings(top - stem_way * 0.004, stem_way, sideways, [(0.0, radius * 1.3), (length, radius)]), 6,
+               part.named("Stem"), 0.006)
+    half_length, half_width, degrees = numbers.TAPE
+    # The strip runs across the face (rising to its left), through the middle of the banana, where its back
+    # bulges: on the head on each side, over the banana in the middle, wrapped round its outer half (the
+    # side away from the head), and down to the head again beside it. (Until 16 October 2026 it was lifted
+    # off the head along the brow, which put it above the banana and behind it from the front.)
+    angle = math.radians(degrees)
+    middle_of_banana = rings[numbers.RINGS // 2][0]
+    flat = Vector((math.cos(angle), 0.0, math.sin(angle)))
+    way = (flat - out * flat.dot(out)).normalized()
+    across_banana = (way - along * way.dot(along)).normalized()
+    slant = way.dot(across_banana)
+    radius = numbers.RADIUS + 0.004
+    path, wide, thick = [], [], []
+    for step in range(13):
+        t = -1.0 + 2.0 * step / 12
+        here = middle_of_banana + way * half_length * t
+        # Where the strip lies on the head under that place.
+        side = here.x - surface.middle.x - surface.face_middle[0]
+        up = here.z - surface.middle.z - surface.face_middle[1]
+        on_head = surface.front(side, up, 0.006)
+        # Where it lies on the banana: across it by "beside", on its outer half.
+        beside = half_length * t * slant
+        if abs(beside) < radius:
+            on_banana = here + out * math.sqrt(radius * radius - beside * beside)
+        else:
+            on_banana = here
+        share = min(1.0, max(0.0, (radius + 0.030 - abs(beside)) / 0.030))
+        share = share * share * (3.0 - 2.0 * share)
+        point = on_head + (on_banana - on_head) * share
+        path.append(point)
+        wide.append(out.cross(way).normalized() * half_width)
+        thick.append(out * 0.004)
+    hats_module.slab(part, path, wide, thick, part.named("Tape"), 0.008, sides=4)
 
 
 def build_fedora(maker):
@@ -751,7 +790,8 @@ HATS = {
     "Gold Thorn": {"shape": "ThornCrown", "colours": {"Vine": (0.93, 0.62, 0.18)}},
     "Silver Thorn": {"shape": "ThornCrown", "colours": {"Vine": (0.64, 0.64, 0.66)}},
     "Silver wreath": {"shape": "Laurel", "colours": {"Leaf": (0.82, 0.76, 0.62), "Stem": (0.52, 0.44, 0.34)}},
-    "Taped Banana": {"shape": "TapedBanana", "colours": {"Peel": (0.98, 0.80, 0.18), "Tip": (0.42, 0.28, 0.14),
+    "Taped Banana": {"shape": "TapedBanana", "colours": {"Peel": (0.99, 0.82, 0.20), "Shade": (0.92, 0.62, 0.12),
+                                                         "Tip": (0.10, 0.08, 0.06), "Stem": (0.45, 0.30, 0.13),
                                                          "Tape": (0.62, 0.62, 0.66)}},
     "Mafia Hat": {"shape": "Fedora",
                   "colours": {"Crown": (0.21, 0.21, 0.24), "Brim": (0.21, 0.21, 0.24), "Under": (0.12, 0.12, 0.14),

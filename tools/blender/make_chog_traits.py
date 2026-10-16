@@ -2631,7 +2631,9 @@ def build(traits=None, replaced=None, head_replaced=None):
         for shapes, on in maker.parts:
             if on == "Head":
                 full.turn_head_up(shapes, head_n)
-            made = shapes.finish(shapes.name, Vector((0.0, 0.0, 0.0)), by_name[on], trait_made)
+            # On the body the outlines keep above the ground, as those of the feet do (the boots of a
+            # costume, 16 October 2026).
+            made = shapes.finish(shapes.name, Vector((0.0, 0.0, 0.0)), by_name[on], trait_made, on_ground=(on == "Body"))
             made["trait"] = f"{trait}={value}"
             made["prefix"] = maker.prefix
             # What the pictures show on this value that its part does not draw yet (a word, a logo).
