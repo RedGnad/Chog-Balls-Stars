@@ -220,8 +220,11 @@ def add_ribs(part, numbers, material):
 # What the Radioactive Genesis wear on the head (their values of "Head"), read on their pictures
 # (.artifacts/chog-body/special/skins.png): ram horns curling back (Red Horn, Purple Horn), ridged horns
 # standing up (Demon Horn, Void Horn, devil horn), a third eye on the brow, a blue gem on the brow
-# (Diamond), a gold seal on the top (Holy Seal), a beam going up from the brow (Blue Laser), mushrooms
-# (Poison Shroom). The whole crown stays: they stand among the spikes.
+# (Diamond), a gold seal above the brow (Holy Seal), a beam going up from the brow (Blue Laser), mushrooms
+# (Poison Shroom). The whole crown stays: they stand among the spikes. (Until 16 October 2026 the horns
+# grew out of the top of the skull, where the spikes of the crown were, and those spikes were taken out:
+# the owner saw horns on the crown where the pictures put them on the brow, and a head without its
+# spikes. They now grow from the front of the head, before the crown, which keeps every spike.)
 # ---------------------------------------------------------------------------------------------
 
 FULL = ((1.0, None, None),) * 7
@@ -236,29 +239,47 @@ RAM_HORN = {
     # about as thick at its root as a sixth of the head, rises well above the crown, then curls out to the
     # side and down, a little to the back; its rings show as ridges. (First: a curl of 0.08 and a thickness
     # of 0.046, small horns beside the pictures; then curled back, hidden from the front.)
-    "CURL": 0.125,            # radius of the curl where it starts; it tightens to TIGHTEN of it at the tip
+    # Where each horn grows: at the upper corner of the brow, in the coordinates of the face (to the side,
+    # above its middle), sunk this far into the head. The pictures draw the root there, in front of the
+    # spikes, which show all around (16 October 2026; the root was on the top of the head until then).
+    "ROOT": (0.18, 0.19),
+    "SUNK": 0.02,
+    # From the brow it first rises straight up this far, so that the curl stands above the head, as drawn.
+    "RISE": 0.13,
+    "RISE_RIDGES": 4,
+    "CURL": 0.135,            # radius of the curl where it starts; it tightens to TIGHTEN of it at the tip
     "TIGHTEN": 0.62,
     "SWEEP_DEG": 205.0,       # how far it turns, from straight up
     "THICK": 0.078,           # half its thickness at the root
     "TIP": 0.34,              # share of THICK left at the tip
     "OUT": 0.10,              # how far the tip drifts out, sideways
     "BACK": 0.35,             # the curl goes out to the side, turned this much towards the back
-    "RIDGES": 22,
+    # Rings along the curl and points around each (22 and 10 until 16 October 2026: with the whole crown
+    # kept, #31 went over 8,000 triangles).
+    "RIDGES": 14,
+    "SIDES": 8,
 }
 
 
 def build_ram_horns(maker):
-    """Two big ridged horns from the top of the head, rising up, then curling out to the side and down, as
-    the pictures draw them (RAM_HORN)."""
+    """Two big ridged horns from the upper corners of the brow, rising up, then curling out to the side and
+    down, as the pictures draw them (RAM_HORN)."""
     numbers = SimpleNamespace(**RAM_HORN)
     for side in (1.0, -1.0):
         part = maker.part()
-        root = maker.surface.towards(Vector((0.50 * side, -0.06, 0.86)).normalized()) - Z * 0.02
+        across, up = numbers.ROOT
+        root = maker.surface.front(across * side, up, -numbers.SUNK)
         back = (X * side + Y * numbers.BACK).normalized()
-        centre = root + back * numbers.CURL
         across = back.cross(Z).normalized()     # square to the plane of the curl
-        sweep = math.radians(numbers.SWEEP_DEG)
         rings = []
+        # The straight rise, its ridges as thick as those at the start of the curl.
+        for step in range(numbers.RISE_RIDGES):
+            first, second = base.frame_across(Z, across)
+            thick = numbers.THICK * (1.12 if step % 2 == 0 else 0.88)
+            rings.append((root + Z * numbers.RISE * step / numbers.RISE_RIDGES, first * thick, second * thick))
+        start = root + Z * numbers.RISE
+        centre = start + back * numbers.CURL
+        sweep = math.radians(numbers.SWEEP_DEG)
         for step in range(numbers.RIDGES + 1):
             t = step / numbers.RIDGES
             angle = t * sweep
@@ -266,27 +287,51 @@ def build_ram_horns(maker):
             point = centre - back * r * math.cos(angle) + Z * r * math.sin(angle) + X * side * numbers.OUT * t * t
             ahead = (back * math.sin(angle) + Z * math.cos(angle) + X * side * numbers.OUT * 2.0 * t).normalized()
             first, second = base.frame_across(ahead, across)
-            thick = numbers.THICK * (1.0 - (1.0 - numbers.TIP) * t) * (1.12 if step % 2 == 0 else 0.88)
+            thick = numbers.THICK * (1.0 - (1.0 - numbers.TIP) * t) * (1.12 if (step + numbers.RISE_RIDGES) % 2 == 0
+                                                                       else 0.88)
             rings.append((point, first * thick, second * thick))
         rings.append((rings[-1][0] + (rings[-1][0] - rings[-2][0]) * 0.7, Vector(), Vector()))
-        part.shell(rings, 10, part.named("Horn"), 0.012)
+        part.shell(rings, numbers.SIDES, part.named("Horn"), 0.012)
 
 
-def build_ridged_horns(maker):
-    """Two horns standing up and out, ridged, slightly bent outwards."""
-    for side in (1.0, -1.0):
-        part = maker.part()
-        away = Vector((0.55 * side, 0.08, 0.83)).normalized()
-        root = maker.surface.towards(away) - away * 0.03
-        rings = []
-        for step in range(9):
-            t = step / 8.0
-            point = root + away * 0.24 * t + X * side * 0.05 * t * t
-            first, second = base.frame_across(away, X)
-            thick = 0.052 * (1.0 - 0.85 * t) * (1.12 if step % 2 == 1 else 0.96)
-            rings.append((point, first * thick, second * thick))
-        rings.append((root + away * 0.265 + X * side * 0.05, Vector(), Vector()))
-        part.shell(rings, 8, part.named("Horn"), 0.012)
+DEMON_HORNS = {
+    # Read on CHOG #343, #625, #1460 (Demon Horn), #140, #1222 (Void Horn) and #1225 (devil horn): five
+    # ridged horns among the spikes, three on the top of the brow (one in the middle, one each side) and
+    # one low on each side of the head, curving up. Each: where its root is on the face (to the side, above
+    # its middle; mirrored when the side is not 0), how far it leans out against straight up (0 up, 1 as
+    # the head faces there), its length, its half thickness at the root, how far its tip bends up.
+    "HORNS": (
+        ((0.00, 0.27), 0.45, 0.17, 0.050, 0.00),
+        ((0.17, 0.24), 0.55, 0.17, 0.050, 0.02),
+        ((0.27, 0.06), 0.90, 0.16, 0.050, 0.08),
+    ),
+    "SUNK": 0.025,
+    "RINGS": 8,
+    "SIDES": 6,                      # (7 on the first try: #1222, in a hoodie, went 31 triangles over 8,000)
+}
+
+
+def build_demon_horns(maker):
+    """Five ridged horns standing among the spikes (DEMON_HORNS); the crown keeps every spike. A value may
+    give its own horns ("horns" of its entry, as HORNS: the 1:1 devil has one pair)."""
+    numbers = SimpleNamespace(**DEMON_HORNS)
+    surface = maker.surface
+    for (across, up), out, length, thick, bend in maker.entry.get("horns", numbers.HORNS):
+        for side in ((1.0,) if across == 0.0 else (1.0, -1.0)):
+            part = maker.part()
+            root = surface.front(across * side, up, -numbers.SUNK)
+            facing = _out(surface, across * side, up)
+            away = (Z * (1.0 - out) + facing * out).normalized()
+            rings = []
+            for step in range(numbers.RINGS + 1):
+                t = step / numbers.RINGS
+                point = root + away * length * t + Z * length * bend * t * t
+                ahead = (away + Z * 2.0 * bend * t).normalized()
+                first, second = base.frame_across(ahead, X)
+                size = thick * (1.0 - 0.85 * t) * (1.12 if step % 2 == 1 else 0.96)
+                rings.append((point, first * size, second * size))
+            rings.append((root + away * length * 1.1 + Z * length * bend * 1.2, Vector(), Vector()))
+            part.shell(rings, numbers.SIDES, part.named("Horn"), 0.012)
 
 
 def build_third_eye(maker):
@@ -310,39 +355,134 @@ def build_gem(maker):
     part.shell(rings, 6, part.named("Gem"), 0.010, smooth=False)
 
 
+HOLY_SEAL = {
+    # Read on CHOG #415, #743 and #1813 (Holy Seal): a large gold wheel standing upright above the brow,
+    # in front of the spikes, its lower edge over the top of the face; a lattice inside it and short rays
+    # around it, each crossed near its tip. (Until 16 October 2026: a small ring lying on the top of the
+    # skull, the upper spikes taken out.) Where it stands: above the middle of the face, then raised and
+    # brought ahead of that point; how far it leans back (from the camera of the game it is seen better).
+    "UP": 0.27,
+    "RAISE": 0.085,
+    "AHEAD": 0.075,
+    "LEAN_BACK_DEG": 15.0,
+    "RADIUS": 0.115,
+    "TUBE": 0.014,
+    "SEGMENTS": 16,
+    "BARS": (-0.05, 0.0, 0.05),      # the lattice: bars across and up, at these distances from the middle
+    "BAR": 0.007,
+    "RAYS": 8,
+    "RAY": (0.055, 0.014),           # length and half width at the root
+    "CROSS": (0.70, 0.022, 0.006),   # the bar across a ray: where along it, half length, radius
+}
+
+
 def build_seal(maker):
+    """Holy Seal (HOLY_SEAL): a gold wheel standing on the brow, before the crown, which keeps every spike."""
+    numbers = SimpleNamespace(**HOLY_SEAL)
     part, surface = maker.part(), maker.surface
-    top = surface.towards(Vector((0.0, 0.05, 1.0)).normalized())
-    for radius, tube, key in ((0.075, 0.016, "Gold"), (0.042, 0.010, "Gold")):
-        rings = []
-        for step in range(25):
-            angle = 2.0 * math.pi * step / 24
-            outward = X * math.cos(angle) + Y * math.sin(angle)
-            rings.append((top + Z * 0.03 + outward * radius, Z * tube, outward * tube))
-        part.shell(rings, 6, part.named(key), 0.010)
-    for step in range(4):
-        angle = math.pi * 0.5 * step + math.pi * 0.25
-        outward = X * math.cos(angle) + Y * math.sin(angle)
-        stations = [(0.0, 0.016), (0.05, 0.0)]
-        part.shell(base.tube_rings(top + Z * 0.03 + outward * 0.085, outward, Z, stations), 6, part.named("Gold"), 0.010)
+    lean = math.radians(numbers.LEAN_BACK_DEG)
+    facing = (-Y * math.cos(lean) + Z * math.sin(lean)).normalized()
+    upward = (Z * math.cos(lean) + Y * math.sin(lean)).normalized()
+    centre = surface.front(0.0, numbers.UP, 0.0) + Z * numbers.RAISE - Y * numbers.AHEAD
+    gold = part.named("Gold")
+    rings = []
+    for step in range(numbers.SEGMENTS + 1):
+        angle = 2.0 * math.pi * step / numbers.SEGMENTS
+        outward = X * math.cos(angle) + upward * math.sin(angle)
+        rings.append((centre + outward * numbers.RADIUS, outward * numbers.TUBE, facing * numbers.TUBE))
+    part.shell(rings, 5, gold, 0.010)
+    for offset in numbers.BARS:
+        reach = math.sqrt(numbers.RADIUS ** 2 - offset ** 2)
+        for along, across in ((X, upward), (upward, X)):
+            start = centre + across * offset - along * reach
+            part.shell(base.tube_rings(start, along, facing, [(0.0, numbers.BAR), (2.0 * reach, numbers.BAR)]), 4,
+                       gold, 0.0)
+    length, wide = numbers.RAY
+    where, half, radius = numbers.CROSS
+    for step in range(numbers.RAYS):
+        angle = 2.0 * math.pi * step / numbers.RAYS + math.pi * 0.5
+        outward = X * math.cos(angle) + upward * math.sin(angle)
+        root = centre + outward * (numbers.RADIUS + numbers.TUBE * 0.5)
+        part.shell(base.tube_rings(root, outward, facing, [(0.0, wide), (length * 0.55, wide * 0.8), (length, 0.0)]),
+                   5, gold, 0.010)
+        sideways = outward.cross(facing).normalized()
+        middle = root + outward * length * where
+        part.shell(base.tube_rings(middle - sideways * half, sideways, facing, [(0.0, radius), (2.0 * half, radius)]),
+                   4, gold, 0.0)
+
+
+HEAD_LASER = {
+    # Read on CHOG #772 (Blue Laser, the only one): a wide pale blue beam leaving the middle of the brow from
+    # a white glow, up and out to the left of the character at about 45 degrees, in front of the spikes.
+    # (Until 16 October 2026: a thin beam straight up, which the bust showed leaning the other way.)
+    "AT": 0.13,                       # above the middle of the face
+    "WAY": (0.70, -0.25, 0.70),       # to the left of the character, ahead, up
+    "BEAM": (0.026, 0.47),            # radius, length
+    "GLOW": (0.040, 0.026),           # the white glow on the brow where it leaves: half width, half height
+}
 
 
 def build_head_laser(maker):
+    """Blue Laser (HEAD_LASER): the beam of the brow and its glow."""
+    numbers = SimpleNamespace(**HEAD_LASER)
     part, surface = maker.part(), maker.surface
-    start = surface.front(0.0, 0.13, 0.0)
-    up = (Z * 0.9 - Y * 0.4).normalized()
-    part.shell(base.tube_rings(start, up, X, [(0.0, 0.018), (0.45, 0.016), (0.47, 0.0)]), 8, part.named("Beam"), 0.0)
+    start = surface.front(0.0, numbers.AT, 0.0)
+    way = Vector(numbers.WAY).normalized()
+    radius, length = numbers.BEAM
+    part.shell(base.tube_rings(start, way, Z, [(0.0, radius * 0.8), (0.04, radius), (length - 0.02, radius),
+                                                (length, 0.0)]), 8, part.named("Beam"), 0.0)
+    import make_chog_traits as traits_module
+    wide, high = numbers.GLOW
+    traits_module.draw_shape(part, surface, part.named("Glow"), traits_module.oval((0.0, numbers.AT), wide, high, 14),
+                             0.026)
+
+
+POISON_SHROOM = {
+    # Read on CHOG #1100 (Poison Shroom, the only one): mushrooms growing out of the head among the spikes,
+    # pale green caps spotted orange on pale stems: a tall one at the top (on the right of the character), a
+    # smaller one leaning out at the top on its left, a small orange one spotted green low on its right side.
+    # (Until 16 October 2026: two purple caps on the top of the skull, the upper spikes taken out.) Each:
+    # where its root is on the face (to the side, above its middle), how far it leans out (0 up, 1 as the
+    # head faces there), the height of its stem, its radius, the radius of its cap, whether the cap is the
+    # orange one.
+    "SHROOMS": (
+        ((-0.05, 0.27), 0.20, 0.17, 0.022, 0.110, False),
+        ((0.18, 0.23), 0.55, 0.12, 0.018, 0.085, False),
+        ((-0.27, 0.06), 0.85, 0.07, 0.014, 0.055, True),
+    ),
+    "SUNK": 0.02,
+    "CAP_SIDES": 10,
+    "SPOTS": 5,                      # around each cap, halfway down it
+    "SPOT": (0.016, 0.006),          # half width and half thickness of a spot, against a cap of 0.1
+}
 
 
 def build_mushrooms(maker):
-    for side, lean, height, cap in ((0.35, 0.25, 0.15, 0.10), (-0.25, -0.2, 0.11, 0.075)):
+    """Poison Shroom (POISON_SHROOM): spotted mushrooms before the crown, which keeps every spike."""
+    numbers = SimpleNamespace(**POISON_SHROOM)
+    surface = maker.surface
+    for (across, up), out, height, stem_radius, cap, orange in numbers.SHROOMS:
         part = maker.part()
-        away = Vector((side, 0.15, 0.9)).normalized()
-        root = maker.surface.towards(away) - away * 0.02
-        stem = (away + X * lean).normalized()
-        part.shell(base.tube_rings(root, stem, X, [(0.0, 0.018), (height, 0.016)]), 8, part.named("Stem"), 0.010)
+        root = surface.front(across, up, -numbers.SUNK)
+        stem = (Z * (1.0 - out) + _out(surface, across, up) * out).normalized()
+        part.shell(base.tube_rings(root, stem, X, [(0.0, stem_radius * 1.15), (height, stem_radius)]), 8,
+                   part.named("Stem"), 0.010)
         top = root + stem * height
-        part.shell(base.ball_rings(top + stem * cap * 0.2, stem, X, cap * 0.55, cap, cap, 6), 12, part.named("Cap"), 0.012)
+        cap_key, spot_key = ("Spot", "Cap") if orange else ("Cap", "Spot")
+        part.shell(base.ball_rings(top + stem * cap * 0.2, stem, X, cap * 0.55, cap, cap, 6), numbers.CAP_SIDES,
+                   part.named(cap_key), 0.012)
+        first, second = base.frame_across(stem, X)
+        wide, thick = numbers.SPOT
+        for step in range(numbers.SPOTS):
+            angle = 2.0 * math.pi * step / numbers.SPOTS + 0.4
+            polar = math.radians(55.0 if step % 2 == 0 else 35.0)
+            radial = first * math.cos(angle) + second * math.sin(angle)
+            normal = (stem * math.cos(polar) * 1.8 + radial * math.sin(polar)).normalized()
+            point = (top + stem * cap * 0.2 + stem * cap * 0.55 * math.cos(polar) + radial * cap * math.sin(polar)
+                     + normal * thick * 0.5 * cap / 0.1)
+            size = cap / 0.1
+            part.shell(base.ball_rings(point, normal, radial, thick * size, wide * size, wide * size, 3), 6,
+                       part.named(spot_key), 0.0)
 
 
 BANDANA_KNOT = {
@@ -373,39 +513,27 @@ def build_bandana(maker):
         part.shell(base.ball_rings(middle, along, Z, length, width, thick, 6), 10, part.named("Band"), 0.012)
 
 
-HAT_SHAPES = {"RamHorns": build_ram_horns, "Bandana": build_bandana, "RidgedHorns": build_ridged_horns,
+HAT_SHAPES = {"RamHorns": build_ram_horns, "Bandana": build_bandana, "DemonHorns": build_demon_horns,
               "ThirdEye": build_third_eye,
               "Gem": build_gem, "Seal": build_seal, "HeadLaser": build_head_laser, "Mushrooms": build_mushrooms}
-# The lines of the crown (make_chog_traits.SPIKES: 0 top, 1 upper pair, 2 middle pair, 3 lowest pair, 4 top of
-# the back row, 5 back pair, 6 straight back) that an object stands in the place of are left out: the
-# horns grow where those spikes would (the build refuses a leaf through an object).
-GONE_LINE = (0.0, None, None)
-
-
-def _crown_without(*lines):
-    return tuple(GONE_LINE if line in lines else FULL[line] for line in range(7))
-
-
+# Every one of these stands before the crown, which keeps all its spikes (the build refuses a leaf through an
+# object, so a part that grew into a spike would fail its Genesis).
 HAT_NUMBERS = {name: {"LEAVES": FULL, "OUTLINE_THICKNESS": 0.012} for name in HAT_SHAPES}
-HAT_NUMBERS["RidgedHorns"]["LEAVES"] = _crown_without(0, 1, 2)
-HAT_NUMBERS["RamHorns"]["LEAVES"] = _crown_without(0, 1, 2, 3)
-# The ram horns curl down the sides, where the side spikes were: tips are looked for behind only.
-HAT_NUMBERS["RamHorns"]["SECTORS"] = (135, -135, 180)
-HAT_NUMBERS["Seal"]["LEAVES"] = _crown_without(0, 1)
-HAT_NUMBERS["Mushrooms"]["LEAVES"] = _crown_without(0, 1)
 # The bandana lies where a headband does, with its leaves (chog_trait_hats.HEADBAND).
 HAT_NUMBERS["Bandana"] = {**hats_module.HEADBAND}
 HATS = {
     "Red Bandana": {"shape": "Bandana", "colours": {"Band": (0.86, 0.20, 0.18), "Line": (0.62, 0.11, 0.12)}},
     "Red Horn": {"shape": "RamHorns", "colours": {"Horn": (0.62, 0.30, 0.24)}},
     "Purple Horn": {"shape": "RamHorns", "colours": {"Horn": (0.56, 0.42, 0.86)}},
-    "Demon Horn": {"shape": "RidgedHorns", "colours": {"Horn": (0.95, 0.52, 0.32)}},
-    "Void Horn": {"shape": "RidgedHorns", "colours": {"Horn": (0.52, 0.36, 0.86)}},
-    "devil horn": {"shape": "RidgedHorns", "colours": {"Horn": (0.90, 0.26, 0.26)}},
+    "Demon Horn": {"shape": "DemonHorns", "colours": {"Horn": (0.95, 0.52, 0.32)}},
+    "Void Horn": {"shape": "DemonHorns", "colours": {"Horn": (0.52, 0.36, 0.86)}},
+    "devil horn": {"shape": "DemonHorns", "colours": {"Horn": (0.90, 0.26, 0.26)}},
     "3rd Eye": {"shape": "ThirdEye", "colours": {"Dark": (0.07, 0.05, 0.10), "White": (0.98, 0.97, 0.94)},
                 "unlit": ("Dark", "White")},
     "Diamond": {"shape": "Gem", "colours": {"Gem": (0.36, 0.76, 0.98)}, "unlit": ("Gem",)},
     "Holy Seal": {"shape": "Seal", "colours": {"Gold": (0.98, 0.80, 0.22)}},
-    "Blue Laser": {"shape": "HeadLaser", "colours": {"Beam": (0.55, 0.92, 1.0)}, "unlit": ("Beam",)},
-    "Poison Shroom": {"shape": "Mushrooms", "colours": {"Stem": (0.95, 0.92, 0.85), "Cap": (0.62, 0.30, 0.82)}},
+    "Blue Laser": {"shape": "HeadLaser", "colours": {"Beam": (0.55, 0.92, 1.0), "Glow": (0.97, 0.99, 1.0)},
+                   "unlit": ("Beam", "Glow")},
+    "Poison Shroom": {"shape": "Mushrooms", "colours": {"Stem": (0.80, 0.90, 0.78), "Cap": (0.62, 0.84, 0.70),
+                                                        "Spot": (0.95, 0.58, 0.24)}},
 }

@@ -772,17 +772,21 @@ def build_clown_nose(maker):
 
 PLUNGER = {
     # The cup: where it stands on the head (degrees from the front, towards the left of the character;
-    # polar degrees), then from its rim on the head up its axis: (height, radius) of each ring.
-    "AT": (-18.0, 22.0),
+    # polar degrees), how upright it stands (0 square to the head there, 1 straight up), then from its rim
+    # on the head up its axis: (height, radius) of each ring. (Polar 22 and square to the head until
+    # 16 October 2026: the cup sat on the top of the skull where the upper spikes were, and those spikes
+    # were taken out. The pictures put it at the front of the top, the spikes all around it.)
+    "AT": (20.0, 38.0),
+    "UPRIGHT": 0.45,
     "CUP": ((-0.030, 0.104), (0.006, 0.118), (0.040, 0.116), (0.078, 0.094), (0.104, 0.056), (0.114, 0.0)),
     "LIP": 1,                    # the rings of the cup up to this one are its darker lip
     "SIDES": 12,
     # The stick: its radius, its length, and the way it leans (towards the left of the character, back).
     "FERRULE": (0.026, 0.034),   # the red collar where the stick enters the cup: radius, length
-    "STICK": (0.014, 0.30, 0.95, 0.30),
+    "STICK": (0.014, 0.30, 2.40, 0.10),
     "OUTLINE_THICKNESS": 0.016,
-    # The cup sits on the top of the head: the leaf on top and the upper pair would go through it.
-    "LEAVES": (GONE, GONE, WHOLE, WHOLE, WHOLE, WHOLE, WHOLE),
+    # The cup sits at the front of the top, before the crown: every spike stays.
+    "LEAVES": FULL_CROWN,
 }
 
 
@@ -791,7 +795,7 @@ def build_plunger(maker):
     part, surface = maker.part(), maker.surface
     degrees, polar_deg = numbers.AT
     angle, polar = math.radians(270.0 + degrees), math.radians(polar_deg)
-    axis = head_normal(surface, angle, polar)
+    axis = (head_normal(surface, angle, polar) * (1.0 - numbers.UPRIGHT) + Z * numbers.UPRIGHT).normalized()
     foot = on_head(surface, angle, polar, 1.0)
     first, second = base.frame_across(axis, X)
     rings = [(foot + axis * height, first * radius, second * radius) for height, radius in numbers.CUP]
@@ -1507,9 +1511,9 @@ HEAD_VALUES = {
                                   "curly edge; no spike", NO_CROWN),
     ("Clown Nose", "Right"): seen((18, 406, 920, 1553, 1926), "a red ball on the nose; the whole crown, as on a "
                                   "bare head", FULL_CROWN),
-    ("Plumber", "Left"): seen((17, 531, 1325, 1601, 1885), "a red plunger cup on the top; the points of the "
-                              "head around it (drawn in cream, as Side=Left draws a head)",
-                              (GONE, GONE, WHOLE, WHOLE, WHOLE, WHOLE, WHOLE)),
+    ("Plumber", "Left"): seen((17, 531, 1325, 1601, 1885), "a red plunger cup at the front of the top; the "
+                              "points of the head all around it (drawn in cream, as Side=Left draws a head)",
+                              FULL_CROWN),
     ("Robber", "Right"): seen((14, 652, 927, 1692, 1960), "a grey knitted mask over the whole head; 2 or 3 "
                               "spikes come out of it on the far side, near the top", ROBBER_POINTS,
                               THROUGH=True),

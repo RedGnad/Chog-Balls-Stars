@@ -693,3 +693,29 @@ the angel's wings were too small to see and its first build went over 8,000 tria
 
 This branch starts from `3d-batch-7`: merging it brings batch 7 too. To put them in the game after a yes:
 merge, build (the library is exported here).
+
+## What stands on the head no longer takes the place of the spikes (16 October 2026, on this branch)
+
+The owner saw horns and the plunger fixed on the top of the skull where the pictures put them on the brow,
+and spikes missing from the head because of it. Each case was looked at against its pictures, then turned
+all around:
+
+| Value | Before | Now |
+| --- | --- | --- |
+| Red Horn, Purple Horn (`RAM_HORN`) | two horns from the top of the head; the four front lines of leaves taken out | from the upper corners of the brow, rising straight (`RISE`) then curling out above the head; every leaf kept; 14 rings of 8 points along each horn (22 of 10 before: #31 went over 8,000 triangles) |
+| Demon Horn, Void Horn, devil horn (`DEMON_HORNS`, new shape `DemonHorns`) | two horns on the top; leaves 0 to 2 taken out | five horns among the spikes, three on the top of the brow and one low on each side curving up, as drawn; every leaf kept |
+| The 1:1 devil (#1376) | the same two horns on the top | one pair of short horns at the corners of the brow (`horns` of its entry), darker than its skin so they read |
+| Plumber (`PLUNGER`) | the cup on the crown (polar 22 degrees), leaves 0 and 1 taken out | at the front of the top (polar 38), standing half upright (`UPRIGHT`), on the left of the character so the bust shows it right of the face as the pictures do, the stick out to the upper right; every leaf kept |
+| Holy Seal (`HOLY_SEAL`) | a small ring lying on the top, leaves 0 and 1 taken out, 1,264 triangles | a large gold wheel standing over the brow, a lattice inside, eight rays each crossed near its tip, about 600 triangles; every leaf kept |
+| Poison Shroom (`POISON_SHROOM`) | two purple caps on the top, leaves 0 and 1 taken out | three spotted mushrooms in the colours of #1100 (pale green caps spotted orange, a small orange one spotted green), before the crown |
+| Blue Laser (`HEAD_LASER`) | a thin beam straight up, leaning the wrong way on the bust | a wide beam from a white glow on the brow, out to the left of the character at about 45 degrees |
+
+The shape `RidgedHorns` and the helper that took lines of leaves out are gone: nothing on these bases takes
+the place of a spike any more. Sheets: `research/evidence/chog-head-objects-horns-before-after-2026-10-16.jpg`
+and `chog-head-objects-plunger-seal-shroom-laser-before-after-2026-10-16.jpg` (the picture, the bust before,
+then the bust and the turns now); every value of every base in `.artifacts/chog-body/traits/batch-8/`
+(`per_value_origin_1.png` to `_4`, `per_value_radioactive_1.png`, `per_value_skull_1.png` to `_3`,
+`one_of_one.png`). The library exported again: 1,970 heroes, 438 pieces, 3.1 MB, 110 built and 1,859 more
+checked, none failed, none lacking a part; the view tests pass on it (84); the ten seen in a local preview
+build (`research/evidence/chog-head-objects-in-game-preview-headless-2026-10-16.png`), the game's own library
+put back right after.

@@ -382,7 +382,7 @@ CLOTH_KINDS = {"Cape": build_cape, "Wings": build_wings, "DevilSuit": build_devi
 
 def hats(headband_numbers):
     """The hats of the 1:1 and their numbers (the helmet lies where a headband does; the devil's horns are
-    the ridged horns of the radioactive Chogs, with their numbers)."""
+    the ridged horns of the radioactive Chogs, one pair of them)."""
     entries = {
         "1:1 Halo": {"shape": "Halo", "colours": {"Halo": (0.99, 0.78, 0.18)}},
         "1:1 Skull Flames": {"shape": "SkullFlames", "colours": {"Fire": (0.98, 0.42, 0.08), "Core": (1.0, 0.86, 0.22)},
@@ -390,7 +390,10 @@ def hats(headband_numbers):
         "1:1 Brain": {"shape": "Brain", "colours": {"Brain": (0.95, 0.52, 0.56), "Groove": (0.82, 0.36, 0.42)}},
         "1:1 Gold Helmet": {"shape": "GoldHelmet", "colours": {"Band": (0.98, 0.76, 0.16), "Line": (0.78, 0.52, 0.08),
                                                                 "Gem": (0.88, 0.10, 0.14)}},
-        "1:1 Devil Horns": {"shape": "RidgedHorns", "colours": {"Horn": (0.82, 0.08, 0.12)}},
+        # Two short horns at the upper corners of the brow, curving up, the spikes all around (on the top of
+        # the head until 16 October 2026, where the upper spikes were taken out).
+        "1:1 Devil Horns": {"shape": "DemonHorns", "colours": {"Horn": (0.58, 0.04, 0.08)},
+                            "horns": (((0.15, 0.24), 0.35, 0.18, 0.058, 0.05),)},
     }
     numbers = {
         "Halo": {"OUTLINE_THICKNESS": 0.012},
