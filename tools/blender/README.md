@@ -630,8 +630,14 @@ branch writes to a scratch file). The owner says yes or no first.
   yet in the export: the game draws one colour per material; the gradient needs a colour role that the game
   computes from the height of each point (a change of `ChogPartsLibrary` and `ChogHeroModel`).
   Sheets: `research/evidence/chog-traits-batch7-radioactive-2026-10-15.png`.
-- **Still wrong:** the skull keeps the round head of a Chog where the pictures draw a skull with a narrower
-  jaw; Red Bandana is not modelled; the ten 1:1 Genesis keep the earlier look.
+- **Still wrong:** Red Bandana is not modelled; the ten 1:1 Genesis keep the earlier look; the skull's
+  profile stays round (only its width narrows into the jaw).
+- **The skull's jaw and hands (16 October):** the skull was the round ball of the Chog with teeth drawn on it.
+  Now (`JAW`, `narrow_jaw` of `chog_trait_bases.py`) the lower head narrows by 38 percent from the
+  cheekbones down, the teeth and the nose with it, as on CHOG #81, #846, #1000, #1104, #1207, #1642; the
+  hands and feet are bone, not the pink mittens of a Chog (`bone_hands`), so a skeleton's arms are their own
+  parts in the export (`("rest", "armLeft", "Skull")`). Front, bust, side and game views:
+  `research/evidence/chog-traits-batch7-skull-jaw-2026-10-16.jpg`.
 - **The ram horns, made again (16 October):** they were small nubs beside the pictures. Now (`RAM_HORN` of
   `chog_trait_bases.py`) each is as thick at its root as a sixth of the head, rises over the crown and
   curls out to the side and down, a little to the back, its rings drawn as ridges, as on CHOG #275, #473,

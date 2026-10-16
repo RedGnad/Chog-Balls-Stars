@@ -131,7 +131,9 @@ def keys_of(genesis_traits):
         # its head with the crown its head object leaves and the skull's teeth, the ribs on its body.
         base_name = genesis_traits["Base"]
         head = ("head", "Skull") if base_name == "Skull" else ("head", "Radioactive", genesis_traits.get("Head"))
-        keys = {("rest", "Body", base_name), ("rest", "armLeft"), ("rest", "armRight"), head}
+        # A skeleton's hands are bone (bases.bone_hands): its arms are its own.
+        arms = ("Skull",) if base_name == "Skull" else ()
+        keys = {("rest", "Body", base_name), ("rest", "armLeft") + arms, ("rest", "armRight") + arms, head}
         for trait in traits.TRAIT_PARTS:
             value = genesis_traits.get(trait)
             if value is not None and isinstance(traits.entry_for(trait, genesis_traits), dict):
@@ -162,6 +164,8 @@ def key_of_object(thing, genesis_traits):
             return next(key for key in keys_of(genesis_traits) if key[0] == "head")
         if thing.name == "Body" and (bases.is_skull(genesis_traits) or bases.is_radioactive(genesis_traits)):
             return ("rest", "Body", genesis_traits["Base"])
+        if thing.name in ("armLeft", "armRight") and bases.is_skull(genesis_traits):
+            return ("rest", thing.name, "Skull")
         return ("rest", thing.name)
     trait, value = thing["trait"].split("=", 1)
     return ("trait", trait, value, genesis_traits.get("Side", "Right"))

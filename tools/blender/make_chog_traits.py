@@ -2504,6 +2504,7 @@ def build(traits=None, replaced=None, head_replaced=None):
         # A skull: no leaf, no hair, no cream face; the bone is the face (chog_trait_bases.py).
         leaves = []
         bases.add_skull_face(head, head_n, surface, full, draw_shape, oval, SKIN, full.EYE, full.BLUSH, full.FACE)
+        bases.narrow_jaw(head, head_n)
     elif bases.is_radioactive(traits):
         # A radioactive Chog: the crown its hat leaves (all of it under horns), no cream face, the skull's
         # teeth and nose showing, no cheek.
@@ -2532,6 +2533,8 @@ def build(traits=None, replaced=None, head_replaced=None):
         arms["armRight"].finish("armRight", at(-shoulder, 0.0, body_n.SHOULDER_HEIGHT), root, materials),
     ]
     by_name = {part.name: part for part in parts}
+    if skull:
+        bases.bone_hands(parts, materials, SKIN, full.GLOVE)
 
     trait_parts, left_out = [], []
     # A hat that covers a trait (the balaclava over the mouth) says it in "HIDES": that part is not

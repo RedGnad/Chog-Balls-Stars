@@ -139,6 +139,34 @@ def add_skull_face(part, numbers, surface, full, draw_shape, oval, SKIN, EYE, BL
         draw_shape(part, surface, SKIN, tooth, lift * 2.6)
 
 
+# The skull's jaw, read on the Skull pictures (CHOG #81, #846, #1000, #1104, #1207, #1642): a wide round
+# cranium over a jaw much narrower than it, the outline stepping in at the cheekbones, by the nose; the
+# row of teeth is about as wide as the jaw. Heights in halves of the head's height from its middle (-1 its
+# bottom): the head narrows from FROM down to TO, by NARROW of its width. (First: the round ball of the
+# Chog with teeth drawn on it, a face more than a skull.)
+JAW = {"FROM": -0.30, "TO": -0.45, "NARROW": 0.38}
+
+
+def narrow_jaw(part, numbers):
+    """Narrows the lower head of a skull into its jaw: every point of the part (the head and what is drawn
+    on it), before its outline is made, so the teeth and the nose stay on it. The eyes and anything worn
+    higher are not touched."""
+    for point in part.mesh.verts:
+        height = (point.co.z - numbers.HEAD_MIDDLE) / numbers.HEAD_HALF_HEIGHT
+        share = min(1.0, max(0.0, (JAW["FROM"] - height) / (JAW["FROM"] - JAW["TO"])))
+        share = share * share * (3.0 - 2.0 * share)
+        point.co.x *= 1.0 - JAW["NARROW"] * share
+
+
+def bone_hands(parts, materials, skin, glove):
+    """A skeleton's hands and feet are bone, not the pink mittens of a Chog: the material of the gloves
+    becomes the skin (the bone colour) on the body and the arms."""
+    for part in parts:
+        for index, slot in enumerate(part.data.materials):
+            if slot is not None and slot.name == glove:
+                part.data.materials[index] = materials[skin]
+
+
 def torso_section(numbers, height):
     """Half width and half depth of the torso at a height (TORSO_RINGS: height, width, depth)."""
     rings = numbers.TORSO_RINGS
