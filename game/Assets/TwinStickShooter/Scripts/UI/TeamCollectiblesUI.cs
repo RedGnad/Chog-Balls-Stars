@@ -36,10 +36,19 @@ namespace TwinStickShooter
       LeftScoreText.text = leftTeamScore.ToString();
       RightScoreText.text = rightTeamScore.ToString();
 
-      LeftBar.fillAmount = leftTeamScore / 10f;
-      RightBar.fillAmount = rightTeamScore / 10f;
+      // In a siege the score is the damage done to the other team's tower and core, in hundreds of
+      // health (MatchModes): the bar fills as they fall. The coins fill it at ten.
+      bool siege = MatchModes.IsSiege(VerifiedFrame);
+      float full = siege ? ((Structures.TowerHealth + Structures.CoreHealth) / MatchModes.HealthPerSiegePoint).AsFloat : 10f;
+      LeftBar.fillAmount = leftTeamScore / full;
+      RightBar.fillAmount = rightTeamScore / full;
 
-      if (leftTeamScore >= 10 && leftTeamScore > rightTeamScore)
+      if (siege)
+      {
+        LeftBarAnimator.SetBool("IsShining", false);
+        RightBarAnimator.SetBool("IsShining", false);
+      }
+      else if (leftTeamScore >= 10 && leftTeamScore > rightTeamScore)
       {
         LeftBarAnimator.SetBool("IsShining", true);
       }

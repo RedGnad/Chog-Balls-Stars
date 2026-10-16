@@ -65,6 +65,11 @@ namespace Quantum {
     Medium,
     High,
   }
+  public enum EMatchMode : byte {
+    TowersAndCoins,
+    Siege,
+    Coins,
+  }
   public enum EMemoryType : byte {
     None = 1,
     EnemyInsivible = 2,
@@ -1422,7 +1427,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 1720;
+    public const Int32 SIZE = 1728;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -1449,20 +1454,22 @@ namespace Quantum {
     private fixed Byte _input_[960];
     [FieldOffset(1568)]
     public BitSet6 PlayerLastConnectionState;
-    [FieldOffset(1616)]
+    [FieldOffset(1624)]
     public FP TimeToFillWithBots;
-    [FieldOffset(1608)]
+    [FieldOffset(1616)]
     public FP MatchTimer;
-    [FieldOffset(1600)]
+    [FieldOffset(1608)]
     public FP MatchDuration;
     [FieldOffset(1584)]
     public QBoolean ControllersEnabled;
     [FieldOffset(1580)]
     public GameState State;
-    [FieldOffset(1624)]
+    [FieldOffset(1632)]
     public HFSMData GameManagerHFSM;
     [FieldOffset(1588)]
     public QDictionaryPtr<Int32, EntityRef> InvisibilitySpots;
+    [FieldOffset(1600)]
+    public FP GameplayStartedAt;
     [FieldOffset(1576)]
     public Byte DestroyedCore;
     [FieldOffset(1592)]
@@ -1494,6 +1501,7 @@ namespace Quantum {
         hash = hash * 31 + (Int32)State;
         hash = hash * 31 + GameManagerHFSM.GetHashCode();
         hash = hash * 31 + InvisibilitySpots.GetHashCode();
+        hash = hash * 31 + GameplayStartedAt.GetHashCode();
         hash = hash * 31 + DestroyedCore.GetHashCode();
         hash = hash * 31 + TeamsData.GetHashCode();
         return hash;
@@ -1522,6 +1530,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->ControllersEnabled, serializer);
         QDictionary.Serialize(&p->InvisibilitySpots, serializer, Statics.SerializeInt32, Statics.SerializeEntityRef);
         QList.Serialize(&p->TeamsData, serializer, Statics.SerializeTeamData);
+        FP.Serialize(&p->GameplayStartedAt, serializer);
         FP.Serialize(&p->MatchDuration, serializer);
         FP.Serialize(&p->MatchTimer, serializer);
         FP.Serialize(&p->TimeToFillWithBots, serializer);
@@ -3152,6 +3161,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(DistanceJoint3D), DistanceJoint3D.SIZE);
       typeRegistry.Register(typeof(Quantum.EAttributeType), 1);
       typeRegistry.Register(typeof(Quantum.EHealthStatus), 1);
+      typeRegistry.Register(typeof(Quantum.EMatchMode), 1);
       typeRegistry.Register(typeof(Quantum.EMemoryType), 1);
       typeRegistry.Register(typeof(Quantum.EModifierAppliance), 1);
       typeRegistry.Register(typeof(Quantum.EModifierOperation), 1);
@@ -3307,6 +3317,7 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<CallbackFlags>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.EAttributeType>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.EHealthStatus>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.EMatchMode>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.EMemoryType>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.EModifierAppliance>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.EModifierOperation>();

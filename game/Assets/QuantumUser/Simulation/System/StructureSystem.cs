@@ -2,8 +2,9 @@ using UnityEngine.Scripting;
 
 namespace Quantum
 {
-	// Builds the towers and the cores when a match begins and lets the towers shoot while it is
-	// played. The rules themselves are in Structures.
+	// Builds the towers and the cores when a match begins (none in a match of coins) and lets the
+	// towers shoot while it is played; in a siege, the score of each team follows the damage done
+	// to the structures. The rules themselves are in Structures and MatchModes.
 	[Preserve]
 	public unsafe class StructureSystem : SystemMainThreadFilter<StructureSystem.Filter>, ISignalOnGameStart, ISignalOnCharacterDamage
 	{
@@ -18,7 +19,11 @@ namespace Quantum
 
 		public void OnGameStart(Frame frame)
 		{
-			Structures.Build(frame);
+			MatchModes.PlayBegins(frame);
+			if (MatchModes.HasStructures(frame))
+			{
+				Structures.Build(frame);
+			}
 		}
 
 		// The signal is named after heroes, but every loss of health passes through it.

@@ -11,6 +11,8 @@ namespace Chog.Screens
     /// since their judge only replays right what was played with its own simulation.
     /// The name is the stamp the build script gives each build (Application.version, set in
     /// QualificationBuild). In the Editor it is "editor": the Editor meets other Editors only.
+    /// The mode the player chose follows it ("-siege", "-coins"; MatchModeChoice), so players of
+    /// one build who chose another mode do not meet either.
     /// </summary>
     public sealed class BuildIdentity : MonoBehaviour
     {
@@ -52,7 +54,7 @@ namespace Chog.Screens
             // Given now, for whoever reads the settings, and again at every connection: the
             // menu's own settings screen can write another version over it.
             if (menu.ConnectArgs != null)
-                menu.ConnectArgs.AppVersion = Version;
+                menu.ConnectArgs.AppVersion = Version + MatchModeChoice.Suffix;
             menu.Connection.OnBeforeConnect ??= new UnityEvent<QuantumMenuConnectArgs>();
             menu.Connection.OnBeforeConnect.AddListener(Name);
             _named = menu;
@@ -60,7 +62,7 @@ namespace Chog.Screens
 
         private static void Name(QuantumMenuConnectArgs connection)
         {
-            connection.AppVersion = Version;
+            connection.AppVersion = Version + MatchModeChoice.Suffix;
         }
     }
 }

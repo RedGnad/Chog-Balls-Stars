@@ -38,11 +38,16 @@ namespace Quantum
 		/// <summary>
 		/// The clock of the match as the machine that runs it must read it (GetTimer): that
 		/// machine ends the match when the clock is under zero, and a core that fell ends it at
-		/// once, whatever the clock says.
+		/// once, whatever the clock says. A siege has no coin countdown: its own time limit is read.
 		/// </summary>
 		public static FP MatchClock(Frame frame)
 		{
-			return WinnerByCore(frame) >= 0 ? -FP._1 : frame.Global->MatchTimer;
+			if (WinnerByCore(frame) >= 0)
+			{
+				return -FP._1;
+			}
+
+			return MatchModes.IsSiege(frame) ? MatchModes.SiegeTimeLeft(frame) : frame.Global->MatchTimer;
 		}
 
 		/// <summary>Puts a tower and a core for each of the two teams, once per match.</summary>
@@ -188,12 +193,13 @@ namespace Quantum
 		public static readonly FP AlarmRadius = 10;
 		public static readonly FP PushCalmDistance = 6;
 
-		/// <summary>A structure was hit: its team's bots come while the alarm lasts.</summary>
+		/// <summary>A structure was hit: its team's bots come while the alarm lasts, and in a siege the score follows.</summary>
 		public static void Hurt(Frame frame, EntityRef entity)
 		{
 			if (frame.Unsafe.TryGetPointer<Structure>(entity, out var structure))
 			{
 				structure->AlarmUntil = frame.Number * frame.DeltaTime + AlarmDuration;
+				MatchModes.CountSiegePoints(frame);
 			}
 		}
 
@@ -334,6 +340,7 @@ namespace Quantum
 				frame.Global->DestroyedCore = (byte)(1 + team);
 			}
 
+			MatchModes.CountSiegePoints(frame);
 			frame.Events.StructureDestroyed(entity, team, structure.Kind);
 		}
 	}

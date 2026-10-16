@@ -81,6 +81,11 @@ namespace Chog.Match
         private GUIStyle _noticeStyle;
         // The alarm of the player's own team, empty while none of its structures is hit.
         private string _alarm = "";
+        // The time a siege has left, at the top of the screen; empty in the other modes.
+        private string _clock = "";
+        private bool _clockShort;
+        private GUIStyle _clockStyle;
+        private const float ShortSeconds = 30f;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Create()
@@ -108,6 +113,15 @@ namespace Chog.Match
             return mine ? "YOUR TOWER FELL" : "ENEMY TOWER DESTROYED";
         }
 
+        private static unsafe bool PlayIsOn(Frame frame) => frame.Global->State == GameState.Playing;
+
+        /// <summary>The time a siege has left as the screen shows it: minutes and seconds, rounded up, never below 0:00.</summary>
+        public static string ClockText(float secondsLeft)
+        {
+            var whole = Mathf.Max(0, Mathf.CeilToInt(secondsLeft));
+            return $"{whole / 60}:{whole % 60:00}";
+        }
+
         /// <summary>What the screen says while a structure of the player's team is being hit.</summary>
         public static string AlarmFor(EStructureKind kind)
         {
@@ -126,6 +140,7 @@ namespace Chog.Match
         // player's team, smaller and pulsing for as long as it is hit.
         private void OnGUI()
         {
+            DrawClock();
             var fell = Time.time < _noticeUntil && _notice.Length > 0;
             if (!fell && _alarm.Length == 0)
                 return;
@@ -155,6 +170,31 @@ namespace Chog.Match
             GUI.Label(band, fell ? _notice : _alarm, _noticeStyle);
         }
 
+        // The siege's clock, top middle between the two scores: white, red in its last thirty seconds.
+        private void DrawClock()
+        {
+            if (_clock.Length == 0)
+                return;
+            if (_clockStyle == null)
+            {
+                _clockStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
+                var koulen = Resources.Load<Font>("Fonts/Koulen-Regular");
+                if (koulen != null)
+                {
+                    _clockStyle.font = koulen;
+                    _clockStyle.fontStyle = FontStyle.Normal;
+                }
+            }
+            _clockStyle.fontSize = Mathf.Max(14, Mathf.RoundToInt(Screen.height * 0.06f));
+            _clockStyle.normal.textColor = _clockShort ? Theirs : Color.white;
+            var area = new Rect(Screen.width * 0.40f, Screen.height * 0.015f, Screen.width * 0.20f, Screen.height * 0.085f);
+            var before = GUI.color;
+            GUI.color = new Color(0f, 0f, 0f, 0.45f);
+            GUI.DrawTexture(area, Texture2D.whiteTexture);
+            GUI.color = before;
+            GUI.Label(area, _clock, _clockStyle);
+        }
+
         private void OnDestroy() => QuantumEvent.UnsubscribeListener(this);
 
         private void Update()
@@ -165,6 +205,13 @@ namespace Chog.Match
             foreach (var drawing in _drawings.Values)
                 drawing.Seen = false;
             _alarm = "";
+            _clock = "";
+            if (frame != null && MatchModes.IsSiege(frame) && PlayIsOn(frame))
+            {
+                var left = MatchModes.SiegeTimeLeft(frame).AsFloat;
+                _clock = ClockText(left);
+                _clockShort = left <= ShortSeconds;
+            }
 
             if (roster != null && roster.ShapeMaterial != null)
             {

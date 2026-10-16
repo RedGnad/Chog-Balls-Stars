@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Play one recorded match again with other seeds and print what the bots did in each.
 
-Usage: watch_bots.py <replay.json> [number of seeds, default 8] [--all-bots] [--dotnet /path/to/dotnet]
+Usage: watch_bots.py <replay.json> [number of seeds, default 8] [--all-bots] [--mode Siege|Coins|TowersAndCoins]
+                     [--dotnet /path/to/dotnet]
 
 With --all-bots the heroes of the recorded players are handed to bots when the match begins:
 six bots, three against three, where a record of an idle player gives two bots and a hero that
@@ -38,6 +39,11 @@ def main():
     all_bots = "--all-bots" in arguments
     if all_bots:
         arguments.remove("--all-bots")
+    mode = []
+    if "--mode" in arguments:
+        at = arguments.index("--mode")
+        mode = ["--test-mode", arguments[at + 1]]
+        del arguments[at:at + 2]
     if not arguments or not dotnet:
         sys.exit(__doc__)
     replay = Path(arguments[0]).resolve()
@@ -50,7 +56,7 @@ def main():
         for seed in range(1, seeds + 1):
             report_path = Path(folder) / f"seed-{seed}.json"
             run = subprocess.run([dotnet, str(VERIFIER), str(replay), str(DATABASE), str(LUT), str(report_path),
-                                  "--test-seed", str(seed)] + (["--test-all-bots", "1"] if all_bots else []),
+                                  "--test-seed", str(seed)] + (["--test-all-bots", "1"] if all_bots else []) + mode,
                                  stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
             if run.returncode or not report_path.is_file():
                 print(f"seed {seed:2d}: the judge failed: {run.stderr.strip()[-200:]}")

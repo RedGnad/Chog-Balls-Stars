@@ -1,0 +1,21 @@
+// Which rules a match is played with (RuntimeConfig.Mode, chosen on the menu; MatchModes.cs).
+
+enum EMatchMode : Byte
+{
+	// The match as it was until 16 October 2026: a tower and a core for each team, and the coins
+	// of the sample deciding when no core falls. Records made before carry no mode: they replay
+	// with these rules.
+	TowersAndCoins,
+	// A tower and a core for each team and no coin, within a time limit: a fallen core ends the
+	// match, otherwise the damage done to the other team's structures decides.
+	Siege,
+	// The sample's Coin Grab: coins only, no structure.
+	Coins
+}
+
+global
+{
+	// When the play of the match began (the end of its preparation), in seconds of the
+	// simulation: the clock of a siege counts from it. 0 until then.
+	FP GameplayStartedAt;
+}

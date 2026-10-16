@@ -519,6 +519,79 @@ internal static unsafe class Program
             });
         });
 
+        RuntimeConfig Mode(EMatchMode mode) => new RuntimeConfig { Mode = mode };
+        // The game manager's coin spawn, run with no prototype: it may only be run where it spawns nothing.
+        int SiegeCoinsSpawned(Frame frame) {
+            int before = frame.ComponentCount<Transform2D>();
+            var context = default(AIContext);
+            new SpawnWithRandomRadius { Amount = 1, Radius = 1 }.Execute(frame, default, ref context);
+            return frame.ComponentCount<Transform2D>() - before;
+        }
+
+        Test("a match of coins builds no structure, a siege spawns no coin, and the earlier match has both", () => {
+            InFrame(new AssetObject[0], Mode(EMatchMode.Coins), frame => {
+                new StructureSystem().OnGameStart(frame);
+                Require(frame.ComponentCount<Structure>() == 0, "A match of coins must have no tower and no core");
+                Require(MatchModes.HasCoins(frame), "A match of coins must spawn its coins");
+            });
+            InFrame(new AssetObject[0], Mode(EMatchMode.Siege), frame => {
+                new StructureSystem().OnGameStart(frame);
+                Require(frame.ComponentCount<Structure>() == 4, "A siege has two towers and two cores");
+                Require(!MatchModes.HasCoins(frame) && SiegeCoinsSpawned(frame) == 0, "A siege must spawn no coin");
+            });
+            // A config without a mode, as in every record made before the modes: towers, cores and coins.
+            InFrame(new AssetObject[0], new RuntimeConfig(), frame => {
+                new StructureSystem().OnGameStart(frame);
+                Require(frame.RuntimeConfig.Mode == EMatchMode.TowersAndCoins, "A config without a mode must play the earlier match");
+                Require(frame.ComponentCount<Structure>() == 4 && MatchModes.HasCoins(frame), "The earlier match has its structures and its coins");
+            });
+        });
+
+        Test("in a siege the score is the damage done to the other team's structures, and the siege's own clock ends the match", () => {
+            InFrame(new AssetObject[0], Mode(EMatchMode.Siege), frame => {
+                new PlayerJoiningSystem().OnInit(frame);
+                new StructureSystem().OnGameStart(frame);
+                var teams = frame.ResolveList(frame.Global->TeamsData);
+                var attacker = HeroAt(frame, 0, default);
+                var tower = StructureOf(frame, 1, EStructureKind.Tower);
+                Ready(frame, tower);
+                Ready(frame, StructureOf(frame, 1, EStructureKind.Core));
+                EffectsHelper.OnApply(frame, attacker, tower, new Effect {
+                    AttributeType = EAttributeType.Health, Value = 950, Appliance = EModifierAppliance.OneTime, Operation = EModifierOperation.Subtract });
+                Structures.Hurt(frame, tower);
+                Require(teams[0].Score == 9 && teams[1].Score == 0, $"950 health taken from team 1 is 9 points for team 0, not {teams[0].Score} to {teams[1].Score}");
+
+                frame.Global->MatchTimer = -5;
+                Require(Structures.MatchClock(frame) > 0, "A siege must not end on the coin countdown's clock");
+                var started = frame.Global->GameplayStartedAt;
+                Require(started > 0 && MatchModes.SiegeTimeLeftAt(started, started + 60) == MatchModes.SiegeSeconds - 60,
+                    "The siege's clock runs from the start of play");
+                Require(MatchModes.SiegeTimeLeftAt(started, started + MatchModes.SiegeSeconds + 1) < 0, "A siege ends when its time runs out");
+                Require(MatchModes.SiegeTimeLeftAt(0, 500) == MatchModes.SiegeSeconds, "Before play begins the siege keeps all its time");
+                var context = default(AIContext);
+                Require(new GetTeamScore { TeamId = 0 }.Execute(frame, default, ref context) == 0,
+                    "The game manager must read no score in a siege, or its coin countdown would start");
+
+                Structures.Destroyed(frame, StructureOf(frame, 1, EStructureKind.Core));
+                Require(teams[0].Score == FPMath.FloorToInt((Structures.CoreHealth + 950) / MatchModes.HealthPerSiegePoint),
+                    "A fallen core counts all its health");
+                Require(Structures.MatchClock(frame) < 0 && Structures.WinnerByCore(frame) == 0, "A fallen core still ends a siege at once");
+            });
+            // The same damage in the earlier match leaves the coins as the score.
+            InFrame(new AssetObject[0], new RuntimeConfig(), frame => {
+                new PlayerJoiningSystem().OnInit(frame);
+                new StructureSystem().OnGameStart(frame);
+                var tower = StructureOf(frame, 1, EStructureKind.Tower);
+                Ready(frame, tower);
+                EffectsHelper.OnApply(frame, HeroAt(frame, 0, default), tower, new Effect {
+                    AttributeType = EAttributeType.Health, Value = 950, Appliance = EModifierAppliance.OneTime, Operation = EModifierOperation.Subtract });
+                Structures.Hurt(frame, tower);
+                Require(frame.ResolveList(frame.Global->TeamsData)[0].Score == 0, "Damage to a structure must not score outside a siege");
+                frame.Global->MatchTimer = 15;
+                Require(Structures.MatchClock(frame) == 15, "Outside a siege the clock is the coin countdown's");
+            });
+        });
+
         var evidence = new {
             clientDate = "2026-10-08", recordedAtUtc = DateTime.UtcNow.ToString("O"),
             sdk = Environment.Version.ToString(), quantumAssembly = typeof(AssetObject).Assembly.FullName,

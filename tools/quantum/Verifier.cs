@@ -34,8 +34,10 @@ internal static unsafe class Verifier
         // against the same recorded commands, which is a quick way to watch what they do.
         // "--test-all-bots 1" hands the heroes of the recorded players to bots when the match
         // begins, as the game does for a player who left: six bots, three against three.
+        // "--test-mode Siege" replays the record with the rules of another mode (MatchMode.qtn).
         (int team, int tick)? coreFalls = null;
         int? seed = null;
+        EMatchMode? mode = null;
         var allBots = false;
         var usage = args.Length < 4 || args.Length % 2 != 0;
         for (var i = 4; i + 1 < args.Length && !usage; i += 2)
@@ -49,12 +51,14 @@ internal static unsafe class Verifier
                 seed = int.Parse(args[i + 1]);
             else if (args[i] == "--test-all-bots" && args[i + 1] == "1")
                 allBots = true;
+            else if (args[i] == "--test-mode" && Enum.TryParse<EMatchMode>(args[i + 1], true, out var asked))
+                mode = asked;
             else
                 usage = true;
         }
         if (usage)
         {
-            Console.Error.WriteLine("usage: Chog.Quantum.Verifier <replay.json | folder of a match> <asset database.json> <LUT folder> <report.json> [--test-core-falls <team>@<tick>] [--test-seed <number>] [--test-all-bots 1]");
+            Console.Error.WriteLine("usage: Chog.Quantum.Verifier <replay.json | folder of a match> <asset database.json> <LUT folder> <report.json> [--test-core-falls <team>@<tick>] [--test-seed <number>] [--test-all-bots 1] [--test-mode TowersAndCoins|Siege|Coins]");
             return 2;
         }
 
@@ -80,9 +84,11 @@ internal static unsafe class Verifier
         using var resources = new ResourceManagerStatic(serializer.AssetsFromByteArray(System.Text.Encoding.UTF8.GetBytes(database)),
             DotNetRunnerFactory.CreateNativeAllocator());
         var runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.RuntimeConfigData.Decode(), compressed: true);
-        var testedRules = seed != null;
+        var testedRules = seed != null || mode != null;
         if (seed != null)
             runtimeConfig.Seed = seed.Value;
+        if (mode != null)
+            runtimeConfig.Mode = mode.Value;
 
         // What the simulation says while it is replayed: the same events the game's own screens
         // react to. The match begins when the selection of characters ends, and from then on
@@ -166,6 +172,9 @@ internal static unsafe class Verifier
         {
             // Null when the record stops before anyone has won: nothing can be said of that match.
             winnerTeam,
+            // The rules the match was played with: the coins picked up are the scores, or in a siege
+            // the damage done to the other team's structures, in hundreds of health.
+            mode = runtimeConfig.Mode.ToString(),
             scores = new[] { teams[0].Score, teams[1].Score },
             // The team whose core was destroyed, which ends a match whatever the scores; null
             // when both cores stood to the end.

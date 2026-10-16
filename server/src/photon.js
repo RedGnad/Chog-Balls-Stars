@@ -18,6 +18,7 @@
 
 import { isAddress, LAST_TOKEN_ID } from './chain.js';
 import { numberOf } from './matches.js';
+import { buildOf } from './modes.js';
 
 // Mastery level from which a Genesis plays its second form (GenesisForms.UnlockLevel in the game).
 const SECOND_FORM_MASTERY_LEVEL = 2;
@@ -145,7 +146,7 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, m
       // A page that kept an older build would play a match nobody here can judge: the judge
       // only replays right what was played with its own simulation.
       const served = await servedNow();
-      if (served && request.AppVersion !== served) {
+      if (served && buildOf(request.AppVersion) !== served) {
         return refused('AnotherBuild', 'this page runs another version of the game than the one served here: load it again');
       }
       const gameId = `${request.GameId}~${randomName('')}`;

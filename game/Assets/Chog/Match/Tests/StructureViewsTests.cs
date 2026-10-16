@@ -27,5 +27,14 @@ namespace Chog.Match.Tests
             Assert.AreEqual("YOUR TOWER IS UNDER ATTACK", StructureViews.AlarmFor(EStructureKind.Tower));
             Assert.AreEqual("YOUR CORE IS UNDER ATTACK", StructureViews.AlarmFor(EStructureKind.Core));
         }
+
+        [Test]
+        public void TheClockOfASiegeReadsMinutesAndSecondsRoundedUp()
+        {
+            Assert.AreEqual("3:00", StructureViews.ClockText(180f));
+            Assert.AreEqual("2:41", StructureViews.ClockText(160.2f));
+            Assert.AreEqual("0:09", StructureViews.ClockText(8.5f));
+            Assert.AreEqual("0:00", StructureViews.ClockText(-3f), "a siege whose time ran out never reads below zero");
+        }
     }
 }

@@ -113,6 +113,13 @@ namespace Quantum
 
 		private void SetWinningFlags(Frame frame, TeamData* teamA, TeamData* teamB)
 		{
+			// A team that leads in coins keeps out of fights to keep them. A siege's score is the
+			// damage done to structures, which nobody can take back: no team holds back for it.
+			if (MatchModes.IsSiege(frame))
+			{
+				return;
+			}
+
 			// Score Flags
 			int scoreA = teamA->Score;
 			int scoreB = teamB->Score;
@@ -176,7 +183,7 @@ namespace Quantum
 
 		private void SenseLowScoreAgentState(Frame frame, TeamData* teamData)
 		{
-			if (teamData->Score < 10)
+			if (MatchModes.IsSiege(frame) || teamData->Score < 10)
 			{
 				teamData->HasLowScoreAgent = false;
 				return;

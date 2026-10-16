@@ -15,12 +15,15 @@ submitting. Character counts are for the 8,000-character fields.
 
 > Chog Genesis is a real-time 3v3 arena for phones where your Chog Genesis NFT is your hero. Connect
 > the wallet that holds it and the game builds your Chog in 3D from its own traits: its hat, its eyes,
-> its mouth, its clothes and its skin, modelled by us for all 1,869 Genesis of the Origin base. The
+> its mouth, its clothes and its skin, modelled by us for all 1,969 Genesis, the skulls, the radioactive
+> Chogs and the ten 1:1 included (13 skulls still wait for their headwear). The
 > traits decide how it plays: its outfit gives its class (brute, ranger, controller), its eyes its
 > special attack, its aura the effect of that attack, its rarity how the attack is delivered, and its
 > hat what its basic attack throws: snowballs from a Russian Hat, dollar coins from a Dollar Cap, its
 > own cap spinning like a frisbee from a word cap, a leaf of its spiky crown when it wears nothing.
-> Matches are played on Photon Quantum's deterministic engine; after each match our services replay
+> Two modes: SIEGE, where each team defends a tower with a Chog's head that shoots lasers from its eyes
+> and a beating heart for a core, three minutes to bring the other core down or to do more damage; and
+> COINS, a race for the coins of the arena. Matches are played on Photon Quantum's deterministic engine; after each match our services replay
 > the recorded inputs to decide the winner themselves, so a result can be trusted with $CHOG at
 > stake. Each Genesis keeps a public career that follows the NFT, not the wallet (matches, wins,
 > badges, mastery; mastery 2 unlocks the second form of its special), and the Genesis with the most
@@ -44,7 +47,8 @@ submitting. Character counts are for the 8,000-character fields.
 - **Judge access instructions (draft):**
 
 > Open the app link on a phone or a desktop browser. Without a wallet you play a recruit (a grey Chog
-> without traits): tap QUICK PLAY, then START; bots fill the empty places. To play a Genesis without
+> without traits): pick SIEGE or COINS with the MODE button, tap QUICK PLAY, then START; bots fill the
+> empty places. To play a Genesis without
 > owning one, open the loan link below: it lends you CHOG #____ for the judging week, without
 > moving the NFT. If you hold a Genesis, CONNECT WALLET (or OPEN IN METAMASK on a phone), pick it,
 > and play it. `?heroes=1` after the address shows a few heroes in 3D from close.
@@ -73,8 +77,8 @@ submitting. Character counts are for the 8,000-character fields.
 
 ## 06 What's next
 
-> Heads for the 100 Genesis on the Skull, Radioactive and 1:1 bases; the special attacks in 3D;
-> stakes in $CHOG on mainnet after testnet; rental of Genesis for $CHOG; seasons and a ladder.
+> The last headwear of the skulls and whole-body costumes; the special attacks in 3D; stakes in $CHOG
+> on mainnet after testnet; rental of Genesis for $CHOG; seasons and a ladder per mode.
 
 ## The 3-minute video (script)
 

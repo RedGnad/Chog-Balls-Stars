@@ -7,7 +7,7 @@
 // "replay" is that program, given by whoever starts the services: it takes the folder of the
 // match (matches.js) and answers the report of the replayed match:
 //
-//   { winnerTeam: 0 | 1 | null, scores: [n, n], coreLostBy: 0 | 1 | null, endedAtTick,
+//   { winnerTeam: 0 | 1 | null, mode, scores: [n, n], coreLostBy: 0 | 1 | null, endedAtTick,
 //     selectionEndedAtTick, firstTick, lastTick, updateRate, players: [{player, team, tokenId}],
 //     simulation }
 //
@@ -18,6 +18,7 @@
 // no verdict at all, and judging can be asked again.
 
 import { DRAW } from './referee.js';
+import { buildOf } from './modes.js';
 
 /**
  * @param {object} options
@@ -43,13 +44,13 @@ export function createJudge({ matches, replay, build = '' }) {
     const match = await matches.get(gameId);
     const playedWith = match?.app?.appVersion ?? null;
     const judged = typeof build === 'function' ? await build() : build;
-    if (judged && playedWith !== judged) {
+    if (judged && buildOf(playedWith) !== judged) {
       return matches.setVerdict(gameId, { void: true, why: 'the match was played with another build than the one judged here', playedWith, build: judged });
     }
 
     const report = await replay(matches.folderOf(gameId), gameId);
     const facts = {
-      scores: report.scores, endedAtTick: report.endedAtTick, selectionEndedAtTick: report.selectionEndedAtTick,
+      mode: report.mode ?? null, scores: report.scores, endedAtTick: report.endedAtTick, selectionEndedAtTick: report.selectionEndedAtTick,
       firstTick: report.firstTick, lastTick: report.lastTick, updateRate: report.updateRate,
       players: report.players, simulation: report.simulation,
     };
@@ -76,6 +77,7 @@ export function createJudge({ matches, replay, build = '' }) {
     }
 
     // The game's own rule gives an even score to the second team; with stakes an even score is a draw.
+    // The scores are the coins picked up, or in a siege the damage done to the structures.
     const even = Array.isArray(report.scores) && report.scores[0] === report.scores[1];
     return matches.setVerdict(gameId, { winnerTeam: even ? DRAW : report.winnerTeam, ...facts });
   }

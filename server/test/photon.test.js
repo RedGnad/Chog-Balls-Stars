@@ -247,6 +247,16 @@ test('a page that runs another build opens no room here, and a match played with
   assert.equal((await matches.get(first)).verdict.winnerTeam, 1, 'a match of the served build is judged');
   assert.equal(replays, 1);
 
+  // A page names the mode its player chose after its build: same build, so it opens and is judged.
+  const siege = JSON.parse((await create(`${served}-siege`)).text).GameId;
+  await playedMatch(api, siege);
+  assert.equal((await matches.get(siege)).verdict.winnerTeam, 1, 'a siege of the served build is judged');
+  assert.equal(replays, 2);
+  const staleSiege = await create('20261011T120000000Z-siege');
+  assert.equal(JSON.parse(staleSiege.text).Error, 'AnotherBuild', 'a mode does not let another build in');
+  const unknownMode = await create(`${served}-golf`);
+  assert.equal(JSON.parse(unknownMode.text).Error, 'AnotherBuild', 'only the modes of the game are read after a build');
+
   // The site is assembled again while a match of the build before is being played.
   const second = JSON.parse((await create(served)).text).GameId;
   served = '20261013T101500000Z';
@@ -255,7 +265,7 @@ test('a page that runs another build opens no room here, and a match played with
   assert.deepEqual(verdict, {
     void: true, why: 'the match was played with another build than the one judged here', playedWith: '20261012T035911141Z', build: served,
   });
-  assert.equal(replays, 1, 'the program of another build was not asked: it would have played another match');
+  assert.equal(replays, 2, 'the program of another build was not asked: it would have played another match');
 });
 
 test('the verdict of a match is what its replay says, never what a page claims', async () => {

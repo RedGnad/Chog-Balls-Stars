@@ -130,6 +130,11 @@ itself has never called these services** (they have no public address yet, `docs
   the second form only when that Genesis bought it or reached mastery 2. Otherwise the player
   enters as a recruit. A loadout named directly and a character left to the machine are
   cleared. When the chain cannot be read the answer is 503, which Photon asks again.
+- **The build and the mode** (`game/create`, `modes.js`): a page names itself to Photon with
+  its build followed by the mode its player chose, `-siege` or `-coins`; a room is refused
+  (`AnotherBuild`) when that build is not the one served, and a match played with another build
+  is void. The mode itself is in the match's config, which the judge replays with; its report
+  says which (`mode`), and in a siege its scores are the damage done to the structures.
 - **The verdict** comes from playing the match again with the input Photon's server
   recorded (`tools/quantum/Verifier.cs`, run by `node.js` when `--verifier` and
   `--quantum-db` are given). What the players' pages claim (`game/result`) is kept and decides

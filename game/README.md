@@ -721,6 +721,37 @@ its beam leaves its eyes; the heart beats, faster while the core is hit; a falle
 ruin in greys, without its head or its heart (`ChogStructureModel`, `StructureViews`). About 4,000
 triangles each. Four tests read the file (`ChogStructureModelTests`).
 
+### Two modes: the siege and the coins (16 October)
+
+Asked for by the owner that day. A button beside QUICK PLAY reads MODE and the mode chosen; a tap
+switches it, the browser keeps it, and `?mode=coins` or `?mode=siege` in an address chooses it
+(`Assets/Chog/Screens/MatchModeChoice.cs`). It goes into the config of the match the player starts
+(`RuntimeConfig.Mode`, `QuantumUser/Simulation/DSL/MatchMode.qtn`, rules in
+`System/MatchModes.cs`) and after the build in the name the page gives Photon (`BuildIdentity`), so
+players only meet players of the same build who chose the same mode.
+
+| Mode | What is in the match | How it ends |
+| --- | --- | --- |
+| SIEGE (the default) | a tower and a core for each team, no coin (none is spawned) | a fallen core ends it at once; otherwise after 180 seconds of play the team that took more health from the other team's tower and core wins. The score on the screen is that damage, in hundreds of health (the bars fill as the structures fall: 200 is both), and a clock at the top shows the time left, red in its last 30 seconds |
+| COINS | the sample's Coin Grab: coins in the middle, no tower and no core | a team holding ten coins or more with the lead starts a countdown of 15 seconds; still ahead at zero, it wins |
+
+A config without a mode, as in every record made before, is `TowersAndCoins`, the match as it was
+(structures and coins together): those records replay as they were played. In a siege the game
+manager of the sample reads no score (`GetTeamScore` answers 0), so its coin countdown never starts,
+and no team holds back to protect a lead (`TeamDataSystem`), since structure damage cannot be taken
+back. The judge reports the mode (`mode`) and replays a record with another one for tests
+(`Chog.Quantum.Verifier ... --test-mode Siege`, `watch_bots.py ... --mode Siege`).
+
+**Seen on 16 October:** a whole siege through Photon's cloud and the public instance, played in the
+headless browser (room `<build>-siege`, about three minutes of play, judged: team 0 won 99 to 80 on
+damage, the core of team 1 left with 2,100 of 12,000), and a match of coins (room `<build>-coins`,
+no structure, ended 12 to 2 by the coins after 103 seconds, judged). Ten more sieges between six
+bots replayed from that record: five ended by a core, after 82 to 173 seconds, five at the end of
+the time by the damage. The clock shown at the top of a siege
+(`research/evidence/siege-clock-headless-2026-10-16.png`). **Not seen:** a phone; two players
+choosing different modes (by the rule above they cannot meet). A party joined by a code needs the
+same mode as its host.
+
 ### A tower and a core for each team (12 October)
 
 Each team defends two structures on the sample's map, built when the match begins
