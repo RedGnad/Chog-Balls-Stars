@@ -1398,7 +1398,11 @@ BIG_RIM_ROW = {"LENGTH": 1.10, "WIDTH": 0.90}
 BUCKET_RIM_ROW = {"LENGTH": 1.40, "WIDTH": 0.70, "SWEEP_DEG": 30.0}
 # Under the fur of the ushanka, and the helmet: their flaps and cheek guards cover the sides of the head down
 # to the jaw, so the row starts behind them, and the check wants it seen behind and three quarters behind.
-USHANKA_RIM_ROW = {"ANGLES": (94.0, 116.0, 138.0, 160.0, 180.0), "SWEEP_DEG": 18.0, "SECTORS": (135, -135, 180)}
+# Its second row (make_chog_traits.UNDER_RIM, "EXTRA_ROWS") only behind: the flaps hide the sides, and with a
+# heavy robe or the duck float the whole row went over 8,000 triangles (#766, #1644, 16 October 2026).
+USHANKA_RIM_ROW = {"ANGLES": (94.0, 116.0, 138.0, 160.0, 180.0), "SWEEP_DEG": 18.0, "SECTORS": (135, -135, 180),
+                   "EXTRA_ROWS": ({"ANGLES": (127.0, 149.0, 171.0), "BELOW_DEG": 20.0, "DROOP_DEG": 30.0,
+                                   "LENGTH": 0.80, "WIDTH": 0.85, "LIFT": 0.12, "SIDES": 4},)}
 
 
 # What the pictures of Side=Left show around a hat (15 October 2026, after batch 5): they are framed closer,
