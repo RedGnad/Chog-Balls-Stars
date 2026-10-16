@@ -772,17 +772,21 @@ def build_clown_nose(maker):
 
 PLUNGER = {
     # The cup: where it stands on the head (degrees from the front, towards the left of the character;
-    # polar degrees), then from its rim on the head up its axis: (height, radius) of each ring.
-    "AT": (-18.0, 22.0),
+    # polar degrees), how upright it stands (0 square to the head there, 1 straight up), then from its rim
+    # on the head up its axis: (height, radius) of each ring. (Polar 22 and square to the head until
+    # 16 October 2026: the cup sat on the top of the skull where the upper spikes were, and those spikes
+    # were taken out. The pictures put it at the front of the top, the spikes all around it.)
+    "AT": (20.0, 38.0),
+    "UPRIGHT": 0.45,
     "CUP": ((-0.030, 0.104), (0.006, 0.118), (0.040, 0.116), (0.078, 0.094), (0.104, 0.056), (0.114, 0.0)),
     "LIP": 1,                    # the rings of the cup up to this one are its darker lip
     "SIDES": 12,
     # The stick: its radius, its length, and the way it leans (towards the left of the character, back).
     "FERRULE": (0.026, 0.034),   # the red collar where the stick enters the cup: radius, length
-    "STICK": (0.014, 0.30, 0.95, 0.30),
+    "STICK": (0.014, 0.30, 2.40, 0.10),
     "OUTLINE_THICKNESS": 0.016,
-    # The cup sits on the top of the head: the leaf on top and the upper pair would go through it.
-    "LEAVES": (GONE, GONE, WHOLE, WHOLE, WHOLE, WHOLE, WHOLE),
+    # The cup sits at the front of the top, before the crown: every spike stays.
+    "LEAVES": FULL_CROWN,
 }
 
 
@@ -791,7 +795,7 @@ def build_plunger(maker):
     part, surface = maker.part(), maker.surface
     degrees, polar_deg = numbers.AT
     angle, polar = math.radians(270.0 + degrees), math.radians(polar_deg)
-    axis = head_normal(surface, angle, polar)
+    axis = (head_normal(surface, angle, polar) * (1.0 - numbers.UPRIGHT) + Z * numbers.UPRIGHT).normalized()
     foot = on_head(surface, angle, polar, 1.0)
     first, second = base.frame_across(axis, X)
     rings = [(foot + axis * height, first * radius, second * radius) for height, radius in numbers.CUP]
@@ -818,7 +822,9 @@ BALACLAVA = {
     "RIM": ((0.0, 83.0), (26.0, 84.0), (40.0, 128.0), (100.0, 152.0), (180.0, 150.0)),
     "SIZE": 1.11,
     "ROWS": 4,
-    "SIDES": 20,
+    # 20 around and 14 ribs until batch 7: with the whole crown through it, a robber in a heavy robe went
+    # over 8,000 triangles.
+    "SIDES": 14,
     # The panel over the lower face and the bridge between the eyes, in the coordinates of the face (to
     # the side, above its middle): its edges, how far off the head.
     "LOWER": (-0.26, 0.26, -0.27, -0.072),
@@ -827,9 +833,9 @@ BALACLAVA = {
     "PANEL_STEPS": (8, 3),
     # The eye holes: middle (to the side, above), half width, half height, the radius of the rolled edge.
     "HOLE": (0.114, 0.004, 0.072, 0.084, 0.016),
-    "HOLE_STATIONS": 14,
+    "HOLE_STATIONS": 12,
     # The knit: darker ribs from the edge up over the top: how many, their half width.
-    "RIBS": (14, 0.006),
+    "RIBS": (10, 0.006),
     "OUTLINE_THICKNESS": 0.020,
     # A knitted mask, tight on the head: the pictures draw the spikes of the far side and of the back
     # coming out of it. Those leaves stay, turned down as under a cap, and come through the knit
@@ -1362,11 +1368,13 @@ HATS_OF_SIDE = {
 # of the back row went through the band); under it, the row under the rim of every hat (RIM_ROW), at the
 # sides and the back (until batch 6 the pairs of a cap: nothing seen at the sides from above).
 BAND_POINTS = (WHOLE, leaf(1.0, 24.0), GONE, GONE, GONE, GONE, GONE)
-# Through the knitted mask, as drawn ("THROUGH"): the middle pair near the top, and those of a cap; the side
-# ones 1.4 times as long and the middle pair straight out to the sides since batch 6, so their points pass
-# the mask seen from above, beside the head.
-ROBBER_POINTS = (GONE, GONE, leaf(1.40, 84.0, 4.0, 0.0, 0.66), leaf(1.40, 112.0, 24.0, 0.0, 0.70), GONE,
-                 leaf(1.10, 104.0, 62.0, 0.0, 0.70), leaf(1.10, None, 104.0, 0.0, 0.70))
+# Through the knitted mask, as drawn ("THROUGH"). Until batch 7 (15 October 2026) four leaves placed by hand
+# from the one angle of the pictures (2 or 3 points near the top of the far side), made longer and turned
+# out to pass the check of the tips all around: from behind they read as a collar at mid height, unlike the
+# bare head the owner compared them with (#17, Plumber). A knitted mask is pulled over the spiky head, so the
+# whole crown of a bare head comes out through it, each leaf where it grows; the pictures, which show only
+# the far side, draw those of the far side.
+ROBBER_POINTS = FULL_CROWN
 
 
 def seen(looked_at, art, leaves, under_rim=None, **numbers):
@@ -1503,9 +1511,9 @@ HEAD_VALUES = {
                                   "curly edge; no spike", NO_CROWN),
     ("Clown Nose", "Right"): seen((18, 406, 920, 1553, 1926), "a red ball on the nose; the whole crown, as on a "
                                   "bare head", FULL_CROWN),
-    ("Plumber", "Left"): seen((17, 531, 1325, 1601, 1885), "a red plunger cup on the top; the points of the "
-                              "head around it (drawn in cream, as Side=Left draws a head)",
-                              (GONE, GONE, WHOLE, WHOLE, WHOLE, WHOLE, WHOLE)),
+    ("Plumber", "Left"): seen((17, 531, 1325, 1601, 1885), "a red plunger cup at the front of the top; the "
+                              "points of the head all around it (drawn in cream, as Side=Left draws a head)",
+                              FULL_CROWN),
     ("Robber", "Right"): seen((14, 652, 927, 1692, 1960), "a grey knitted mask over the whole head; 2 or 3 "
                               "spikes come out of it on the far side, near the top", ROBBER_POINTS,
                               THROUGH=True),

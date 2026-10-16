@@ -605,3 +605,117 @@ wide, under a picture 1.2 units wide.
 - A report that "Apply Transform" loses the place of child objects:
   <https://devtalk.blender.org/t/fbx-exporter-apply-transform/26640>. Checked here: the file keeps
   each part at its place under the root (see the "file:" lines of the check).
+
+## Batch 7: the robber, the Skull and Radioactive bases (15 October 2026, night, pictures only, branch `3d-batch-7`)
+
+Nothing of this is in the game: the game's library of parts was not written again (the export of this
+branch writes to a scratch file). The owner says yes or no first.
+
+- **The robber.** The four leaves placed by hand under the knitted mask (batch 6) read from behind as a
+  collar at mid height, unlike the bare head and the plumber the owner compared them with. A knitted mask
+  is pulled over the spiky head, so the whole crown of a bare head now comes through it, each leaf where it
+  grows (`ROBBER_POINTS = FULL_CROWN`). The mask is lighter (14 sides, 10 ribs) so a robber in a heavy robe
+  stays under 8,000 triangles. Sheet: `research/evidence/chog-traits-batch7-robber-before-after-2026-10-15.png`.
+- **The Skull base** (60 Genesis, `chog_trait_bases.py`): a bald skull in the bone colour of its Skin (ten
+  colours read on the pictures), no leaf, no cream face, the pink cheeks, a nose hole, a row of teeth in
+  place of the mouth (no Skull Genesis has a Mouth), ribs and breastbone on the body. Hats and eyes are
+  those of the other Genesis. It is in the export of this branch: all 1,929 Genesis of Origin and Skull
+  built, all matching their parts (`--check 5000`), none over 8,000 triangles; a bare skull throws bones.
+  Sheet: `research/evidence/chog-traits-batch7-skull-2026-10-15.png`.
+- **The Radioactive base** (30 Genesis): the spiky Chog in a gradient from a deep colour at the feet to a
+  light one at the top (four Skins), no cream face, the skull's teeth and nose showing, no cheek, the ribs,
+  and its own eyes: the eyes of Side=Left in a glowing tint of the skin (17 values). Its values of Head are
+  modelled: ram horns curling at the sides (Red Horn, Purple Horn), ridged horns (Demon, Void, devil), a
+  third eye, a gem (Diamond), a gold seal (Holy Seal), a beam (Blue Laser), mushrooms (Poison Shroom). Not
+  yet in the export: the game draws one colour per material; the gradient needs a colour role that the game
+  computes from the height of each point (a change of `ChogPartsLibrary` and `ChogHeroModel`).
+  Sheets: `research/evidence/chog-traits-batch7-radioactive-2026-10-15.png`.
+- **Still wrong:** the ten 1:1 Genesis keep the earlier look; the skull's profile stays round (only its
+  width narrows into the jaw); Red Bandana's band is the narrow headband where the pictures draw a wider
+  scarf.
+- **Red Bandana (16 October, CHOG #874 and #1192):** the band of a headband and a knot with two flaps on the
+  upper front of the head (`build_bandana`); the library has it (388 pieces, 1,959 Genesis checked).
+  `research/evidence/chog-traits-batch7-red-bandana-2026-10-16.jpg`.
+- **The skull's jaw and hands (16 October):** the skull was the round ball of the Chog with teeth drawn on it.
+  Now (`JAW`, `narrow_jaw` of `chog_trait_bases.py`) the lower head narrows by 38 percent from the
+  cheekbones down, the teeth and the nose with it, as on CHOG #81, #846, #1000, #1104, #1207, #1642; the
+  hands and feet are bone, not the pink mittens of a Chog (`bone_hands`), so a skeleton's arms are their own
+  parts in the export (`("rest", "armLeft", "Skull")`). Front, bust, side and game views:
+  `research/evidence/chog-traits-batch7-skull-jaw-2026-10-16.jpg`.
+- **The branch's library, 16 October:** exported again with the horns, the jaw and the bone hands, 1,959
+  Genesis built or checked (`--check 5000`), all matching their parts; the view tests of the branch pass on
+  it (84). Seen in the game in a preview build made on the local network only (the game's own library
+  was put back right after): skulls with bone hands and jaws, radioactive Chogs with their curled horns,
+  close and from the game's camera (`research/evidence/chog-traits-batch7-in-game-preview-headless-2026-10-16.png`).
+  To put batch 7 in the game after a yes: merge this branch, build (the library is already exported here).
+- **The ram horns, made again (16 October):** they were small nubs beside the pictures. Now (`RAM_HORN` of
+  `chog_trait_bases.py`) each is as thick at its root as a sixth of the head, rises over the crown and
+  curls out to the side and down, a little to the back, its rings drawn as ridges, as on CHOG #275, #473,
+  #672, #1067, #1200 (Red Horn) and #31, #1745 (Purple Horn). A first try curled them back, hidden from the
+  front. Seen from the front, the side, behind and the game's angle:
+  `research/evidence/chog-traits-batch7-ram-horns-2026-10-16.jpg`. #31 dressed: 7,519 triangles (limit
+  8,000). The library of the branch is not exported again yet: it will be at the merge.
+
+Batch 7 in the game, as a preview only (15 October, 23:59): the export of this branch with the Radioactive
+base (format 5: its skins run from their colour at the feet to a lighter one at the top) covers 1,959
+Genesis (Origin, Skull, Radioactive), all built and matching their parts, none over 8,000 triangles; only the
+ten 1:1 Genesis keep the earlier look. A build made with that library on the local network only (the
+library of the game was put back right after; the public address was not touched) draws them as the
+Blender pictures do, the gradients included:
+`research/evidence/chog-traits-batch7-in-game-preview-headless-2026-10-15.png`. To put batch 7 in the game
+once the owner says yes: merge this branch, run `export_chog_parts.py`, build.
+
+## The ten 1:1 Genesis (16 October 2026, on the branch `3d-one-of-one`, pictures and a local preview)
+
+Each 1:1 Genesis is a character of its own and its metadata names no trait but its base and its tier.
+`chog_one_of_one.py` gives each one a look read on its picture, as traits the builder knows (skin, eyes,
+mouth, hat, clothing) and parts no other Genesis wears: the cape of the fire Chog (#53), the flames of
+the skull (#392), the brain of the zombie (#494), the frog suit with its eyes (#973), the halo and the
+wings of the angel (#1159), the gold helmet with its red gem (#1290), the horns and the trident of the
+devil (#1376); The Scream (#434), the manga page in greys (#1006) and the Chog of gold (#1373) are their
+colours, eyes and mouths. `make_chog_traits.traits_of` gives a 1:1 its look; `export_chog_parts.py`
+exports them like any Genesis, with their body, arms and head under their own number (their hands or
+cheeks are their own colours). The devil throws its trident (a new attack object); the others throw
+their hat (the halo, the brain, the flames, the helmet) or a spike of their crown in their colours, and
+each says it under its hero (`LINES`).
+
+The library of this branch covers all 1,969 Genesis (1,970 with the recruit; 433 pieces, 3.2 MB), every
+one built or checked (`--check 5000`); the view tests pass on it (84). Seen beside their pictures
+(`research/evidence/chog-one-of-one-pictures-and-busts-2026-10-16.jpg`) and in the game in a preview build
+made on the local network only, the game's own library put back right after
+(`research/evidence/chog-one-of-one-in-game-preview-headless-2026-10-16.png`).
+
+Not drawn: the painted style of #434 and its hands on its cheeks, the cracks of the skull of #392, the
+stripes on the face of #1290, the screentone of #1006, the green drool of #494 (gritted teeth instead).
+Tried and changed on the way: #494's brain crossed the crown (the upper and middle pairs of leaves are
+left out under it, and the brain made larger); #973 had round frog eyes (the tired lids read as Pepe);
+the angel's wings were too small to see and its first build went over 8,000 triangles.
+
+This branch starts from `3d-batch-7`: merging it brings batch 7 too. To put them in the game after a yes:
+merge, build (the library is exported here).
+
+## What stands on the head no longer takes the place of the spikes (16 October 2026, on this branch)
+
+The owner saw horns and the plunger fixed on the top of the skull where the pictures put them on the brow,
+and spikes missing from the head because of it. Each case was looked at against its pictures, then turned
+all around:
+
+| Value | Before | Now |
+| --- | --- | --- |
+| Red Horn, Purple Horn (`RAM_HORN`) | two horns from the top of the head; the four front lines of leaves taken out | from the upper corners of the brow, rising straight (`RISE`) then curling out above the head; every leaf kept; 14 rings of 8 points along each horn (22 of 10 before: #31 went over 8,000 triangles) |
+| Demon Horn, Void Horn, devil horn (`DEMON_HORNS`, new shape `DemonHorns`) | two horns on the top; leaves 0 to 2 taken out | five horns among the spikes, three on the top of the brow and one low on each side curving up, as drawn; every leaf kept |
+| The 1:1 devil (#1376) | the same two horns on the top | one pair of short horns at the corners of the brow (`horns` of its entry), darker than its skin so they read |
+| Plumber (`PLUNGER`) | the cup on the crown (polar 22 degrees), leaves 0 and 1 taken out | at the front of the top (polar 38), standing half upright (`UPRIGHT`), on the left of the character so the bust shows it right of the face as the pictures do, the stick out to the upper right; every leaf kept |
+| Holy Seal (`HOLY_SEAL`) | a small ring lying on the top, leaves 0 and 1 taken out, 1,264 triangles | a large gold wheel standing over the brow, a lattice inside, eight rays each crossed near its tip, about 600 triangles; every leaf kept |
+| Poison Shroom (`POISON_SHROOM`) | two purple caps on the top, leaves 0 and 1 taken out | three spotted mushrooms in the colours of #1100 (pale green caps spotted orange, a small orange one spotted green), before the crown |
+| Blue Laser (`HEAD_LASER`) | a thin beam straight up, leaning the wrong way on the bust | a wide beam from a white glow on the brow, out to the left of the character at about 45 degrees |
+
+The shape `RidgedHorns` and the helper that took lines of leaves out are gone: nothing on these bases takes
+the place of a spike any more. Sheets: `research/evidence/chog-head-objects-horns-before-after-2026-10-16.jpg`
+and `chog-head-objects-plunger-seal-shroom-laser-before-after-2026-10-16.jpg` (the picture, the bust before,
+then the bust and the turns now); every value of every base in `.artifacts/chog-body/traits/batch-8/`
+(`per_value_origin_1.png` to `_4`, `per_value_radioactive_1.png`, `per_value_skull_1.png` to `_3`,
+`one_of_one.png`). The library exported again: 1,970 heroes, 438 pieces, 3.1 MB, 110 built and 1,859 more
+checked, none failed, none lacking a part; the view tests pass on it (84); the ten seen in a local preview
+build (`research/evidence/chog-head-objects-in-game-preview-headless-2026-10-16.png`), the game's own library
+put back right after.

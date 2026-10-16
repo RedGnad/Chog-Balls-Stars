@@ -65,7 +65,7 @@ pair, 4 top of the back row, 5 back pair, 6 straight back); all are made `LEAF_L
 | Bob Hair | Right | all 45, closely 43, 48, 159, 470, 482, 1137, 1380 | Yellow curly hair: a big mass on top, puffs beside the face; a red band tied over the brow, both its edges waving, a darker lower edge. The same yellow and red on all 45, whatever the skin. On #43, #470, #1137 the tip of one skin spike shows above the band on the far side | Curls in one yellow, a red band with waving edges around the hair over the brow, curls kept off the band; no leaf (the spike tip is not built: it would have to come through the hair) |
 | Rainbow Wig | Left | 29, 346, 1276, 1469, 1967 | An afro in blocks of colour around a face with a curly edge; no spike | Curly wig in six colours; no leaf (unchanged) |
 | Clown Nose | Right | 18, 406, 920, 1553, 1926 | A red ball on the nose; the whole crown as on a bare head | Nose ball; the whole crown |
-| Plumber | Left | 17, 531, 1325, 1601, 1885 | A red plunger cup on the top, its stick up to one side; around it the points of the head, in cream as Side=Left draws a head | Plunger; leaves 2 to 6 (unchanged) |
+| Plumber | Left | 17, 531, 1325, 1601, 1885 | A red plunger cup at the front of the top, its stick out to the upper right of the picture; around it the points of the head, in cream as Side=Left draws a head | Plunger; every leaf (16 October 2026: the cup on the crown and leaves 0 and 1 taken out until then) |
 | Robber | Right | 14, 652, 927, 1692, 1960 | Grey knitted balaclava with ribs, eye holes with a rolled edge; 2 or 3 spikes come out of the knit on the far side, near the top | Balaclava; leaves 2, 3, 5, 6 through the knit, as drawn ("THROUGH", recorded in parts.json) |
 | BTC Cap | Left | 162, 492, 702, 1579, 1954 | Orange crown, white Bitcoin B, dark brown brim; no spike | Cap, logo; no leaf |
 | MCGA | Left | 103, 568, 1028, 1472, 1951 | Purple cap, white MAKE CHOG GREAT AGAIN in two lines; no spike | Cap; no leaf |
@@ -99,20 +99,20 @@ first two Genesis of each line (the one Genesis when there is one); the others w
 
 | Value | Side, base, Genesis | What the art shows |
 | --- | --- | --- |
-| Red Horn | Left, Radioactive: 275, 473, 672, 1067, 1200 | Two brown ram horns curling over the head |
+| Red Horn | Left, Radioactive: 275, 473, 672, 1067, 1200 | Two brown ram horns rising from the upper corners of the brow and curling out above the head; the spikes all around |
 | Silver wreath | Left, Skull: 207, 418, 939, 1331 | A laurel wreath of pale leaves across the skull |
 | 3rd Eye | Left, Radioactive: 598, 703, 1657, 1849 | A third eye on the forehead |
-| Demon Horn | Left, Radioactive: 343, 625, 1460 | Orange ridged horns on top and at the sides |
-| Holy Seal | Left, Radioactive: 415, 743, 1813 | A gold round seal, a grid inside and four short arms, on top of the head |
+| Demon Horn | Left, Radioactive: 343, 625, 1460 | Five orange ridged horns among the spikes: three on the top of the brow, one low on each side curving up |
+| Holy Seal | Left, Radioactive: 415, 743, 1813 | A large gold wheel standing upright above the brow, a grid inside it and short rays around it, each crossed near its tip; the spikes behind |
 | Gold Thorn | Left, Skull: 1723, 1819, 1838 | A crown of gold thorns around the skull |
-| Purple Horn | Left, Radioactive: 31, 1745 | Two purple ram horns |
-| Void Horn | Left, Radioactive: 140, 1222 | Purple ridged horns on top and at the sides |
+| Purple Horn | Left, Radioactive: 31, 1745 | Two purple ram horns, as Red Horn |
+| Void Horn | Left, Radioactive: 140, 1222 | Five lilac ridged horns among the spikes, as Demon Horn |
 | Taped Banana | Right, Skull: 373, 978 | A banana taped to the forehead with grey tape |
 | Diamond | Left, Radioactive: 834, 1009 | A blue gem on the forehead |
 | Red Bandana | Left, Radioactive: 874, 1192 | An orange-red bandana over the head, knotted on top |
 | Silver Thorn | Left, Skull: 1107, 1647 | A crown of grey thorns around the skull |
-| Blue Laser | Left, Radioactive: 772 | A light blue beam going up from the forehead |
-| Poison Shroom | Left, Radioactive: 1100 | Mushrooms growing out of the head |
-| devil horn | Left, Radioactive: 1225 | Red and white ridged horns on top and at the sides |
+| Blue Laser | Left, Radioactive: 772 | A wide light blue beam leaving the middle of the brow from a white glow, out to the upper right of the picture |
+| Poison Shroom | Left, Radioactive: 1100 | Mushrooms growing out of the head among the spikes: pale green caps spotted orange on pale stems, a tall one on top, one leaning out, a small orange one spotted green low on the side |
+| devil horn | Left, Radioactive: 1225 | Five red ridged horns among the spikes, as Demon Horn |
 | Mafia Hat | Right, Skull: 1311 | A pale fedora with a dark band |
 | Head Wrap | Right, Skull: 1861 | A white wrapped cloth (turban) over the skull |

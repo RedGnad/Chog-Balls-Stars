@@ -70,15 +70,15 @@ WORDS = {
     "CoinButtcoin": "BUTTCOINS", "Bolt": "LIGHTNING", "Peace": "PEACE SIGNS", "SunDisc": "RISING SUNS",
     "RedRing": "ITS HEADBAND", "YellowRing": "MAGIC RINGS", "Spear": "SPEARS", "Arrow": "ARROWS",
     "MoneyBag": "MONEY BAGS", "Pizza": "PIZZA", "MiniChog": "LITTLE CHOGS", "Yarn": "BALLS OF YARN",
-    "RainbowBall": "RAINBOWS", "Nose": "CLOWN NOSES",
+    "RainbowBall": "RAINBOWS", "Nose": "CLOWN NOSES", "Bone": "BONES",
 }
 
 
-def label_of(head_value):
+def label_of(head_value, skull=False):
     """The line under a hero: what it throws, and from which trait."""
     key, _ = attack_of(head_value)
     if not head_value:
-        return "THROWS THE SPIKES OF ITS CROWN"
+        return "THROWS BONES" if skull else "THROWS THE SPIKES OF ITS CROWN"
     if key == "HAT":
         return "THROWS ITS " + head_value.upper()
     return "THROWS " + WORDS[key] + " FROM ITS " + head_value.upper()
@@ -338,6 +338,14 @@ def build_nose(shapes, word_pieces):
     ball(shapes, Vector((0.035, -0.07, 0.05)), 0.025, shapes.named("Glint"), outline=0.0, stacks=4, sides=6)
 
 
+def build_bone(shapes, word_pieces):
+    """A bone, for a skull without a hat (it has no spike to throw): a shaft and two knobs at each end."""
+    tube(shapes, Vector((-0.12, 0.0, 0.0)), X, [(0.0, 0.024), (0.24, 0.024)], shapes.named("Bone"), sides=10)
+    for end in (-0.13, 0.13):
+        for offset in (-0.026, 0.026):
+            ball(shapes, Vector((end, offset, 0.0)), 0.034, shapes.named("Bone"), stacks=6, sides=10)
+
+
 def build_leaf(shapes, word_pieces):
     """A leaf of the crown, as add_leaf_crown makes one, pointing along -Y, in the skin of the hero."""
     profile = ((0.00, 0.90, 0.92), (0.12, 0.99, 1.00), (0.25, 1.00, 0.95), (0.46, 0.79, 0.70),
@@ -386,4 +394,5 @@ OBJECTS = {
                      "Green": (0.24, 0.75, 0.30), "Blue": (0.20, 0.50, 0.92), "Purple": (0.55, 0.28, 0.82)}, (),
                     build_rainbow_ball, (0.98, 0.86, 0.18)),
     "Nose": ({"Red": (0.91, 0.15, 0.17), "Glint": (1.0, 1.0, 1.0)}, ("Glint",), build_nose, (0.91, 0.15, 0.17)),
+    "Bone": ({"Bone": (0.95, 0.94, 0.88)}, (), build_bone, (0.95, 0.94, 0.88)),
 }

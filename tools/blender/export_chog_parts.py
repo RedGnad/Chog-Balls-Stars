@@ -68,7 +68,13 @@ import bpy  # noqa: E402
 import make_chog_traits as traits  # noqa: E402  (the folder of this file must be on the path first)
 import render_chog_full as shots  # noqa: E402
 import chog_attack_objects as attacks  # noqa: E402
+import chog_trait_bases as bases  # noqa: E402
 from mathutils import Vector  # noqa: E402
+
+# What the 1:1 Genesis throw that no other does (chog_one_of_one.py): the devil's trident.
+attacks.ATTACK_OF_HEAD.update(traits.one.ATTACK_OF_HEAD)
+attacks.OBJECTS.update(traits.one.ATTACK_OBJECTS)
+attacks.WORDS.update(traits.one.ATTACK_WORDS)
 
 REST_PARTS = ("Body", "Head", "armLeft", "armRight")
 DEFAULT_OUT = os.path.join(traits.REPOSITORY, "game", "Assets", "Chog", "Resources", "ChogParts.bytes")
@@ -89,6 +95,18 @@ ROLE_FIXED, ROLE_SKIN, ROLE_FACE = 0, 1, 2
 RECRUIT = 0
 RECRUIT_SKIN = {"skin": (0.62, 0.62, 0.66), "face": traits.GENESIS_FACE}
 SKINS = {**traits.SKINS, "Recruit": RECRUIT_SKIN}
+# The Skull base (batch 7): its own bone colours, by "Skin", under names that do not meet those of Origin.
+SKINS.update({"Skull " + name: {"skin": colour, "face": colour} for name, colour in bases.SKULL_SKINS.items()})
+# The Radioactive base: a skin that runs from its colour at the feet to a lighter one at the top (format 5).
+SKINS.update({"Radioactive " + name: {"skin": bottom, "face": bottom, "top": top}
+              for name, (bottom, top) in bases.RADIOACTIVE_SKINS.items()})
+BASES = ("Origin", "Skull", "Radioactive")
+
+
+def skin_key(genesis_traits):
+    """The name of a Genesis's colours in SKINS."""
+    base_name = genesis_traits.get("Base", "Origin")
+    return ("" if base_name == "Origin" else base_name + " ") + genesis_traits.get("Skin", "")
 LIGHT_LIT, LIGHT_UNLIT, LIGHT_OUTLINE = 0, 1, 2
 
 
@@ -104,15 +122,44 @@ def all_genesis():
             record = json.loads(line)
             genesis_traits = {str(item["trait_type"]): str(item["value"])
                               for item in json.loads(record["raw_json"]).get("attributes", [])}
-            if genesis_traits.get("Base") == "Origin":
-                found[int(record["metadata_id"])] = genesis_traits
+            number = int(record["metadata_id"])
+            if genesis_traits.get("Base") in BASES:
+                found[number] = genesis_traits
+            elif genesis_traits.get("Base") == "1:1":
+                # A 1:1 Genesis names no trait: it is built with the look chog_one_of_one.py gives it.
+                found[number] = traits.one.look_of(number, genesis_traits)
     return found
 
 
 def keys_of(genesis_traits):
     """The keys of the parts a Genesis wears: what each part is built from, and nothing else."""
+    return {own_key(key, genesis_traits) for key in shared_keys_of(genesis_traits)}
+
+
+def own_key(key, genesis_traits):
+    """A 1:1 Genesis keeps its body, its arms and its head under its own number: their colours are its own
+    (hands, cheeks), and nothing is shared with another Genesis but the parts of the traits it wears."""
+    number = traits.one.number_of(genesis_traits)
+    return key + ("1:1", number) if number and key[0] in ("rest", "head") else key
+
+
+def shared_keys_of(genesis_traits):
+    """keys_of before a 1:1 Genesis takes its own."""
     side = genesis_traits.get("Side", "Right")
     keys = {("rest", name) for name in ("Body", "armLeft", "armRight")}
+    if bases.is_skull(genesis_traits) or bases.is_radioactive(genesis_traits):
+        # A skull: its own head (no leaf, whatever the hat), and the ribs on its body. A radioactive Chog:
+        # its head with the crown its head object leaves and the skull's teeth, the ribs on its body.
+        base_name = genesis_traits["Base"]
+        head = ("head", "Skull") if base_name == "Skull" else ("head", "Radioactive", genesis_traits.get("Head"))
+        # A skeleton's hands are bone (bases.bone_hands): its arms are its own.
+        arms = ("Skull",) if base_name == "Skull" else ()
+        keys = {("rest", "Body", base_name), ("rest", "armLeft") + arms, ("rest", "armRight") + arms, head}
+        for trait in traits.TRAIT_PARTS:
+            value = genesis_traits.get(trait)
+            if value is not None and isinstance(traits.entry_for(trait, genesis_traits), dict):
+                keys.add(("trait", trait, value, side))
+        return keys
     # The head: its leaves follow the hat when the hat is modelled, else a hood (head_look).
     hat = traits.entry_for("Head", genesis_traits)
     hat_value = genesis_traits.get("Head") if isinstance(hat, dict) else None
@@ -133,9 +180,18 @@ def keys_of(genesis_traits):
 
 def key_of_object(thing, genesis_traits):
     """The key an object of a built hero belongs to (see keys_of)."""
+    return own_key(shared_key_of_object(thing, genesis_traits), genesis_traits)
+
+
+def shared_key_of_object(thing, genesis_traits):
+    """key_of_object before a 1:1 Genesis takes its own."""
     if thing.name in REST_PARTS:
         if thing.name == "Head":
-            return next(key for key in keys_of(genesis_traits) if key[0] == "head")
+            return next(key for key in shared_keys_of(genesis_traits) if key[0] == "head")
+        if thing.name == "Body" and (bases.is_skull(genesis_traits) or bases.is_radioactive(genesis_traits)):
+            return ("rest", "Body", genesis_traits["Base"])
+        if thing.name in ("armLeft", "armRight") and bases.is_skull(genesis_traits):
+            return ("rest", thing.name, "Skull")
         return ("rest", thing.name)
     trait, value = thing["trait"].split("=", 1)
     return ("trait", trait, value, genesis_traits.get("Side", "Right"))
@@ -327,7 +383,7 @@ def main():
         wanted = {int(number) for number in arguments.genesis.split(",") if number.strip()}
         everyone = {number: found for number, found in everyone.items() if number in wanted}
     worn_keys = {number: keys_of(found) for number, found in everyone.items()}
-    unknown_skins = sorted({found.get("Skin") for found in everyone.values()} - set(traits.SKINS))
+    unknown_skins = sorted({skin_key(found) for found in everyone.values()} - set(SKINS))
     if unknown_skins:
         raise SystemExit(f"CHOG_PARTS no colour recorded for Skin {unknown_skins}")
     chosen = cover(worn_keys)
@@ -413,6 +469,8 @@ def main():
     def attack_for(found, worn):
         """The piece a hero's basic attack throws and how it moves (see chog_attack_objects)."""
         key, style = attacks.attack_of(found.get("Head"))
+        if bases.is_skull(found) and not found.get("Head"):
+            key, style = "Bone", attacks.TUMBLE
         if key == "HAT":
             hat = by_key.get(("trait", "Head", found.get("Head"), found.get("Side", "Right")))
             if hat:
@@ -433,7 +491,7 @@ def main():
             continue
         if lacking:
             incomplete[number] = lacking
-        heroes[number] = (found["Skin"], worn, *attack_for(found, worn))
+        heroes[number] = (skin_key(found), worn, *attack_for(found, worn))
 
     # The recruit: the body, the arms and the head of a Genesis without hat or hood.
     bare = ("head", None, None, None)
@@ -442,8 +500,10 @@ def main():
     heroes[RECRUIT] = ("Recruit", [index for key in (("rest", "Body"), bare, ("rest", "armLeft"), ("rest", "armRight"))
                                    for index in by_key[key]], attack_pieces["Leaf"], attacks.TUMBLE)
 
-    labels = {number: attacks.label_of(everyone[number].get("Head")) if number in everyone else
+    labels = {number: attacks.label_of(everyone[number].get("Head"), bases.is_skull(everyone[number])) if number in everyone else
               "THROWS THE SPIKES OF ITS CROWN" for number in heroes}
+    # A 1:1 Genesis says what it throws in its own words (chog_one_of_one.LINES).
+    labels.update({number: line for number, line in traits.one.LINES.items() if number in heroes})
     write_library(arguments.out, materials, rest, pieces, heroes, labels)
     size = os.path.getsize(arguments.out)
     triangles = sum(len(piece["indices"]) // 3 for piece in pieces)
