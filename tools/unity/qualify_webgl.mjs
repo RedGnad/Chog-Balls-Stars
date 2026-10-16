@@ -250,12 +250,17 @@ try {
       await screenshot('browser-during-drag.png');
       await command('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     }else{
+      // CHOG_BROWSER_DRAG_KEY=<letter> holds that key for the whole drag: walking while attacking.
+      const dragKey=(process.env.CHOG_BROWSER_DRAG_KEY||'').toLowerCase();
+      const keyEvent=type=>command('Input.dispatchKeyEvent',{type,key:dragKey,code:'Key'+dragKey.toUpperCase(),windowsVirtualKeyCode:dragKey.toUpperCase().charCodeAt(0),nativeVirtualKeyCode:dragKey.toUpperCase().charCodeAt(0)});
+      if(dragKey){await keyEvent('keyDown');await sleep(300);}
       await command('Input.dispatchMouseEvent',{type:'mousePressed',x:x1,y:y1,button:'left',buttons:1,clickCount:1});
       await command('Input.dispatchMouseEvent',{type:'mouseMoved',x:(x1+x2)/2,y:(y1+y2)/2,button:'left',buttons:1});
       await command('Input.dispatchMouseEvent',{type:'mouseMoved',x:x2,y:y2,button:'left',buttons:1});
       await sleep(Number(process.env.CHOG_BROWSER_DRAG_MS||2000));
       await screenshot('browser-during-drag.png');
       await command('Input.dispatchMouseEvent',{type:'mouseReleased',x:x2,y:y2,button:'left',buttons:0,clickCount:1});
+      if(dragKey){await keyEvent('keyUp');await sleep(1500);await screenshot('browser-after-drag-key.png');}
     }
   }
   if(process.env.CHOG_BROWSER_SPECIAL){

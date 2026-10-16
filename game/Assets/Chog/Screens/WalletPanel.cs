@@ -292,9 +292,10 @@ namespace Chog.Screens
         private void Refresh()
         {
             var state = PlayerWallet.State;
-            if (_lastState == WalletState.Connecting && state == WalletState.Ready)
+            // Connecting, then Reading (its Genesis), then Ready.
+            if (_lastState == WalletState.Connecting && (state == WalletState.Reading || state == WalletState.Ready))
                 _justConnected = true;
-            else if (state != WalletState.Ready)
+            else if (state != WalletState.Reading && state != WalletState.Ready)
                 _justConnected = false;
             _lastState = state;
             // What the wallet may play: the Genesis it holds, then those it rents.
