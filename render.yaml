@@ -36,15 +36,18 @@ services:
       # The deployed shop contract (contracts/README.md). Leave empty while there is none: the
       # game then sells nothing.
       - key: SHOP_ADDRESS
-        sync: false
+        # Deployed on Monad mainnet on 16 October 2026 (contracts/script/DeployMainnet.s.sol).
+        value: "0xb23a3c3492b9ba83d80c8abc9a5484d2885f058a"
       # The deployed rental contract (contracts/README.md). Leave empty while there is none: the
       # game then offers no rental.
       - key: RENTAL_ADDRESS
-        sync: false
+        value: "0x7f1271d43b0e41e2eeddd5290f459fdc6196a19a"
       # The deployed wager contract and the key of its referee (contracts/README.md): both or
       # neither. Leave empty while there is none: no match is then staked on.
       - key: WAGER_ADDRESS
-        sync: false
+        value: "0xc7524a808d2b00b43a4d3e2becb8500e409b41e3"
+      # The key of the referee 0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34 (.artifacts/services-public/
+      # mainnet-referee-key on the development Mac): pasted when the service is created, never written here.
       - key: REFEREE_KEY
         sync: false
     # With plan "starter" (512 MB, half a CPU), add this disk so the careers survive:

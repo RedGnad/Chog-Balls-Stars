@@ -26,7 +26,20 @@ about 0.43 MON, at most 0.86 at its estimated top fee); the services read the th
 100 $CHOG, rental open, wager on chain 143 in $CHOG, not a test). Then, on this Mac,
 `sh tools/contracts/mainnet_deployment.sh 0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34 .artifacts/services-public/mainnet-contracts`
 checks the three on the chain and writes the settings that `tools/release/serve_public.sh ... --mainnet`
-reads. **Not deployed yet.**
+reads.
+
+**Deployed by the owner on 16 October 2026** from the development wallet
+`0x981F6E0Ea94f45fDB8ee7680DC862212E3C720e0` (owner of the wager and of the shop, treasury of the shop),
+and checked on the chain with the script above:
+
+| Contract | Address on Monad mainnet |
+| --- | --- |
+| ChogWager | `0xc7524a808d2b00b43a4d3e2becb8500e409b41e3` (referee `0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34`) |
+| ChogRental | `0x7f1271d43b0e41e2eeddd5290f459fdc6196a19a` (a tenth of each rental burned) |
+| ChogShop | `0xb23a3c3492b9ba83d80c8abc9a5484d2885f058a` (the second form on sale at 100 $CHOG) |
+
+The public instance takes stakes, rentals and purchases on them since that day (`serve_public.sh ... --mainnet`;
+`render.yaml` names them for the host).
 
 **Decided by the user on 15 October 2026: the contracts go to Monad's testnet first**, deployed
 with a development wallet of theirs (its key never leaves their machine: an encrypted Foundry
