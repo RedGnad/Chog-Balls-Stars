@@ -654,7 +654,10 @@ TAPED_BANANA = {
     # (First: 0.240 by 0.031 under a strip 0.092 wide: the tape hid the banana.)
     "LENGTH": 0.290, "RADIUS": 0.037, "BEND": 0.045, "RINGS": 11, "SIDES": 6,
     "STEM": (0.040, 0.010),        # length and radius of the stem, going on from its top
-    "TAPE": (0.165, 0.034, 38.0),  # half length, half width, degrees from across the face (rising to its left)
+    # Half length, half width, degrees from across the face (rising to its left). Its middle is that of the
+    # banana, where its back bulges (16 October 2026, the owner: the tape was off to the side, at AT, BEND to
+    # the left of the banana; 38 degrees until then, 24 on the pictures).
+    "TAPE": (0.165, 0.036, 28.0),
 }
 
 
@@ -692,18 +695,37 @@ def build_taped_banana(maker):
     part.shell(base.tube_rings(top - stem_way * 0.004, stem_way, sideways, [(0.0, radius * 1.3), (length, radius)]), 6,
                part.named("Stem"), 0.006)
     half_length, half_width, degrees = numbers.TAPE
+    # The strip runs across the face (rising to its left), through the middle of the banana, where its back
+    # bulges: on the head on each side, over the banana in the middle, wrapped round its outer half (the
+    # side away from the head), and down to the head again beside it. (Until 16 October 2026 it was lifted
+    # off the head along the brow, which put it above the banana and behind it from the front.)
     angle = math.radians(degrees)
-    across = (math.cos(angle), math.sin(angle))
+    middle_of_banana = rings[numbers.RINGS // 2][0]
+    flat = Vector((math.cos(angle), 0.0, math.sin(angle)))
+    way = (flat - out * flat.dot(out)).normalized()
+    across_banana = (way - along * way.dot(along)).normalized()
+    slant = way.dot(across_banana)
+    radius = numbers.RADIUS + 0.004
     path, wide, thick = [], [], []
-    for step in range(11):
-        t = -1.0 + 2.0 * step / 10
-        side, up = numbers.AT[0] + across[0] * half_length * t, numbers.AT[1] + across[1] * half_length * t
-        lift = 0.006 + (numbers.OFF + numbers.RADIUS + 0.006) * max(0.0, 1.0 - (t * 2.2) ** 2) ** 0.5
-        here = _out(surface, side, up)
-        direction = Vector((across[0], 0.0, across[1]))
-        path.append(surface.front(side, up, lift))
-        wide.append(here.cross(direction).normalized() * half_width)
-        thick.append(here * 0.004)
+    for step in range(13):
+        t = -1.0 + 2.0 * step / 12
+        here = middle_of_banana + way * half_length * t
+        # Where the strip lies on the head under that place.
+        side = here.x - surface.middle.x - surface.face_middle[0]
+        up = here.z - surface.middle.z - surface.face_middle[1]
+        on_head = surface.front(side, up, 0.006)
+        # Where it lies on the banana: across it by "beside", on its outer half.
+        beside = half_length * t * slant
+        if abs(beside) < radius:
+            on_banana = here + out * math.sqrt(radius * radius - beside * beside)
+        else:
+            on_banana = here
+        share = min(1.0, max(0.0, (radius + 0.030 - abs(beside)) / 0.030))
+        share = share * share * (3.0 - 2.0 * share)
+        point = on_head + (on_banana - on_head) * share
+        path.append(point)
+        wide.append(out.cross(way).normalized() * half_width)
+        thick.append(out * 0.004)
     hats_module.slab(part, path, wide, thick, part.named("Tape"), 0.008, sides=4)
 
 

@@ -1971,59 +1971,28 @@ def build_hoodie(maker):
 # replaces the crown of leaves (the entry gives "head": its LEAVES), as the pictures show.
 # ---------------------------------------------------------------------------------------------
 COSTUME = {
-    # The belly in another colour (shark, dragon): half its width, its lower and upper edge.
+    # The belly in another colour (shark): half its width, its lower and upper edge.
     "BELLY": (0.085, 0.300, 0.540),
     # The teeth of the shark along the edge of the hood: how many, from how far round on each side
     # (degrees from the front), how long, how wide at their foot (degrees).
     "TEETH": (11, 70.0, 0.050, 6.0),
     # The fin on the back of the hood: polar degrees where it starts and ends, its height, half thickness.
     "FIN": (24.0, 96.0, 0.150, 0.016),
-    # The horns of the dragon: degrees from the front, polar degrees, length, radius at the foot.
-    "HORNS": (34.0, 40.0, 0.130, 0.040),
-    # The tip of the banana: how far the top of the hood rises, then the stalk (length, radius).
-    "PEAK": 0.32,
-    "STALK": (0.080, 0.030),
     # The bandana over the lower face: in the coordinates of the face, its upper corners (to the side,
     # above), its point below the chin, how far off the head, its dots.
     "BANDANA": (0.27, -0.040, -0.300, 0.032),
     "BANDANA_DOTS": ((-0.12, -0.085), (0.0, -0.090), (0.12, -0.085), (-0.06, -0.150), (0.06, -0.150),
                      (0.0, -0.210), (-0.17, -0.060), (0.17, -0.060)),
-    # The wings of the dragon, on the back: the shoulder they leave from (to the side, height), their
-    # span, their height, their thickness, and the way they spread (to the side, back, up).
-    # (First: 0.20 spread mostly to the sides, in the red of the suit: hidden behind the arms.)
-    "WINGS": (0.06, 0.54, 0.27, 0.20, 0.010),
-    "WING_WAY": (0.75, 0.95, 0.45),
-    # 16 October 2026, the owner: the pictures draw a whole dragon and a whole banana, not a hood over a
-    # suit. The face of a dragon (#16, #42, #143, #194, #226) looks out of its open mouth: cream fangs round
-    # the opening of the hood (how many, from how far round on each side, how long, how wide at the foot),
-    # two nostrils on the top of the snout (degrees from the front, polar degrees, radius), and a tail
-    # behind, thick at the back and thin at its tip, its points along its top: (places, then radii).
-    "FANGS": (6, 66.0, 0.095, 14.0),
-    "NOSTRILS": (13.0, 30.0, 0.016),
-    "TAIL": (((0.0, 0.17, 0.36), (0.0, 0.30, 0.25), (0.05, 0.42, 0.15), (0.11, 0.52, 0.10), (0.18, 0.58, 0.09)),
-             (0.070, 0.058, 0.040, 0.022, 0.0)),
-    "TAIL_POINTS": 3,
-    # A banana (#37, #154, #187, #269, #317): ridges down its skin from the tip to the face (degrees from
-    # the front of each), its tip bending back, as a banana does.
-    "RIDGES": (-62.0, 0.0, 62.0, 180.0),
-    "PEAK_BEND": 0.10,
-    # 16 October 2026, the owner again: a costume covers the whole body, and the dragon and the banana are
-    # whole. Trousers in the colour of the suit over each leg, from the ankle up into the suit (how far they
-    # stand off the leg); boots over the feet in it when the entry asks ("boots": how much larger than the
-    # foot); the snout of the dragon over the face, its upper jaw (polar degrees of its middle at the front,
-    # how far it stands ahead, its half length ahead, half width, half height), the nostrils on it; the peel
-    # of the banana around the whole body, faceted as a banana is (from which height, how many flat faces, how
-    # far off the torso, how much wider at its foot, the height under which it turns orange).
+    # 16 October 2026, the owner: a costume covers the whole body. Trousers in the colour of the suit over
+    # each leg, from the ankle up into the suit (how far they stand off the leg); boots over the feet of a
+    # whole costume (build_mascot: how much larger than the foot).
     "TROUSERS": 0.016,
     "BOOTS": 1.10,
-    # (First: at 32 degrees, a lump on the top of the head.)
-    "SNOUT": (52.0, 0.060, 0.120, 0.170, 0.062),
     # The seat of the trousers between the legs: its height, half its height, half width, half depth.
     "SEAT": (0.200, 0.070, 0.175, 0.135),
     # Under the chin, the hood closes on the face: a band from cheek to cheek (degrees each side of the
     # front, polar degrees of its upper and lower edge, how much larger than the head).
     "CHIN": (62.0, 152.0, 176.0, 1.10),     # (128 at first: it hid the mouth)
-    "PEEL": (0.10, 5, 0.040, 0.075, 0.40),
     "OUTLINE_THICKNESS": 0.014,
 }
 
@@ -2066,28 +2035,14 @@ def add_boots(maker, part, material, larger):
 
 def build_costume(maker):
     """A costume with a hood up: the suit ("Track" with long sleeves), its belly, the hood over the head,
-    and what the entry adds ("teeth", "fin", "horns", "peak", "bandana", "wings")."""
+    and what the entry adds ("teeth", "fin", "bandana"). The banana and the dragon are whole costumes since
+    16 October 2026 (build_mascot)."""
     entry = maker.entry
     numbers = SimpleNamespace(**COSTUME)
     build_track(maker)
     torso = maker.parts[0][0]
     colours = entry["colours"]
     add_trousers(maker, torso, torso.named("Main"), numbers)
-    if entry.get("boots"):
-        add_boots(maker, torso, torso.named("Main"), numbers.BOOTS)
-    if entry.get("peel"):
-        # The banana: a faceted peel around the whole body, wider at its foot, orange below and yellow above.
-        low, sides, off, flare, orange_below = numbers.PEEL
-        top = maker.body.SHOULDER_HEIGHT - 0.04
-        rings = []
-        for index in range(6):
-            share = index / 5
-            height = low + (top - low) * share
-            half_width, half_depth = KIT.torso_section(maker.body, max(height, 0.30))
-            grow = off + flare * (1.0 - share) ** 1.5
-            rings.append((Z * height + Y * 0.01, X * (half_width + grow), Y * (half_depth + grow)))
-        _, faces = torso.shell(rings, sides, torso.named("Hood"), numbers.OUTLINE_THICKNESS, smooth=False)
-        torso.paint([face for face in faces if face.calc_center_median().z < orange_below], torso.named("Main"))
     if "Belly" in colours:
         half, low, high = numbers.BELLY
         rows = []
@@ -2097,21 +2052,6 @@ def build_costume(maker):
             rows.append([shirt_front(maker, height, side, 0.004) for side in (-wide, -wide * 0.33, wide * 0.33, wide)])
         full.add_skin(torso, SimpleNamespace(middle=Vector((0.0, 0.0, (low + high) * 0.5))), rows, torso.named("Belly"),
                       around=False)
-    if entry.get("wings"):
-        side_at, height, span, tall, thick = numbers.WINGS
-        to_side, to_back, to_up = numbers.WING_WAY
-        for sign in (1.0, -1.0):
-            root = Vector((sign * side_at, 0.10, height))
-            out = Vector((sign * to_side, to_back, to_up)).normalized()
-            up = Vector((0.0, 0.25, 1.0)).normalized()
-            # A bat wing: its top edge, then three points along its lower edge, scalloped.
-            outline_points = [root, root + out * span + up * tall * 0.6, root + out * span * 0.95,
-                              root + out * span * 0.62 + up * tall * 0.05, root + out * span * 0.45 - up * tall * 0.15,
-                              root + out * span * 0.28 - up * tall * 0.02, root + out * span * 0.12 - up * tall * 0.22]
-            normal = out.cross(up).normalized()
-            front = [point + normal * thick for point in outline_points]
-            back = [point - normal * thick for point in outline_points]
-            KIT.add_loops(torso, [back, front], torso.named("Wing"), numbers.OUTLINE_THICKNESS)
     build_hood_up(maker)
     hood = maker.parts[-1][0]
     surface = maker.surface
@@ -2149,100 +2089,6 @@ def build_costume(maker):
             wide.append(X * half_thick)
             thick.append(out * (rise + 0.02) * 0.5)
         slab(hood, path, wide, thick, hood.named("Hood"), numbers.OUTLINE_THICKNESS, sides=4)
-    if entry.get("horns"):
-        degrees, polar_deg, length, radius = numbers.HORNS
-        for sign in (1.0, -1.0):
-            angle, polar = math.radians(270.0 + sign * degrees), math.radians(polar_deg)
-            out = head_normal(surface, angle, polar)
-            foot = on_head(surface, angle, polar, interpolate(hood_numbers.SIZE, degrees)) - out * 0.02
-            way = (out + Z * 0.6).normalized()
-            hood.shell(base.tube_rings(foot, way, X, ((0.0, radius), (length * 0.5, radius * 0.75), (length, radius * 0.15))),
-                       7, hood.named("Horn"), numbers.OUTLINE_THICKNESS)
-    if entry.get("peak"):
-        # The banana: a tall point rising from the top of the hood and bending back, its stalk at the tip,
-        # and ridges down its skin.
-        length, radius = numbers.STALK
-        top = on_head(surface, 0.0, 0.0, interpolate(hood_numbers.SIZE, 90.0))
-        rise, bend = numbers.PEAK, numbers.PEAK_BEND
-        stations = ((-0.10, 0.20), (0.0, 0.17), (rise * 0.55 - 0.10, 0.10), (rise - 0.10, 0.045))
-        rings = []
-        for height, wide in stations:
-            share = max(0.0, height / (rise - 0.10))
-            centre = top + Z * height + Y * bend * share * share
-            ahead = (Z + Y * bend * 2.0 * share).normalized()
-            first, second = base.frame_across(ahead, X)
-            rings.append((centre, first * wide, second * wide))
-        hood.shell(rings, 10, hood.named("Hood"), numbers.OUTLINE_THICKNESS)
-        tip_way = (Z * 0.6 + Y * 0.8).normalized()
-        hood.shell(base.tube_rings(rings[-1][0] + Y * 0.005, tip_way, X, ((0.0, radius), (length, radius * 0.8))), 6,
-                   hood.named("Tip"), numbers.OUTLINE_THICKNESS * 0.8)
-        for degrees in numbers.RIDGES:
-            angle = math.radians(270.0 + degrees)
-            rim = interpolate(hood_numbers.RIM, abs(degrees))
-            size = interpolate(hood_numbers.SIZE, abs(degrees)) * 1.004
-            places = [on_head(surface, angle, math.radians(rim * (1.0 - share)), size) for share in (0.05, 0.3, 0.55, 0.8)]
-            stations = []
-            for index, place in enumerate(places):
-                ahead = places[min(index + 1, 3)] - places[max(index - 1, 0)]
-                first, second = base.frame_across(ahead, Z)
-                stations.append((place, first * 0.007, second * 0.007))
-            hood.shell(stations, 4, hood.named("Ridge"), 0.0)
-    if entry.get("fangs"):
-        count, around, length, half_deg = numbers.FANGS
-        middle_of_face = surface.front(0.0, 0.0, 0.0)
-        for index in range(count):
-            degrees = -around + 2.0 * around * index / (count - 1)
-            angle = math.radians(270.0 + degrees)
-            polar = math.radians(interpolate(hood_numbers.RIM, abs(degrees)))
-            size = interpolate(hood_numbers.SIZE, abs(degrees))
-            corners = [on_head(surface, angle + math.radians(turn), polar, size * 1.0) for turn in (-half_deg, half_deg)]
-            foot = (corners[0] + corners[1]) * 0.5
-            out = head_normal(surface, angle, polar)
-            tip = foot + (middle_of_face - foot).normalized() * length + out * 0.010
-            # A flat fang with some thickness: wide across its foot, thin out of the hood, to its point.
-            across = (corners[1] - corners[0]) * 0.5
-            hood.shell([(foot + out * 0.006, across, out * 0.008), (tip, Vector(), Vector())], 4,
-                       hood.named("Tooth"), 0.008)
-    if entry.get("snout"):
-        # The upper jaw of the dragon over the face, the nostrils on its top, near its tip.
-        polar_deg, ahead, half_long, half_wide, half_tall = numbers.SNOUT
-        front, polar = math.radians(270.0), math.radians(polar_deg)
-        root = on_head(surface, front, polar, interpolate(hood_numbers.SIZE, 0.0))
-        forward = (head_normal(surface, front, polar) * 0.35 - Y * 0.65).normalized()
-        centre = root + forward * (ahead + half_long * 0.6)
-        hood.shell(base.ball_rings(centre, forward, X, half_long, half_wide, half_tall, 6), 12, hood.named("Hood"),
-                   numbers.OUTLINE_THICKNESS)
-        if entry.get("nostrils"):
-            radius = numbers.NOSTRILS[2]
-            up = (Z - forward * Z.dot(forward)).normalized()
-            for sign in (1.0, -1.0):
-                place = centre + forward * half_long * 0.62 + up * half_tall * 0.78 + X * sign * half_wide * 0.32
-                disc_on(hood, surface, place, (up + forward * 0.6).normalized(), radius, hood.named("Nostril"),
-                        segments=8)
-    elif entry.get("nostrils"):
-        degrees, polar_deg, radius = numbers.NOSTRILS
-        size = interpolate(hood_numbers.SIZE, degrees)
-        for sign in (1.0, -1.0):
-            angle, polar = math.radians(270.0 + sign * degrees), math.radians(polar_deg)
-            centre = on_head(surface, angle, polar, size * 1.006)
-            disc_on(hood, surface, centre, head_normal(surface, angle, polar), radius, hood.named("Nostril"), segments=8)
-    if entry.get("tail"):
-        places, radii = numbers.TAIL
-        points = [Vector(place) for place in places]
-        rings = []
-        for index, (point, radius) in enumerate(zip(points, radii)):
-            ahead = points[min(index + 1, len(points) - 1)] - points[max(index - 1, 0)]
-            first, second = base.frame_across(ahead, X)
-            rings.append((point, first * radius, second * radius) if radius > 0.0 else (point, Vector(), Vector()))
-        torso.shell(rings, 8, torso.named("Main"), numbers.OUTLINE_THICKNESS)
-        for index in range(numbers.TAIL_POINTS):
-            share = 0.2 + 0.6 * index / max(1, numbers.TAIL_POINTS - 1)
-            at = int(share * (len(points) - 1))
-            point = points[at] + (points[at + 1] - points[at]) * (share * (len(points) - 1) - at)
-            radius = radii[at] + (radii[at + 1] - radii[at]) * (share * (len(points) - 1) - at)
-            way = Vector((0.0, -0.3, 1.0)).normalized()
-            torso.shell(base.tube_rings(point + Z * radius * 0.6, way, X, ((0.0, 0.020), (0.05, 0.0))), 4,
-                        torso.named("Horn"), numbers.OUTLINE_THICKNESS * 0.6)
     if entry.get("bandana"):
         # A triangle of cloth over the lower face, from below the eyes to a point under the chin, with
         # white dots: it covers the mouth ("HIDES" in "head").
@@ -2257,6 +2103,399 @@ def build_costume(maker):
         for side, height in numbers.BANDANA_DOTS:
             full.add_skin(hood, surface, full.patch_loops(surface, (side, height), 0.010, 0.010, 2.0, 0.0, lift + 0.003, 1, 6),
                           hood.named("Dot"))
+
+
+# ---------------------------------------------------------------------------------------------
+# Whole costumes (16 October 2026, the owner after batch 10: the costume must be whole, as big on the body
+# as on the head: "the whole Chog is inside a banana", "the suit is a big dragon body"). One volume on "Body"
+# holds the character from above its feet to over its head, as wide round the body as round the head. The
+# face looks out of it through an opening framed by a collar on "Head", which follows the face when the
+# head turns (see below); the mittens come out of its sides and the feet from under it.
+# ---------------------------------------------------------------------------------------------
+MASCOT = {
+    # The volume, ring by ring from the bottom up: height, half width, how far its middle stands behind
+    # (+) the axis of the body, half depth. The head is 0.60 wide (its middle 0.81 high, its top 1.06), the
+    # torso 0.31: the volume is about 0.80 wide from the hips to the brow, its front close to the face.
+    # (First: 0.80 wide round the face, the face small in it; the pictures draw the banana a third wider
+    # than the face. Its end now rises over the head and bends back.)
+    "BANANA": ((0.10, 0.20, 0.00, 0.17), (0.20, 0.26, -0.01, 0.22), (0.35, 0.31, -0.01, 0.26),
+               (0.50, 0.34, 0.00, 0.28), (0.65, 0.36, 0.02, 0.29), (0.80, 0.37, 0.04, 0.29),
+               (0.95, 0.35, 0.05, 0.28), (1.06, 0.30, 0.07, 0.24), (1.15, 0.22, 0.10, 0.17),
+               (1.23, 0.14, 0.14, 0.11), (1.29, 0.075, 0.19, 0.06), (1.32, 0.045, 0.22, 0.04)),
+    "DRAGON": ((0.10, 0.22, 0.00, 0.20), (0.20, 0.31, -0.01, 0.27), (0.35, 0.37, -0.01, 0.31),
+               (0.50, 0.39, 0.00, 0.32), (0.65, 0.40, 0.02, 0.31), (0.80, 0.40, 0.04, 0.30),
+               (0.95, 0.37, 0.05, 0.28), (1.05, 0.31, 0.06, 0.23), (1.11, 0.20, 0.07, 0.14),
+               (1.145, 0.0, 0.07, 0.0)),
+    # A banana has five flat sides with their edges rounded off: points across each side (degrees each side
+    # of its middle), the edge between two sides being the rest of its 72 degrees. A dragon is round.
+    "FACETS": (5, (-30.0, -15.0, 0.0, 15.0, 30.0)),
+    "ROUND": 20,
+    # The colours of the banana by height, from the top: green over the head, yellow round the face, deeper
+    # to orange at the feet, as the pictures run (#37, #154, #187).
+    "BANDS": ((1.12, "Green"), (0.70, "Hood"), (0.42, "Mid"), (-1.0, "Main")),
+    # The opening: the oval of the face this much of its dark line larger, the points round it; the
+    # collar from inside the head ("TUCK" of its size), out of it at "LIP" off the face, then over the
+    # volume: degrees further from the middle of the face than the opening, how far off the volume. The
+    # volume itself is open where the collar covers it: "CUT" degrees beyond the opening.
+    "OPENING": (0.6, 24),
+    "TUCK": 0.86,
+    "LIP": 0.020,
+    "COLLAR": ((4.0, 0.028), (14.0, 0.028), (26.0, 0.006)),
+    "CUT": 10.0,
+    # The stalk of the banana from its top, bending back: way, length and radius, its dark end.
+    "STALK": ((0.0, 0.75, 0.66), 0.090, 0.030, 0.016),
+    # The dragon: the light belly (its middle height, half width, half height), the horns round the face
+    # (where round the opening, as on #16, #42 and #773: degrees from the side of its left, counted up;
+    # length, radius), the nostrils on the top of the hood (degrees each side, polar degrees, radius), the
+    # dark "w" of its scales (where: from a point, a way), wings on its back and its tail.
+    "BELLY": (0.34, 0.20, 0.17),
+    "HORN_PLACES": (30.0, 150.0, 205.0, 335.0, 250.0, 290.0),
+    "HORN": (0.115, 0.040),
+    "NOSTRILS": (11.0, 24.0, 0.026),
+    "SCALES": (((0.0, 0.0, 0.81), (-0.40, -0.30, 0.86)), ((0.0, 0.0, 0.81), (0.42, -0.26, 0.87)),
+               ((0.0, 0.0, 0.81), (0.70, 0.25, 0.67)), ((0.0, 0.0, 0.81), (-0.72, 0.20, 0.66)),
+               ((0.0, 0.0, 0.81), (0.05, 0.75, 0.66)), ((0.0, 0.0, 0.40), (-0.86, -0.42, 0.10)),
+               ((0.0, 0.0, 0.40), (0.88, -0.38, -0.05)), ((0.0, 0.0, 0.30), (0.30, 0.95, 0.10))),
+    "SCALE": (0.034, 0.024, 0.006),
+    # The wings: where they leave the back (to the side, height), their way out (to the side, back, up),
+    # span, height, thickness.
+    # (First: out to the back and up, seen edge on from the camera of the game, two red spikes. A bat wing
+    # of the pictures shows its face from the front: it spreads to the side, its face turned ahead and up.)
+    # (Then: from the sides of the back, most of each wing inside the volume.)
+    "WING_ROOT": (0.14, 0.68),
+    "WING_WAY": (1.00, 0.40, 0.30),
+    "WING_UP": (0.0, 0.30, 0.95),
+    "WING_SIZE": (0.46, 0.32, 0.012),
+    # The tail from low on the back: places behind the back (to the side, behind, height), radii.
+    # (Then straight back from the bottom: seen end on from behind, a lump.) It curls round to the left of
+    # the character and up, so it shows beside the body from the front and from behind.
+    "TAIL": (((0.0, -0.05, 0.22), (0.0, 0.10, 0.16), (0.13, 0.22, 0.15), (0.25, 0.27, 0.22), (0.33, 0.26, 0.34),
+              (0.36, 0.22, 0.42)),
+             (0.095, 0.082, 0.066, 0.050, 0.034, 0.0)),
+    "CLAWS": (3, 0.045, 0.040, 0.016),    # on each boot: how many, apart, length, radius
+    "RIBS": (1, 3, 5),                    # the points of the edge of a wing its dark ribs run to
+    "ANKLES": (0.02, 0.16),               # the legs of the suit, from and to these heights
+    "OUTLINE_THICKNESS": 0.016,
+}
+# When the head turns (6 degrees running, 8 attacking, ChogBodyAnimator) the collar slides over the volume
+# by about 0.05 and in or out of it by 0.02: it covers the cut edge of the volume from 6 degrees inside it
+# to 16 beyond it, and stands 0.028 off it there.
+
+
+def mascot_axes(maker):
+    """From the axes of "Head" before the head is turned up to those of "Body", and back."""
+    from mathutils import Matrix
+    pitch = math.radians(maker.head.HEAD_PITCH_DEG)
+    middle = maker.surface.middle
+    neck = Z * full.NECK_HEIGHT
+    turn, back = Matrix.Rotation(-pitch, 3, "X"), Matrix.Rotation(pitch, 3, "X")
+    to_body = lambda point: neck + middle + turn @ (point - middle)
+    to_head = lambda point: middle + back @ (point - neck - middle)
+    return to_body, to_head, turn
+
+
+def mascot_rings(maker, shape):
+    """The rings of points of the volume, from the bottom up, and its top point when it closes on one."""
+    numbers = SimpleNamespace(**MASCOT)
+    rows = numbers.BANANA if shape == "banana" else numbers.DRAGON
+    if shape == "banana":
+        count, across = numbers.FACETS
+        directions = []
+        for facet in range(count):
+            for degrees in across:
+                delta = math.radians(degrees)
+                directions.append((math.radians(360.0 / count * facet) + delta, 1.0 / math.cos(delta) / 1.07))
+    else:
+        directions = [(2.0 * math.pi * index / numbers.ROUND, 1.0) for index in range(numbers.ROUND)]
+    rings, top = [], None
+    for height, half_width, behind, half_depth in rows:
+        if half_width <= 0.0:
+            top = Vector((0.0, behind, height))
+            continue
+        rings.append([Vector((math.sin(angle) * reach * half_width, behind - math.cos(angle) * reach * half_depth,
+                              height)) for angle, reach in directions])
+    return rings, top
+
+
+def build_mascot(maker):
+    """A whole costume (MASCOT): the sleeves of a suit, boots, the volume round the whole character with the
+    opening of the face, the collar on the head, and what the shape adds (the stalk of a banana; the belly,
+    horns, nostrils, scales, wings, tail and claws of a dragon)."""
+    import bmesh
+    from mathutils import Matrix
+    from mathutils.bvhtree import BVHTree
+    entry, surface, head = maker.entry, maker.surface, maker.head
+    numbers = SimpleNamespace(**MASCOT)
+    shape = entry["shape"]
+    build_track(maker)
+    torso = maker.parts[0][0]
+    # The shirt under the volume is never seen: only its sleeves stay.
+    torso.mesh.free()
+    torso.mesh, torso.outlined, torso.open_faces = bmesh.new(), [], []
+    # Under the volume only the ankles could show, behind the boots: a short leg of the suit over each.
+    body = maker.body
+    for sign in (1.0, -1.0):
+        hip = Vector((sign * body.LEG_HALF_SPACING, 0.0, body.LEG_TOP))
+        ankle = Vector((sign * (body.LEG_HALF_SPACING + body.LEG_STANCE), 0.0, 0.0))
+        across = X * (body.LEG_HALF_WIDTH + COSTUME["TROUSERS"])
+        deep = Y * (body.LEG_HALF_DEPTH + COSTUME["TROUSERS"])
+        torso.shell([(ankle + (hip - ankle) * (height / body.LEG_TOP), across, deep) for height in numbers.ANKLES], 8,
+                    torso.named("Main"), 0.0)
+    add_boots(maker, torso, torso.named("Main"), COSTUME["BOOTS"])
+    to_body, to_head, turn = mascot_axes(maker)
+    middle_body = to_body(surface.middle)
+
+    # The opening: the oval of the face, as add_face draws it, and the ways from the middle of the head
+    # through it; the middle of the face; a frame across the way the face looks.
+    share, points = numbers.OPENING
+    half_width = head.FACE_HALF_WIDTH + head.FACE_LINE * share
+    half_height = head.FACE_HALF_HEIGHT + head.FACE_LINE * share
+    rim = []
+    for index in range(points):
+        angle = 2.0 * math.pi * index / points
+        side = half_width * KIT.power(math.cos(angle), head.FACE_SQUARENESS)
+        up = half_height * KIT.power(math.sin(angle), head.FACE_SQUARENESS)
+        rim.append(surface.front(side * (1.0 + head.FACE_TAPER * up / half_height), up, 0.0))
+    looking = (surface.front(0.0, 0.0, 0.0) - surface.middle).normalized()
+    first, second = base.frame_across(looking, X)
+
+    def flat(way):
+        """A way from the middle of the head on a flat map round the face: its angle off the face, round it."""
+        way = way.normalized()
+        off = math.acos(max(-1.0, min(1.0, way.dot(looking))))
+        round_it = math.atan2(way.dot(second), way.dot(first))
+        return off * math.cos(round_it), off * math.sin(round_it)
+
+    def beyond(point, degrees):
+        """The way from the middle of the head through a point of the opening, turned "degrees" further off
+        the face."""
+        way = (point - surface.middle).normalized()
+        return Matrix.Rotation(math.radians(degrees), 3, looking.cross(way).normalized()) @ way
+
+    def inside(polygon, place):
+        x, y = place
+        crossings = False
+        for (x1, y1), (x2, y2) in zip(polygon, polygon[1:] + polygon[:1]):
+            if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
+                crossings = not crossings
+        return crossings
+
+    cut = [flat(beyond(point, numbers.CUT)) for point in rim]
+
+    # The volume, whole, to find its surface from inside; then built without what the collar covers.
+    rings, top = mascot_rings(maker, shape)
+    whole = bmesh.new()
+    whole_rows = [[whole.verts.new(point) for point in ring] for ring in rings]
+    count = len(rings[0])
+    for lower, upper in zip(whole_rows, whole_rows[1:]):
+        for index in range(count):
+            after = (index + 1) % count
+            whole.faces.new((lower[index], lower[after], upper[after], upper[index]))
+    whole.faces.new(list(reversed(whole_rows[0])))
+    if top is not None:
+        apex = whole.verts.new(top)
+        for index in range(count):
+            whole.faces.new((whole_rows[-1][index], whole_rows[-1][(index + 1) % count], apex))
+    else:
+        whole.faces.new(whole_rows[-1])
+    whole.normal_update()      # the tree gives the normals of the faces: without this they are all zero
+    tree = BVHTree.FromBMesh(whole)
+
+    def on_volume(origin, way, lift):
+        """Where a line from inside the volume leaves it, "lift" off it, and the way out there."""
+        hit, normal, _, _ = tree.ray_cast(origin, way.normalized(), 5.0)
+        if hit is None or normal.length < 0.5:
+            raise SystemExit(f"CHOG_TRAITS {maker.prefix}: a line from {tuple(origin)} does not leave the volume")
+        if normal.dot(way) < 0.0:
+            normal = -normal
+        return hit + normal * lift, normal
+
+    mesh = torso.mesh
+    rows = [[mesh.verts.new(point) for point in ring] for ring in rings]
+    faces, left_open, axes = [], 0, {}
+    middles = [sum(ring, Vector()) / len(ring) for ring in rings]
+    for (lower, upper), low_middle, high_middle in zip(zip(rows, rows[1:]), middles, middles[1:]):
+        for index in range(count):
+            after = (index + 1) % count
+            corners = (lower[index], lower[after], upper[after], upper[index])
+            centre = sum((corner.co for corner in corners), Vector()) / 4.0
+            if inside(cut, flat(to_head(centre) - surface.middle)):
+                left_open += 1
+                continue
+            face = mesh.faces.new(corners)
+            faces.append(face)
+            axes[face] = (low_middle + high_middle) * 0.5
+    faces.append(mesh.faces.new(list(reversed(rows[0]))))
+    if top is not None:
+        apex = mesh.verts.new(top)
+        faces += [mesh.faces.new((rows[-1][index], rows[-1][(index + 1) % count], apex)) for index in range(count)]
+    else:
+        faces.append(mesh.faces.new(rows[-1]))
+    for vertex in [vertex for vertex in mesh.verts if not vertex.link_faces]:
+        mesh.verts.remove(vertex)
+    if not left_open:
+        raise SystemExit(f"CHOG_TRAITS {maker.prefix}: the opening of the face cuts nothing out of the volume")
+    for face in faces:
+        face.smooth = shape != "banana"
+        face.normal_update()
+        if face in axes and face.normal.dot(face.calc_center_median() - axes[face]) < 0.0:
+            raise SystemExit(f"CHOG_TRAITS {maker.prefix}: a face of the volume looks inwards")
+    if shape == "banana":
+        for face in faces:
+            height = face.calc_center_median().z
+            torso.paint([face], torso.named(next(name for below, name in numbers.BANDS if height > below)))
+    else:
+        torso.paint(faces, torso.named("Main"))
+    torso.open_faces.extend(faces)
+    torso.outlined.append((faces, numbers.OUTLINE_THICKNESS, None))
+
+    # The collar, on the head: inside the head at the opening, out of it just off the face, then over the
+    # volume round the opening.
+    collar = maker.part(on="Head")
+    loops = [[surface.middle + (point - surface.middle) * numbers.TUCK for point in rim],
+             [point + head_normal_at(surface, point) * numbers.LIP for point in rim]]
+    for degrees, lift in numbers.COLLAR:
+        loops.append([to_head(on_volume(middle_body, turn @ beyond(point, degrees), lift)[0]) for point in rim])
+    collar_mesh = collar.mesh
+    collar_rows = [[collar_mesh.verts.new(point) for point in loop] for loop in loops]
+    bands = []
+    for lower, upper in zip(collar_rows, collar_rows[1:]):
+        band = [collar_mesh.faces.new((lower[index], lower[(index + 1) % points], upper[(index + 1) % points],
+                                       upper[index])) for index in range(points)]
+        bands.append(band)
+    collar_faces = [face for band in bands for face in band]
+    for face in collar_faces:
+        face.smooth = True
+        face.normal_update()
+    probe = bands[-1][0]
+    if probe.normal.dot(probe.calc_center_median() - surface.middle) < 0.0:
+        for face in collar_faces:
+            face.normal_flip()
+    if shape == "banana":
+        for face in collar_faces:
+            height = to_body(face.calc_center_median()).z
+            collar.paint([face], collar.named(next(name for below, name in numbers.BANDS if height > below)))
+    else:
+        collar.paint(collar_faces, collar.named("Hood"))
+    shares = {}
+    for row, share_of_row in zip(collar_rows, (0.0, 1.0, 0.6, 0.3, 0.0)):
+        for vertex in row:
+            shares[vertex] = share_of_row
+    collar.open_faces.extend(collar_faces)
+    collar.outlined.append((collar_faces, numbers.OUTLINE_THICKNESS, shares))
+
+    if shape == "banana":
+        way, length, radius, end = numbers.STALK
+        way = Vector(way).normalized()
+        tip_middle = sum(rings[-1], Vector()) / len(rings[-1])
+        torso.shell(base.tube_rings(tip_middle - way * 0.02, way, X, ((0.0, radius), (length * 0.6, radius * 0.92),
+                                                                       (length, radius * 0.86))),
+                    7, torso.named("Stem"), numbers.OUTLINE_THICKNESS * 0.8)
+        torso.shell(base.tube_rings(tip_middle + way * (length - 0.004), way, X, ((0.0, radius * 0.80), (end, radius * 0.7))),
+                    7, torso.named("Tip"), numbers.OUTLINE_THICKNESS * 0.6)
+        return
+
+    # The dragon.
+    belly_height, belly_wide, belly_tall = numbers.BELLY
+    centre = Vector((0.0, 0.0, belly_height))
+    belly = [[on_volume(centre, -Y, 0.005)[0]]]
+    for ring in (1, 2, 3):
+        loop = []
+        for index in range(16):
+            angle = 2.0 * math.pi * index / 16
+            aim = Vector((belly_wide * ring / 3 * math.cos(angle), -0.30, belly_tall * ring / 3 * math.sin(angle)))
+            loop.append(on_volume(centre, aim, 0.005)[0])
+        belly.append(loop)
+    full.add_skin(torso, SimpleNamespace(middle=centre), belly, torso.named("Belly"))
+    side_deg, polar_deg, radius = numbers.NOSTRILS
+    for sign in (1.0, -1.0):
+        aim = Matrix.Rotation(math.radians(sign * side_deg), 3, "Z") @ Vector(
+            (0.0, -math.sin(math.radians(polar_deg)), math.cos(math.radians(polar_deg))))
+        place, out = on_volume(middle_body, aim, 0.004)
+        disc_on(torso, SimpleNamespace(middle=middle_body), place, out, radius, torso.named("Nostril"), segments=10)
+    wide, tall, thick = numbers.SCALE
+    for origin, aim in numbers.SCALES:
+        origin = Vector(origin)
+        place, out = on_volume(origin, Vector(aim), 0.0)
+        along = out.cross(Z if abs(out.dot(Z)) < 0.9 else Y).normalized()
+        up = out.cross(along).normalized()
+        if up.dot(Z) < 0.0:
+            up = -up
+        path = []
+        for step_side, step_up in ((-1.0, 1.0), (-0.5, -1.0), (0.0, 0.25), (0.5, -1.0), (1.0, 1.0)):
+            target = place + along * wide * step_side + up * tall * step_up * 0.5
+            path.append(on_volume(origin, target - origin, 0.006)[0])
+        widths, depths = [], []
+        for index, point in enumerate(path):
+            ahead = path[min(index + 1, 4)] - path[max(index - 1, 0)]
+            widths.append(out.cross(ahead).normalized() * thick)
+            depths.append(out * 0.003)
+        slab(torso, path, widths, depths, torso.named("Scale"), 0.0, sides=4)
+    side_at, height = numbers.WING_ROOT
+    to_side, to_back, to_up = numbers.WING_WAY
+    span, wing_tall, wing_thick = numbers.WING_SIZE
+    for sign in (1.0, -1.0):
+        origin = Vector((0.0, 0.0, height))
+        root, _ = on_volume(origin, Vector((sign * side_at, 0.40, 0.0)), -0.020)
+        out = Vector((sign * to_side, to_back, to_up)).normalized()
+        up = Vector(numbers.WING_UP).normalized()
+        up = (up - out * up.dot(out)).normalized()
+        edge = [root, root + out * span + up * wing_tall * 0.6, root + out * span * 0.95,
+                root + out * span * 0.62 + up * wing_tall * 0.05, root + out * span * 0.45 - up * wing_tall * 0.15,
+                root + out * span * 0.28 - up * wing_tall * 0.02, root + out * span * 0.12 - up * wing_tall * 0.22]
+        normal = out.cross(up).normalized()
+        KIT.add_loops(torso, [[point - normal * wing_thick for point in edge], [point + normal * wing_thick for point in edge]],
+                      torso.named("Wing"), numbers.OUTLINE_THICKNESS)
+        for index in numbers.RIBS:
+            reach = edge[index] - root
+            rib_way = reach.normalized()
+            slab(torso, [root + rib_way * 0.03, root + reach * 0.96], [normal.cross(rib_way).normalized() * 0.007] * 2,
+                 [normal * (wing_thick + 0.004)] * 2, torso.named("Rib"), 0.0, sides=4)
+    places, radii = numbers.TAIL
+    back_point, _ = on_volume(Vector((0.0, 0.0, places[0][2])), Y, 0.0)
+    tail_points = [Vector((x, back_point.y + behind, z)) for x, behind, z in places]
+    tail_rings = []
+    for index, (point, tail_radius) in enumerate(zip(tail_points, radii)):
+        ahead = tail_points[min(index + 1, len(tail_points) - 1)] - tail_points[max(index - 1, 0)]
+        across_first, across_second = base.frame_across(ahead, X)
+        tail_rings.append((point, across_first * tail_radius, across_second * tail_radius) if tail_radius > 0.0
+                          else (point, Vector(), Vector()))
+    torso.shell(tail_rings, 7, torso.named("Main"), numbers.OUTLINE_THICKNESS)
+    for index in (1, 2, 3, 4):
+        point, tail_radius = tail_points[index], radii[index]
+        torso.shell(base.tube_rings(point + Z * tail_radius * 0.7, Vector((0.0, -0.3, 1.0)), X,
+                                    ((0.0, 0.032), (0.070, 0.0))), 4, torso.named("Horn"), numbers.OUTLINE_THICKNESS * 0.6)
+    claws, apart, claw_length, claw_radius = numbers.CLAWS
+    body = maker.body
+    for sign in (1.0, -1.0):
+        ankle = Vector((sign * (body.LEG_HALF_SPACING + body.LEG_STANCE), 0.0, 0.0))
+        toes = Matrix.Rotation(math.radians(body.FOOT_TOE_OUT_DEG) * sign, 3, "Z") @ -Y
+        heel = ankle - toes * body.FOOT_HEEL_BACK * COSTUME["BOOTS"]
+        front = heel + toes * body.FOOT_LENGTH * COSTUME["BOOTS"] * 0.97 + Z * body.FOOT_HEIGHT * 0.30
+        across = toes.cross(Z).normalized()
+        for index in range(claws):
+            offset = (index - (claws - 1) * 0.5) * apart
+            torso.shell(base.tube_rings(front + across * offset - toes * 0.012, toes, Z,
+                                        ((0.0, claw_radius), (claw_length, 0.0))), 5, torso.named("Horn"),
+                        numbers.OUTLINE_THICKNESS * 0.5)
+    # The horns round the face, on the collar: from its middle row, out along the volume, away from the face.
+    horn_length, horn_radius = numbers.HORN
+    for degrees in numbers.HORN_PLACES:
+        index = int(round(degrees / 360.0 * points)) % points
+        root = loops[3][index]
+        outer = loops[4][index]
+        lift_way = (root - surface.middle).normalized()
+        way = ((outer - root).normalized() * 0.75 + lift_way * 0.60).normalized()
+        collar.shell(base.tube_rings(root - way * 0.020, way, lift_way.cross(way), (
+            (0.0, horn_radius), (horn_length * 0.55, horn_radius * 0.70), (horn_length, horn_radius * 0.12))), 6,
+            collar.named("Horn"), numbers.OUTLINE_THICKNESS * 0.8)
+
+
+def head_normal_at(surface, point):
+    """The way out of the egg of the head at a point on it."""
+    local = point - surface.middle
+    half = surface.half
+    return Vector((local.x / half.x ** 2, local.y / half.y ** 2, local.z / half.z ** 2)).normalized()
 
 
 ASTRO = {
@@ -2367,7 +2606,7 @@ def build_duck_float(maker):
 
 
 CLOTH_KINDS = {"Jacket": build_jacket, "Track": build_track, "Hoodie": build_hoodie, "Costume": build_costume,
-               "Astro": build_astro, "DuckFloat": build_duck_float}
+               "Astro": build_astro, "DuckFloat": build_duck_float, "Mascot": build_mascot}
 
 
 def shade(colour, amount=0.68):
@@ -2628,19 +2867,21 @@ CLOTHES.update({
     "Shark Suit": costume((0.27, 0.71, 0.92), {"Hood": (0.27, 0.71, 0.92), "Rim": (0.23, 0.55, 0.80),
                                                "Belly": (0.92, 0.95, 0.97), "Tooth": (0.97, 0.97, 0.97)},
                           teeth=True, fin=True),
-    # A banana: yellow, its point rising over the head, a green stalk at the tip.
-    # (16 October 2026: the suit deeper orange than the hood, as the pictures run from yellow at the top to
-    # orange below; ridges down the skin, the tip bending back.)
-    "Banana suit": costume((0.95, 0.56, 0.05), {"Hood": (0.98, 0.72, 0.08), "Rim": (0.89, 0.53, 0.05),
-                                                "Tip": (0.36, 0.26, 0.10), "Ridge": (0.80, 0.48, 0.04)}, peak=True,
-                           peel=True, boots=True),
-    # A red dragon: tan belly and horns, small wings on the back; since 16 October 2026 cream fangs round
-    # the face, nostrils on the snout and a tail.
-    "Dragon suit": costume((0.92, 0.27, 0.17), {"Hood": (0.92, 0.27, 0.17), "Rim": (0.76, 0.19, 0.11),
-                                                "Belly": (0.95, 0.70, 0.46), "Horn": (0.95, 0.76, 0.50),
-                                                "Wing": (0.66, 0.13, 0.10), "Tooth": (0.97, 0.90, 0.72),
-                                                "Nostril": (0.30, 0.06, 0.05)},
-                           horns=True, wings=True, fangs=True, nostrils=True, tail=True, snout=True, boots=True),
+    # A whole banana round the whole Chog (build_mascot, 16 October 2026, after the owner saw a hood over a
+    # suit twice): its five sides from yellow round the face to orange at the feet, green over the head, its
+    # stalk at the top; colours measured on #37 (until then a hood with a point over a faceted peel).
+    "Banana suit": {**costume((0.93, 0.56, 0.04), {"Mid": (0.98, 0.64, 0.08), "Hood": (1.00, 0.71, 0.11),
+                                                   "Green": (0.55, 0.66, 0.10), "Stem": (0.40, 0.36, 0.10),
+                                                   "Tip": (0.20, 0.14, 0.06)}),
+                    "kind": "Mascot", "shape": "banana"},
+    # A whole red dragon (build_mascot): its round body as wide as the head, a light belly, tan horns round
+    # the face, the nostrils on top, dark scales, wings, a tail and claws; colours measured on #16 (until
+    # then a hood with fangs and a snout over a suit).
+    "Dragon suit": {**costume((0.96, 0.31, 0.21), {"Hood": (0.96, 0.31, 0.21), "Belly": (1.00, 0.76, 0.52),
+                                                   "Horn": (0.96, 0.82, 0.46), "Wing": (0.74, 0.16, 0.11),
+                                                   "Nostril": (0.30, 0.06, 0.05), "Scale": (0.80, 0.18, 0.12),
+                                                   "Rib": (0.50, 0.08, 0.06)}),
+                    "kind": "Mascot", "shape": "dragon"},
     # The space suit: white, grey stripes down the sleeves, the ring of the helmet around the face. Its
     # glass is not drawn; the pictures show the crown inside it, so the crown stays.
     "Astro Suit": {"kind": "Astro", "colours": {"Main": (0.90, 0.88, 0.84), "Collar": (0.70, 0.70, 0.72),
@@ -2679,7 +2920,13 @@ MUMMY_WRAP = {
     "BAND": (0.034, 0.012, 0.007),
     "CROSS": ((80.0, 0.60), (-80.0, 0.33)),       # (degrees round from the front, height) of its two ends
     "WAIST": 0.315,
-    "JAW": (116.0, 1.13, 0.046),                  # polar degrees of its middle, size against the head, half width (128 at first: under the teeth)
+    # Round the jaw (16 October 2026, the owner: "still badly made on the head"; until then one ring 13 % larger
+    # than the head, which stood off it like a flange): tight on the skull over the upper teeth, under the
+    # nose, as on #552 and #816. The height of its middle on the face, its half width, how far off the head
+    # at the front (over the teeth, drawn 0.031 off it) and at the back; a second turn over the first,
+    # tilted (degrees), a little narrower.
+    "JAW": (-0.080, 0.032, 0.040, 0.012),
+    "JAW_TURN": (7.0, 0.80, 0.008),
     "STATIONS": 13,
 }
 
@@ -2717,16 +2964,24 @@ def build_mummy(maker):
               for step in range(numbers.STATIONS)])
     band([around_torso(-180.0 + 360.0 * step / 16, numbers.WAIST) for step in range(17)])
 
-    # Round the jaw, over the teeth, narrowed with the skull's jaw (narrow_jaw).
+    # Round the jaw, then narrowed with the skull's jaw (narrow_jaw), as the head is.
     head = maker.part()
-    polar_deg, larger, half_band = numbers.JAW
-    rows = []
-    for edge in (-1.0, 1.0):
-        polar = math.radians(polar_deg) + edge * half_band / surface.half.z
-        rows.append([on_head(surface, 2.0 * math.pi * step / 20, polar, larger) for step in range(20)])
-    KIT.add_loops(head, [rows[0], [point + (point - surface.middle).normalized() * 0.012 for point in rows[0]],
-                         [point + (point - surface.middle).normalized() * 0.012 for point in rows[1]], rows[1]],
-                  head.named("Wrap"), 0.008)
+    up, half_band, front_lift, back_lift = numbers.JAW
+    tilt_deg, narrower, over = numbers.JAW_TURN
+    height = maker.head.FACE_MIDDLE[1] + up
+    middle_polar = math.acos(max(-1.0, min(1.0, height / surface.half.z)))
+    steps = 24
+    for tilt, wide, extra in ((0.0, 1.0, 0.0), (math.radians(tilt_deg), narrower, over)):
+        rows = [[], [], [], []]
+        for step in range(steps):
+            angle = 2.0 * math.pi * step / steps
+            facing = math.cos(math.radians(from_front(angle)))
+            lift = back_lift + (front_lift - back_lift) * max(0.0, facing) ** 0.6 + extra
+            polar = middle_polar - tilt * math.sin(angle)     # the second turn lower at the front
+            for row, (edge, off) in enumerate(((-1.0, -0.004), (-1.0, lift), (1.0, lift), (1.0, -0.004))):
+                here = polar + edge * half_band * wide / surface.half.z
+                rows[row].append(on_head(surface, angle, here, 1.0) + head_normal(surface, angle, here) * off)
+        KIT.add_loops(head, rows, head.named("Wrap"), 0.008)
     bases.narrow_jaw(head, maker.head)
 
 
