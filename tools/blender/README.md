@@ -638,6 +638,12 @@ branch writes to a scratch file). The owner says yes or no first.
   hands and feet are bone, not the pink mittens of a Chog (`bone_hands`), so a skeleton's arms are their own
   parts in the export (`("rest", "armLeft", "Skull")`). Front, bust, side and game views:
   `research/evidence/chog-traits-batch7-skull-jaw-2026-10-16.jpg`.
+- **The branch's library, 16 October:** exported again with the horns, the jaw and the bone hands, 1,959
+  Genesis built or checked (`--check 5000`), all matching their parts; the view tests of the branch pass on
+  it (84). Seen in the game in a preview build made on the local network only (the game's own library
+  was put back right after): skulls with bone hands and jaws, radioactive Chogs with their curled horns,
+  close and from the game's camera (`research/evidence/chog-traits-batch7-in-game-preview-headless-2026-10-16.png`).
+  To put batch 7 in the game after a yes: merge this branch, build (the library is already exported here).
 - **The ram horns, made again (16 October):** they were small nubs beside the pictures. Now (`RAM_HORN` of
   `chog_trait_bases.py`) each is as thick at its root as a sixth of the head, rises over the crown and
   curls out to the side and down, a little to the back, its rings drawn as ridges, as on CHOG #275, #473,
