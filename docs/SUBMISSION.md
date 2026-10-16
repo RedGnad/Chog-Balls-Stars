@@ -22,8 +22,10 @@ submitting. Character counts are for the 8,000-character fields.
 > own cap spinning like a frisbee from a word cap, a leaf of its spiky crown when it wears nothing.
 > Matches are played on Photon Quantum's deterministic engine; after each match our services replay
 > the recorded inputs to decide the winner themselves, so a result can be trusted with $CHOG at
-> stake. A holder can also lend their Genesis with a link, without moving it, and **[not yet]** rent
-> it out for $CHOG.
+> stake. Each Genesis keeps a public career that follows the NFT, not the wallet (matches, wins,
+> badges, mastery; mastery 2 unlocks the second form of its special), and the Genesis with the most
+> wins are listed in TOP GENESIS on the menu. A holder can also lend their Genesis with a link, without
+> moving it, and **[not yet]** rent it out for $CHOG.
 
 ## 02 Show it
 
@@ -61,8 +63,9 @@ submitting. Character counts are for the 8,000-character fields.
 
 ## 05 Under the hood (and pre-existing work to declare)
 
-- Built on Photon's Quantum 3 Twin Stick Shooter sample (its map, its controls, its bots and its menu
-  framework, restyled), with its Cartoon FX assets still used for some effects.
+- Built on Photon's Quantum 3 Twin Stick Shooter sample (its map, recoloured in the Chog night, its
+  controls, its bots and its menu framework, restyled), with its Cartoon FX assets still used for some
+  effects.
 - Fonts Koulen and Convergence (SIL Open Font License), as on chog.xyz.
 - Written during the hackathon: the Genesis catalogue and trait rules, the 3D heroes and attack
   objects (Blender scripts), the services and the judge, the contracts, the screens, the structures
