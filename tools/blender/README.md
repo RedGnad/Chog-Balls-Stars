@@ -605,9 +605,15 @@ branch writes to a scratch file). The owner says yes or no first.
   yet in the export: the game draws one colour per material; the gradient needs a colour role that the game
   computes from the height of each point (a change of `ChogPartsLibrary` and `ChogHeroModel`).
   Sheets: `research/evidence/chog-traits-batch7-radioactive-2026-10-15.png`.
-- **Still wrong:** the ram horns are smaller than drawn; the skull keeps the round head of a Chog where the
-  pictures draw a skull with a narrower jaw; Red Bandana is not modelled; the ten 1:1 Genesis keep the
-  earlier look.
+- **Still wrong:** the skull keeps the round head of a Chog where the pictures draw a skull with a narrower
+  jaw; Red Bandana is not modelled; the ten 1:1 Genesis keep the earlier look.
+- **The ram horns, made again (16 October):** they were small nubs beside the pictures. Now (`RAM_HORN` of
+  `chog_trait_bases.py`) each is as thick at its root as a sixth of the head, rises over the crown and
+  curls out to the side and down, a little to the back, its rings drawn as ridges, as on CHOG #275, #473,
+  #672, #1067, #1200 (Red Horn) and #31, #1745 (Purple Horn). A first try curled them back, hidden from the
+  front. Seen from the front, the side, behind and the game's angle:
+  `research/evidence/chog-traits-batch7-ram-horns-2026-10-16.jpg`. #31 dressed: 7,519 triangles (limit
+  8,000). The library of the branch is not exported again yet: it will be at the merge.
 
 Batch 7 in the game, as a preview only (15 October, 23:59): the export of this branch with the Radioactive
 base (format 5: its skins run from their colour at the feet to a lighter one at the top) covers 1,959

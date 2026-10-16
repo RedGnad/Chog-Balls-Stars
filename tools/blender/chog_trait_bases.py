@@ -13,6 +13,7 @@ the cream face, add_skull_face(); the body gets add_ribs(). The colours are SKUL
 """
 
 import math
+from types import SimpleNamespace
 
 from mathutils import Vector
 
@@ -201,25 +202,45 @@ def _out(surface, side, up):
     return (surface.front(side, up, 0.01) - surface.front(side, up, 0.0)).normalized()
 
 
+RAM_HORN = {
+    # Read on CHOG #275, #473, #672, #1067, #1200 (Red Horn) and #31, #1745 (Purple Horn): each horn is
+    # about as thick at its root as a sixth of the head, rises well above the crown, then curls out to the
+    # side and down, a little to the back; its rings show as ridges. (First: a curl of 0.08 and a thickness
+    # of 0.046, small horns beside the pictures; then curled back, hidden from the front.)
+    "CURL": 0.125,            # radius of the curl where it starts; it tightens to TIGHTEN of it at the tip
+    "TIGHTEN": 0.62,
+    "SWEEP_DEG": 205.0,       # how far it turns, from straight up
+    "THICK": 0.078,           # half its thickness at the root
+    "TIP": 0.34,              # share of THICK left at the tip
+    "OUT": 0.10,              # how far the tip drifts out, sideways
+    "BACK": 0.35,             # the curl goes out to the side, turned this much towards the back
+    "RIDGES": 22,
+}
+
+
 def build_ram_horns(maker):
-    """Two horns from the top of the head, curling back, down and forward beside it."""
+    """Two big ridged horns from the top of the head, rising up, then curling out to the side and down, as
+    the pictures draw them (RAM_HORN)."""
+    numbers = SimpleNamespace(**RAM_HORN)
     for side in (1.0, -1.0):
         part = maker.part()
-        root = maker.surface.towards(Vector((0.62 * side, 0.0, 0.78)).normalized())
-        radius0 = 0.080
-        centre = root - Z * radius0 + X * side * 0.01
+        root = maker.surface.towards(Vector((0.50 * side, -0.06, 0.86)).normalized()) - Z * 0.02
+        back = (X * side + Y * numbers.BACK).normalized()
+        centre = root + back * numbers.CURL
+        across = back.cross(Z).normalized()     # square to the plane of the curl
+        sweep = math.radians(numbers.SWEEP_DEG)
         rings = []
-        for step in range(15):
-            t = step / 14.0
-            angle = t * 1.15 * math.pi
-            r = radius0 * (1.0 - 0.45 * t)
-            point = centre + Z * r * math.cos(angle) + Y * r * math.sin(angle) + X * side * (0.15 * t)
-            ahead = -Z * math.sin(angle) + Y * math.cos(angle) + X * side * 0.15
-            first, second = base.frame_across(ahead, X)
-            thick = 0.046 * (1.0 - 0.70 * t) * (1.08 if step % 2 == 0 else 0.94)
+        for step in range(numbers.RIDGES + 1):
+            t = step / numbers.RIDGES
+            angle = t * sweep
+            r = numbers.CURL * (1.0 - (1.0 - numbers.TIGHTEN) * t)
+            point = centre - back * r * math.cos(angle) + Z * r * math.sin(angle) + X * side * numbers.OUT * t * t
+            ahead = (back * math.sin(angle) + Z * math.cos(angle) + X * side * numbers.OUT * 2.0 * t).normalized()
+            first, second = base.frame_across(ahead, across)
+            thick = numbers.THICK * (1.0 - (1.0 - numbers.TIP) * t) * (1.12 if step % 2 == 0 else 0.88)
             rings.append((point, first * thick, second * thick))
-        rings.append((rings[-1][0] + (rings[-1][0] - rings[-2][0]) * 0.6, Vector(), Vector()))
-        part.shell(rings, 8, part.named("Horn"), 0.012)
+        rings.append((rings[-1][0] + (rings[-1][0] - rings[-2][0]) * 0.7, Vector(), Vector()))
+        part.shell(rings, 10, part.named("Horn"), 0.012)
 
 
 def build_ridged_horns(maker):
