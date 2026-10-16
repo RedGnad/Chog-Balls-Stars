@@ -502,6 +502,25 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**16 October 2026, 18:45 (the owner played a match, validated the 3D, and found the game unplayable with
+a mouse and keyboard).**
+- **Batch 11 merged and in the game** (build `20261016T162441148Z`, seen in the build with `?heroes=`); all
+  checks pass (85 view tests, 31 simulation, services, 58 contract tests, the judge replays both fixtures).
+  Render serves it since 18:30 (the push deployed it; the docs push before it was the last one that deploys
+  without touching the image, `buildFilter` in `render.yaml`).
+- **Photon half switched:** the owner's match (18:19 to 18:29) asked Render who the player was (the Mac got
+  no `photon/auth`), but its record still went to the Mac (`photon/hook/...` in
+  `.artifacts/services-public/public.log`): `WebHookBaseUrl` still names the tunnel. Until it names Render, a
+  staked match started on Render cannot be settled there (refund after an hour).
+- **Why a computer cannot play** (seen in a scripted desktop run, headless Chrome without touch emulation,
+  `.artifacts/unity/check-desktop-1/`): the touch layout shows on a desktop page, because
+  `MobileButtonsManager` shows it whenever `Touchscreen.current` exists, and Unity's web player reports one
+  there; and `CombatInputReader` ignores the mouse buttons and the pointer's aim whenever that layout is
+  shown (written so that a finger on a stick does not also count as a click). W A S D moves; clicking does
+  nothing. Not changed yet: the owner asked how professional games do it first.
+**Next action:** the owner's choice on desktop controls; `WebHookBaseUrl` on Render; the cron; the session
+with #1287 on Render.
+
 **16 October 2026, 18:10 (the owner created the Render service from the Blueprint and added its domain at
 Reown).**
 - **Render live:** `https://chog-genesis-game.onrender.com` (the name asked in `render.yaml`, no suffix, so
