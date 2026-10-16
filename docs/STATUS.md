@@ -502,6 +502,31 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**16 October 2026, 20:30 (desktop controls, the owner's first session with #1287 on Render, MetaMask's block).**
+- **Desktop controls on Render** (build `20261016T182139759Z`): the sticks show only while a finger is used
+  (`ControlModeWatcher`, rule `ControlModeRule` in `Chog.Match`, tested); on a computer a panel names the
+  keys and fills with the energy and the special's charge (`ChogDesktopControls`); Space fires the special.
+  A mouse attack leaves on the press: decided in the simulation (`QuantumDemoInputTopDown.User.cs`: the
+  unused `Dash` button carries "aimed with a pointer"; older records carry it up and the judge still agrees
+  on both fixtures). Checked on Render with Metal drawing (`CHOG_BROWSER_GPU=1`) and the probe `CHOG_PROBE`
+  (`?perf=1`): a held click near or far attacks, also while W is held. The run that held D first and clicked
+  later saw the server replace the late inputs (`ReplacedByServer`) and repeat the walk: taken as the scripted
+  browser's lag, not seen by a person yet. Not verified: Space, a click held for more than one attack (one
+  attack per press for now).
+- **The owner played as a recruit with #1287 chosen**: the services only let a signed-in wallet play its
+  Genesis, and the button only spoke of a career. Now the signature is asked right after connecting, the button
+  reads SIGN IN TO PLAY IT, and the recruit note says "connect ... and sign in" (checked on Render with a
+  stand-in wallet: asked at once). The owner bought the second form of #1287 with the Ledger (100 $CHOG); the
+  form button now says FIRST FORM / SECOND FORM. A recruit gets no class buttons (one character).
+- **MetaMask blocks the Render address**: any unknown subdomain of `onrender.com` and other free hosts
+  (DEPLOY.md, "MetaMask's site scan"). Needs a domain of our own.
+- **The Mac's public instance, local services and test server stopped**: Photon's hooks and sign-in now go to
+  Render, so a local build can only be tried there (a build must equal Render's to enter a match).
+- **The disk filled twice** (swap reached 9 GB with the Editor and the browsers): old builds pruned, old renders
+  and browser profiles deleted by the owner.
+**Next action:** the owner's domain for MetaMask; their session with #1287 signed in; which screen they find
+messy; recording the video.
+
 **16 October 2026, 18:45 (the owner played a match, validated the 3D, and found the game unplayable with
 a mouse and keyboard).**
 - **Batch 11 merged and in the game** (build `20261016T162441148Z`, seen in the build with `?heroes=`); all
