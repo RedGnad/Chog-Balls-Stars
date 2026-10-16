@@ -38,7 +38,28 @@ SKULL_SKINS = {
 
 # The face of a skull, against the middle of the face of H3 (to the side, above), as add_face places
 # its parts: the teeth where the mouth would be, wider; the nose hole between the eyes and the teeth.
-TEETH = {"MIDDLE_UP": -0.094, "HALF_WIDTH": 0.108, "HALF_HEIGHT": 0.038, "COUNT": 6, "GAP": 0.007}
+# The teeth, read again on the Skull pictures (CHOG #81, #846, #1079, #1313) and the Radioactive ones (#275,
+# #343, #1134, #1187) on 16 October 2026, when the owner asked for jaws and teeth that read as a skull's
+# (until then six square teeth in a small dark band). A skull grins with two rows of rounded teeth on a
+# dark mouth, the upper row larger, and a dark crack runs from its corner up the cheek on the near side.
+# A radioactive Chog shows one row of teeth drawn in dark lines on its skin, along the line of its jaw.
+# Places in the coordinates of the face (to the side, above its middle), before a skull's jaw is narrowed
+# (narrow_jaw), which brings these rows in by about a third.
+TEETH = {
+    "UPPER": (-0.086, 0.188, 0.031, 7),     # middle height, half width of the row, half height of a tooth, count
+    "LOWER": (-0.139, 0.160, 0.022, 6),
+    "GAP": 0.009,                            # between two teeth of a row
+    "MOUTH": (-0.112, 0.204, 0.064),         # the dark behind them: middle height, half width, half height
+    "CRACK": ((0.198, -0.100), (0.222, -0.076), (0.238, -0.050), (0.244, -0.026)),
+    "CRACK_THICK": (0.011, 0.009, 0.006, 0.003),
+    # The radioactive row: middle height, half width, half height, count, and the dark line around each.
+    "GLOW_ROW": (-0.100, 0.150, 0.024, 6),
+    "GLOW_LINE": 0.005,
+    # The jaw under that row, as a dark line: places, and its thickness.
+    "JAW_LINE": ((-0.205, -0.050), (-0.180, -0.120), (-0.120, -0.162), (0.0, -0.178), (0.120, -0.162),
+                 (0.180, -0.120), (0.205, -0.050)),
+    "JAW_THICK": 0.006,
+}
 NOSE = {"UP": -0.035, "HALF_WIDTH": 0.020, "HALF_HEIGHT": 0.016}
 
 # Ribs: how many, from which height of the torso to which (shares of its height), how far around the
@@ -50,11 +71,13 @@ RIBS = {"COUNT": 5, "FROM": 0.34, "TO": 0.80, "SPREAD_DEG": 64.0, "THICK": 0.014
 # top to a deeper bottom as if lit from inside (the "Skin" value: Green, Blue, Multi Colored, Red), no
 # cream face, the teeth and nose of a skull showing on the lower face, the ribs through the body, and
 # eyes that glow in a pale tint of the skin. (bottom, top) colours, read on their pictures.
+# (Pushed further apart on 16 October 2026, the owner finding the run of colour faint on some: the bottoms
+# deeper, the tops lighter, as the pictures glow.)
 RADIOACTIVE_SKINS = {
-    "Green": ((0.30, 0.78, 0.22), (0.92, 0.98, 0.30)),
-    "Blue": ((0.16, 0.48, 0.90), (0.48, 0.93, 0.98)),
-    "Multi Colored": ((0.42, 0.86, 0.42), (0.98, 0.56, 0.84)),
-    "Red": ((0.86, 0.22, 0.42), (0.99, 0.58, 0.72)),
+    "Green": ((0.20, 0.70, 0.14), (0.96, 1.00, 0.34)),
+    "Blue": ((0.10, 0.40, 0.88), (0.62, 0.97, 1.00)),
+    "Multi Colored": ((0.30, 0.82, 0.30), (1.00, 0.62, 0.90)),
+    "Red": ((0.80, 0.12, 0.36), (1.00, 0.72, 0.84)),
 }
 # The tint the eyes of each colour glow in (the white of an eye of the collection, in that colour).
 RADIOACTIVE_EYE_TINTS = {
@@ -103,9 +126,21 @@ def skin_of(traits):
     return {"skin": colour, "face": colour}
 
 
-def add_skull_face(part, numbers, surface, full, draw_shape, oval, SKIN, EYE, BLUSH, FACE, cheeks=True):
+def rounded(middle, half_width, half_height, points=8, squareness=3.0):
+    """The edge of a rounded box drawn on the face (a superellipse), as places (to the side, above)."""
+    edge = []
+    for index in range(points):
+        angle = 2.0 * math.pi * index / points + math.pi / points
+        c, s = math.cos(angle), math.sin(angle)
+        edge.append((middle[0] + half_width * math.copysign(abs(c) ** (2.0 / squareness), c),
+                     middle[1] + half_height * math.copysign(abs(s) ** (2.0 / squareness), s)))
+    return edge
+
+
+def add_skull_face(part, numbers, surface, full, draw_shape, oval, SKIN, EYE, BLUSH, FACE, cheeks=True, near=1.0):
     """The cheeks, the nose hole and the teeth on the skull. The skull has no cream face: the bone of the
-    head is its face. A radioactive head draws no cheek."""
+    head is its face. A radioactive head draws no cheek, and its teeth as lines along its jaw (TEETH).
+    "near": the side of the character the picture shows nearer (1 its left), where a skull's grin cracks."""
     lift = numbers.FACE_LIFT
     drawn = lift * 1.8
     cheek_side, cheek_up, cheek_width, cheek_height = numbers.CHEEK
@@ -121,23 +156,33 @@ def add_skull_face(part, numbers, surface, full, draw_shape, oval, SKIN, EYE, BL
     draw_shape(part, surface, EYE, [(-half_w, up + half_h * 0.2), (half_w, up + half_h * 0.2), (0.0, up - half_h * 1.3)],
                drawn)
 
-    # The teeth: a dark band, then the teeth on it in the bone colour, the gaps between them dark.
-    middle, half_width, half_height = TEETH["MIDDLE_UP"], TEETH["HALF_WIDTH"], TEETH["HALF_HEIGHT"]
-    band = []
-    for index in range(16):
-        angle = 2.0 * math.pi * index / 16
-        band.append((math.cos(angle) * (half_width + 0.008) * min(1.0, 1.15 * abs(math.cos(angle)) + 0.35),
-                     middle + math.sin(angle) * (half_height + 0.008)))
-    draw_shape(part, surface, EYE, band, drawn, middle=(0.0, middle))
-    count, gap = TEETH["COUNT"], TEETH["GAP"]
-    width = (2.0 * half_width - gap * (count - 1)) / count
-    for index in range(count):
-        left = -half_width + index * (width + gap)
-        # The teeth at the ends are shorter: the row follows the jaw.
-        shorten = 0.25 if index in (0, count - 1) else 0.0
-        top, bottom = middle + half_height * (1.0 - shorten), middle - half_height * (1.0 - shorten)
-        tooth = [(left, bottom), (left + width, bottom), (left + width, top), (left, top)]
-        draw_shape(part, surface, SKIN, tooth, lift * 2.6)
+    import make_chog_traits as traits_module
+    if cheeks:
+        # A skull: the dark mouth, two rows of rounded teeth in the bone colour on it, the crack of the grin.
+        middle, half_width, half_height = TEETH["MOUTH"]
+        draw_shape(part, surface, EYE, rounded((0.0, middle), half_width, half_height, 16, 2.6), drawn,
+                   middle=(0.0, middle))
+        for up, half_row, half_tall, count in (TEETH["UPPER"], TEETH["LOWER"]):
+            wide = (2.0 * half_row - TEETH["GAP"] * (count - 1)) / count
+            for index in range(count):
+                centre = -half_row + wide * 0.5 + index * (wide + TEETH["GAP"])
+                # The teeth at the ends are shorter: the rows follow the jaw.
+                tall = half_tall * (0.78 if index in (0, count - 1) else 1.0)
+                draw_shape(part, surface, SKIN, rounded((centre, up), wide * 0.5, tall), lift * 2.6)
+        crack = [(near * side, up) for side, up in TEETH["CRACK"]]
+        traits_module.draw_line(part, surface, EYE, crack, list(TEETH["CRACK_THICK"]), drawn)
+    else:
+        # A radioactive Chog: one row of teeth drawn in dark lines on the skin, and the line of the jaw.
+        up, half_row, half_tall, count = TEETH["GLOW_ROW"]
+        wide = (2.0 * half_row - TEETH["GAP"] * (count - 1)) / count
+        line = TEETH["GLOW_LINE"]
+        for index in range(count):
+            centre = -half_row + wide * 0.5 + index * (wide + TEETH["GAP"])
+            tall = half_tall * (0.75 if index in (0, count - 1) else 1.0)
+            draw_shape(part, surface, EYE, rounded((centre, up), wide * 0.5 + line, tall + line), drawn)
+            draw_shape(part, surface, SKIN, rounded((centre, up), wide * 0.5, tall), lift * 2.6)
+        jaw = list(TEETH["JAW_LINE"])
+        traits_module.draw_line(part, surface, EYE, jaw, [TEETH["JAW_THICK"]] * len(jaw), drawn)
 
 
 # The skull's jaw, read on the Skull pictures (CHOG #81, #846, #1000, #1104, #1207, #1642): a wide round
@@ -413,10 +458,11 @@ def build_seal(maker):
 
 HEAD_LASER = {
     # Read on CHOG #772 (Blue Laser, the only one): a wide pale blue beam leaving the middle of the brow from
-    # a white glow, up and out to the left of the character at about 45 degrees, in front of the spikes.
-    # (Until 16 October 2026: a thin beam straight up, which the bust showed leaning the other way.)
+    # a white glow, straight out of the head. (A thin beam straight up until 16 October 2026, which the bust
+    # showed leaning the other way; then one at 45 degrees to the side, which the owner saw slanting along
+    # the head where the picture has it come straight out of it.)
     "AT": 0.13,                       # above the middle of the face
-    "WAY": (0.70, -0.25, 0.70),       # to the left of the character, ahead, up
+    "UP": 0.12,                       # how far it is turned up from straight out of the head
     "BEAM": (0.026, 0.47),            # radius, length
     "GLOW": (0.040, 0.026),           # the white glow on the brow where it leaves: half width, half height
 }
@@ -427,7 +473,7 @@ def build_head_laser(maker):
     numbers = SimpleNamespace(**HEAD_LASER)
     part, surface = maker.part(), maker.surface
     start = surface.front(0.0, numbers.AT, 0.0)
-    way = Vector(numbers.WAY).normalized()
+    way = (_out(surface, 0.0, numbers.AT) + Z * numbers.UP).normalized()
     radius, length = numbers.BEAM
     part.shell(base.tube_rings(start, way, Z, [(0.0, radius * 0.8), (0.04, radius), (length - 0.02, radius),
                                                 (length, 0.0)]), 8, part.named("Beam"), 0.0)
@@ -513,14 +559,182 @@ def build_bandana(maker):
         part.shell(base.ball_rings(middle, along, Z, length, width, thick, 6), 10, part.named("Band"), 0.012)
 
 
+# ---------------------------------------------------------------------------------------------
+# What only Skull Genesis wear on the head (16 October 2026: the owner saw bare skulls where the pictures
+# draw them): a crown of thorns in gold (#1723, #1819, #1838) or in silver (#1107, #1647), a laurel wreath
+# (#207, #418, #939, #1331), a banana taped on the brow (#373, #978), a fedora (#1311) and a turban (#1861).
+# ---------------------------------------------------------------------------------------------
+
+def _ring_path(surface, front_polar, back_polar, size, segments, wave=0.0, phase=0.0, waves=3):
+    """Points around the head, at front_polar degrees from the top at the front and back_polar at the back:
+    (point, way out of the head, angle seen from above, polar radians). "wave" makes the path wind in and
+    out and up and down, "waves" times around."""
+    points = []
+    for step in range(segments):
+        angle = 2.0 * math.pi * step / segments
+        front = 0.5 - 0.5 * math.sin(angle)
+        polar = math.radians(back_polar + (front_polar - back_polar) * front)
+        point = hats_module.on_head(surface, angle, polar, size)
+        out = hats_module.head_normal(surface, angle, polar)
+        if wave:
+            turn = waves * angle + phase
+            point = point + (out * math.sin(turn) + Z * math.cos(turn) * 0.6) * wave
+        points.append((point, out, angle, polar))
+    return points
+
+
+def _tube_loop(part, points, radius, material, sides, outline):
+    """A tube around a closed path of points."""
+    count, rings = len(points), []
+    for index in range(count + 1):
+        ahead = points[(index + 1) % count][0] - points[(index - 1) % count][0]
+        first, second = base.frame_across(ahead, Z)
+        rings.append((points[index % count][0], first * radius, second * radius))
+    part.shell(rings, sides, material, outline)
+
+
+THORN_CROWN = {
+    # Two strands wound around each other around the top of the skull, lower at the front, thorns out.
+    # (First try: a tube of 0.011 at 50 and 34 degrees, 20 thorns of 0.032: a thin ring on the top, where the
+    # pictures draw a bushy crown down on the brow.)
+    "FRONT": 60.0, "BACK": 44.0, "SIZE": 1.04, "SEGMENTS": 28, "TUBE": 0.017, "WAVE": 0.020,
+    "THORNS": 28, "THORN": (0.052, 0.010),   # count, then the length and the radius of each thorn
+}
+
+
+def build_thorn_crown(maker):
+    numbers = SimpleNamespace(**THORN_CROWN)
+    part, surface = maker.part(), maker.surface
+    vine = part.named("Vine")
+    for phase in (0.0, math.pi):
+        _tube_loop(part, _ring_path(surface, numbers.FRONT, numbers.BACK, numbers.SIZE, numbers.SEGMENTS,
+                                    numbers.WAVE, phase), numbers.TUBE, vine, 5, 0.008)
+    length, radius = numbers.THORN
+    places = _ring_path(surface, numbers.FRONT, numbers.BACK, numbers.SIZE, numbers.THORNS)
+    for index, (point, out, angle, polar) in enumerate(places):
+        along = (places[(index + 1) % len(places)][0] - places[index - 1][0]).normalized()
+        way = (out + Z * (0.55 if index % 2 == 0 else -0.35) + along * (0.35 if index % 3 else -0.35)).normalized()
+        part.shell(base.tube_rings(point, way, Z, [(0.0, radius), (length, 0.0)]), 4, vine, 0.006)
+
+
+LAUREL = {
+    # A thin stem around the head and leaves along it on both sides, pointing back, one above and one below
+    # the stem in turn, lying flat on the head.
+    # (First try: 16 leaves of 0.050 at 46 degrees: a ring of grains, where the pictures draw large leaves.)
+    "FRONT": 54.0, "BACK": 36.0, "SIZE": 1.02, "STEM": 0.008, "LEAVES": 12,
+    "LEAF": (0.075, 0.032, 0.008),            # half length, half width, half thickness
+}
+
+
+def build_laurel(maker):
+    numbers = SimpleNamespace(**LAUREL)
+    part, surface = maker.part(), maker.surface
+    _tube_loop(part, _ring_path(surface, numbers.FRONT, numbers.BACK, numbers.SIZE, 32), numbers.STEM,
+               part.named("Stem"), 4, 0.0)
+    half_long, half_wide, half_thick = numbers.LEAF
+    places = _ring_path(surface, numbers.FRONT, numbers.BACK, numbers.SIZE + 0.01, numbers.LEAVES)
+    for index, (point, out, angle, polar) in enumerate(places):
+        tangent = (places[(index + 1) % len(places)][0] - places[index - 1][0]).normalized()
+        backwards = tangent if tangent.y > 0.0 else -tangent
+        along = (backwards + Z * (0.45 if index % 2 == 0 else -0.45) + out * 0.25).normalized()
+        sideways = along.cross(out).normalized()
+        part.shell(base.ball_rings(point + along * half_long * 0.9, along, sideways, half_long, half_wide, half_thick, 4),
+                   6, part.named("Leaf"), 0.006)
+
+
+TAPED_BANANA = {
+    # A small banana on the brow, at a slant, held by two strips of grey tape crossing over it.
+    # (First try: 0.150 long, 0.022 thick, high on the head: hidden under its tape from the front.)
+    "AT": (0.030, 0.170), "TILT_DEG": 35.0, "OFF": 0.030, "LENGTH": 0.210, "RADIUS": 0.033, "BEND": 0.034,
+    "RINGS": 9, "TIPS": 0.14,                 # the share of its length at each end in the brown of its tips
+    "TAPE": (0.120, 0.030), "TAPE_TURNS_DEG": (25.0, -30.0),
+}
+
+
+def build_taped_banana(maker):
+    import make_chog_traits as traits_module
+    numbers = SimpleNamespace(**TAPED_BANANA)
+    part, surface = maker.part(), maker.surface
+    out = _out(surface, *numbers.AT)
+    middle = surface.front(numbers.AT[0], numbers.AT[1], numbers.OFF)
+    tilt = math.radians(numbers.TILT_DEG)
+    upright = X * math.sin(tilt) + Z * math.cos(tilt)
+    along = (upright - out * upright.dot(out)).normalized()
+    bend = along.cross(out).normalized()
+    rings, half = [], numbers.LENGTH * 0.5
+    for step in range(numbers.RINGS):
+        s = -half + numbers.LENGTH * step / (numbers.RINGS - 1)
+        share = s / half
+        radius = numbers.RADIUS * max(0.15, 1.0 - 0.75 * share ** 4)
+        first, second = base.frame_across(along, bend)
+        rings.append((middle + along * s + bend * numbers.BEND * share * share, first * radius, second * radius))
+    _, faces = part.shell(rings, 8, part.named("Peel"), 0.008)
+    tip = half * (1.0 - 2.0 * numbers.TIPS)
+    part.paint([face for face in faces if abs((face.calc_center_median() - middle).dot(along)) > tip], part.named("Tip"))
+    half_length, half_width = numbers.TAPE
+    for turn in numbers.TAPE_TURNS_DEG:
+        angle = math.radians(90.0 - numbers.TILT_DEG + turn)
+        across = (math.cos(angle), math.sin(angle))
+        path, wide, thick = [], [], []
+        for step in range(7):
+            t = -1.0 + 2.0 * step / 6
+            side, up = numbers.AT[0] + across[0] * half_length * t, numbers.AT[1] + across[1] * half_length * t
+            lift = 0.006 + (numbers.OFF + numbers.RADIUS + 0.004) * max(0.0, 1.0 - (t * 1.7) ** 2)
+            point = surface.front(side, up, lift)
+            here = _out(surface, side, up)
+            direction = Vector((across[0], 0.0, across[1]))
+            width_way = here.cross(direction).normalized()
+            path.append(point)
+            wide.append(width_way * half_width)
+            thick.append(here * 0.004)
+        hats_module.slab(part, path, wide, thick, part.named("Tape"), 0.006, sides=4)
+
+
+def build_fedora(maker):
+    """The fedora of #1311: the round crown and the brim of the bucket hat, taller and flatter (the
+    numbers of its entry), and a band around the foot of the crown."""
+    import make_chog_traits as traits_module
+    traits_module.build_bucket(maker)
+    numbers = maker.numbers(traits_module.BUCKET)
+    part = maker.part()
+    crown = traits_module.CapCrown(numbers, maker.surface.middle)
+    low = numbers.BRIM_HEIGHT + numbers.BRIM_THICKNESS * 0.5
+    angles = [2.0 * math.pi * index / numbers.SIDES for index in range(numbers.SIDES)]
+    loops = [[crown.around(height, angle, 1.025) for angle in angles] for height in (low, low + FEDORA_BAND)]
+    traits_module.full.add_skin(part, maker.surface, loops, part.named("Band"))
+
+
+FEDORA_BAND = 0.046
+
+
+HEAD_WRAP = {
+    # A turban over the skull down to the brow, wider than the head and puffed in folds, two of its rows in
+    # the shade of a fold. The rim: (degrees from the front, polar degrees).
+    "RIM": ((0.0, 66.0), (60.0, 82.0), (120.0, 98.0), (180.0, 102.0)),
+    "ROWS": 5, "SIZE": 1.16, "SIDES": 16, "SWELL": 0.030, "FOLDS": (1, 3),
+}
+
+
+def build_turban(maker):
+    numbers = SimpleNamespace(**HEAD_WRAP)
+    part, surface = maker.part(), maker.surface
+    bands = hats_module.dome(part, surface, part.named("Cloth"), numbers.SIDES, numbers.RIM, numbers.ROWS, numbers.SIZE,
+                             0.014, swell=lambda angle, polar, row: numbers.SWELL * math.sin(2.0 * angle + 1.3 * row))
+    for row in numbers.FOLDS:
+        if row < len(bands):
+            part.paint(bands[row], part.named("Fold"))
+
+
 HAT_SHAPES = {"RamHorns": build_ram_horns, "Bandana": build_bandana, "DemonHorns": build_demon_horns,
-              "ThirdEye": build_third_eye,
+              "ThirdEye": build_third_eye, "ThornCrown": build_thorn_crown, "Laurel": build_laurel,
+              "TapedBanana": build_taped_banana, "Fedora": build_fedora, "Turban": build_turban,
               "Gem": build_gem, "Seal": build_seal, "HeadLaser": build_head_laser, "Mushrooms": build_mushrooms}
 # Every one of these stands before the crown, which keeps all its spikes (the build refuses a leaf through an
 # object, so a part that grew into a spike would fail its Genesis).
 HAT_NUMBERS = {name: {"LEAVES": FULL, "OUTLINE_THICKNESS": 0.012} for name in HAT_SHAPES}
-# The bandana lies where a headband does, with its leaves (chog_trait_hats.HEADBAND).
-HAT_NUMBERS["Bandana"] = {**hats_module.HEADBAND}
+# The bandana lies where a headband does (chog_trait_hats.HEADBAND), under the whole crown, as the headbands
+# do since 16 October 2026: its crossings with the leaves are kept, not refused.
+HAT_NUMBERS["Bandana"] = {**hats_module.HEADBAND, "LEAVES": FULL}
 HATS = {
     "Red Bandana": {"shape": "Bandana", "colours": {"Band": (0.86, 0.20, 0.18), "Line": (0.62, 0.11, 0.12)}},
     "Red Horn": {"shape": "RamHorns", "colours": {"Horn": (0.62, 0.30, 0.24)}},
@@ -534,6 +748,19 @@ HATS = {
     "Holy Seal": {"shape": "Seal", "colours": {"Gold": (0.98, 0.80, 0.22)}},
     "Blue Laser": {"shape": "HeadLaser", "colours": {"Beam": (0.55, 0.92, 1.0), "Glow": (0.97, 0.99, 1.0)},
                    "unlit": ("Beam", "Glow")},
+    "Gold Thorn": {"shape": "ThornCrown", "colours": {"Vine": (0.93, 0.62, 0.18)}},
+    "Silver Thorn": {"shape": "ThornCrown", "colours": {"Vine": (0.64, 0.64, 0.66)}},
+    "Silver wreath": {"shape": "Laurel", "colours": {"Leaf": (0.82, 0.76, 0.62), "Stem": (0.52, 0.44, 0.34)}},
+    "Taped Banana": {"shape": "TapedBanana", "colours": {"Peel": (0.98, 0.80, 0.18), "Tip": (0.42, 0.28, 0.14),
+                                                         "Tape": (0.62, 0.62, 0.66)}},
+    "Mafia Hat": {"shape": "Fedora",
+                  "colours": {"Crown": (0.21, 0.21, 0.24), "Brim": (0.21, 0.21, 0.24), "Under": (0.12, 0.12, 0.14),
+                              "Band": (0.88, 0.88, 0.90)},
+                  "numbers": {"RINGS": ((0.090, 0.99, 0.000), (0.160, 1.00, 0.004), (0.262, 0.95, 0.016),
+                                        (0.332, 0.80, 0.030), (0.372, 0.50, 0.040)),
+                              "TOP": (0.386, 0.040), "BRIM_LENGTH": 0.130, "BRIM_DIP_DEG": 6.0,
+                              "BRIM_FRONT_LENGTH": 0.120, "BRIM_FRONT_RISE_DEG": 10.0, "BRIM_FRONT_SPREAD": 1.0}},
+    "Head Wrap": {"shape": "Turban", "colours": {"Cloth": (0.95, 0.95, 0.93), "Fold": (0.80, 0.80, 0.83)}},
     "Poison Shroom": {"shape": "Mushrooms", "colours": {"Stem": (0.80, 0.90, 0.78), "Cap": (0.62, 0.84, 0.70),
                                                         "Spot": (0.95, 0.58, 0.24)}},
 }

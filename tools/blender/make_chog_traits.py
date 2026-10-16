@@ -293,6 +293,9 @@ BUCKET = {
 # its points: from the camera of the game, a crown pierced by spikes. The pictures show the crown on
 # the top of the head and the spikes beside and behind it, below its band.)
 CROWN = {
+    # The leaves of the head come through the band where they grow, as a crown sits on a spiky head: their
+    # crossings are kept in parts.json, not refused (16 October 2026).
+    "THROUGH": True,
     "RIM_HALF_WIDTH": 0.318,
     "RIM_HALF_DEPTH": 0.283,
     "SQUARENESS": 2.2,
@@ -847,6 +850,16 @@ UNDER_RIM = {
     # The sectors where the check of spike_sectors_seen wants a tip seen (SPIKE_SECTORS below when not
     # given): fewer only where the hat covers the sides of the head down to the jaw.
     "SECTORS": None,
+    # Rows of smaller leaves planted under the first (16 October 2026: the owner saw one single row of
+    # spikes under a cap from the front and from the side, "one turned down is missing"). Each: the angles
+    # of its leaves (between those of the first row), how much lower than the first it is rooted and how
+    # much further down it leans (degrees), its length and width against a leaf of the first row, how far
+    # its point bends up, and the points around a leaf (fewer than the first row: the triangles of a
+    # dressed hero). A leaf of these rows that finds no place under the hat is left out and said.
+    "EXTRA_ROWS": (
+        {"ANGLES": (91.0, 117.0, 143.0, 168.0), "BELOW_DEG": 20.0, "DROOP_DEG": 30.0, "LENGTH": 0.80,
+         "WIDTH": 0.85, "LIFT": 0.12, "SIDES": 4},
+    ),
 }
 # The leaves of the row are smaller than those of the crown: a lighter section from root to point (four
 # rings in place of six of LEAF_PROFILE), so that 9 to 12 of them keep a dressed hero under TRIANGLE_LIMIT
@@ -929,9 +942,10 @@ def add_rim_leaves(part, numbers, surface, hat_shapes, under):
     back, up = -ahead, -down
     profile = RIM_PROFILE
 
-    def rings_of(angle, rim, below, droop, length):
+    def rings_of(angle, rim, below, droop, length, width=width, thickness=thickness, lift=None):
         """The rings of one leaf rooted "below" degrees under the rim at that angle, leaning down by
         "droop" degrees from straight out of the head."""
+        lift = under["LIFT"] if lift is None else lift
         polar = math.radians(rim + below)
         root = hats_and_clothes.on_head(surface, angle, polar, 1.0)
         out = hats_and_clothes.head_normal(surface, angle, polar)
@@ -946,7 +960,7 @@ def add_rim_leaves(part, numbers, surface, hat_shapes, under):
         wide = wide.normalized() if wide.length > 1e-6 else X.copy()
         thick = away.cross(wide)
         rise = up - away * up.dot(away)
-        curl = rise.normalized() * length * under["LIFT"] if rise.length > 1e-6 else Vector()
+        curl = rise.normalized() * length * lift if rise.length > 1e-6 else Vector()
         rings = [(root - away * numbers.SPIKE_SUNK, wide * width * 0.5 * profile[0][1],
                   thick * thickness * 0.5 * profile[0][2])]
         for along, wider, thicker in profile[1:]:
@@ -955,11 +969,15 @@ def add_rim_leaves(part, numbers, surface, hat_shapes, under):
         rings.append((root + away * length + curl, NOWHERE, NOWHERE))
         return rings
 
-    def place(degrees, side, name):
+    def place(degrees, side, name, row=None):
         """The first way of placing the leaf that does not cross the hat (as leaf_crossings judges it,
         outline included), in the order of RIM_TRIES: its whole length first, at its own angle, then
         rooted lower and leaning down; then a little to either side of its angle (past a tail, a
-        flap); then shorter. Returns (rings, what was changed) or None."""
+        flap); then shorter. A leaf of an extra row ("row") is rooted lower and leans further, smaller.
+        Returns (rings, what was changed) or None."""
+        row = row or {}
+        lower, further = row.get("BELOW_DEG", 0.0), row.get("DROOP_DEG", 0.0)
+        own = (width * row.get("WIDTH", 1.0), thickness * row.get("WIDTH", 1.0), row.get("LIFT"))
         for share in RIM_TRIES["LENGTH"]:
             for turn in RIM_TRIES["TURN_DEG"]:
                 angle = math.radians(270.0 + side * (degrees + turn))
@@ -968,8 +986,9 @@ def add_rim_leaves(part, numbers, surface, hat_shapes, under):
                     continue
                 for below in RIM_TRIES["BELOW_DEG"]:
                     for droop in RIM_TRIES["DROOP_DEG"]:
-                        rings = rings_of(angle, rim, under["BELOW_DEG"] + below, under["DROOP_DEG"] + droop,
-                                         length * share)
+                        rings = rings_of(angle, rim, under["BELOW_DEG"] + lower + below,
+                                         under["DROOP_DEG"] + further + droop,
+                                         length * row.get("LENGTH", 1.0) * share, *own)
                         if not leaf_crossings([(name, rings)], hat_shapes, numbers, surface, outside):
                             moved = [f"{label} {value:+.0f}" for label, value in
                                      (("turn", turn), ("lower", below), ("down", droop)) if value]
@@ -994,6 +1013,20 @@ def add_rim_leaves(part, numbers, surface, hat_shapes, under):
             part.shell(rings, numbers.LEAF_SIDES, SKIN, numbers.OUTLINE_THICKNESS, smooth=True)
             built.append((name, rings))
             said.append(f"{degrees:.0f}{where[:2]} ({how})")
+
+    for number, row in enumerate(under["EXTRA_ROWS"], start=2):
+        for degrees in row["ANGLES"]:
+            for side in ((1.0,) if degrees in (0.0, 180.0) else (1.0, -1.0)):
+                where = "" if degrees in (0.0, 180.0) else (" left" if side > 0.0 else " right")
+                name = f"rim leaf {degrees:.0f}{where}, row {number}"
+                found = place(degrees, side, name, row)
+                if found is None:
+                    said.append(f"row {number} {degrees:.0f}{where[:2]} left out (no place)")
+                    continue
+                rings, how = found
+                part.shell(rings, row.get("SIDES", numbers.LEAF_SIDES), SKIN, numbers.OUTLINE_THICKNESS, smooth=True)
+                built.append((name, rings))
+                said.append(f"row {number} {degrees:.0f}{where[:2]} ({how})")
 
     # Inside an open hat (the crown): leaves rooted on the head within it, straight out of the head and
     # leaning back, shortened or tilted until they cross nothing.

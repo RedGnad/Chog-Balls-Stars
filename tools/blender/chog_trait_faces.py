@@ -128,6 +128,11 @@ HEART = {"AT": (0.112, 0.012), "HALF_WIDTH": 0.060, "LINE": 0.010, "LEAN_DEG": 1
          "GLINT": (-0.026, 0.020, 0.011, 0.008), "SEGMENTS": 28}
 # "Flat" (Side=Left): a short thick dash for each eye.
 FLAT_EYE = {"AT": (0.112, 0.004), "HALF": 0.044, "THICKNESS": 0.017, "SLOPE": 0.04}
+# The eyes of a skull as the pictures of Side=Right draw "Flat", "Normal" and "Up" on six skeletons
+# (#846, #1214; #1079, #1311; #1313, #1889; 16 October 2026): a large dark socket for each eye, with a short
+# white dash across its middle ("dash"), a round white glint near its top ("glint"), or nothing.
+SOCKET = {"AT": (0.112, 0.008), "SOCKET": (0.062, 0.066), "DASH": (0.030, 0.009), "GLINT": (0.004, 0.026, 0.018, 0.018),
+          "MARK": "", "SEGMENTS": 16}
 
 # White eyes, as the pictures of Side=Left draw "Angry", "Vertical", "Smirk", "Frog", "Retard" and
 # "Worried" (added 15 October 2026, read on the 1000-point pictures of CHOG #29, #91, #175, #63, #111, #2,
@@ -648,6 +653,20 @@ def build_flat_eye(maker):
         HOST.draw_line(part, surface, part.named("Dark"), places, [numbers.THICKNESS] * 5, LIFT[0])
         for end in (places[0], places[-1]):
             disc(part, surface, part.named("Dark"), end, numbers.THICKNESS * 0.5, numbers.THICKNESS * 0.5, LIFT[0], 8)
+
+
+def build_socket_eye(maker):
+    """The dark sockets of a skull's eyes and the white mark in them (SOCKET)."""
+    numbers = maker.numbers(SOCKET)
+    part, surface = maker.part(), maker.surface
+    for side in (1.0, -1.0):
+        middle = (side * numbers.AT[0], numbers.AT[1])
+        disc(part, surface, part.named("Dark"), middle, *numbers.SOCKET, LIFT[0], numbers.SEGMENTS)
+        if numbers.MARK == "dash":
+            disc(part, surface, part.named("White"), middle, *numbers.DASH, LIFT[1], 10, squareness=4.0)
+        elif numbers.MARK == "glint":
+            across, up, wide, tall = numbers.GLINT
+            disc(part, surface, part.named("White"), (middle[0] + across * side, middle[1] + up), wide, tall, LIFT[1], 10)
 
 
 def build_white_eye(defaults):
@@ -1349,8 +1368,12 @@ EYES_OF_SIDE = {
         },
     },
     "Right": {
-        # "Flat" on Side=Right is worn only by two skeletons (Base Skull), another drawing.
-        "Flat": NOT_BUILT,
+        # Worn on Side=Right only by skeletons (Base Skull), another drawing: dark sockets (SOCKET).
+        "Flat": {"kind": "Socket", "colours": {"Dark": DARK, "White": WHITE}, "unlit": ("Dark", "White"),
+                 "numbers": {"MARK": "dash"}},
+        "Normal": {"kind": "Socket", "colours": {"Dark": DARK, "White": WHITE}, "unlit": ("Dark", "White")},
+        "Up": {"kind": "Socket", "colours": {"Dark": DARK, "White": WHITE}, "unlit": ("Dark", "White"),
+               "numbers": {"MARK": "glint"}},
     },
 }
 
@@ -1426,7 +1449,7 @@ EYE_KINDS = {
     "Angry": build_white_eye(ANGRY), "Vertical": build_white_eye(VERTICAL), "Smirk": build_white_eye(SMIRK),
     "Frog": build_white_eye(FROG), "Retard": build_white_eye(RETARD), "WorriedEye": build_white_eye(WORRIED_EYE),
     "BaseEye": build_base_eye, "XD": build_xd, "Glasses3D": build_glasses_3d, "CoinGlass": build_coin_glass,
-    "PixelShades": build_pixel_shades,
+    "PixelShades": build_pixel_shades, "Socket": build_socket_eye,
 }
 MOUTH_KINDS = {
     "Sad": build_line_mouth(SAD), "SmileCurl": build_line_mouth(SMILE_CURL), "Worried": build_worried,

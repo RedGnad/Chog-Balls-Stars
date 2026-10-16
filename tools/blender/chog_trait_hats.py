@@ -286,6 +286,9 @@ def build_ushanka(maker):
 # for the Japanese one, a red sun in the middle of the front.
 # ---------------------------------------------------------------------------------------------
 HEADBAND = {
+    # The band passes under the spikes of the head, which keeps its whole crown: the crossings of the leaves
+    # are kept in parts.json, not refused (16 October 2026).
+    "THROUGH": True,
     "SIDES": 18,
     # Polar degrees of its lower and upper edge, by degrees from the front. On the pictures the band
     # lies on the brow just above the eyes, the spikes standing above it.
@@ -1364,10 +1367,6 @@ HATS_OF_SIDE = {
 # of the seven lines of the crown (SIDE_POINTS, BIG_SIDE_POINTS, CROWN_POINTS, DURAG_POINTS, USHANKA_POINTS,
 # in the history of this file): from behind and from above that made two spikes on each side and none at
 # the back. They now take RIM_ROW and its kin (below), planted under the real rim of each hat.
-# Above and below a headband: the leaf on top and the upper pair (raised a little) stand above it (the top
-# of the back row went through the band); under it, the row under the rim of every hat (RIM_ROW), at the
-# sides and the back (until batch 6 the pairs of a cap: nothing seen at the sides from above).
-BAND_POINTS = (WHOLE, leaf(1.0, 24.0), GONE, GONE, GONE, GONE, GONE)
 # Through the knitted mask, as drawn ("THROUGH"). Until batch 7 (15 October 2026) four leaves placed by hand
 # from the one angle of the pictures (2 or 3 points near the top of the far side), made longer and turned
 # out to pass the check of the tips all around: from behind they read as a collar at mid height, unlike the
@@ -1399,11 +1398,11 @@ BIG_RIM_ROW = {"LENGTH": 1.10, "WIDTH": 0.90}
 BUCKET_RIM_ROW = {"LENGTH": 1.40, "WIDTH": 0.70, "SWEEP_DEG": 30.0}
 # Under the fur of the ushanka, and the helmet: their flaps and cheek guards cover the sides of the head down
 # to the jaw, so the row starts behind them, and the check wants it seen behind and three quarters behind.
-USHANKA_RIM_ROW = {"ANGLES": (94.0, 116.0, 138.0, 160.0, 180.0), "SWEEP_DEG": 18.0, "SECTORS": (135, -135, 180)}
-# The crown sits on the spiky head: the row under its band, and a tuft inside the open band, rooted on
-# the top of the head and leaning back, whose points rise behind its points, as the pictures draw spikes
-# behind the crown. (Batch 5 kept one short leaf on top: a lone spike in the middle of the crown.)
-CROWN_ROW = {"INSIDE": ((0.0, 8.0), (130.0, 24.0)), "INSIDE_LENGTH": 1.05}
+# Its second row (make_chog_traits.UNDER_RIM, "EXTRA_ROWS") only behind: the flaps hide the sides, and with a
+# heavy robe or the duck float the whole row went over 8,000 triangles (#766, #1644, 16 October 2026).
+USHANKA_RIM_ROW = {"ANGLES": (94.0, 116.0, 138.0, 160.0, 180.0), "SWEEP_DEG": 18.0, "SECTORS": (135, -135, 180),
+                   "EXTRA_ROWS": ({"ANGLES": (127.0, 149.0, 171.0), "BELOW_DEG": 20.0, "DROOP_DEG": 30.0,
+                                   "LENGTH": 0.80, "WIDTH": 0.85, "LIFT": 0.12, "SIDES": 4},)}
 
 
 # What the pictures of Side=Left show around a hat (15 October 2026, after batch 5): they are framed closer,
@@ -1487,9 +1486,12 @@ HEAD_VALUES = {
     ("Mon Beanie", "Left"): seen((71, 765, 1002, 1351, 1801), LEFT_HEAD,
         NO_CROWN, RIM_ROW),
     # The other headwear of Side=Right.
+    # The crown sits on the spiky head, which keeps its whole crown of spikes around it, as on a bare head; a
+    # spike may touch the band (16 October 2026: the owner found the row under the band too sparse, "more
+    # like the spikes of the base"; the crossings are kept in parts.json, not refused).
     ("Crown", "Right"): seen((44, 858, 1127, 1358, 1899), "3 or 4 short spikes on the far side, from beside the "
                              "band of the crown down to the cheek; spikes behind its points at the top",
-                             NO_CROWN, CROWN_ROW),
+                             FULL_CROWN),
     ("Wizard Hat", "Right"): seen((10, 472, 872, 1495, 1809), "2 or 3 spikes on the far side, from under the hat "
                                   "down to the cheek, larger than under a cap", NO_CROWN, BIG_RIM_ROW),
     ("Durag", "Right"): seen((51, 570, 1001, 1563, 1884), "3 large spikes on the far side, from the height of "
@@ -1500,10 +1502,12 @@ HEAD_VALUES = {
                                    "the far side, behind the flap, near the top", NO_CROWN, USHANKA_RIM_ROW),
     ("Russian Hat", "Left"): seen((34, 504, 982, 1518, 1876), "cream fur, dark leather flaps with snaps; " + LEFT_HEAD,
         NO_CROWN, USHANKA_RIM_ROW),
+    # A headband is tied around the spiky head: the whole crown stays and the band passes under the spikes
+    # (16 October 2026, the owner: no reason to leave room for a band; the crossings are kept, not refused).
     ("Red Headband", "Right"): seen((12, 686, 1014, 1790, 1957), "the whole crown above the band and down the far "
-                                    "side; a darker line along its lower edge", BAND_POINTS, RIM_ROW),
+                                    "side; a darker line along its lower edge", FULL_CROWN),
     ("Japan Headband", "Right"): seen((65, 523, 891, 1435, 1962), "the whole crown above the white band, a red "
-                                      "sun on its front", BAND_POINTS, RIM_ROW),
+                                      "sun on its front", FULL_CROWN),
     ("Bob Hair", "Right"): seen((43, 48, 159, 470, 482, 1137, 1380), "yellow curly hair, a red band with waving "
                                 "edges tied over the brow; the tip of one spike above the band, far side",
                                 NO_CROWN),
@@ -1989,6 +1993,20 @@ COSTUME = {
     # (First: 0.20 spread mostly to the sides, in the red of the suit: hidden behind the arms.)
     "WINGS": (0.06, 0.54, 0.27, 0.20, 0.010),
     "WING_WAY": (0.75, 0.95, 0.45),
+    # 16 October 2026, the owner: the pictures draw a whole dragon and a whole banana, not a hood over a
+    # suit. The face of a dragon (#16, #42, #143, #194, #226) looks out of its open mouth: cream fangs round
+    # the opening of the hood (how many, from how far round on each side, how long, how wide at the foot),
+    # two nostrils on the top of the snout (degrees from the front, polar degrees, radius), and a tail
+    # behind, thick at the back and thin at its tip, its points along its top: (places, then radii).
+    "FANGS": (6, 66.0, 0.095, 14.0),
+    "NOSTRILS": (13.0, 30.0, 0.016),
+    "TAIL": (((0.0, 0.17, 0.36), (0.0, 0.30, 0.25), (0.05, 0.42, 0.15), (0.11, 0.52, 0.10), (0.18, 0.58, 0.09)),
+             (0.070, 0.058, 0.040, 0.022, 0.0)),
+    "TAIL_POINTS": 3,
+    # A banana (#37, #154, #187, #269, #317): ridges down its skin from the tip to the face (degrees from
+    # the front of each), its tip bending back, as a banana does.
+    "RIDGES": (-62.0, 0.0, 62.0, 180.0),
+    "PEAK_BEND": 0.10,
     "OUTLINE_THICKNESS": 0.014,
 }
 
@@ -2066,15 +2084,74 @@ def build_costume(maker):
             hood.shell(base.tube_rings(foot, way, X, ((0.0, radius), (length * 0.5, radius * 0.75), (length, radius * 0.15))),
                        7, hood.named("Horn"), numbers.OUTLINE_THICKNESS)
     if entry.get("peak"):
-        # The banana: a tall point rising from the top of the hood, its stalk at the tip.
+        # The banana: a tall point rising from the top of the hood and bending back, its stalk at the tip,
+        # and ridges down its skin.
         length, radius = numbers.STALK
         top = on_head(surface, 0.0, 0.0, interpolate(hood_numbers.SIZE, 90.0))
-        rise = numbers.PEAK
-        hood.shell(base.tube_rings(top - Z * 0.10, Z, X, ((0.0, 0.20), (0.10, 0.17), (rise * 0.55, 0.10),
-                                                         (rise, 0.045))), 10, hood.named("Hood"), numbers.OUTLINE_THICKNESS)
-        hood.shell(base.tube_rings(top + Z * (rise - 0.01), (Z - Y * 0.3).normalized(), X,
-                                   ((0.0, radius), (length, radius * 0.8))), 6, hood.named("Tip"),
-                   numbers.OUTLINE_THICKNESS * 0.8)
+        rise, bend = numbers.PEAK, numbers.PEAK_BEND
+        stations = ((-0.10, 0.20), (0.0, 0.17), (rise * 0.55 - 0.10, 0.10), (rise - 0.10, 0.045))
+        rings = []
+        for height, wide in stations:
+            share = max(0.0, height / (rise - 0.10))
+            centre = top + Z * height + Y * bend * share * share
+            ahead = (Z + Y * bend * 2.0 * share).normalized()
+            first, second = base.frame_across(ahead, X)
+            rings.append((centre, first * wide, second * wide))
+        hood.shell(rings, 10, hood.named("Hood"), numbers.OUTLINE_THICKNESS)
+        tip_way = (Z * 0.6 + Y * 0.8).normalized()
+        hood.shell(base.tube_rings(rings[-1][0] + Y * 0.005, tip_way, X, ((0.0, radius), (length, radius * 0.8))), 6,
+                   hood.named("Tip"), numbers.OUTLINE_THICKNESS * 0.8)
+        for degrees in numbers.RIDGES:
+            angle = math.radians(270.0 + degrees)
+            rim = interpolate(hood_numbers.RIM, abs(degrees))
+            size = interpolate(hood_numbers.SIZE, abs(degrees)) * 1.004
+            places = [on_head(surface, angle, math.radians(rim * (1.0 - share)), size) for share in (0.05, 0.3, 0.55, 0.8)]
+            stations = []
+            for index, place in enumerate(places):
+                ahead = places[min(index + 1, 3)] - places[max(index - 1, 0)]
+                first, second = base.frame_across(ahead, Z)
+                stations.append((place, first * 0.007, second * 0.007))
+            hood.shell(stations, 4, hood.named("Ridge"), 0.0)
+    if entry.get("fangs"):
+        count, around, length, half_deg = numbers.FANGS
+        middle_of_face = surface.front(0.0, 0.0, 0.0)
+        for index in range(count):
+            degrees = -around + 2.0 * around * index / (count - 1)
+            angle = math.radians(270.0 + degrees)
+            polar = math.radians(interpolate(hood_numbers.RIM, abs(degrees)))
+            size = interpolate(hood_numbers.SIZE, abs(degrees))
+            corners = [on_head(surface, angle + math.radians(turn), polar, size * 1.0) for turn in (-half_deg, half_deg)]
+            foot = (corners[0] + corners[1]) * 0.5
+            out = head_normal(surface, angle, polar)
+            tip = foot + (middle_of_face - foot).normalized() * length + out * 0.010
+            # A flat fang with some thickness: wide across its foot, thin out of the hood, to its point.
+            across = (corners[1] - corners[0]) * 0.5
+            hood.shell([(foot + out * 0.006, across, out * 0.008), (tip, Vector(), Vector())], 4,
+                       hood.named("Tooth"), 0.008)
+    if entry.get("nostrils"):
+        degrees, polar_deg, radius = numbers.NOSTRILS
+        size = interpolate(hood_numbers.SIZE, degrees)
+        for sign in (1.0, -1.0):
+            angle, polar = math.radians(270.0 + sign * degrees), math.radians(polar_deg)
+            centre = on_head(surface, angle, polar, size * 1.006)
+            disc_on(hood, surface, centre, head_normal(surface, angle, polar), radius, hood.named("Nostril"), segments=8)
+    if entry.get("tail"):
+        places, radii = numbers.TAIL
+        points = [Vector(place) for place in places]
+        rings = []
+        for index, (point, radius) in enumerate(zip(points, radii)):
+            ahead = points[min(index + 1, len(points) - 1)] - points[max(index - 1, 0)]
+            first, second = base.frame_across(ahead, X)
+            rings.append((point, first * radius, second * radius) if radius > 0.0 else (point, Vector(), Vector()))
+        torso.shell(rings, 8, torso.named("Main"), numbers.OUTLINE_THICKNESS)
+        for index in range(numbers.TAIL_POINTS):
+            share = 0.2 + 0.6 * index / max(1, numbers.TAIL_POINTS - 1)
+            at = int(share * (len(points) - 1))
+            point = points[at] + (points[at + 1] - points[at]) * (share * (len(points) - 1) - at)
+            radius = radii[at] + (radii[at + 1] - radii[at]) * (share * (len(points) - 1) - at)
+            way = Vector((0.0, -0.3, 1.0)).normalized()
+            torso.shell(base.tube_rings(point + Z * radius * 0.6, way, X, ((0.0, 0.020), (0.05, 0.0))), 4,
+                        torso.named("Horn"), numbers.OUTLINE_THICKNESS * 0.6)
     if entry.get("bandana"):
         # A triangle of cloth over the lower face, from below the eyes to a point under the chin, with
         # white dots: it covers the mouth ("HIDES" in "head").
@@ -2460,12 +2537,17 @@ CLOTHES.update({
                                                "Belly": (0.92, 0.95, 0.97), "Tooth": (0.97, 0.97, 0.97)},
                           teeth=True, fin=True),
     # A banana: yellow, its point rising over the head, a green stalk at the tip.
-    "Banana suit": costume((0.95, 0.67, 0.06), {"Hood": (0.95, 0.67, 0.06), "Rim": (0.89, 0.53, 0.05),
-                                                "Tip": (0.55, 0.72, 0.12)}, peak=True),
-    # A red dragon: tan belly and horns, small wings on the back.
+    # (16 October 2026: the suit deeper orange than the hood, as the pictures run from yellow at the top to
+    # orange below; ridges down the skin, the tip bending back.)
+    "Banana suit": costume((0.95, 0.56, 0.05), {"Hood": (0.98, 0.72, 0.08), "Rim": (0.89, 0.53, 0.05),
+                                                "Tip": (0.36, 0.26, 0.10), "Ridge": (0.80, 0.48, 0.04)}, peak=True),
+    # A red dragon: tan belly and horns, small wings on the back; since 16 October 2026 cream fangs round
+    # the face, nostrils on the snout and a tail.
     "Dragon suit": costume((0.92, 0.27, 0.17), {"Hood": (0.92, 0.27, 0.17), "Rim": (0.76, 0.19, 0.11),
                                                 "Belly": (0.95, 0.70, 0.46), "Horn": (0.95, 0.76, 0.50),
-                                                "Wing": (0.66, 0.13, 0.10)}, horns=True, wings=True),
+                                                "Wing": (0.66, 0.13, 0.10), "Tooth": (0.97, 0.90, 0.72),
+                                                "Nostril": (0.30, 0.06, 0.05)},
+                           horns=True, wings=True, fangs=True, nostrils=True, tail=True),
     # The space suit: white, grey stripes down the sleeves, the ring of the helmet around the face. Its
     # glass is not drawn; the pictures show the crown inside it, so the crown stays.
     "Astro Suit": {"kind": "Astro", "colours": {"Main": (0.90, 0.88, 0.84), "Collar": (0.70, 0.70, 0.72),
@@ -2480,6 +2562,91 @@ CLOTHES.update({
 })
 for name in ("Gangster suit", "Shark Suit", "Banana suit", "Astro Suit", "Dragon suit", "Duck Float"):
     LEFT_OUT.pop(name, None)
+
+# The clothing no Genesis wore in 3D until 16 October 2026 (117 Genesis, most of them of the base Origin on
+# Side=Left; the owner asked for every Genesis dressed). Each takes a cut already built, in the colours read
+# on its pictures (CHOG #64, #25, #32 the toads, #247 the armour, #227 Sci Fi, #216 the yukata, #474 Guko,
+# #358 Gojo, #846 the cape, #1311 the robe, #552 the mummy, #978 the vest, #155 the stripes, #772 Boner,
+# #275 and #1009 the tanks, #1221 and #1723 the holed jackets, #1289 the suit); what that cut does not draw
+# is said in "print_missing".
+def toad(main, rim, belly, pupil):
+    """A toad costume: the suit and the hood of a costume in one colour, a lighter belly, two big eyes on top
+    of the hood (the frog suit of the 1:1, chog_one_of_one.py), the teeth of hair showing under the hood."""
+    entry = costume(main, {"Hood": main, "Rim": rim, "Belly": belly, "EyeBall": (0.97, 0.97, 0.95), "Pupil": pupil},
+                    head={"LEAVES": NO_CROWN, "FRINGE": True})
+    return {**entry, "kind": "FrogSuit"}
+
+
+MUMMY_WRAP = {
+    # Two strips of bandage across the lower face of the skull, at a slant: (start, end) in the coordinates of
+    # the face, half their width, how far off the head; the face is narrowed with the jaw (narrow_jaw).
+    "BANDS": (((-0.25, -0.064), (0.25, -0.112), 0.034), ((-0.24, -0.150), (0.23, -0.108), 0.030)),
+    "LIFT": 0.030,
+}
+
+
+def build_mummy(maker):
+    """A mummy: bandages round the body as the stripes of a shirt with long sleeves, and two across the face."""
+    import chog_trait_bases as bases
+    KIT.build_tee(maker)
+    numbers = SimpleNamespace(**MUMMY_WRAP)
+    part, surface = maker.part(), maker.surface
+    for (start, end, half) in numbers.BANDS:
+        rows = []
+        for edge in (-1.0, 1.0):
+            row = []
+            for step in range(7):
+                t = step / 6
+                side = start[0] + (end[0] - start[0]) * t
+                up = start[1] + (end[1] - start[1]) * t + edge * half
+                row.append(surface.front(side, up, numbers.LIFT))
+            rows.append(row)
+        full.add_skin(part, surface, rows, part.named("Wrap"), around=False)
+    bases.narrow_jaw(part, maker.head)
+
+
+CLOTH_KINDS["Mummy"] = build_mummy
+STRIPED_TANK = {"kind": "Tee", "stripes": True, "numbers": {"SLEEVE": 0.0, "STEP": 0.046}}
+CLOTHES.update({
+    "toad blue suit": toad((0.33, 0.56, 0.93), (0.62, 0.80, 1.00), (0.62, 0.92, 0.86), (0.36, 0.78, 0.25)),
+    "Toad pink suit": toad((0.93, 0.27, 0.53), (0.98, 0.62, 0.78), (0.98, 0.74, 0.86), (0.30, 0.68, 0.95)),
+    "Toad green Suit": toad((0.18, 0.74, 0.56), (0.55, 0.92, 0.75), (0.70, 0.95, 0.82), (0.98, 0.50, 0.15)),
+    "Golden Armor": {"kind": "Tee", "colours": {"Main": (0.96, 0.74, 0.22), "Stripe": (0.82, 0.56, 0.12),
+                                                "Collar": (0.70, 0.46, 0.10)},
+                     "stripes": True, "numbers": {"STEP": 0.046, "SLEEVE": 0.09},
+                     "print_missing": "the round plates on the shoulders"},
+    "Sci Fi": track((0.98, 0.62, 0.14), stripe=(0.25, 0.85, 0.95), collar=(0.15, 0.15, 0.18),
+                    missing="the dark ring of the collar and its lights"),
+    "White Yukata": tee((0.97, 0.95, 0.95), collar=(0.92, 0.64, 0.74), SLEEVE=LONG_SLEEVE,
+                        missing="the crossed fronts and the pink blossoms"),
+    "Guko": tee((0.98, 0.52, 0.10), collar=(0.16, 0.28, 0.72), missing="the blue undershirt, the belt and the emblem"),
+    "Gojo": {**tee((0.13, 0.14, 0.24), (0.09, 0.10, 0.17)), "numbers": {"STEP": 0.076, "COLLAR": (0.600, 0.640),
+                                                                         "SLEEVE": LONG_SLEEVE},
+             "print_missing": "the round button of the high collar"},
+    "Wizard Cape": {"kind": "Cape", "colours": {"Cape": (0.17, 0.22, 0.52), "Collar": (0.10, 0.12, 0.32),
+                                                "Clasp": (0.96, 0.78, 0.22)},
+                    "print_missing": "the yellow pattern of the cape"},
+    "Jesus Robe": tee((0.95, 0.94, 0.90), collar=(0.80, 0.16, 0.13), SLEEVE=LONG_SLEEVE,
+                      missing="the red sash over the shoulder"),
+    "Mummy": {"kind": "Mummy", "colours": {"Main": (0.93, 0.91, 0.84), "Stripe": (0.78, 0.74, 0.64),
+                                          "Collar": (0.78, 0.74, 0.64), "Wrap": (0.93, 0.91, 0.84)},
+              "stripes": True, "numbers": {"STEP": 0.046, "SLEEVE": LONG_SLEEVE}},
+    "CEO Vest": {"kind": "Tee", "colours": {"Main": (0.30, 0.31, 0.35), "Stripe": (0.22, 0.23, 0.27),
+                                            "Collar": (0.19, 0.20, 0.24)},
+                 "stripes": True, "numbers": {"SLEEVE": 0.0, "STEP": 0.046}},
+    "Stripe Shirt": dict(CLOTHES["Stripes"]),
+    "Stripe shirts": dict(CLOTHES["Stripes"]),
+    "White Tank": tee((0.95, 0.95, 0.92), SLEEVE=0.0, COLLAR=(0.566, 0.593)),
+    "Purple Tank": {**STRIPED_TANK, "colours": {"Main": (0.56, 0.52, 0.64), "Stripe": (0.46, 0.42, 0.54),
+                                                "Collar": (0.40, 0.36, 0.48)}},
+    "Boner": with_({**STRIPED_TANK, "colours": {"Main": (0.74, 0.80, 0.70), "Stripe": (0.64, 0.70, 0.60),
+                                                "Collar": (0.55, 0.60, 0.52)}},
+                   colours={"Print": (0.10, 0.10, 0.10)}, print=("BONER", 0.400, 0.048, 0.200, 0.0)),
+    "Blue Mafia": jacket((0.16, 0.25, 0.62), WHITE, (0.14, 0.22, 0.58)),
+    "Orange Holed Jacket": hoodie((0.96, 0.50, 0.14), print_missing="the holes in the cloth"),
+    "Blue Holed Jacket": hoodie((0.32, 0.64, 0.95), print_missing="the holes in the cloth"),
+})
+
 
 CLOTHES_OF_SIDE = {
     "Left": {
