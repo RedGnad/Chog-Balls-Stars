@@ -2007,8 +2007,61 @@ COSTUME = {
     # the front of each), its tip bending back, as a banana does.
     "RIDGES": (-62.0, 0.0, 62.0, 180.0),
     "PEAK_BEND": 0.10,
+    # 16 October 2026, the owner again: a costume covers the whole body, and the dragon and the banana are
+    # whole. Trousers in the colour of the suit over each leg, from the ankle up into the suit (how far they
+    # stand off the leg); boots over the feet in it when the entry asks ("boots": how much larger than the
+    # foot); the snout of the dragon over the face, its upper jaw (polar degrees of its middle at the front,
+    # how far it stands ahead, its half length ahead, half width, half height), the nostrils on it; the peel
+    # of the banana around the whole body, faceted as a banana is (from which height, how many flat faces, how
+    # far off the torso, how much wider at its foot, the height under which it turns orange).
+    "TROUSERS": 0.016,
+    "BOOTS": 1.10,
+    # (First: at 32 degrees, a lump on the top of the head.)
+    "SNOUT": (52.0, 0.060, 0.120, 0.170, 0.062),
+    # The seat of the trousers between the legs: its height, half its height, half width, half depth.
+    "SEAT": (0.200, 0.070, 0.175, 0.135),
+    # Under the chin, the hood closes on the face: a band from cheek to cheek (degrees each side of the
+    # front, polar degrees of its upper and lower edge, how much larger than the head).
+    "CHIN": (62.0, 152.0, 176.0, 1.10),     # (128 at first: it hid the mouth)
+    "PEEL": (0.10, 5, 0.040, 0.075, 0.40),
     "OUTLINE_THICKNESS": 0.014,
 }
+
+
+def add_trousers(maker, part, material, numbers):
+    """A leg of trousers over each leg, from the ankle up into the suit."""
+    body = maker.body
+    for side in (1.0, -1.0):
+        hip = Vector((side * body.LEG_HALF_SPACING, 0.0, body.LEG_TOP))
+        ankle = Vector((side * (body.LEG_HALF_SPACING + body.LEG_STANCE), 0.0, 0.0))
+        on_leg = lambda height: ankle + (hip - ankle) * (height / body.LEG_TOP)
+        across = X * (body.LEG_HALF_WIDTH + numbers.TROUSERS)
+        deep = Y * (body.LEG_HALF_DEPTH + numbers.TROUSERS)
+        part.shell([(on_leg(0.03), across, deep), (on_leg(body.LEG_ENTERS_TORSO), across, deep),
+                    (on_leg(body.LEG_TOP), across * 0.9, deep * 0.9)], 12, material, numbers.OUTLINE_THICKNESS)
+    # The seat, between the legs and under the suit, so no skin shows there.
+    height, half_tall, half_wide, half_deep = numbers.SEAT
+    part.shell(base.ball_rings(Z * height, Z, X, half_tall, half_wide, half_deep, 5), 12, material, 0.0)
+
+
+def add_boots(maker, part, material, larger):
+    """A shell over each foot, the foot of the body made "larger", in the colour of the costume."""
+    from mathutils import Matrix
+    body = maker.body
+    for side in (1.0, -1.0):
+        ankle = Vector((side * (body.LEG_HALF_SPACING + body.LEG_STANCE), 0.0, 0.0))
+        turn = Matrix.Rotation(math.radians(body.FOOT_TOE_OUT_DEG) * side, 3, "Z")
+        across, ahead = turn @ X, turn @ -Y
+        heel = ankle - ahead * body.FOOT_HEEL_BACK * larger
+        height, length, width = body.FOOT_HEIGHT * larger, body.FOOT_LENGTH * larger, body.FOOT_WIDTH * larger
+        rings = [(heel + Z * height * 0.26, Vector(), Vector())]
+        for along, wide, tall in body.FOOT_RINGS:
+            top = height * tall
+            rings.append((heel + ahead * length * along + Z * top * 0.42, across * width * 0.5 * wide, Z * top * 0.58))
+        rings.append((heel + ahead * length + Z * height * 0.30, Vector(), Vector()))
+        points, _ = part.shell(rings, 12, material, 0.012)
+        for point in points:
+            point.co.z = max(point.co.z, 0.0)
 
 
 def build_costume(maker):
@@ -2019,6 +2072,22 @@ def build_costume(maker):
     build_track(maker)
     torso = maker.parts[0][0]
     colours = entry["colours"]
+    add_trousers(maker, torso, torso.named("Main"), numbers)
+    if entry.get("boots"):
+        add_boots(maker, torso, torso.named("Main"), numbers.BOOTS)
+    if entry.get("peel"):
+        # The banana: a faceted peel around the whole body, wider at its foot, orange below and yellow above.
+        low, sides, off, flare, orange_below = numbers.PEEL
+        top = maker.body.SHOULDER_HEIGHT - 0.04
+        rings = []
+        for index in range(6):
+            share = index / 5
+            height = low + (top - low) * share
+            half_width, half_depth = KIT.torso_section(maker.body, max(height, 0.30))
+            grow = off + flare * (1.0 - share) ** 1.5
+            rings.append((Z * height + Y * 0.01, X * (half_width + grow), Y * (half_depth + grow)))
+        _, faces = torso.shell(rings, sides, torso.named("Hood"), numbers.OUTLINE_THICKNESS, smooth=False)
+        torso.paint([face for face in faces if face.calc_center_median().z < orange_below], torso.named("Main"))
     if "Belly" in colours:
         half, low, high = numbers.BELLY
         rows = []
@@ -2047,6 +2116,12 @@ def build_costume(maker):
     hood = maker.parts[-1][0]
     surface = maker.surface
     hood_numbers = SimpleNamespace(**{**HOOD, **entry.get("hood_numbers", {})})
+    around, upper, lower, larger = numbers.CHIN
+    rows = []
+    for polar_deg in (upper, (upper + lower) * 0.5, lower):
+        rows.append([on_head(surface, math.radians(270.0 + degrees), math.radians(polar_deg), larger)
+                     for degrees in [-around + 2.0 * around * index / 8 for index in range(9)]])
+    full.add_skin(hood, surface, rows, hood.named("Hood"), around=False)
     if entry.get("teeth"):
         count, around, length, half_deg = numbers.TEETH
         for index in range(count):
@@ -2128,7 +2203,23 @@ def build_costume(maker):
             across = (corners[1] - corners[0]) * 0.5
             hood.shell([(foot + out * 0.006, across, out * 0.008), (tip, Vector(), Vector())], 4,
                        hood.named("Tooth"), 0.008)
-    if entry.get("nostrils"):
+    if entry.get("snout"):
+        # The upper jaw of the dragon over the face, the nostrils on its top, near its tip.
+        polar_deg, ahead, half_long, half_wide, half_tall = numbers.SNOUT
+        front, polar = math.radians(270.0), math.radians(polar_deg)
+        root = on_head(surface, front, polar, interpolate(hood_numbers.SIZE, 0.0))
+        forward = (head_normal(surface, front, polar) * 0.35 - Y * 0.65).normalized()
+        centre = root + forward * (ahead + half_long * 0.6)
+        hood.shell(base.ball_rings(centre, forward, X, half_long, half_wide, half_tall, 6), 12, hood.named("Hood"),
+                   numbers.OUTLINE_THICKNESS)
+        if entry.get("nostrils"):
+            radius = numbers.NOSTRILS[2]
+            up = (Z - forward * Z.dot(forward)).normalized()
+            for sign in (1.0, -1.0):
+                place = centre + forward * half_long * 0.62 + up * half_tall * 0.78 + X * sign * half_wide * 0.32
+                disc_on(hood, surface, place, (up + forward * 0.6).normalized(), radius, hood.named("Nostril"),
+                        segments=8)
+    elif entry.get("nostrils"):
         degrees, polar_deg, radius = numbers.NOSTRILS
         size = interpolate(hood_numbers.SIZE, degrees)
         for sign in (1.0, -1.0):
@@ -2311,6 +2402,7 @@ def track(main, stripe=None, zip_colour=None, collar=None, missing="", **numbers
 
 
 LONG_SLEEVE = 0.19     # down the arm to the mitten (ARM_LENGTH 0.30, hand 0.22 across)
+COSTUME_SLEEVE = 0.205  # a costume's sleeve goes into the mitten: no skin at the wrist (16 October 2026)
 WHITE = (0.96, 0.96, 0.96)
 
 CLOTHES = {
@@ -2518,7 +2610,7 @@ def costume(main, hood_colours, head=None, **keys):
     """A costume of COSTUME: the suit in "main" with long sleeves, the hood in "hood_colours" (Hood, and
     Rim for the edge of its opening), what replaces the leaves and the teeth of hair under the hood."""
     entry = {"kind": "Costume", "colours": {"Main": main, "Collar": shade(main), **hood_colours},
-             "numbers": {"STEP": 0.076, "SLEEVE": LONG_SLEEVE},
+             "numbers": {"STEP": 0.076, "SLEEVE": COSTUME_SLEEVE},
              "head": head or {"LEAVES": NO_CROWN, "FRINGE": False}}
     return {**entry, **keys}
 
@@ -2540,14 +2632,15 @@ CLOTHES.update({
     # (16 October 2026: the suit deeper orange than the hood, as the pictures run from yellow at the top to
     # orange below; ridges down the skin, the tip bending back.)
     "Banana suit": costume((0.95, 0.56, 0.05), {"Hood": (0.98, 0.72, 0.08), "Rim": (0.89, 0.53, 0.05),
-                                                "Tip": (0.36, 0.26, 0.10), "Ridge": (0.80, 0.48, 0.04)}, peak=True),
+                                                "Tip": (0.36, 0.26, 0.10), "Ridge": (0.80, 0.48, 0.04)}, peak=True,
+                           peel=True, boots=True),
     # A red dragon: tan belly and horns, small wings on the back; since 16 October 2026 cream fangs round
     # the face, nostrils on the snout and a tail.
     "Dragon suit": costume((0.92, 0.27, 0.17), {"Hood": (0.92, 0.27, 0.17), "Rim": (0.76, 0.19, 0.11),
                                                 "Belly": (0.95, 0.70, 0.46), "Horn": (0.95, 0.76, 0.50),
                                                 "Wing": (0.66, 0.13, 0.10), "Tooth": (0.97, 0.90, 0.72),
                                                 "Nostril": (0.30, 0.06, 0.05)},
-                           horns=True, wings=True, fangs=True, nostrils=True, tail=True),
+                           horns=True, wings=True, fangs=True, nostrils=True, tail=True, snout=True, boots=True),
     # The space suit: white, grey stripes down the sleeves, the ring of the helmet around the face. Its
     # glass is not drawn; the pictures show the crown inside it, so the crown stays.
     "Astro Suit": {"kind": "Astro", "colours": {"Main": (0.90, 0.88, 0.84), "Collar": (0.70, 0.70, 0.72),
