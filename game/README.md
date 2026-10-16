@@ -647,15 +647,18 @@ drawn larger than its collision circle overlaps a wall slightly when it stands a
 **Every Genesis of the base Origin (1,869) plays its own 3D hero**: the Chog of `tools/blender`
 (head H3, the crown of leaves its hat lets out, the hat, the eyes, the mouth and the clothing of
 that Genesis, in its skin colour), the look the owner said yes to after batch 6. No picture is laid
-on it. A recruit (a player without a Genesis) wears the same Chog bare, in grey. The 100 Genesis
-on another base (Skull, Radioactive, 1:1) need their own head and keep the earlier look (the body
-above with the picture as the head) until it is made.
+on it. A recruit (a player without a Genesis) wears the same Chog bare, in grey. **Since 16 October
+the other 100 do too** (the owner's yes to batch 7 and the 1:1): the 60 Skull Genesis wear a skull with
+its jaw, its teeth and a skeleton's bones, the 30 Radioactive a head that runs from one colour to
+another with the skull showing through, and each of the ten 1:1 is a character of its own
+(`tools/blender/chog_one_of_one.py`). Six values worn by Skull Genesis only are not modelled yet (Gold
+Thorn, Silver Thorn, Silver wreath, Taped Banana, Mafia Hat, Head Wrap: 13 Genesis show a bare skull).
 
 How it gets there. One file per Genesis would weigh 400 MB, so `tools/blender/export_chog_parts.py`
-writes a library of parts instead (`Assets/Chog/Resources/ChogParts.bytes`, 2.1 MB): each part once
-(324 in all: heads with the leaves of each hat, hats, eyes, mouths, clothes, the body and the arms)
-and, for every Genesis, the parts it wears and its skin. The export builds the 79 Genesis that wear
-every part between them, then builds every other Genesis and checks that each of its parts is the
+writes a library of parts instead (`Assets/Chog/Resources/ChogParts.bytes`, 3.1 MB on 16 October):
+each part once (438 in all: heads with the leaves of each hat, hats, eyes, mouths, clothes, the body and
+the arms) and, for every Genesis, the parts it wears and its skin. The export builds the 110 Genesis that
+wear every part between them, then builds every other Genesis and checks that each of its parts is the
 very one kept: a part that depended on more than its own trait would fail the export. In the game,
 `ChogPartsLibrary` reads the file (tested outside Unity) and `ChogHeroModel` makes, for each hero,
 one mesh for each of the four parts `ChogBodyAnimator` moves, its colours in the vertices, drawn with
@@ -708,7 +711,8 @@ careers on a test bench (services started on their own port and data folder,
 `research/evidence/top-genesis-example-careers-headless-2026-10-16.png`); the public instance has no
 recorded match yet. A career still counts what the players' pages report (`server/README.md`).
 
-**The tower and the core in 3D**, a proposal not yet shown by default: `?structures3d=1` draws them from
+**The tower and the core in 3D**, shown to everyone since the owner's yes of 16 October (a private test
+page gets the earlier flat pictures with `?structures3d=0`), drawn from
 `Assets/Chog/Resources/ChogStructures.bytes` (`tools/blender/make_chog_structures.py`, the format of the
 heroes' library) in place of the flat pictures: a totem of pale stone with bands in the side's colour
 under the head of a Chog with glowing laser eyes and gritted teeth, and a pink heart leaning back in a

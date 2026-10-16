@@ -8,8 +8,9 @@ namespace Chog.Match
     /// The tower and the core in 3D (tools/blender/make_chog_structures.py): a totem with the head of a
     /// Chog whose laser eyes the tower fires with, and a heart held in a crown of Chog leaves. Read from
     /// the library "ChogStructures", made like the library of the heroes' parts: four records, each
-    /// structure in the colour of each side. A page shows them with "structures3d=1" until the owner of
-    /// the game says yes to them; StructureViews draws the flat pictures otherwise.
+    /// structure in the colour of each side. Shown to everyone since the owner's yes (16 October 2026);
+    /// a private test page asks for the earlier flat pictures with "structures3d=0", which StructureViews
+    /// also draws when the library cannot be read.
     /// </summary>
     public static class ChogStructureModel
     {
@@ -22,16 +23,18 @@ namespace Chog.Match
 
         private static ChogPartsLibrary s_library;
         private static bool s_loaded;
-        private static bool? s_asked;
+        private static bool? s_off;
 
-        /// <summary>Whether this page draws the structures in 3D: asked by its address, and the library read.</summary>
+        /// <summary>Whether this page draws the structures in 3D: unless a private test page asked for the flat
+        /// pictures, when the library is read.</summary>
         public static bool On
         {
             get
             {
-                s_asked ??= PerformanceSampling.TryGetQueryValue(Application.absoluteURL, QueryParameter, out var value)
-                            && value == "1";
-                return s_asked.Value && Library != null;
+                s_off ??= LocalGenesis.TestEntriesAllowed(Application.absoluteURL, Application.isEditor)
+                          && PerformanceSampling.TryGetQueryValue(Application.absoluteURL, QueryParameter, out var value)
+                          && value == "0";
+                return !s_off.Value && Library != null;
             }
         }
 
