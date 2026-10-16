@@ -1,7 +1,7 @@
 # Render blueprint: the whole game behind one address (docs/DEPLOY.md).
 # One container (Dockerfile) serves the WebGL build, the hero page, the portraits and the
 # services, and judges the matches with the .NET runtime it carries.
-# Not applied yet: nothing is deployed until this file is used to create the service.
+# Applied on 16 October 2026: the service is https://chog-genesis-game.onrender.com.
 services:
   - type: web
     name: chog-genesis-game
@@ -13,6 +13,22 @@ services:
     # the submission: plan "starter" and the disk at the end of this file.
     plan: free
     healthCheckPath: /api/health
+    # A push deploys again, and a new container loses the careers and the records of the
+    # matches (a staked match in play then waits for its refund). So only a change to what the
+    # image is made of deploys: the files the Dockerfile copies (see .dockerignore), and this
+    # file. Docs, research and the 3D tools do not.
+    buildFilter:
+      paths:
+        - Dockerfile
+        - .dockerignore
+        - render.yaml
+        - server/package.json
+        - server/package-lock.json
+        - server/src/**
+        - web/hero/**
+        - site/**
+        - tests/fixtures/replays/**
+        - tools/release/check_judge.sh
     envVars:
       # The public address of the game, without a trailing slash. Asked when the service is
       # created; it is written in the message a wallet signs.

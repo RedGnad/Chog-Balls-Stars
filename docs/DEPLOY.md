@@ -287,7 +287,15 @@ the Blueprint reference). The build of the game is 24 MB, so 5 GB is about 200 f
 6. Reown's dashboard: add the new domain to the project's allowed domains.
 7. cron-job.org: a request to `https://<address>/api/health` every 10 minutes keeps it awake.
 
-Each push to `main` deploys again and so empties the careers and the records of the matches.
+Each push to `main` that changes what the image is made of (the `buildFilter` of `render.yaml`: the files
+the Dockerfile copies, and `render.yaml`) deploys again and so empties the careers and the records of the
+matches; a push of docs, research or the 3D tools alone does not (`https://render.com/docs/monorepo-support.md`,
+"Setting build filters"). A commit can also skip its deploy with `[skip render]` in its message
+(`https://render.com/docs/deploys.md`).
+
+Done on 16 October 2026: the service is `https://chog-genesis-game.onrender.com` (no suffix was needed) and
+step 4 passed from the Mac (page, build files in gzip, hero page, the three contracts on mainnet, the owner's
+Genesis read, Photon's entries refused without the secret). Photon's dashboard and the cron were still to do.
 
 ## To decide (the user)
 

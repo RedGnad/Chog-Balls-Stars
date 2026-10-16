@@ -502,6 +502,19 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**16 October 2026, 18:10 (the owner created the Render service from the Blueprint and added its domain at
+Reown).**
+- **Render live:** `https://chog-genesis-game.onrender.com` (the name asked in `render.yaml`, no suffix, so
+  `PUBLIC_ORIGIN` is right). Checked from the Mac with `check_public.sh`: the page, the four build files
+  (the three `.gz` with `Content-Encoding: gzip`), a portrait, the hero page, the build
+  `20261016T092135229Z`, Photon's two entries refused without their secret (403), the simulation assets and
+  release notes not served; the wager, rental and shop read on Monad mainnet with the referee
+  `0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34`; the owner's address reads token 1795 through the public RPC;
+  the sign-in message names `chog-genesis-game.onrender.com`. Not yet: Photon still calls the Mac's tunnel,
+  so no match has been played against Render; cron-job.org not set.
+**Next action:** the owner points Photon's two addresses at Render and sets the cron; then a match from the
+Render address, and the session with #1287 there; the owner's yes on batch 11.
+
 **16 October 2026, 14:30 (the owner refused batch 10's two costumes, its tape and the mummy's head, and asked
 for the Render steps again).**
 - **Batch 11 on `3d-batch-10`** (not pushed, not in the game): the banana and the dragon are whole costumes
