@@ -413,10 +413,11 @@ def build_seal(maker):
 
 HEAD_LASER = {
     # Read on CHOG #772 (Blue Laser, the only one): a wide pale blue beam leaving the middle of the brow from
-    # a white glow, up and out to the left of the character at about 45 degrees, in front of the spikes.
-    # (Until 16 October 2026: a thin beam straight up, which the bust showed leaning the other way.)
+    # a white glow, straight out of the head. (A thin beam straight up until 16 October 2026, which the bust
+    # showed leaning the other way; then one at 45 degrees to the side, which the owner saw slanting along
+    # the head where the picture has it come straight out of it.)
     "AT": 0.13,                       # above the middle of the face
-    "WAY": (0.70, -0.25, 0.70),       # to the left of the character, ahead, up
+    "UP": 0.12,                       # how far it is turned up from straight out of the head
     "BEAM": (0.026, 0.47),            # radius, length
     "GLOW": (0.040, 0.026),           # the white glow on the brow where it leaves: half width, half height
 }
@@ -427,7 +428,7 @@ def build_head_laser(maker):
     numbers = SimpleNamespace(**HEAD_LASER)
     part, surface = maker.part(), maker.surface
     start = surface.front(0.0, numbers.AT, 0.0)
-    way = Vector(numbers.WAY).normalized()
+    way = (_out(surface, 0.0, numbers.AT) + Z * numbers.UP).normalized()
     radius, length = numbers.BEAM
     part.shell(base.tube_rings(start, way, Z, [(0.0, radius * 0.8), (0.04, radius), (length - 0.02, radius),
                                                 (length, 0.0)]), 8, part.named("Beam"), 0.0)
@@ -519,8 +520,9 @@ HAT_SHAPES = {"RamHorns": build_ram_horns, "Bandana": build_bandana, "DemonHorns
 # Every one of these stands before the crown, which keeps all its spikes (the build refuses a leaf through an
 # object, so a part that grew into a spike would fail its Genesis).
 HAT_NUMBERS = {name: {"LEAVES": FULL, "OUTLINE_THICKNESS": 0.012} for name in HAT_SHAPES}
-# The bandana lies where a headband does, with its leaves (chog_trait_hats.HEADBAND).
-HAT_NUMBERS["Bandana"] = {**hats_module.HEADBAND}
+# The bandana lies where a headband does (chog_trait_hats.HEADBAND), under the whole crown, as the headbands
+# do since 16 October 2026: its crossings with the leaves are kept, not refused.
+HAT_NUMBERS["Bandana"] = {**hats_module.HEADBAND, "LEAVES": FULL}
 HATS = {
     "Red Bandana": {"shape": "Bandana", "colours": {"Band": (0.86, 0.20, 0.18), "Line": (0.62, 0.11, 0.12)}},
     "Red Horn": {"shape": "RamHorns", "colours": {"Horn": (0.62, 0.30, 0.24)}},

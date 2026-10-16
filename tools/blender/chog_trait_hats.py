@@ -286,6 +286,9 @@ def build_ushanka(maker):
 # for the Japanese one, a red sun in the middle of the front.
 # ---------------------------------------------------------------------------------------------
 HEADBAND = {
+    # The band passes under the spikes of the head, which keeps its whole crown: the crossings of the leaves
+    # are kept in parts.json, not refused (16 October 2026).
+    "THROUGH": True,
     "SIDES": 18,
     # Polar degrees of its lower and upper edge, by degrees from the front. On the pictures the band
     # lies on the brow just above the eyes, the spikes standing above it.
@@ -1364,10 +1367,6 @@ HATS_OF_SIDE = {
 # of the seven lines of the crown (SIDE_POINTS, BIG_SIDE_POINTS, CROWN_POINTS, DURAG_POINTS, USHANKA_POINTS,
 # in the history of this file): from behind and from above that made two spikes on each side and none at
 # the back. They now take RIM_ROW and its kin (below), planted under the real rim of each hat.
-# Above and below a headband: the leaf on top and the upper pair (raised a little) stand above it (the top
-# of the back row went through the band); under it, the row under the rim of every hat (RIM_ROW), at the
-# sides and the back (until batch 6 the pairs of a cap: nothing seen at the sides from above).
-BAND_POINTS = (WHOLE, leaf(1.0, 24.0), GONE, GONE, GONE, GONE, GONE)
 # Through the knitted mask, as drawn ("THROUGH"). Until batch 7 (15 October 2026) four leaves placed by hand
 # from the one angle of the pictures (2 or 3 points near the top of the far side), made longer and turned
 # out to pass the check of the tips all around: from behind they read as a collar at mid height, unlike the
@@ -1400,10 +1399,6 @@ BUCKET_RIM_ROW = {"LENGTH": 1.40, "WIDTH": 0.70, "SWEEP_DEG": 30.0}
 # Under the fur of the ushanka, and the helmet: their flaps and cheek guards cover the sides of the head down
 # to the jaw, so the row starts behind them, and the check wants it seen behind and three quarters behind.
 USHANKA_RIM_ROW = {"ANGLES": (94.0, 116.0, 138.0, 160.0, 180.0), "SWEEP_DEG": 18.0, "SECTORS": (135, -135, 180)}
-# The crown sits on the spiky head: the row under its band, and a tuft inside the open band, rooted on
-# the top of the head and leaning back, whose points rise behind its points, as the pictures draw spikes
-# behind the crown. (Batch 5 kept one short leaf on top: a lone spike in the middle of the crown.)
-CROWN_ROW = {"INSIDE": ((0.0, 8.0), (130.0, 24.0)), "INSIDE_LENGTH": 1.05}
 
 
 # What the pictures of Side=Left show around a hat (15 October 2026, after batch 5): they are framed closer,
@@ -1487,9 +1482,12 @@ HEAD_VALUES = {
     ("Mon Beanie", "Left"): seen((71, 765, 1002, 1351, 1801), LEFT_HEAD,
         NO_CROWN, RIM_ROW),
     # The other headwear of Side=Right.
+    # The crown sits on the spiky head, which keeps its whole crown of spikes around it, as on a bare head; a
+    # spike may touch the band (16 October 2026: the owner found the row under the band too sparse, "more
+    # like the spikes of the base"; the crossings are kept in parts.json, not refused).
     ("Crown", "Right"): seen((44, 858, 1127, 1358, 1899), "3 or 4 short spikes on the far side, from beside the "
                              "band of the crown down to the cheek; spikes behind its points at the top",
-                             NO_CROWN, CROWN_ROW),
+                             FULL_CROWN),
     ("Wizard Hat", "Right"): seen((10, 472, 872, 1495, 1809), "2 or 3 spikes on the far side, from under the hat "
                                   "down to the cheek, larger than under a cap", NO_CROWN, BIG_RIM_ROW),
     ("Durag", "Right"): seen((51, 570, 1001, 1563, 1884), "3 large spikes on the far side, from the height of "
@@ -1500,10 +1498,12 @@ HEAD_VALUES = {
                                    "the far side, behind the flap, near the top", NO_CROWN, USHANKA_RIM_ROW),
     ("Russian Hat", "Left"): seen((34, 504, 982, 1518, 1876), "cream fur, dark leather flaps with snaps; " + LEFT_HEAD,
         NO_CROWN, USHANKA_RIM_ROW),
+    # A headband is tied around the spiky head: the whole crown stays and the band passes under the spikes
+    # (16 October 2026, the owner: no reason to leave room for a band; the crossings are kept, not refused).
     ("Red Headband", "Right"): seen((12, 686, 1014, 1790, 1957), "the whole crown above the band and down the far "
-                                    "side; a darker line along its lower edge", BAND_POINTS, RIM_ROW),
+                                    "side; a darker line along its lower edge", FULL_CROWN),
     ("Japan Headband", "Right"): seen((65, 523, 891, 1435, 1962), "the whole crown above the white band, a red "
-                                      "sun on its front", BAND_POINTS, RIM_ROW),
+                                      "sun on its front", FULL_CROWN),
     ("Bob Hair", "Right"): seen((43, 48, 159, 470, 482, 1137, 1380), "yellow curly hair, a red band with waving "
                                 "edges tied over the brow; the tip of one spike above the band, far side",
                                 NO_CROWN),
