@@ -16,7 +16,7 @@ submitting. Character counts are for the 8,000-character fields.
 > Chog Genesis is a real-time 3v3 arena for phones where your Chog Genesis NFT is your hero. Connect
 > the wallet that holds it and the game builds your Chog in 3D from its own traits: its hat, its eyes,
 > its mouth, its clothes and its skin, modelled by us for all 1,969 Genesis, the skulls, the radioactive
-> Chogs and the ten 1:1 included (13 skulls still wait for their headwear). The
+> Chogs and the ten 1:1 included. The
 > traits decide how it plays: its outfit gives its class (brute, ranger, controller), its eyes its
 > special attack, its aura the effect of that attack, its rarity how the attack is delivered, and its
 > hat what its basic attack throws: snowballs from a Russian Hat, dollar coins from a Dollar Cap, its
@@ -27,8 +27,11 @@ submitting. Character counts are for the 8,000-character fields.
 > the recorded inputs to decide the winner themselves, so a result can be trusted with $CHOG at
 > stake. Each Genesis keeps a public career that follows the NFT, not the wallet (matches, wins,
 > badges, mastery; mastery 2 unlocks the second form of its special), and the Genesis with the most
-> wins are listed in TOP GENESIS on the menu. A holder can also lend their Genesis with a link, without
-> moving it, and **[not yet]** rent it out for $CHOG.
+> wins are listed in TOP GENESIS on the menu. $CHOG runs through three contracts of ours on Monad
+> mainnet: players stake $CHOG on their own team and the winners are paid on the replayed result; a
+> holder rents their Genesis out at a price a day, paid straight to them, while keeping it in their
+> wallet; and the second form of a Genesis can be bought now instead of at mastery 2. A tenth of every
+> payment is burned. A holder can also lend their Genesis for free with a link, without moving it.
 
 ## 02 Show it
 
@@ -37,8 +40,10 @@ submitting. Character counts are for the 8,000-character fields.
 - **Demo video:** **[not yet]** (script below).
 - **Tech stack:** Unity 6 (WebGL, mobile first), Photon Quantum 3 (deterministic simulation,
   server-side input recording), Node.js services (wallet sign-in, Photon custom authentication and
-  webhooks, a judge that replays every match with .NET), Solidity contracts on Monad (wager, rental,
-  shop; Foundry tests), Reown AppKit and injected wallets, Blender (all 3D modelled by script).
+  webhooks, a judge that replays every match with .NET), Solidity contracts on Monad mainnet (wager
+  `0xc7524a808d2b00b43a4d3e2becb8500e409b41e3`, rental `0x7f1271d43b0e41e2eeddd5290f459fdc6196a19a`, shop
+  `0xb23a3c3492b9ba83d80c8abc9a5484d2885f058a`; Foundry tests), Reown AppKit and injected wallets, Blender
+  (all 3D modelled by script).
 
 ## 03 For judges
 
@@ -48,13 +53,11 @@ submitting. Character counts are for the 8,000-character fields.
 
 > Open the app link on a phone or a desktop browser. Without a wallet you play a recruit (a grey Chog
 > without traits): pick SIEGE or COINS with the MODE button, tap QUICK PLAY, then START; bots fill the
-> empty places. To play a Genesis without
-> owning one, open the loan link below: it lends you CHOG #____ for the judging week, without
-> moving the NFT. If you hold a Genesis, CONNECT WALLET (or OPEN IN METAMASK on a phone), pick it,
-> and play it. `?heroes=1` after the address shows a few heroes in 3D from close.
+> empty places. If you hold a Genesis, CONNECT WALLET (or OPEN IN METAMASK on a phone), pick it,
+> and play it; SIGN IN to record its career. Without one, RENT A HERO rents a Genesis a holder offers.
+> `?heroes=1` after the address shows a few heroes in 3D from close, `?heroes=1287,1376,16` those.
 
-  The loan link needs a holder to create it (the owner's Genesis, held until the end of judging,
-  see the chat of 15 October).
+  (The owner decided on 16 October 2026: no loan link for the judges; judges who hold a Chog connect it.)
 
 ## 04 Why Chog matters (the "NFT gate")
 
@@ -73,12 +76,12 @@ submitting. Character counts are for the 8,000-character fields.
 - Fonts Koulen and Convergence (SIL Open Font License), as on chog.xyz.
 - Written during the hackathon: the Genesis catalogue and trait rules, the 3D heroes and attack
   objects (Blender scripts), the services and the judge, the contracts, the screens, the structures
-  (towers and cores).
+  (towers and cores) and the two modes (SIEGE and COINS).
 
 ## 06 What's next
 
-> The last headwear of the skulls and whole-body costumes; the special attacks in 3D; stakes in $CHOG
-> on mainnet after testnet; rental of Genesis for $CHOG; seasons and a ladder per mode.
+> The special attacks in 3D; seasons and a ladder per mode; more items for a Genesis in the shop;
+> tournaments staked in $CHOG.
 
 ## The 3-minute video (script)
 
@@ -88,5 +91,6 @@ submitting. Character counts are for the 8,000-character fields.
    is modelled.
 3. 0:50 to 1:50. A match on a phone: the hat thrown as the basic attack, the special from the eyes, a
    tower falling, the end screen with the hero cheering.
-4. 1:50 to 2:30. Trust: the match replayed by the services, the stake paid on chain (testnet).
+4. 1:50 to 2:30. Trust and $CHOG: two players stake on a SIEGE, the match replayed by the services,
+   CLAIM pays the winner on Monad mainnet; a Genesis rented out, its second form bought.
 5. 2:30 to 3:00. A recruit without NFT next to a Genesis: what the NFT changes.
