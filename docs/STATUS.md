@@ -426,8 +426,12 @@ visit that played a few seconds of a match through the tunnel):
   (`research/evidence/chog-structures-3d-turn-2026-10-16.jpg`,
   `research/evidence/structures-2d-and-3d-in-match-headless-2026-10-16.png`). To show it to everyone: make
   `ChogStructureModel.On` true without the option and build.
-- **Batch 7, on its branch:** the ram horns made again after the pictures, thick, ridged, curling out to the
-  side (`2e46b74`, pushed; sheet on the branch). The skull's round head is still the known weak point.
+- **Batch 7, on its branch, ready to merge on a yes** (`54a7488`, pushed): the ram horns made again after
+  the pictures, thick, ridged, curling out to the side; the skull narrowing into its jaw under the
+  cheekbones, a skeleton's hands and feet in bone; the branch's library exported again with Red Bandana too (1,959
+  Genesis built or checked, all matching), the view tests of the branch passing on it, and seen in the game in a local
+  preview build (`main`'s own library put back and built again right after). Merging needs no export: merge,
+  then build.
 - **Seen on film, the brute's basic attack:** its impact shards fly out in front; the strike itself falls
   in the 224 ms the headless browser takes to release the touch, twice: not caught on a frame.
 - **Found:** a scripted visit with `?token=` now always plays a recruit (the admission reads the real chain
