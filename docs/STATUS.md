@@ -502,6 +502,22 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**16 October 2026, 14:30 (the owner refused batch 10's two costumes, its tape and the mummy's head, and asked
+for the Render steps again).**
+- **Batch 11 on `3d-batch-10`** (not pushed, not in the game): the banana and the dragon are whole costumes
+  (`build_mascot` in `tools/blender/chog_trait_hats.py`): one volume on "Body" from above the feet to over the
+  head, as wide round the body as round the head, the face looking out through an opening whose collar sits on
+  "Head" and follows it; the mittens out of its sides, the boots under it. The banana: five flat sides from
+  green over the head to orange at the feet, its end bending back to its stalk. The dragon: round, a light
+  belly, tan horns round the face, nostrils and dark scales, ribbed wings, a curled tail, claws on the boots.
+  The tape now wraps over the middle of the banana (it was centred off it, then lifted behind it); the mummy's
+  bandage lies tight on the skull under the nose, in two turns (it stood off the head like a flange). Library
+  exported (1,970 heroes, 0 lacking a part, 0 failed, heaviest 7,984 triangles), 85 view tests pass. Sheets
+  `.artifacts/chog-body/traits/batch-11/before_after_1.png` and `more_suits.png`.
+- **Render:** the steps and the free plan's limits as Render's pages gave them today are in
+  [DEPLOY.md](DEPLOY.md), "Render, step by step". Not started: the owner creates the service.
+**Next action:** the owner's yes on batch 11; their session with #1287 once they hold $CHOG; Render.
+
 **16 October 2026, 12:15 (the owner deployed the three contracts on Monad mainnet and validated batch 9 but
 four points; they buy $CHOG and set up Render later).**
 - **Mainnet live:** wager `0xc7524a808d2b00b43a4d3e2becb8500e409b41e3`, rental
