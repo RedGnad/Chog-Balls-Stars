@@ -2559,6 +2559,91 @@ CLOTHES.update({
 for name in ("Gangster suit", "Shark Suit", "Banana suit", "Astro Suit", "Dragon suit", "Duck Float"):
     LEFT_OUT.pop(name, None)
 
+# The clothing no Genesis wore in 3D until 16 October 2026 (117 Genesis, most of them of the base Origin on
+# Side=Left; the owner asked for every Genesis dressed). Each takes a cut already built, in the colours read
+# on its pictures (CHOG #64, #25, #32 the toads, #247 the armour, #227 Sci Fi, #216 the yukata, #474 Guko,
+# #358 Gojo, #846 the cape, #1311 the robe, #552 the mummy, #978 the vest, #155 the stripes, #772 Boner,
+# #275 and #1009 the tanks, #1221 and #1723 the holed jackets, #1289 the suit); what that cut does not draw
+# is said in "print_missing".
+def toad(main, rim, belly, pupil):
+    """A toad costume: the suit and the hood of a costume in one colour, a lighter belly, two big eyes on top
+    of the hood (the frog suit of the 1:1, chog_one_of_one.py), the teeth of hair showing under the hood."""
+    entry = costume(main, {"Hood": main, "Rim": rim, "Belly": belly, "EyeBall": (0.97, 0.97, 0.95), "Pupil": pupil},
+                    head={"LEAVES": NO_CROWN, "FRINGE": True})
+    return {**entry, "kind": "FrogSuit"}
+
+
+MUMMY_WRAP = {
+    # Two strips of bandage across the lower face of the skull, at a slant: (start, end) in the coordinates of
+    # the face, half their width, how far off the head; the face is narrowed with the jaw (narrow_jaw).
+    "BANDS": (((-0.25, -0.064), (0.25, -0.112), 0.034), ((-0.24, -0.150), (0.23, -0.108), 0.030)),
+    "LIFT": 0.030,
+}
+
+
+def build_mummy(maker):
+    """A mummy: bandages round the body as the stripes of a shirt with long sleeves, and two across the face."""
+    import chog_trait_bases as bases
+    KIT.build_tee(maker)
+    numbers = SimpleNamespace(**MUMMY_WRAP)
+    part, surface = maker.part(), maker.surface
+    for (start, end, half) in numbers.BANDS:
+        rows = []
+        for edge in (-1.0, 1.0):
+            row = []
+            for step in range(7):
+                t = step / 6
+                side = start[0] + (end[0] - start[0]) * t
+                up = start[1] + (end[1] - start[1]) * t + edge * half
+                row.append(surface.front(side, up, numbers.LIFT))
+            rows.append(row)
+        full.add_skin(part, surface, rows, part.named("Wrap"), around=False)
+    bases.narrow_jaw(part, maker.head)
+
+
+CLOTH_KINDS["Mummy"] = build_mummy
+STRIPED_TANK = {"kind": "Tee", "stripes": True, "numbers": {"SLEEVE": 0.0, "STEP": 0.046}}
+CLOTHES.update({
+    "toad blue suit": toad((0.33, 0.56, 0.93), (0.62, 0.80, 1.00), (0.62, 0.92, 0.86), (0.36, 0.78, 0.25)),
+    "Toad pink suit": toad((0.93, 0.27, 0.53), (0.98, 0.62, 0.78), (0.98, 0.74, 0.86), (0.30, 0.68, 0.95)),
+    "Toad green Suit": toad((0.18, 0.74, 0.56), (0.55, 0.92, 0.75), (0.70, 0.95, 0.82), (0.98, 0.50, 0.15)),
+    "Golden Armor": {"kind": "Tee", "colours": {"Main": (0.96, 0.74, 0.22), "Stripe": (0.82, 0.56, 0.12),
+                                                "Collar": (0.70, 0.46, 0.10)},
+                     "stripes": True, "numbers": {"STEP": 0.046, "SLEEVE": 0.09},
+                     "print_missing": "the round plates on the shoulders"},
+    "Sci Fi": track((0.98, 0.62, 0.14), stripe=(0.25, 0.85, 0.95), collar=(0.15, 0.15, 0.18),
+                    missing="the dark ring of the collar and its lights"),
+    "White Yukata": tee((0.97, 0.95, 0.95), collar=(0.92, 0.64, 0.74), SLEEVE=LONG_SLEEVE,
+                        missing="the crossed fronts and the pink blossoms"),
+    "Guko": tee((0.98, 0.52, 0.10), collar=(0.16, 0.28, 0.72), missing="the blue undershirt, the belt and the emblem"),
+    "Gojo": {**tee((0.13, 0.14, 0.24), (0.09, 0.10, 0.17)), "numbers": {"STEP": 0.076, "COLLAR": (0.600, 0.640),
+                                                                         "SLEEVE": LONG_SLEEVE},
+             "print_missing": "the round button of the high collar"},
+    "Wizard Cape": {"kind": "Cape", "colours": {"Cape": (0.17, 0.22, 0.52), "Collar": (0.10, 0.12, 0.32),
+                                                "Clasp": (0.96, 0.78, 0.22)},
+                    "print_missing": "the yellow pattern of the cape"},
+    "Jesus Robe": tee((0.95, 0.94, 0.90), collar=(0.80, 0.16, 0.13), SLEEVE=LONG_SLEEVE,
+                      missing="the red sash over the shoulder"),
+    "Mummy": {"kind": "Mummy", "colours": {"Main": (0.93, 0.91, 0.84), "Stripe": (0.78, 0.74, 0.64),
+                                          "Collar": (0.78, 0.74, 0.64), "Wrap": (0.93, 0.91, 0.84)},
+              "stripes": True, "numbers": {"STEP": 0.046, "SLEEVE": LONG_SLEEVE}},
+    "CEO Vest": {"kind": "Tee", "colours": {"Main": (0.30, 0.31, 0.35), "Stripe": (0.22, 0.23, 0.27),
+                                            "Collar": (0.19, 0.20, 0.24)},
+                 "stripes": True, "numbers": {"SLEEVE": 0.0, "STEP": 0.046}},
+    "Stripe Shirt": dict(CLOTHES["Stripes"]),
+    "Stripe shirts": dict(CLOTHES["Stripes"]),
+    "White Tank": tee((0.95, 0.95, 0.92), SLEEVE=0.0, COLLAR=(0.566, 0.593)),
+    "Purple Tank": {**STRIPED_TANK, "colours": {"Main": (0.56, 0.52, 0.64), "Stripe": (0.46, 0.42, 0.54),
+                                                "Collar": (0.40, 0.36, 0.48)}},
+    "Boner": with_({**STRIPED_TANK, "colours": {"Main": (0.74, 0.80, 0.70), "Stripe": (0.64, 0.70, 0.60),
+                                                "Collar": (0.55, 0.60, 0.52)}},
+                   colours={"Print": (0.10, 0.10, 0.10)}, print=("BONER", 0.400, 0.048, 0.200, 0.0)),
+    "Blue Mafia": jacket((0.16, 0.25, 0.62), WHITE, (0.14, 0.22, 0.58)),
+    "Orange Holed Jacket": hoodie((0.96, 0.50, 0.14), print_missing="the holes in the cloth"),
+    "Blue Holed Jacket": hoodie((0.32, 0.64, 0.95), print_missing="the holes in the cloth"),
+})
+
+
 CLOTHES_OF_SIDE = {
     "Left": {
         "Tuxedo": jacket((0.27, 0.25, 0.30), WHITE, (0.86, 0.12, 0.12)),
