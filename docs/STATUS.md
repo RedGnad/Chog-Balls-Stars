@@ -473,6 +473,35 @@ mieux", the gameplay good for a start; a new round of 3D corrections, case by ca
   a minute for a first visit, a reload of everything after each new build. With 1 GB a month on the free
   plan (about 40 first visits; that test took 47 MB of it), the judges need a host before 23 October.
 
+**16 October 2026, 13:30 (the user: yes to the 3D in the game and to two modes; B, build on mainnet
+directly; the Genesis is to be sold the next day, so everything that needs it is tested today; Render with
+a ping from cron-job.org for the host).**
+- **In the game for everyone** (public address, build `20261016T075943857Z`): every Genesis plays its 3D
+  hero (batch 7, the 1:1 and the head objects merged), the tower and the core in 3D, and **two modes**
+  chosen beside QUICK PLAY: SIEGE (towers and cores, no coin, 180 seconds, the damage to the structures
+  decides) and COINS (the sample's Coin Grab, no structure); rooms are kept apart by mode
+  (`<build>-siege`, `<build>-coins`). Seen through Photon's cloud and judged: a whole siege (99 to 80 on
+  damage) and a match of coins (12 to 2); ten sieges of six bots replayed: five ended by a core.
+  31 simulation, 85 view, 72 service tests; the judge agrees on the recorded fixtures.
+- **Mainnet, ready to deploy** (`contracts/script/DeployMainnet.s.sol`, the wager, the rental and the shop in
+  real $CHOG; rehearsed on a local copy of mainnet, about 0.43 MON of gas that day; the mainnet referee
+  `0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34`; `tools/contracts/mainnet_deployment.sh` then
+  `serve_public.sh ... --mainnet`). **Not deployed: waiting for the user's run with their wallet.**
+- **Batch 9 of the 3D, on `3d-batch-9`** (committed, not pushed while the user judges it): a second row of
+  spikes under every hat, the whole crown of spikes under the crown and the headbands, the laser straight
+  out of the brow, socket eyes for six skulls, a skull's grin in two rows of teeth and a radioactive jaw line,
+  deeper radioactive colour runs, the six headwear only skulls wear (thorns in gold and silver, laurel,
+  taped banana, fedora, turban), the dragon suit with fangs, nostrils and a tail, the banana bent and ridged,
+  and the clothing of the 117 Genesis that had none (toad suits, armour, Sci Fi, yukata, Guko, Gojo, cape,
+  robe, mummy, vests, stripes, tanks, holed jackets, a blue suit), most of them in a cut already built, what
+  it does not draw said in `print_missing`. Library exported: 1,970 heroes, 497 pieces, all built or checked;
+  85 view tests pass on it. Boards in `.artifacts/chog-body/traits/batch-9/`.
+- **Found:** cron-job.org sets no number of jobs (fair use, every minute at most, 30 seconds a call); Render
+  gives 750 free hours a month per workspace and suspends every free service of it when they run out, and
+  a free service loses its files at each restart (`https://render.com/docs/free.md`).
+**Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
+rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
+
 **Where things stood, 11 October 2026, 15:00.** The secured version asked for
 on 10 October (D33) exists up to the point where Photon's cloud must call us. What is written
 and tested: the game services answer Photon's question "who connects" (a signed-in wallet, a
