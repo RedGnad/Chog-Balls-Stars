@@ -311,7 +311,7 @@ answer's `recommendedAction` is `BLOCK` or `NONE`. Asked that day with `curl` (h
 | `BLOCK` | ours on `onrender.com`, and any made-up name under `onrender.com`, `vercel.app`, `netlify.app`, `pages.dev`, `github.io`, `trycloudflare.com` (names that do not exist are blocked too) |
 | `NONE` | the ngrok tunnel, made-up names under `ngrok-free.app`, `ngrok.app`, `fly.dev`, `up.railway.app`, `duckdns.org`, made-up `.xyz` and `.com` domains, `chogathon.chog.xyz` |
 
-So it is the host, not our name or our page: an unknown subdomain of those free hosts is blocked by default.
+Made-up names prove little: see the correction below, measured on real sites.
 The fix is a domain of our own pointed at the Render service (Render's Hobby plan includes two custom
 domains, `https://render.com/docs/custom-domains.md`), with `PUBLIC_ORIGIN` set to it (the sign-in message
 names it) and the domain added at Reown; Photon's two addresses can stay on `onrender.com`, since a browser
@@ -334,6 +334,15 @@ The way out of a dApp-scan block: Blockaid's form at `https://report.blockaid.io
 `MetaMask/eth-phishing-detect` issues of September and October 2026, removal requests for a dApp-scan block
 were closed in 1 to 123 hours; one for a `github.io` page ended unblocked, one for a `vercel.app` page was sent
 to Blockaid's form and was still `BLOCK` on 16 October.
+
+**Correction, measured the same evening on real sites.** The rule above ("an unknown subdomain of those hosts is
+blocked by default") was drawn from made-up names, and it is wrong as a rule: of 33 live `vercel.app` sites named
+in the owner's projects (some are other teams' entries noted during research), 10 answer `NONE` and 23 `BLOCK`.
+The `github.io` evidence was a name that serves nothing (404). What a `BLOCK` does is in the extension's
+`ui/hooks/useOriginTrustSignals.ts`: `BLOCK` shows the site as "Malicious", `WARN` as a warning, `VERIFIED` as
+verified, `NONE` shows nothing. The game's pages on Vercel (`tools/release/vercel_site.sh deploy`, production
+address `https://chog-genesis.vercel.app`, project `chog-genesis` of the owner's account) answered `BLOCK` too
+right after their first publication.
 
 ## To decide (the user)
 
