@@ -2671,31 +2671,63 @@ def toad(main, rim, belly, pupil):
 
 
 MUMMY_WRAP = {
-    # Two strips of bandage across the lower face of the skull, at a slant: (start, end) in the coordinates of
-    # the face, half their width, how far off the head; the face is narrowed with the jaw (narrow_jaw).
-    "BANDS": (((-0.25, -0.064), (0.25, -0.112), 0.034), ((-0.24, -0.150), (0.23, -0.108), 0.030)),
-    "LIFT": 0.030,
+    # Read again on #552, #816 and #1642 (16 October 2026, the owner: "not really bandages"; until then a
+    # striped shirt and two flat strips): the skeleton shows, its ribs between the bandages, wide cream
+    # bandages with a dark edge laid over it: one round the jaw over the teeth, two crossing on the chest
+    # from each shoulder to the other hip, one round the waist. Each band: its half width, how far off the
+    # body, its half thickness.
+    "BAND": (0.034, 0.012, 0.007),
+    "CROSS": ((80.0, 0.60), (-80.0, 0.33)),       # (degrees round from the front, height) of its two ends
+    "WAIST": 0.315,
+    "JAW": (116.0, 1.13, 0.046),                  # polar degrees of its middle, size against the head, half width (128 at first: under the teeth)
+    "STATIONS": 13,
 }
 
 
 def build_mummy(maker):
-    """A mummy: bandages round the body as the stripes of a shirt with long sleeves, and two across the face."""
+    """A mummy (MUMMY_WRAP): bandages over the skeleton, which keeps its ribs."""
     import chog_trait_bases as bases
-    KIT.build_tee(maker)
     numbers = SimpleNamespace(**MUMMY_WRAP)
-    part, surface = maker.part(), maker.surface
-    for (start, end, half) in numbers.BANDS:
-        rows = []
-        for edge in (-1.0, 1.0):
-            row = []
-            for step in range(7):
-                t = step / 6
-                side = start[0] + (end[0] - start[0]) * t
-                up = start[1] + (end[1] - start[1]) * t + edge * half
-                row.append(surface.front(side, up, numbers.LIFT))
-            rows.append(row)
-        full.add_skin(part, surface, rows, part.named("Wrap"), around=False)
-    bases.narrow_jaw(part, maker.head)
+    body, surface = maker.body, maker.surface
+    torso = maker.part(on="Body")
+    wrap = torso.named("Wrap")
+    half_wide, off, half_thick = numbers.BAND
+
+    def around_torso(degrees, height):
+        half_width, half_depth = KIT.torso_section(body, height)
+        angle = math.radians(degrees)
+        point = Vector((math.sin(angle) * (half_width + off), -math.cos(angle) * (half_depth + off), height))
+        out = Vector((math.sin(angle) / (half_width + off), -math.cos(angle) / (half_depth + off), 0.0)).normalized()
+        return point, out
+
+    def band(places):
+        path, wide, thick = [], [], []
+        for index, (point, out) in enumerate(places):
+            ahead = places[min(index + 1, len(places) - 1)][0] - places[max(index - 1, 0)][0]
+            across = out.cross(ahead).normalized()
+            path.append(point)
+            wide.append(across * half_wide)
+            thick.append(out * half_thick)
+        slab(torso, path, wide, thick, wrap, 0.008, sides=4)
+
+    (from_deg, from_height), (to_deg, to_height) = numbers.CROSS
+    for sign in (1.0, -1.0):
+        band([around_torso(sign * (from_deg + (to_deg - from_deg) * step / (numbers.STATIONS - 1)),
+                           from_height + (to_height - from_height) * step / (numbers.STATIONS - 1))
+              for step in range(numbers.STATIONS)])
+    band([around_torso(-180.0 + 360.0 * step / 16, numbers.WAIST) for step in range(17)])
+
+    # Round the jaw, over the teeth, narrowed with the skull's jaw (narrow_jaw).
+    head = maker.part()
+    polar_deg, larger, half_band = numbers.JAW
+    rows = []
+    for edge in (-1.0, 1.0):
+        polar = math.radians(polar_deg) + edge * half_band / surface.half.z
+        rows.append([on_head(surface, 2.0 * math.pi * step / 20, polar, larger) for step in range(20)])
+    KIT.add_loops(head, [rows[0], [point + (point - surface.middle).normalized() * 0.012 for point in rows[0]],
+                         [point + (point - surface.middle).normalized() * 0.012 for point in rows[1]], rows[1]],
+                  head.named("Wrap"), 0.008)
+    bases.narrow_jaw(head, maker.head)
 
 
 CLOTH_KINDS["Mummy"] = build_mummy
@@ -2721,9 +2753,7 @@ CLOTHES.update({
                     "print_missing": "the yellow pattern of the cape"},
     "Jesus Robe": tee((0.95, 0.94, 0.90), collar=(0.80, 0.16, 0.13), SLEEVE=LONG_SLEEVE,
                       missing="the red sash over the shoulder"),
-    "Mummy": {"kind": "Mummy", "colours": {"Main": (0.93, 0.91, 0.84), "Stripe": (0.78, 0.74, 0.64),
-                                          "Collar": (0.78, 0.74, 0.64), "Wrap": (0.93, 0.91, 0.84)},
-              "stripes": True, "numbers": {"STEP": 0.046, "SLEEVE": LONG_SLEEVE}},
+    "Mummy": {"kind": "Mummy", "colours": {"Wrap": (0.94, 0.91, 0.82)}},
     "CEO Vest": {"kind": "Tee", "colours": {"Main": (0.30, 0.31, 0.35), "Stripe": (0.22, 0.23, 0.27),
                                             "Collar": (0.19, 0.20, 0.24)},
                  "stripes": True, "numbers": {"SLEEVE": 0.0, "STEP": 0.046}},
