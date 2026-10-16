@@ -60,7 +60,7 @@ import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
 import { createSessions } from './session.js';
 import { createShop } from './shop.js';
-import { createStatic } from './static.js';
+import { createStatic, movedToPublic } from './static.js';
 import { createWager, wagerNetwork } from './wager.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -167,7 +167,7 @@ const files = createStatic([
 async function handle(request) {
   const path = new URL(request.url).pathname;
   if (path.startsWith('/api/')) return api(request);
-  return (await files(request)) ?? new Response('Not found', { status: 404 });
+  return movedToPublic(request, publicOrigin) ?? (await files(request)) ?? new Response('Not found', { status: 404 });
 }
 
 const port = Number(environment.PORT ?? 10000);

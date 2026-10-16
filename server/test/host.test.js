@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { after, before, test } from 'node:test';
 import { createApi } from '../src/api.js';
 import { careerFile, createHttpServer, reownProjectId, servedBuild, sessionSecret } from '../src/node.js';
-import { createStatic, describeFile } from '../src/static.js';
+import { createStatic, describeFile, movedToPublic } from '../src/static.js';
 
 let folder;
 let serve;
@@ -168,4 +168,12 @@ test('the build a site folder serves is read from its release notes, each time i
   assert.equal(await servedBuild(site), '', 'a name that is not a stamp is no build');
   await writeFile(join(site, 'RELEASE.json'), 'not json');
   assert.equal(await servedBuild(site), '');
+});
+
+test('a page asked at the services\' own address is sent to the public one, path and query kept', () => {
+  const moved = movedToPublic(new Request('https://chog-genesis-game.onrender.com/hero/?n=1287'), 'https://chogarena.vercel.app');
+  assert.equal(moved.status, 308);
+  assert.equal(moved.headers.get('location'), 'https://chogarena.vercel.app/hero/?n=1287');
+  assert.equal(movedToPublic(new Request('https://chogarena.vercel.app/'), 'https://chogarena.vercel.app'), null);
+  assert.equal(movedToPublic(new Request('http://localhost:8090/'), ''), null);
 });

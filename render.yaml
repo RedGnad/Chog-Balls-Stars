@@ -30,10 +30,12 @@ services:
         - tests/fixtures/replays/**
         - tools/release/check_judge.sh
     envVars:
-      # The public address of the game, without a trailing slash. Asked when the service is
-      # created; it is written in the message a wallet signs.
+      # The public address of the game, without a trailing slash; it is written in the message a
+      # wallet signs. Since 16 October 2026 the pages are served by Vercel
+      # (tools/release/vercel_site.sh), which passes /api/ on to this service; a page asked here is
+      # sent there (movedToPublic in server/src/static.js).
       - key: PUBLIC_ORIGIN
-        sync: false
+        value: https://chogarena.vercel.app
       - key: SESSION_SECRET
         generateValue: true
       # What Photon's dashboard sends with its requests (docs/DEPLOY.md, "Photon"). Asked when

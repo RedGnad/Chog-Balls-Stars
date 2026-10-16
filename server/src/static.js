@@ -89,3 +89,16 @@ export function createStatic(mounts) {
     return new Response(Readable.toWeb(createReadStream(file)), { status: 200, headers });
   };
 }
+
+/**
+ * Where a page asked at another address than the public one is sent: the same path at the public
+ * address (308), or null when it is already there. The pages may be served elsewhere (on Vercel,
+ * tools/release/vercel_site.sh) while these services keep their own address: a page opened at the
+ * services' address would show a sign-in message naming another site.
+ */
+export function movedToPublic(request, publicOrigin) {
+  if (!publicOrigin) return null;
+  const url = new URL(request.url);
+  if (url.host === new URL(publicOrigin).host) return null;
+  return new Response(null, { status: 308, headers: { Location: publicOrigin + url.pathname + url.search } });
+}

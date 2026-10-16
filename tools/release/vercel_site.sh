@@ -1,7 +1,7 @@
 #!/bin/sh
 # Lays out the pages of the game for Vercel and, with "deploy", publishes them there.
 #
-#   sh tools/release/vercel_site.sh            # lays out .artifacts/vercel/chog-genesis
+#   sh tools/release/vercel_site.sh            # lays out .artifacts/vercel/chogarena (https://chogarena.vercel.app)
 #   sh tools/release/vercel_site.sh deploy     # and publishes it to production (vercel CLI, logged in)
 #
 # Vercel serves what a browser opens: the game (site/game), the hero page (web/hero) and the
@@ -15,7 +15,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$HERE/../.." && pwd)
 SERVICES=${CHOG_SERVICES_ORIGIN:-https://chog-genesis-game.onrender.com}
 # The folder's name is the Vercel project's name on the first deploy.
-OUT="$ROOT/.artifacts/vercel/chog-genesis"
+OUT="$ROOT/.artifacts/vercel/chogarena"
 
 mkdir -p "$OUT/hero" "$OUT/genesis-art"
 # Kept in step with the sources, files gone from them included; the project link Vercel keeps in

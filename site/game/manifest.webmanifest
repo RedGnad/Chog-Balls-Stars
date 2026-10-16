@@ -1,6 +1,6 @@
 {
-  "name": "Chog Genesis",
-  "short_name": "Chog Genesis",
+  "name": "Chog Arena",
+  "short_name": "Chog Arena",
   "description": "3v3 arena. Your Chog Genesis is your hero.",
   "start_url": "./",
   "scope": "./",
