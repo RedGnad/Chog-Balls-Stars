@@ -217,6 +217,10 @@ def render_one(name, blend=None, out=None, only=None, colour=None, size=504, bus
     if genesis:
         tones["ChogFace"] = tuple(root["chog_face"])
         tones["ChogBlush"] = tuple(root["chog_blush"])
+    # A material of a part of the base that keeps its own colour (the grey cheeks of a 1:1).
+    for material in bpy.data.materials:
+        if material.name not in tones and "srgb" in material:
+            tones[material.name] = tuple(material["srgb"])
     background = tuple(root["chog_background"]) if genesis and "chog_background" in root else BUST_PLAIN
     side = root.get("chog_side", "Right")
 

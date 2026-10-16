@@ -664,3 +664,32 @@ library of the game was put back right after; the public address was not touched
 Blender pictures do, the gradients included:
 `research/evidence/chog-traits-batch7-in-game-preview-headless-2026-10-15.png`. To put batch 7 in the game
 once the owner says yes: merge this branch, run `export_chog_parts.py`, build.
+
+## The ten 1:1 Genesis (16 October 2026, on the branch `3d-one-of-one`, pictures and a local preview)
+
+Each 1:1 Genesis is a character of its own and its metadata names no trait but its base and its tier.
+`chog_one_of_one.py` gives each one a look read on its picture, as traits the builder knows (skin, eyes,
+mouth, hat, clothing) and parts no other Genesis wears: the cape of the fire Chog (#53), the flames of
+the skull (#392), the brain of the zombie (#494), the frog suit with its eyes (#973), the halo and the
+wings of the angel (#1159), the gold helmet with its red gem (#1290), the horns and the trident of the
+devil (#1376); The Scream (#434), the manga page in greys (#1006) and the Chog of gold (#1373) are their
+colours, eyes and mouths. `make_chog_traits.traits_of` gives a 1:1 its look; `export_chog_parts.py`
+exports them like any Genesis, with their body, arms and head under their own number (their hands or
+cheeks are their own colours). The devil throws its trident (a new attack object); the others throw
+their hat (the halo, the brain, the flames, the helmet) or a spike of their crown in their colours, and
+each says it under its hero (`LINES`).
+
+The library of this branch covers all 1,969 Genesis (1,970 with the recruit; 433 pieces, 3.2 MB), every
+one built or checked (`--check 5000`); the view tests pass on it (84). Seen beside their pictures
+(`research/evidence/chog-one-of-one-pictures-and-busts-2026-10-16.jpg`) and in the game in a preview build
+made on the local network only, the game's own library put back right after
+(`research/evidence/chog-one-of-one-in-game-preview-headless-2026-10-16.png`).
+
+Not drawn: the painted style of #434 and its hands on its cheeks, the cracks of the skull of #392, the
+stripes on the face of #1290, the screentone of #1006, the green drool of #494 (gritted teeth instead).
+Tried and changed on the way: #494's brain crossed the crown (the upper and middle pairs of leaves are
+left out under it, and the brain made larger); #973 had round frog eyes (the tired lids read as Pepe);
+the angel's wings were too small to see and its first build went over 8,000 triangles.
+
+This branch starts from `3d-batch-7`: merging it brings batch 7 too. To put them in the game after a yes:
+merge, build (the library is exported here).

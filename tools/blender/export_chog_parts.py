@@ -71,6 +71,11 @@ import chog_attack_objects as attacks  # noqa: E402
 import chog_trait_bases as bases  # noqa: E402
 from mathutils import Vector  # noqa: E402
 
+# What the 1:1 Genesis throw that no other does (chog_one_of_one.py): the devil's trident.
+attacks.ATTACK_OF_HEAD.update(traits.one.ATTACK_OF_HEAD)
+attacks.OBJECTS.update(traits.one.ATTACK_OBJECTS)
+attacks.WORDS.update(traits.one.ATTACK_WORDS)
+
 REST_PARTS = ("Body", "Head", "armLeft", "armRight")
 DEFAULT_OUT = os.path.join(traits.REPOSITORY, "game", "Assets", "Chog", "Resources", "ChogParts.bytes")
 SUMMARY = os.path.join(traits.REPOSITORY, ".artifacts", "chog-body", "parts-export.json")
@@ -117,13 +122,29 @@ def all_genesis():
             record = json.loads(line)
             genesis_traits = {str(item["trait_type"]): str(item["value"])
                               for item in json.loads(record["raw_json"]).get("attributes", [])}
+            number = int(record["metadata_id"])
             if genesis_traits.get("Base") in BASES:
-                found[int(record["metadata_id"])] = genesis_traits
+                found[number] = genesis_traits
+            elif genesis_traits.get("Base") == "1:1":
+                # A 1:1 Genesis names no trait: it is built with the look chog_one_of_one.py gives it.
+                found[number] = traits.one.look_of(number, genesis_traits)
     return found
 
 
 def keys_of(genesis_traits):
     """The keys of the parts a Genesis wears: what each part is built from, and nothing else."""
+    return {own_key(key, genesis_traits) for key in shared_keys_of(genesis_traits)}
+
+
+def own_key(key, genesis_traits):
+    """A 1:1 Genesis keeps its body, its arms and its head under its own number: their colours are its own
+    (hands, cheeks), and nothing is shared with another Genesis but the parts of the traits it wears."""
+    number = traits.one.number_of(genesis_traits)
+    return key + ("1:1", number) if number and key[0] in ("rest", "head") else key
+
+
+def shared_keys_of(genesis_traits):
+    """keys_of before a 1:1 Genesis takes its own."""
     side = genesis_traits.get("Side", "Right")
     keys = {("rest", name) for name in ("Body", "armLeft", "armRight")}
     if bases.is_skull(genesis_traits) or bases.is_radioactive(genesis_traits):
@@ -159,9 +180,14 @@ def keys_of(genesis_traits):
 
 def key_of_object(thing, genesis_traits):
     """The key an object of a built hero belongs to (see keys_of)."""
+    return own_key(shared_key_of_object(thing, genesis_traits), genesis_traits)
+
+
+def shared_key_of_object(thing, genesis_traits):
+    """key_of_object before a 1:1 Genesis takes its own."""
     if thing.name in REST_PARTS:
         if thing.name == "Head":
-            return next(key for key in keys_of(genesis_traits) if key[0] == "head")
+            return next(key for key in shared_keys_of(genesis_traits) if key[0] == "head")
         if thing.name == "Body" and (bases.is_skull(genesis_traits) or bases.is_radioactive(genesis_traits)):
             return ("rest", "Body", genesis_traits["Base"])
         if thing.name in ("armLeft", "armRight") and bases.is_skull(genesis_traits):
@@ -476,6 +502,8 @@ def main():
 
     labels = {number: attacks.label_of(everyone[number].get("Head"), bases.is_skull(everyone[number])) if number in everyone else
               "THROWS THE SPIKES OF ITS CROWN" for number in heroes}
+    # A 1:1 Genesis says what it throws in its own words (chog_one_of_one.LINES).
+    labels.update({number: line for number, line in traits.one.LINES.items() if number in heroes})
     write_library(arguments.out, materials, rest, pieces, heroes, labels)
     size = os.path.getsize(arguments.out)
     triangles = sum(len(piece["indices"]) // 3 for piece in pieces)

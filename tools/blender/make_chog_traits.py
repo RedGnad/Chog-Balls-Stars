@@ -88,6 +88,7 @@ import make_chog_full as full  # noqa: E402  (the folder of this file must be on
 from render_chog_body import linear  # noqa: E402
 import chog_trait_faces as faces  # noqa: E402  (eyes and mouths added on 14 October 2026, registered below)
 import chog_trait_bases as bases  # noqa: E402  (the Skull base, batch 7, 15 October 2026)
+import chog_one_of_one as one  # noqa: E402  (the ten 1:1 Genesis, 16 October 2026)
 
 variants, base = full.variants, full.base
 X, Y, Z, NOWHERE = base.X, base.Y, base.Z, base.NOWHERE
@@ -2280,6 +2281,17 @@ OF_SIDE.update({"Head": hats_and_clothes.HATS_OF_SIDE, "Body": hats_and_clothes.
 # Batch 4: every value of "Head" (on each Side) gets the leaves and the numbers its pictures ask for
 # (HEAD_VALUES of chog_trait_hats.py), which replace those of its shape.
 OF_SIDE["Head"] = hats_and_clothes.from_the_art(HATS, OF_SIDE["Head"])
+# The ten 1:1 Genesis (chog_one_of_one.py): their eyes, mouths, hats, clothing and skins.
+TRAIT_PARTS["Eyes"][1].update(one.EYES)
+TRAIT_PARTS["Mouth"][1].update(one.mouths(TRAIT_PARTS["Mouth"][1]))
+_ONE_HATS, _ONE_HAT_NUMBERS = one.hats(hats_and_clothes.HEADBAND)
+HATS.update(_ONE_HATS)
+HAT_SHAPES.update(one.HAT_SHAPES)
+HAT_NUMBERS.update(_ONE_HAT_NUMBERS)
+CLOTHES.update(one.clothes(hats_and_clothes.tee, hats_and_clothes.costume))
+CLOTH_KINDS.update(one.CLOTH_KINDS)
+SKINS.update(one.SKINS)
+bases.SKULL_SKINS.update(one.SKULL_SKINS)
 
 
 def head_from_the_art(traits):
@@ -2305,8 +2317,10 @@ def traits_of(number):
                 continue
             record = json.loads(line)
             if int(record["metadata_id"]) == int(number):
-                return {str(item["trait_type"]): str(item["value"])
-                        for item in json.loads(record["raw_json"]).get("attributes", [])}
+                found = {str(item["trait_type"]): str(item["value"])
+                         for item in json.loads(record["raw_json"]).get("attributes", [])}
+                # A 1:1 Genesis names no trait: it is given its look (chog_one_of_one.py).
+                return one.look_of(number, found) if found.get("Base") == "1:1" else found
     raise SystemExit(f"CHOG_TRAITS no Genesis named CHOG #{number} in the recorded metadata")
 
 
@@ -2533,8 +2547,22 @@ def build(traits=None, replaced=None, head_replaced=None):
         arms["armRight"].finish("armRight", at(-shoulder, 0.0, body_n.SHOULDER_HEIGHT), root, materials),
     ]
     by_name = {part.name: part for part in parts}
-    if skull:
+    one_number = one.number_of(traits)
+    if skull or one_number in one.HANDS_OF_SKIN:
         bases.bone_hands(parts, materials, SKIN, full.GLOVE)
+    if one_number in one.BLUSH:
+        # Cheeks that are not pink (the manga page): their own material, in their colour.
+        blush = bpy.data.materials.new(f"OneBlush{one_number}")
+        blush.diffuse_color = linear(one.BLUSH[one_number])
+        shader = blush.node_tree.nodes.get("Principled BSDF") if blush.node_tree else None
+        if shader is not None:
+            shader.inputs["Base Color"].default_value = linear(one.BLUSH[one_number])
+        blush["srgb"] = list(one.BLUSH[one_number])
+        blush["unlit"] = False
+        for part in parts:
+            for index, slot in enumerate(part.data.materials):
+                if slot is not None and slot.name == full.BLUSH:
+                    part.data.materials[index] = blush
 
     trait_parts, left_out = [], []
     # A hat that covers a trait (the balaclava over the mouth) says it in "HIDES": that part is not
@@ -2719,7 +2747,7 @@ def make_one(number, out=None, hat=None, replaced=None, head_replaced=None):
         if "top" in skin:
             root["chog_skin_top"] = list(skin["top"])
         root["chog_face"] = list(skin.get("face", GENESIS_FACE))
-        root["chog_blush"] = list(GENESIS_BLUSH)
+        root["chog_blush"] = list(one.BLUSH.get(one.number_of(traits), GENESIS_BLUSH))
         root["chog_side"] = traits.get("Side", "Right")
         background = background_colour(traits.get("Background"))
         if background:

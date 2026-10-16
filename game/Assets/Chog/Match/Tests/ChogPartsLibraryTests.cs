@@ -15,6 +15,8 @@ namespace Chog.Match.Tests
         private const int OriginGenesis = 1869;
         // The Genesis of the Skull (60) and Radioactive (30) bases, which batch 7 gives their own heads.
         private const int SkullAndRadioactiveGenesis = 90;
+        // The ten 1:1 Genesis, each a character of its own (tools/blender/chog_one_of_one.py).
+        private const int OneOfOneGenesis = 10;
         private const int TriangleLimit = 8000;
 
         private static ChogPartsLibrary s_library;
@@ -40,7 +42,7 @@ namespace Chog.Match.Tests
         [Test]
         public void EveryGenesisOfTheBaseOriginAndTheRecruitHaveAHero()
         {
-            Assert.AreEqual(OriginGenesis + SkullAndRadioactiveGenesis + 1, Library.Heroes.Count);
+            Assert.AreEqual(OriginGenesis + SkullAndRadioactiveGenesis + OneOfOneGenesis + 1, Library.Heroes.Count);
             Assert.IsTrue(Library.TryGetHero(ChogHeroModel.Recruit, out var recruit));
             Assert.AreEqual("Recruit", Library.Skins[recruit.Skin].Name);
             Assert.AreEqual(4, recruit.Pieces.Length, "the recruit is the bare Chog: body, head, two arms");
@@ -156,8 +158,9 @@ namespace Chog.Match.Tests
             Assert.AreEqual(0.5f, r, 1e-5f, "half way up the head: half of each");
             library.ColourOf(0, 1, 2f, out _, out var g, out _, out _);
             Assert.AreEqual(1f, g, 1e-5f, "a skin of one colour stays so at every height");
-            Assert.IsTrue(Library.Skins.All(skin => skin.HasTop == skin.Name.StartsWith("Radioactive ")),
-                "the skins of the Radioactive base, and only they, run to another colour");
+            Assert.IsTrue(Library.Skins.All(skin => skin.HasTop == (skin.Name.StartsWith("Radioactive ")
+                                                                  || skin.Name == "1:1 Flame" || skin.Name == "1:1 Gold")),
+                "the skins of the Radioactive base and of the 1:1 of fire and of gold, and only they, run to another colour");
         }
 
         [Test]
