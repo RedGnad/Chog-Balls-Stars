@@ -262,6 +262,33 @@ for a whole match that the judge then replayed ("Photon" section).
 Not tried: Render itself, a container, a domain name, a real wallet, a phone on the public
 address, more than one player at a time on the services.
 
+## Render, step by step (free plan, written 16 October 2026)
+
+What Render's pages said that day (`https://render.com/docs/free.md`, `https://render.com/pricing.md`,
+`https://render.com/docs/infrastructure-as-code.md`): a free web service has 0.1 CPU and 512 MB, sleeps
+after 15 minutes without a request and takes about a minute to wake, loses its files when it sleeps or
+restarts, and cannot have a disk; a workspace gets 750 free instance hours a month (one service awake all
+month is 744), 500 build minutes and 5 GB of outbound traffic, beyond which a workspace without a card is
+suspended until the next month. A Docker service may be free (the `docker` runtime and the `free` plan of
+the Blueprint reference). The build of the game is 24 MB, so 5 GB is about 200 first visits.
+
+1. Sign in on render.com with GitHub and let Render read `RedGnad/chogathon` (private).
+2. New, Blueprint, the repository, branch `main`: Render reads `render.yaml` and asks the values marked
+   `sync: false`. `PUBLIC_ORIGIN`: `https://chog-genesis-game.onrender.com` (the address Render gives the
+   service; if the name is taken it adds a suffix, then correct the value once the address shows).
+   `PHOTON_AUTH`: `1`. `PHOTON_SECRET`, `REOWN_PROJECT_ID`, `REFEREE_KEY`: the contents of `photon-secret`,
+   `reown-project-id` and `mainnet-referee-key` in `.artifacts/services-public/` on the development Mac
+   (copied with `pbcopy < <file>`, never printed). The secret is the one Photon's dashboard already holds.
+3. Deploy. The first build of the container ever made happens here; it replays the recorded matches and
+   fails if a winner differs. Its log is what to look at if it fails.
+4. `sh tools/release/check_public.sh https://<address>` from the Mac.
+5. Photon's dashboard: only the two addresses change (`/api/photon/auth`, `/api/photon/hook` on the new
+   address). From then on the instance on the Mac no longer hears from Photon.
+6. Reown's dashboard: add the new domain to the project's allowed domains.
+7. cron-job.org: a request to `https://<address>/api/health` every 10 minutes keeps it awake.
+
+Each push to `main` deploys again and so empties the careers and the records of the matches.
+
 ## To decide (the user)
 
 | Question | Why it is open |
