@@ -39,7 +39,20 @@ echo "building the program that plays a match again..."
 python3 "$ROOT/tools/quantum/headless.py" verify --dotnet "$DOTNET" >/dev/null
 VERIFIER="$ROOT/.artifacts/dotnet-build/bin/Chog.Quantum.Verifier/release/Chog.Quantum.Verifier.dll"
 
-WAGER=$(sh "$HERE/rehearse_wager.sh" | tail -1)
+# WAGER=<address> plays the match on a wager already deployed on mainnet, as it is on the copy: its owner,
+# impersonated on the copy only, makes the test referee its referee there. Otherwise a wager is deployed.
+if [ -n "${WAGER:-}" ]; then
+  OWNER=$(cast call "$WAGER" "owner()(address)" --rpc-url "$RPC")
+  send_as "$OWNER" "$WAGER" "setReferee(address)" "$(cast wallet address --private-key "$TEST_KEY")"
+  echo "the deployed wager $WAGER, on the copy, now listens to the test referee"
+  # The players, as rehearse_wager.sh prepares them: anvil's second and third accounts.
+  for PLAYER in 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC; do
+    give_mon "$PLAYER"
+    give_chog "$PLAYER" 10000
+  done
+else
+  WAGER=$(sh "$HERE/rehearse_wager.sh" | tail -1)
+fi
 echo "wager on the copy: $WAGER"
 
 mkdir -p "$DATA"
@@ -55,4 +68,6 @@ until curl -s -o /dev/null "http://127.0.0.1:$PORT/api/health"; do
   sleep 0.2
 done
 
-node "$ROOT/server/rehearsal/secure_match.mjs" --record "$RECORD" --wager "$WAGER" --services "http://127.0.0.1:$PORT" --data "$DATA" --rpc "$RPC" --cheat "$CHEAT"
+# HOST_TOKEN and GUEST_TOKEN (default 1795 and 408; 0 a recruit) must be what the record was played with.
+node "$ROOT/server/rehearsal/secure_match.mjs" --record "$RECORD" --wager "$WAGER" --services "http://127.0.0.1:$PORT" --data "$DATA" --rpc "$RPC" --cheat "$CHEAT" \
+  --host-token "${HOST_TOKEN:-1795}" --guest-token "${GUEST_TOKEN:-408}"

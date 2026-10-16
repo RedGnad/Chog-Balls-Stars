@@ -1,0 +1,34 @@
+The contracts deployed on Monad mainnet on 16 October 2026, rehearsed on a local copy of the chain
+=================================================================================================
+
+Chain:   anvil --fork-url https://rpc.monad.xyz (chain 143), on this Mac. The deployed contracts are
+         on the copy as they are on mainnet. No transaction was sent to the real chain. The wallets
+         that act are public test keys (anvil's accounts, the web3.js documentation's key) and real
+         holders impersonated on the copy only.
+Build:   20261016T092135229Z (the one the public address serves).
+
+1. A staked match on the deployed wager (0xc7524a808d2b00b43a4d3e2becb8500e409b41e3)
+   WAGER=<it> HOST_TOKEN=0 GUEST_TOKEN=0 sh tools/contracts/rehearse_secure_match.sh
+       .artifacts/replays/20261015T140645-winner0-tick6436.json <build folder>
+   Its owner, impersonated on the copy, made the test referee its referee there. Two recruits staked
+   25 $CHOG each on their own team; the stakes were locked; the judge replayed the record (6,377 ticks):
+   team 0 won 11 to 6; the referee signed; a third party brought it: host 10000 -> 10022.5 $CHOG,
+   guest 10000 -> 9975, 2.5 burned, 0 left in the contract, state 2 (settled).
+   With the same record declared as Genesis 1795 and 408 the match was called off (the record was
+   played as recruits) and both stakes came back: state 3 (refunded).
+
+2. A rental from the game on the deployed rental (0x7f1271d43b0e41e2eeddd5290f459fdc6196a19a)
+   The real holders of CHOG #1464 (token 3) and token 408 offered them at 10 $CHOG a day (on the copy).
+   browser_check.sh rent: RENT A HERO, the first offer, one day: rentalsOf(player) = [3], the holder
+   received 9 $CHOG, 1 burned; the menu shows the rented Genesis chosen, "RENTED 23 h".
+   browser_check.sh rentout offer: RENT IT OUT for token 1795 (CHOG #1287): offerOf(1795) = true,
+   10 $CHOG a day, by the player.
+
+3. A purchase from the game on the deployed shop (0xb23a3c3492b9ba83d80c8abc9a5484d2885f058a)
+   browser_check.sh buy: the form button of CHOG #1287 (token 1795) read "MASTERY 2, OR NOW FOR
+   100 $CHOG"; after the approval and the purchase owned(1795, 1) = true, the treasury (the owner's
+   development wallet) received 90 $CHOG on the copy, 10 burned, and the button reads
+   "FORM, TAP TO CHANGE".
+
+Not rehearsed here: a real wallet (the stand-in signs at once), a Ledger, Photon's own calls for the
+staked match (played by server/rehearsal/secure_match.mjs).

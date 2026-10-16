@@ -119,7 +119,9 @@ async function main() {
     for (const player of [HOST, GUEST]) {
       player.wallet = createWallet(hexToBytes(player.key));
       player.address = player.wallet.address;
-      const holder = await cast('call', GENESIS, 'ownerOf(uint256)(address)', String(player.tokenId));
+      // Token 0 is a recruit, who stakes without a Genesis (a record played as recruits).
+      const holder = player.tokenId === 0 ? player.address
+        : await cast('call', GENESIS, 'ownerOf(uint256)(address)', String(player.tokenId));
       if (holder.toLowerCase() !== player.address) {
         await cast('rpc', 'anvil_setBalance', holder, '0x56BC75E2D63100000');
         await cast('rpc', 'anvil_impersonateAccount', holder);
@@ -127,7 +129,7 @@ async function main() {
         await cast('rpc', 'anvil_stopImpersonatingAccount', holder);
       }
       player.before = await chogOf(player.address);
-      console.log(`${player.name} ${player.address}: Genesis ${player.tokenId}, ${whole(player.before)} $CHOG`);
+      console.log(`${player.name} ${player.address}: ${player.tokenId ? `Genesis ${player.tokenId}` : 'a recruit'}, ${whole(player.before)} $CHOG`);
       if (player.before < STAKE) throw new Error(`${player.name} has less than the stake: run tools/contracts/rehearse_wager.sh first`);
     }
 

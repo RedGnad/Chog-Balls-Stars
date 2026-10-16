@@ -45,6 +45,9 @@
 #       step dearer, or TAKE IT BACK. The stand-in wallet sends real transactions to the chain
 #       behind CHOG_BROWSER_WALLET_RPC (default http://127.0.0.1:8545): only ever a local copy
 #       prepared by tools/contracts/rehearse_rental.sh, with services started with --rental.
+#   browser_check.sh buy <base url> <label>
+#       connect, tap the first Genesis of the wallet, then the form button that sells its second form: the
+#       stand-in wallet sends the approval and the purchase to the copy behind CHOG_BROWSER_WALLET_RPC.
 #   browser_check.sh rent <base url> <label> [offer slot 1 to 6, default 1] [days button 1 to 3, default 1]
 #                         [play seconds, default 0] [where RENT A HERO is: title | large, default title]
 #       connect, RENT A HERO, pick that offer and that length, pay, and see the rented Genesis
@@ -197,6 +200,15 @@ case "$MODE" in
       withdraw) tap 3 701 441 14000 ;;
       *) echo "unknown button: $4" >&2; exit 2 ;;
     esac
+    ;;
+  buy)
+    # The second form bought from the shop for the first Genesis of the wallet (a local copy with services
+    # started with --shop, the wallet holding that Genesis and $CHOG): the form button, then the wallet.
+    export CHOG_BROWSER_WALLET_KEY=$TEST_KEY CHOG_BROWSER_WALLET_RPC=${CHOG_BROWSER_WALLET_RPC:-http://127.0.0.1:8545}
+    export CHOG_BROWSER_URL="$BASE/?perf=1" CHOG_BROWSER_SETTLE_MS=6000
+    tap 1 $CONNECT 6000
+    tap 2 417 263 2500
+    tap 3 828 385 26000
     ;;
   rent)
     export CHOG_BROWSER_WALLET_KEY=$TEST_KEY CHOG_BROWSER_WALLET_RPC=${CHOG_BROWSER_WALLET_RPC:-http://127.0.0.1:8545}
