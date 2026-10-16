@@ -10,10 +10,8 @@ namespace Chog.Controls
         public Vector2 PointerPosition;
         public bool Fire;
         public bool AltFire;
-        // Held through the mouse (or its keys) alone, not a stick or a pad: these aim at the pointer
-        // when they are pressed, so the game can attack on the press.
-        public bool PointerFire;
-        public bool PointerSpecial;
+        // False while the pointer aims (a mouse, without a stick or a pad in use): the game then
+        // attacks when a button is pressed rather than when it is let go.
         public bool UseStickAim;
     }
 
@@ -50,17 +48,13 @@ namespace Chog.Controls
             else if (special) _lastStickAim = _specialAim;
             else if (fire) _lastStickAim = _basicAim;
 
-            bool mouseFire = !touchControls && _mouseFire.IsPressed();
-            bool mouseSpecial = !touchControls && _mouseSpecial.IsPressed();
             var state = new CombatInputState
             {
                 Move = _move.ReadValue<Vector2>(),
                 StickAim = _lastStickAim,
                 PointerPosition = _point.ReadValue<Vector2>(),
-                Fire = fire || mouseFire,
-                AltFire = special || mouseSpecial,
-                PointerFire = mouseFire && !fire,
-                PointerSpecial = mouseSpecial && !special,
+                Fire = fire || (!touchControls && _mouseFire.IsPressed()),
+                AltFire = special || (!touchControls && _mouseSpecial.IsPressed()),
                 // The sample casts on release. Keep the stick's aim for that input tick.
                 UseStickAim = touchControls || fire || special || _fireWasHeld || _specialWasHeld
             };

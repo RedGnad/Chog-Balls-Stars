@@ -19,7 +19,9 @@ if(keptProfile){
 const profile=keptProfile||await mkdtemp(join(tmpdir(),'chog-browser-'));
 const chrome=spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',[
   '--headless=new','--mute-audio',`--user-data-dir=${profile}`,'--remote-debugging-port=0','--no-first-run',
-  '--no-default-browser-check','--enable-unsafe-swiftshader','--use-angle=swiftshader',
+  // CHOG_BROWSER_GPU=1 draws with the Mac's GPU (Metal) instead of SwiftShader: software drawing
+  // runs the game at about five frames a second, too slow to stand for a player.
+  '--no-default-browser-check',...(process.env.CHOG_BROWSER_GPU==='1'?['--use-angle=metal','--enable-gpu']:['--enable-unsafe-swiftshader','--use-angle=swiftshader']),
   '--autoplay-policy=no-user-gesture-required','--disable-background-networking','--disable-component-update',
   // CHOG_BROWSER_IGNORE_CERT=1 accepts a self-signed certificate, for a local HTTPS test only.
   ...(process.env.CHOG_BROWSER_IGNORE_CERT==='1'?['--ignore-certificate-errors']:[]),'about:blank'
@@ -184,31 +186,39 @@ try {
   }
   if(!loaded)throw new Error('Unity loader timeout');
   await sleep(Number(process.env.CHOG_BROWSER_SETTLE_MS||1800));await screenshot('browser-menu.png');
+  // A tap of the menu: a finger on a touch page (the game picks its controls from what was last
+  // used, ControlModeWatcher), the left mouse button on a desktop one.
+  const tap=async(x,y)=>{
+    if(touch){
+      await command('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{id:3,x,y}]});
+      await sleep(60);
+      await command('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    }else{
+      await command('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1});
+      await command('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',buttons:0,clickCount:1});
+    }
+  };
   if(process.env.CHOG_BROWSER_CLICK_X&&process.env.CHOG_BROWSER_CLICK_Y){
     const x=Number(process.env.CHOG_BROWSER_CLICK_X),y=Number(process.env.CHOG_BROWSER_CLICK_Y);
-    await command('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1});
-    await command('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',buttons:0,clickCount:1});
+    await tap(x,y);
     await sleep(Number(process.env.CHOG_BROWSER_AFTER_CLICK_MS||10000));
     await screenshot('browser-after-click.png');
   }
   if(process.env.CHOG_BROWSER_CLICK_2_X&&process.env.CHOG_BROWSER_CLICK_2_Y){
     const x=Number(process.env.CHOG_BROWSER_CLICK_2_X),y=Number(process.env.CHOG_BROWSER_CLICK_2_Y);
-    await command('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1});
-    await command('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',buttons:0,clickCount:1});
+    await tap(x,y);
     await sleep(Number(process.env.CHOG_BROWSER_AFTER_CLICK_2_MS||10000));
     await screenshot('browser-after-second-click.png');
   }
   if(process.env.CHOG_BROWSER_CLICK_3_X&&process.env.CHOG_BROWSER_CLICK_3_Y){
     const x=Number(process.env.CHOG_BROWSER_CLICK_3_X),y=Number(process.env.CHOG_BROWSER_CLICK_3_Y);
-    await command('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1});
-    await command('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',buttons:0,clickCount:1});
+    await tap(x,y);
     await sleep(Number(process.env.CHOG_BROWSER_AFTER_CLICK_3_MS||10000));
     await screenshot('browser-after-third-click.png');
   }
   if(process.env.CHOG_BROWSER_CLICK_4_X&&process.env.CHOG_BROWSER_CLICK_4_Y){
     const x=Number(process.env.CHOG_BROWSER_CLICK_4_X),y=Number(process.env.CHOG_BROWSER_CLICK_4_Y);
-    await command('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1});
-    await command('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',buttons:0,clickCount:1});
+    await tap(x,y);
     await sleep(Number(process.env.CHOG_BROWSER_AFTER_CLICK_4_MS||10000));
     await screenshot('browser-after-fourth-click.png');
   }
@@ -216,8 +226,7 @@ try {
   for(let number=5;number<=9;number++){
     const x=Number(process.env[`CHOG_BROWSER_CLICK_${number}_X`]),y=Number(process.env[`CHOG_BROWSER_CLICK_${number}_Y`]);
     if(!process.env[`CHOG_BROWSER_CLICK_${number}_X`]||!process.env[`CHOG_BROWSER_CLICK_${number}_Y`])continue;
-    await command('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1});
-    await command('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',buttons:0,clickCount:1});
+    await tap(x,y);
     await sleep(Number(process.env[`CHOG_BROWSER_AFTER_CLICK_${number}_MS`]||10000));
     await screenshot(`browser-after-click-${number}.png`);
   }

@@ -25,7 +25,8 @@ namespace Quantum
           filter.Transform->Rotation = FPVector2.RadiansSignedSkipNormalize(FPVector2.Up, moveDirection);
         }
 
-        if (filter.InputContainer->Input.Fire.WasReleased == true || filter.InputContainer->Input.AltFire.WasReleased == true)
+        var input = filter.InputContainer->Input;
+        if (input.Casts(input.Fire) || input.Casts(input.AltFire))
         {
           SkillData attackData = frame.FindAsset<SkillData>(filter.CharacterAttacks->BasicSkillData.Id);
 

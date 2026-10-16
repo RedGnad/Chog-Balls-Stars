@@ -5,7 +5,6 @@ namespace TwinStickShooter
   using UnityEngine;
   using UnityEngine.InputSystem;
   using Chog.Controls;
-  using Chog.Match;
 
   [RequireComponent(typeof(PlayerInput))]
   public class TopDownInput : MonoBehaviour
@@ -16,9 +15,6 @@ namespace TwinStickShooter
     private AttackPreview _attackPreview;
     private PlayerInput _playerInput;
     private CombatInputReader _reader;
-    private PressPulse _firePulse, _specialPulse;
-    // What a held mouse button sent, written to the console once it is let go (CHOG_INPUT).
-    private int _heldFrom, _heldTicks, _sentDown, _askedAgain, _lastTick = -1, _reports;
     private bool _focused = true;
     private bool _paused;
 
@@ -80,21 +76,15 @@ namespace TwinStickShooter
     public void PollInput(CallbackPollInput callback)
     {
       QuantumDemoInputTopDown input = default;
-      // While a button is held, whatever the pulses send.
-      bool showPreview = false, previewSpecial = false;
       if (_reader != null && _focused && !_paused)
       {
         var state = _reader.Read(MobileButtonsManager.TouchControlsVisible);
         var move = state.Move.ToFPVector2();
         input.MoveDirection = IsInverseControl ? -move : move;
-        // The mouse attacks on the press (PressPulse); a stick or a pad on the release, as before.
-        bool firePulse = _firePulse.Next(state.PointerFire, callback.Frame);
-        bool specialPulse = _specialPulse.Next(state.PointerSpecial, callback.Frame);
-        input.Fire = state.PointerFire ? firePulse : state.Fire;
-        input.AltFire = state.PointerSpecial ? specialPulse : state.AltFire;
-        NoteMouse(state.PointerFire || state.PointerSpecial, callback.Frame, firePulse || specialPulse);
-        showPreview = state.Fire || state.AltFire;
-        previewSpecial = state.AltFire;
+        input.Fire = state.Fire;
+        input.AltFire = state.AltFire;
+        // Aimed with the mouse, an attack leaves on the press; with a stick or a pad, on the release.
+        input.AimsWithPointer = !state.UseStickAim;
 
         if (state.UseStickAim)
         {
@@ -109,33 +99,11 @@ namespace TwinStickShooter
 
       if (_attackPreview != null)
       {
-        bool show = showPreview && input.AimDirection != FPVector2.Zero;
+        bool show = (input.Fire || input.AltFire) && input.AimDirection != FPVector2.Zero;
         _attackPreview.gameObject.SetActive(show);
-        if (show) _attackPreview.UpdateAttackPreview(input.AimDirection, previewSpecial);
+        if (show) _attackPreview.UpdateAttackPreview(input.AimDirection, input.AltFire);
       }
       callback.SetInput(input, DeterministicInputFlags.Repeatable);
-    }
-
-    private void NoteMouse(bool held, int tick, bool down)
-    {
-      if (held)
-      {
-        if (_heldTicks == 0) _heldFrom = tick;
-        if (tick == _lastTick) _askedAgain++;
-        else
-        {
-          _heldTicks++;
-          if (down) _sentDown++;
-        }
-      }
-      else if (_heldTicks > 0)
-      {
-        if (_reports++ < 20)
-          Debug.Log("CHOG_INPUT mouse held from tick " + _heldFrom + " for " + _heldTicks + " ticks, sent down " +
-                    _sentDown + ", ticks asked again " + _askedAgain);
-        _heldTicks = _sentDown = _askedAgain = 0;
-      }
-      _lastTick = tick;
     }
 
     private FPVector2 GetDirectionToMouse(Vector2 mousePosition)

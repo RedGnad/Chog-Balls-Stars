@@ -55,44 +55,5 @@ namespace Chog.Match.Tests
             Assert.IsFalse(rule.Observe(ControlInput.Key, 2f));
             Assert.AreEqual(ControlMode.Desktop, rule.Mode);
         }
-
-        [Test]
-        public void AClickIsSentAsAPressThenARelease()
-        {
-            var pulse = new PressPulse();
-            Assert.IsTrue(pulse.Next(true, 100));
-            Assert.IsFalse(pulse.Next(false, 101));
-            Assert.IsFalse(pulse.Next(false, 102));
-        }
-
-        [Test]
-        public void AHeldButtonAttacksEveryOtherTick()
-        {
-            var pulse = new PressPulse();
-            var sent = new bool[6];
-            for (var tick = 0; tick < sent.Length; tick++)
-                sent[tick] = pulse.Next(true, 40 + tick);
-            CollectionAssert.AreEqual(new[] { true, false, true, false, true, false }, sent);
-        }
-
-        [Test]
-        public void ATickAskedForAgainGetsTheSameAnswer()
-        {
-            var pulse = new PressPulse();
-            Assert.IsTrue(pulse.Next(true, 7));
-            Assert.IsTrue(pulse.Next(true, 7));
-            Assert.IsFalse(pulse.Next(true, 8));
-            Assert.IsFalse(pulse.Next(true, 8));
-            Assert.IsTrue(pulse.Next(true, 9));
-        }
-
-        [Test]
-        public void LettingGoInTheMiddleSendsTheReleaseAndStartsAgainOnTheNextPress()
-        {
-            var pulse = new PressPulse();
-            Assert.IsTrue(pulse.Next(true, 1));
-            Assert.IsFalse(pulse.Next(false, 2));
-            Assert.IsTrue(pulse.Next(true, 3));
-        }
     }
 }

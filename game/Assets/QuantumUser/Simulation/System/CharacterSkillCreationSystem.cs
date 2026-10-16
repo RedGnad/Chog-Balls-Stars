@@ -44,7 +44,7 @@ namespace Quantum
 
     private void ApplyAttackInput(Frame frame, QuantumDemoInputTopDown input, Button button, EntityRef entity, FPVector2 entityPos, EAttributeType type, MovementData* movementData, AssetRef<SkillData> dataRef)
     {
-      bool actionReleased = button.WasReleased;
+      bool actionReleased = input.Casts(button);
 
       if (actionReleased == true && movementData->IsOnAttackLock == false)
       {

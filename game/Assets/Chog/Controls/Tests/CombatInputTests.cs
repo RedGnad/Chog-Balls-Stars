@@ -43,7 +43,6 @@ namespace Chog.Controls.Tests
             Press(_mouse.leftButton);
             var state = _reader.Read(false);
             Assert.That(state.Fire, Is.True);
-            Assert.That(state.PointerFire, Is.True);
             Assert.That(state.AltFire, Is.False);
             Assert.That(state.UseStickAim, Is.False);
             Assert.That(state.PointerPosition, Is.EqualTo(new Vector2(200, 100)));
@@ -52,7 +51,6 @@ namespace Chog.Controls.Tests
             state = _reader.Read(false);
             Assert.That(state.Fire, Is.False);
             Assert.That(state.AltFire, Is.True);
-            Assert.That(state.PointerSpecial, Is.True);
         }
 
         [Test]
@@ -62,7 +60,6 @@ namespace Chog.Controls.Tests
             Press(keys.spaceKey);
             var state = _reader.Read(false);
             Assert.That(state.AltFire, Is.True);
-            Assert.That(state.PointerSpecial, Is.True);
             Assert.That(state.UseStickAim, Is.False);
         }
 
@@ -72,7 +69,6 @@ namespace Chog.Controls.Tests
             Press(_mouse.leftButton);
             var state = _reader.Read(true);
             Assert.That(state.Fire, Is.False);
-            Assert.That(state.PointerFire, Is.False);
         }
 
         [Test]
