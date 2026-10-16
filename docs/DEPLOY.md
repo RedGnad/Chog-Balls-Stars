@@ -321,6 +321,20 @@ never opens them. MetaMask's static list (`https://github.com/MetaMask/eth-phish
 public price list (`POST https://api.porkbun.com/api/json/v3/pricing/get`) gave that day: `.xyz` 2.04 USD the
 first year, 14.21 USD a renewal; `.com` 11.08 USD.
 
+Asked again later that day: `chogtanks.vercel.app` (the owner's earlier game, an old site) answers `NONE`,
+while a new name under `vercel.app` answers `BLOCK`: an address earns its way out with time, so moving to
+Vercel would not help. Made-up names that answered `NONE`: `deno.dev`, `web.app` (Firebase; `firebaseapp.com`
+is `BLOCK`), `hf.space`, `koyeb.app`, `surge.sh`, `zeabur.app`, `northflank.app`, `is-a.dev`, `js.org`, `eu.org`,
+`mooo.com`; `workers.dev` and `azurestaticapps.net` answer `BLOCK`. Only `ipfs.io`, `dweb.link`,
+`cf-ipfs.com`, `cloudflare-ipfs.com`, `irys.xyz` and `sites.google.com` are judged by path
+(`PHISHING_DETECTION_PATH_BASED_ROOT_DOMAINS` in `packages/phishing-controller/src/utils.ts`).
+
+The way out of a dApp-scan block: Blockaid's form at `https://report.blockaid.io` (it posts to
+`/api/submitDappForm`; it asks the domain, the wallet, an email and a captcha, so the owner sends it). In the
+`MetaMask/eth-phishing-detect` issues of September and October 2026, removal requests for a dApp-scan block
+were closed in 1 to 123 hours; one for a `github.io` page ended unblocked, one for a `vercel.app` page was sent
+to Blockaid's form and was still `BLOCK` on 16 October.
+
 ## To decide (the user)
 
 | Question | Why it is open |
