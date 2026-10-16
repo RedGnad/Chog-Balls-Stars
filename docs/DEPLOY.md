@@ -383,6 +383,15 @@ sites years old (xdao.app) or with no transaction at all (equiramarkets.com); Me
 already unflagged" or "no longer blocked" between 1 and 123 hours later, after the owner's report at
 `https://report.blockaid.io`. So the block is Blockaid's current scanner, not this code: it is cleared on request.
 
+**Why the owner's other projects never showed it (measured 16 October, 22:00).** Their projects with a domain of
+their own, all bought and served through Vercel (`vercel domains ls`: `viky.cash` 35 days old, `lock-in.quest`,
+`sentri-fi.xyz`), answer `NONE`; 14 of their 17 `*.vercel.app` addresses answer `BLOCK`, among them projects from
+February and April 2025 (`nadomons0`, `monstack`), so age is not what clears it. Made-up subdomains of their
+domains (`chogarena.lock-in.quest`) and unregistered names (`chogarena.xyz`, `.com`, `.fun`, `.app`) answer `NONE`.
+Vercel's price quote (`vercel domains price <name>`, no purchase): `chogarena.xyz` 1.99 USD the first year then
+13 USD, `.fun` and `.lol` 1.99 then 27, `.com` 11.25, `.app` 9.99 then 15. RDAP (`https://rdap.org/domain/<name>`)
+found none of the `chogarena` names registered.
+
 ## To decide (the user)
 
 | Question | Why it is open |
