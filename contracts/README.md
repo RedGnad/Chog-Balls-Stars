@@ -517,3 +517,116 @@ unlocks instead of a key (`tools/contracts/rehearse_shop.sh`).
 | At what price | Set by the owner with `setItem`, changeable at any time. The rehearsals used 500 and 750 $CHOG, numbers without meaning. |
 | Where the $CHOG goes | A treasury address, a burn, or a split (`burnedShare`, fixed for the life of the contract). |
 | Who deploys and owns it | A deployment needs a funded Monad wallet; its owner sets the prices. |
+
+# ChogCareers: the career of each Genesis, on chain
+
+**Written on 17 October 2026, not deployed.** The owner asked for as many services on chain as possible ("on veut le
+plus de service possible onchain"). Until now careers are kept by the game services in a file that Render's free plan
+loses "every time the service redeploys, restarts, or spins down" (https://render.com/docs/free.md), and a match is
+credited on the word of the player's own page. Here the referee records each match once the judge has replayed it,
+and the career is keyed by token id, so it follows the Genesis when the token is sold (`docs/PRODUCT-REVIEW.md`,
+"Careers that follow the NFT").
+
+## What the contract does
+
+`src/ChogCareers.sol`, no dependency, not upgradeable.
+
+- `record(bytes32 matchKey, uint8 winnerTeam, Entry[] entries)`: only the referee (`msg.sender`), once per match key
+  (meant to be `keccak256` of the name the game server gives the match, as for the wager). `winnerTeam` is 0 or 1, 2 for
+  a draw. An `Entry` is `(uint16 tokenId, uint8 team, uint8 playedBy)`, `playedBy` 0 holder, 1 renter, 2 guest; entries
+  come in strictly ascending token id (which is what makes a Genesis count once per match), 1 to 16 of them, token ids
+  1 to 1969. Bots and recruits have no entry.
+- Per Genesis, one storage word: `matches`, `wins`, `draws`, `rentedMatches`, `guestMatches`, `streak` (wins in a row up
+  to the last match; a loss or a draw ends it), `bestStreak`, `lastPlayedAt` (seconds).
+- Events: `MatchRecorded(matchKey indexed, winnerTeam, entries)` and, for each entry, `Played(matchKey indexed,
+  tokenId indexed, team, playedBy, outcome)` with outcome 0 lost, 1 won, 2 draw, so the whole history can be rebuilt
+  from logs. Logs of `rpc.monad.xyz` are limited to 100 blocks a request, so the game reads the counters, not the logs.
+- Reads: `careerOf(tokenId)`, `careersOf(uint256[])`, `resultOf(matchKey)` (recorded, winner), and
+  `packedCareers(firstTokenId, count)`, the raw word of each career for a reader that ranks every Genesis in one call.
+  From the lowest bits: matches 32, wins 32, draws 32, rentedMatches 32, guestMatches 32, streak 16, bestStreak 16,
+  lastPlayedAt 64.
+- The owner can only replace the referee (`setReferee`) and hand the contract over (`transferOwnership`).
+- Mastery and badges are not stored: they are read from the counters off chain, with the rule of
+  `server/src/career.js` (`masteryOf`, `BADGES`), which stays the source.
+- The careers are a fixed array declared first, one word per token id from slot 1, rather than a mapping. Monad prices
+  cold storage by page of 128 consecutive slots since its revision MONAD_TEN (MIP-8, active on mainnet since
+  2026-09-02 14:30 UTC, https://docs.monad.xyz/developer-essentials/changelog/releases.md), and "each key of a mapping
+  still resolves to its own page" (https://docs.monad.xyz/developer-essentials/opcode-pricing.md): with the array, 128
+  careers share a page and reading all 1,969 touches 16 pages.
+
+## Gas, measured on Monad mainnet itself
+
+Measured on 17 October 2026 with `eth_estimateGas` on `https://rpc.monad.xyz`, the contract's runtime code and storage
+given as a state override (nothing deployed, nothing sent), so with Monad's own gas rules
+(`python3 -I tools/contracts/estimate_careers_gas.py` measures again). The figures include the 21,000 of any
+transaction.
+
+| Call | First match of these Genesis | Genesis that already played |
+| --- | --- | --- |
+| `record`, 1 Genesis | 95,698 | 78,630 |
+| `record`, 3 Genesis | 164,239 | 111,811 |
+| `record`, 6 Genesis on 6 pages | 258,399 | 154,397 |
+| `record`, 6 Genesis on one page (token ids 1 to 127) | 211,985 | 108,166 |
+| `packedCareers(1, 1969)` as an `eth_call` | 960,361 | |
+| `careersOf` of the 1,969 ids as an `eth_call` | 3,057,770 | |
+
+The public endpoints allow 200M gas per `eth_call` (Monad's JSON-RPC overview, read 10 October 2026), so one call ranks
+every Genesis. About 28,000 gas of each first record is the match key, which is what keeps a match from being counted
+twice.
+
+**Monad charges the gas limit, not the gas used.** Its documentation says so: "The gas charged for a transaction is the
+**gas limit**", `gas_paid = gas_limit * price_per_gas`, a choice made for asynchronous execution
+(https://docs.monad.xyz/developer-essentials/gas-pricing.md, read 17 October 2026; minimum base fee 100 MON-gwei,
+transaction gas limit 30M). So the services must send each record with a limit close to its estimate, not a round
+ceiling.
+
+Cost per match at the price read that morning (102 gwei from `cast gas-price`, MON at 0.0227 USD from CoinGecko at
+09:05), with a limit equal to the estimate:
+
+| Match | MON | USD |
+| --- | --- | --- |
+| 1 Genesis, already played | 0.0080 | 0.00018 |
+| 1 Genesis, first match | 0.0098 | 0.00022 |
+| 6 Genesis, already played | 0.0157 | 0.00036 |
+| 6 Genesis, first match | 0.0264 | 0.00060 |
+
+At that price 10 MON pays for about 380 matches of six Genesis playing for the first time, and about 1,250 of one
+Genesis that already played. The tests in `test/ChogCareers.t.sol` print the same calls
+under Ethereum's rules, which are not Monad's.
+
+## Tests
+
+`forge test --match-contract ChogCareersTest`: 16 tests, one of them a fuzz test of the counters over 24 random results.
+Only the referee records, a match key once, a whole 3v3 with every way of playing, streaks across wins, losses and
+draws, a draw for everyone, rented and guest counts, token ids out of the collection, a Genesis twice or out of order
+in one match (nothing of the refused match is kept), bad teams and kinds, 0 and 17 entries, the events of a match,
+`careersOf` and `packedCareers` over the 1,969 ids (the packed words decoded and compared), the owner's two powers,
+the constructor.
+
+## Deploying (not done)
+
+In the owner's terminal, with the development wallet imported once
+(`~/.foundry/bin/cast wallet import chog-dev --interactive`) and a little MON on it (the deployment is one
+transaction):
+
+```sh
+cd contracts
+REFEREE=<address of the key the services record with> \
+  ~/.foundry/bin/forge script script/DeployCareers.s.sol --rpc-url monad --account chog-dev --broadcast
+```
+
+The script refuses any chain but 143 and a referee equal to the deploying wallet. The referee then needs MON for the
+records; the services do not send any record before they are given the contract's address.
+
+## Limits
+
+- **The referee is trusted.** The contract checks who sends a record, not the match. Whoever holds the referee's key
+  can write any result for any Genesis; a stolen key is answered by `setReferee` from the owner, but what it wrote
+  stays. The services write only after the judge's replay, from the inputs Photon's server recorded.
+- **The referee pays the gas.** Its MON balance is the hard limit on what can be recorded. A player who plays many
+  matches costs the project their gas; the services bound it: a match is recorded only with a verdict of the judge
+  and at least one Genesis played by a signed-in holder, renter or guest, at most one match a minute per Genesis
+  (as `career.js` does today), and within a daily number of records. To be written in the services.
+- A match that the services never record (a restart before the verdict, a referee without MON) is simply not in the
+  careers.
+- Not reviewed by anyone else, not audited.
