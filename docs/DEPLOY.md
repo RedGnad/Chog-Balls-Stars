@@ -414,6 +414,40 @@ found none of the `chogarena` names registered.
 - So the way out without sending anything is a domain of our own on the Vercel project, with `PUBLIC_ORIGIN` and
   Reown following it; then check the verdict once it is live.
 
+## Keeping careers and match records on the free plan (researched 17 October 2026)
+
+What must outlive a restart of the free service (it has no disk): `careers.json` (careers, TOP GENESIS, and
+the times a holder took a lent Genesis back; about 250 bytes per credited report, rewritten whole), and for
+a staked match `match.json`, `verdict.json` and `wager.json` (about 2 KB a match together) until `settle` is
+called; after one hour the contract lets anyone refund instead. The replay chunks (about 7.8 KB every 10 s,
+up to about 540 KB a match) are needed only until the judge has run, from local files
+(`tools/quantum/Verifier.cs`). Sign-in needs nothing stored: challenges, sessions and passes are tokens signed
+with `SESSION_SECRET`, which Render keeps across deploys (`generateValue: true`).
+
+Pages read on 17 October 2026, the providers' own:
+
+| Option | Free limits | Lasts? | Card | From Node |
+| --- | --- | --- | --- | --- |
+| Upstash Redis Free (https://upstash.com/pricing/redis, https://upstash.com/docs/redis/overall/pricing, https://upstash.com/docs/redis/help/faq.md) | 250 MB, 500K commands a month | On disk; archived after 30 days without activity, with emails first, restored from the console | None | Plain `fetch` to its REST API (https://upstash.com/docs/redis/features/restapi) |
+| Turso Free (https://turso.tech/pricing) | 5 GB | Archived after 10 days idle, unarchived by hand | None | `fetch` (`/v2/pipeline`) |
+| Neon Free (https://neon.com/docs/introduction/plans) | 1 GB | Kept; compute suspended over a limit | None | Needs its driver |
+| Supabase Free (https://supabase.com/docs/guides/platform/free-project-pausing) | 500 MB | Paused after a week without activity | Not stated | `fetch` (PostgREST) |
+| Cloudflare KV (https://developers.cloudflare.com/kv/platform/limits/) | 1,000 writes a day | Durable; one write per second per key | Not checked | REST |
+| Firestore Spark (https://firebase.google.com/pricing) | 1 GiB, 20K writes a day | Kept | None | Needs a signed Google token or `firebase-admin` |
+| MongoDB Atlas M0 (https://www.mongodb.com/docs/atlas/reference/free-shared-limitations/) | 512 MB | Paused after 30 days without a connection | Not stated | Driver only (its Data API ended 30 September 2025) |
+| Vercel Blob Hobby (https://vercel.com/docs/vercel-blob/usage-and-pricing) | 2,000 uploads a month | Blocked 30 days when over | | Its package |
+| Render Key Value Free (https://render.com/docs/key-value.md) | 25 MB | Lost at every restart | | |
+| Render Postgres Free (https://render.com/docs/free.md) | 1 GB | Expires 30 days after creation | | `pg` driver |
+| Render Starter + disk (https://render.com/pricing.md, https://render.com/docs/disks.md) | 7 USD a month (512 MB, half a CPU) + 0.25 USD per GB a month | Durable; one instance, no zero-downtime deploy | Yes | No change |
+
+The smallest change for no monthly cost: Upstash Redis over REST, no new dependency. In `server/src/node.js` a
+REST client (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`), a careers store with the shape of
+`careerFile`, and a match store that writes local files and copies every key but the replay chunks,
+`replay-start` and `configs` to Redis, reading Redis only when the local file is missing; `host.js` picks them
+when both variables are set. About 85 commands for a 10-minute match (about 5,000 matches a month). Still lost
+after it: a match whose container restarts before its verdict (void, or refunded after an hour). Not measured:
+whether the free instance's CPU lets the judge finish a replay within its 330 s.
+
 ## To decide (the user)
 
 | Question | Why it is open |
