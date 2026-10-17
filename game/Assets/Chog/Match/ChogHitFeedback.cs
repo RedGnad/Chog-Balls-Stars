@@ -45,14 +45,16 @@ namespace Chog.Match
         // What was done, for the console line CHOG_JUICE (every 15 seconds while it changes) and the
         // performance overlay: hits on heroes, of them flashed (a 3D hero was found), held (the hit stop),
         // hits on structures, falls of structures.
-        private static int s_hits, s_flashed, s_held, s_structureHits, s_falls;
+        private static int s_hits, s_flashed, s_held, s_structureHits, s_falls, s_localHits, s_deaths, s_returns;
+        private static float s_mostTrauma;
         private int _hitsLogged = -1;
         private float _nextLog;
 
         /// <summary>One line for the performance overlay and the console.</summary>
         public static string Status => "juice hits " + s_hits + "  flashed " + s_flashed + "  held " + s_held +
-                                       "  structure hits " + s_structureHits + "  falls " + s_falls +
-                                       "  trauma " + ChogCameraShake.Trauma.ToString("0.00");
+                                       "  local hit " + s_localHits + "  structure hits " + s_structureHits +
+                                       "  falls " + s_falls + "  heroes down " + s_deaths + "  back " + s_returns +
+                                       "  trauma " + ChogCameraShake.Trauma.ToString("0.00") + " most " + s_mostTrauma.ToString("0.00");
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Create()
@@ -70,6 +72,9 @@ namespace Chog.Match
             QuantumEvent.Subscribe<EventCharacterSkill>(this, OnSkill);
             QuantumEvent.Subscribe<EventStructureDestroyed>(this, OnStructureFell);
             QuantumEvent.Subscribe<EventGameOver>(this, _ => ChogCameraShake.Clear());
+            // Counted only (TwinStickShooter.CharacterView draws the fall and the return).
+            QuantumEvent.Subscribe<EventCharacterDefeated>(this, _ => s_deaths++);
+            QuantumEvent.Subscribe<EventCharacterRespawned>(this, _ => s_returns++);
         }
 
         private void OnDestroy() => QuantumEvent.UnsubscribeListener(this);
@@ -127,6 +132,7 @@ namespace Chog.Match
             ChogSounds.Hit(localHit || localHits);
             if (localHit)
             {
+                s_localHits++;
                 ChogCameraShake.Add(ChogCameraShake.LocalHit);
                 ChogHaptics.Pulse(ChogHaptics.HitMilliseconds);
             }
@@ -220,6 +226,7 @@ namespace Chog.Match
 
         private void LateUpdate()
         {
+            s_mostTrauma = Mathf.Max(s_mostTrauma, ChogCameraShake.Trauma);
             if (Time.unscaledTime >= _nextLog)
             {
                 _nextLog = Time.unscaledTime + 15f;

@@ -691,6 +691,48 @@ The two fonts are under the SIL Open Font License; their licence files are besid
 `Assets/Chog/Resources/Fonts/` and ship with the game. `Assets/Chog/Editor/ChogFontAssets.cs` makes
 their TextMesh Pro assets once, before a build.
 
+### Juice and sound (17 October)
+
+All of it is in the view: the simulation and `Time.timeScale` are never touched, and every effect of a
+blow is shorter than a quarter of a second, since Quantum can raise a blow on a predicted frame and cancel
+it later. The rules are plain numbers in `Assets/Chog/Match` and are tested (`Tests/ChogJuiceTests.cs`,
+`ChogBodyTests.cs`).
+
+- **Fewer objects per hit:** impact bursts, beams, flat and facing shapes and the signature flash are
+  kept and drawn again (`ChogEffectPool`); `?perf=1` shows `pool made N reused N`.
+- **A blow** (`ChogHitFeedback`): the 3D hero hit turns white for 90 ms (`_Flash` of `ChogHero.shader`,
+  through a property block, so the shared material is untouched), squashes to 0.85 high and 1.1 wide and
+  springs back in 0.25 s (`ChogBodyAnimator.Flinch`); on a blow that involves the local hero both poses
+  hold for 0.06 s, about two frames of a phone (`ChogBodyAnimator.Hold`; positions keep following the
+  simulation). The attacker is the last enemy hero that cast within 1.2 s and 12 units of the target: the
+  hit event names no attacker.
+- **Damage numbers** (`FloatingCombatText`, `ChogDamageNumbers`): pop 0.6, 1.3, 1 in 0.1 s; red on the
+  local hero, orange on its team, warm white on the other; larger for a larger share of health; blows on
+  one target within 0.2 s add up; a blow Quantum cancels is taken back.
+- **Falls and returns** (`CharacterView`, `ChogHeroPop`): a fallen hero swells for 0.1 s where it fell
+  (the simulation moves it away at once, so the model is left there for that moment), then bursts into
+  pieces of its skin and face colours; a returning hero grows in with a Back ease in 0.35 s.
+- **Bars and structures:** a health bar keeps a pale gold trail that waits 0.4 s, then drains
+  (`FilledBarUI`, `ChogBarTrail`); a 3D tower or core that is hit wobbles and flashes, and bursts when it
+  falls (`StructureViews`); the special gauge swells and chimes when it is full (`SpecialFillBarUI`).
+- **Camera shake** (`ChogCameraShake`, applied by `LocalPlayerCameraFollow` on top of the place it
+  follows): trauma +0.2 when the local hero is hit, +0.5 on its fall or a fallen structure, the camera
+  moved by the square of the trauma (at most 0.45 units), the trauma lost at 1.4 a second.
+- **Sounds** (`ChogSounds`): eight audio sources taken in turn, every sound a folder of variants under
+  `Assets/Chog/Audio/Resources/ChogAudio/`, pitch 0.92 to 1.08, at most two plays of one clip within
+  50 ms, louder when the local hero is involved; the sample's attack sounds go through the same voices
+  (`AudioManager`, `SFXPlayer`); every chunky button clicks (`ChogPressSounds` listens to
+  `ChogPress.Pressed`); a menu loop outside the arena scene and a match loop while it is loaded, cross-faded.
+  The sounds are heard from one listener kept by `ChogSounds` (the menu scene had none). Sources and
+  licences, all CC0: `Assets/Chog/Audio/LICENSES.md`. The WebGL build re-encodes them as AAC.
+- **Vibration** (`ChogHaptics`, `ChogHaptics.jslib`): 20 ms when the local hero is hit, 60 ms on its fall,
+  40 ms when a structure falls, through `navigator.vibrate` (Android browsers; nothing elsewhere).
+
+What the screens call: `ChogSounds.Reward(step)` (one chime a note higher per step), `ChogSounds.Click()`,
+`ChogSounds.SpecialReady()`, `ChogSounds.PlayMusic(ChogMusic)`; the settings, stored on the device:
+`ChogSounds.MusicVolume` (`chog.music-volume`, 0.5), `ChogSounds.SoundVolume` (`chog.sound-volume`, 1),
+`ChogCameraShake.Enabled` (`chog.camera-shake`, on), `ChogHaptics.Enabled` (`chog.haptics`, on).
+
 ### The arena, the leaderboard and the 3D structures (16 October)
 
 **The arena** was the sample's dungeon in its own browns. `Assets/Chog/Screens/ChogArenaSkin.cs` gives
