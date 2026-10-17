@@ -486,8 +486,9 @@ namespace Chog.Match
             MonadTransactions.SwitchToMonad(() =>
             {
                 SetStep(RentalStep.Sending, RentalAction.Withdraw, tokenId, "");
+                // The holder's own rented-out Genesis is known from the account too: both are read again.
                 MonadTransactions.Send(holder, Address, WithdrawData(tokenId), WithdrawGasLimit, "taking the offer back",
-                    () => Confirm(tokenId, () => !TryGetOffer(tokenId, out _), ReadOffers, "taking the offer back"), Fail);
+                    () => Confirm(tokenId, () => !TryGetOffer(tokenId, out _), then => ReadOffers(() => ReadAccount(then)), "taking the offer back"), Fail);
             }, Fail);
         }
 

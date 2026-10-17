@@ -113,7 +113,7 @@ namespace Chog.Screens
             });
             _offerWithdraw = MakeButton("Withdraw", new Vector2(0.47f, 0.05f), new Vector2(0.77f, 0.22f), out var withdrawLabel, cover);
             _offerWithdraw.GetComponent<Image>().color = QuietColor;
-            withdrawLabel.text = "TAKE IT BACK";
+            withdrawLabel.text = "STOP OFFERING";
             _offerWithdraw.onClick.AddListener(() =>
             {
                 GenesisRental.Dismiss();
@@ -426,7 +426,7 @@ namespace Chog.Screens
                 return;
             _marketAside.interactable = !busy;
             _marketAsideLabel.text = owed != "0"
-                ? "<size=70%>TAKE BACK</size>\n" + MonadTransactions.PriceText(owed) + " $CHOG"
+                ? "<size=70%>GET YOUR REFUND</size>\n" + MonadTransactions.PriceText(owed) + " $CHOG"
                 : "END NOW";
         }
 

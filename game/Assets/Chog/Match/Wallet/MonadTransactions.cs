@@ -234,7 +234,11 @@ namespace Chog.Match
             if (!IsDigits(wei))
                 return "?";
 
-            var hundredths = BigInteger.Parse(wei, CultureInfo.InvariantCulture) / BigInteger.Pow(10, 16);
+            var amount = BigInteger.Parse(wei, CultureInfo.InvariantCulture);
+            // Below a hundredth, which a rental earned by the second often is: neither nothing nor a false zero.
+            if (amount > 0 && amount < BigInteger.Pow(10, 16))
+                return "<0.01";
+            var hundredths = amount / BigInteger.Pow(10, 16);
             var whole = BigInteger.Divide(hundredths, 100).ToString(CultureInfo.InvariantCulture);
             var rest = (int)(hundredths % 100);
             return rest == 0 ? whole : whole + "." + (rest % 10 == 0 ? (rest / 10).ToString(CultureInfo.InvariantCulture) : rest.ToString("00", CultureInfo.InvariantCulture));

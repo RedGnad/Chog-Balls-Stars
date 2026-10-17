@@ -40,6 +40,7 @@ namespace Chog.Match.Tests
             Assert.AreEqual("1.25", MonadTransactions.PriceText("1250000000000000000"));
             Assert.AreEqual("0.05", MonadTransactions.PriceText("50000000000000000"));
             Assert.AreEqual("0", MonadTransactions.PriceText("0"));
+            Assert.AreEqual("<0.01", MonadTransactions.PriceText("3333333333333333"), "a rental earned by the second is not shown as nothing");
             Assert.AreEqual("?", MonadTransactions.PriceText("1e21"));
             Assert.AreEqual("?", MonadTransactions.PriceText(null));
         }
