@@ -9,7 +9,9 @@ submitting. Character counts are for the 8,000-character fields.
 
 - **Project name:** Chog Arena (chosen by the owner on 16 October 2026; Chog Genesis is the NFT collection)
 - **Banner:** to make from a capture of the menu with a hero in 3D, or of the heroes sheet
-  (`research/evidence/heroes-and-attack-objects-headless-2026-10-15.png`).
+  (`research/evidence/heroes-and-attack-objects-headless-2026-10-15.png`). Read on chogathon.chog.xyz
+  that day (its page's own styles): project cards show the image at 16:9 and another view at 16:7,
+  both `object-fit: cover`; so 1920 by 1080 with what matters inside the middle 16:7 band.
 
 **Description**
 
