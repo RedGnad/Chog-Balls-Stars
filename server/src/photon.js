@@ -162,7 +162,7 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, s
 
     await matches.admitted(request.GameId, {
       userId: request.UserId, actorNr: numberOf(request.ActorNr), playerSlot: numberOf(request.PlayerSlot),
-      address: isAddress(cookie.address) ? cookie.address : null, lender: right === 'guest' ? cookie.pass.lender : null,
+      address: isAddress(cookie.address) ? cookie.address : null, lender: right === 'guest' ? passOf(cookie).lender : null,
       right, tokenId, form, askedToken, askedForm, ...(right === 'stand-in' ? { standIn: true } : {}),
     });
 
