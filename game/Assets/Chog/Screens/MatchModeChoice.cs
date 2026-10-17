@@ -118,8 +118,8 @@ namespace Chog.Screens
             var area = new GameObject(ButtonName, typeof(RectTransform), typeof(Image), typeof(Button));
             var rect = (RectTransform)area.transform;
             rect.SetParent(main.transform, false);
-            rect.anchorMin = new Vector2(0.44f, 0.12f);
-            rect.anchorMax = new Vector2(0.60f, 0.25f);
+            rect.anchorMin = new Vector2(0.44f, 0.135f);
+            rect.anchorMax = new Vector2(0.60f, 0.285f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
             var button = area.GetComponent<Button>();
@@ -135,11 +135,11 @@ namespace Chog.Screens
             label.alignment = TextAlignmentOptions.Center;
             label.enableAutoSizing = true;
             label.fontSizeMin = 10f;
-            label.fontSizeMax = 30f;
+            label.fontSizeMax = 44f;
             label.raycastTarget = false;
-            ChogTheme.Style(button, ChogTheme.ButtonKind.Secondary);
+            ChogTheme.Style(button, ChogTheme.ButtonKind.Quiet);
 
-            void Show() => label.text = "<size=70%>MODE</size>\n" + LabelOf(Chosen);
+            void Show() => label.text = "<size=50%>MODE, TAP TO CHANGE</size>\n" + LabelOf(Chosen);
             Show();
             button.onClick.AddListener(() =>
             {

@@ -27,8 +27,11 @@ namespace Chog.Screens
         // the mode and a large PLAY at the bottom right, the other buttons small at the bottom left.
         private static readonly Vector2 StageMin = new Vector2(0.03f, 0.19f);
         private static readonly Vector2 StageMax = new Vector2(0.41f, 0.71f);
-        private static readonly Vector2 ButtonsMin = new Vector2(0.62f, 0.04f);
-        private static readonly Vector2 ButtonsMax = new Vector2(0.97f, 0.28f);
+        // PLAY and, under it, PLAY WITH FRIENDS, placed one by one (the sample's column lays them out from its top).
+        private static readonly Vector2 PlayMin = new Vector2(0.62f, 0.135f);
+        private static readonly Vector2 PlayMax = new Vector2(0.97f, 0.285f);
+        private static readonly Vector2 PartyMin = new Vector2(0.62f, 0.04f);
+        private static readonly Vector2 PartyMax = new Vector2(0.97f, 0.115f);
 
         private ChogHeroStage _stage;
         private TextMeshProUGUI _name;
@@ -182,11 +185,18 @@ namespace Chog.Screens
             var column = play != null ? play.transform.parent as RectTransform : null;
             if (column != null)
             {
-                column.anchorMin = ButtonsMin;
-                column.anchorMax = ButtonsMax;
+                // The column covers the screen and lays nothing out: each button is placed in screen shares.
+                foreach (var layout in column.GetComponents<LayoutGroup>())
+                    layout.enabled = false;
+                foreach (var fitter in column.GetComponents<ContentSizeFitter>())
+                    fitter.enabled = false;
+                column.anchorMin = Vector2.zero;
+                column.anchorMax = Vector2.one;
                 column.offsetMin = Vector2.zero;
                 column.offsetMax = Vector2.zero;
-                column.pivot = new Vector2(0f, 0f);
+                column.pivot = new Vector2(0.5f, 0.5f);
+                Place(play, PlayMin, PlayMax);
+                Place(party, PartyMin, PartyMax);
             }
             if (play != null)
             {
@@ -236,6 +246,20 @@ namespace Chog.Screens
                 _name.text = played > 0 ? "CHOG #" + played : "RECRUIT";
                 _line.text = ChogHeroModel.AttackLine(played > 0 ? played : ChogHeroModel.Recruit);
             }
+        }
+
+        private static void Place(Button button, Vector2 min, Vector2 max)
+        {
+            if (button == null)
+                return;
+            var area = (RectTransform)button.transform;
+            area.anchorMin = min;
+            area.anchorMax = max;
+            area.offsetMin = Vector2.zero;
+            area.offsetMax = Vector2.zero;
+            area.pivot = new Vector2(0.5f, 0.5f);
+            foreach (var element in button.GetComponents<LayoutElement>())
+                element.ignoreLayout = true;
         }
 
         // The sample's labels sit to the right of an icon this game does not show: centred over the whole button.

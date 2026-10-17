@@ -13,7 +13,9 @@ namespace Chog.Match
     /// </summary>
     public sealed class ChogHeroStage : MonoBehaviour
     {
-        private const float TurnDegreesPerSecond = 22f;
+        // The hero sways about the three-quarter view, as a showcase does, instead of turning its back.
+        private const float SwayDegrees = 40f;
+        private const float SwaySeconds = 7f;
         private const float FieldOfView = 24f;
         private const float Elevation = 10f;
         private const float StartTurn = 200f;   // three quarter, from the front left, as the pictures
@@ -146,7 +148,7 @@ namespace Chog.Match
             _camera.transform.localPosition = new Vector3(0f, height * 0.36f, 0f) - turn * Vector3.forward * distance;
 
             if (_turns)
-                _hero.Rotate(0f, TurnDegreesPerSecond * Time.deltaTime, 0f, Space.Self);
+                _hero.localRotation = Quaternion.Euler(0f, StartTurn + SwayDegrees * Mathf.Sin(Time.unscaledTime * 2f * Mathf.PI / SwaySeconds), 0f);
         }
 
         // The camera draws only while the stage is on screen: a hidden menu costs nothing in a match.

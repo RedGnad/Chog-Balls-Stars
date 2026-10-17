@@ -27,7 +27,7 @@ namespace Chog.Screens
         private const int SlotsPerPage = 6;
 
         // Share of the main screen the panel takes: right of the hero, under the player name, over the mode and PLAY.
-        private static readonly Vector2 PanelMin = new Vector2(0.44f, 0.31f);
+        private static readonly Vector2 PanelMin = new Vector2(0.44f, 0.32f);
         private static readonly Vector2 PanelMax = new Vector2(0.97f, 0.80f);
 
         // The career line: the whole width, or the room left by the buttons that lend and rent out.
