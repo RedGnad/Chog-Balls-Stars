@@ -547,7 +547,11 @@ and the career registry built, deployed by the owner and wired; the stand-in for
   `/api/careers/recent` shows what happened to the last judged matches, since Render's log is not readable from here.
 - **Seen:** the owner's match of 09:43 was credited by the old file careers (the report path works; the match of 16
   October evening was lost to a restart). After 09:46 the referee sent nothing (nonce 0): the owner's matches fell
-  during five redeploys of that quarter of an hour (most likely; no log). **Not yet seen: a career written on chain.**
+  during five redeploys of that quarter of an hour (most likely; no log). **Seen at 10:57:** the owner's signed match
+  with #1287 (holder, team 0, won) judged on Render and written on chain by the referee, transaction
+  `0x04a6c37fbad4cabe6910d3257882590b8cc4ba10420dee74da07b8e1b0a4e30c` (block 114141758, 110,052 gas, about 0.011 MON):
+  `careerOf(1795)` reads 1 match, 1 win, best streak 1; the game's career answer reads it (badges First match, First
+  win). https://monadscan.com/tx/0x04a6c37fbad4cabe6910d3257882590b8cc4ba10420dee74da07b8e1b0a4e30c
 - **The player's path, rebuilt and checked in a muted browser** (build `20261017T082930801Z`, on Render and Vercel):
   the end of a match has PLAY AGAIN and MENU (Enter, Escape), the score of both teams, the Genesis's career once on
   Monad; a whole siege played from the public address and left with MENU back to the menu, then a new match entered.
