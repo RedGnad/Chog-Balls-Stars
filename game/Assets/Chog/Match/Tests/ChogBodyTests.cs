@@ -57,6 +57,38 @@ namespace Chog.Match.Tests
         }
 
         [Test]
+        public void AHitSquashesTheBodyAndItSpringsBackInAQuarterOfASecond()
+        {
+            var calm = ChogBodyAnimator.Pose(0f, 0f, 0f, 0f, 0f);
+            Assert.AreEqual(Vector3.one, calm.BodyScale, "no squash without a hit");
+
+            var hit = ChogBodyAnimator.Pose(0f, 0f, 0f, 0f, 0f, 0f);
+            Assert.AreEqual(ChogBodyAnimator.FlinchHeight, hit.BodyScale.y, 0.001f, "lower at the moment of the hit");
+            Assert.AreEqual(ChogBodyAnimator.FlinchWidth, hit.BodyScale.x, 0.001f, "wider across");
+            Assert.AreEqual(hit.BodyScale.x, hit.BodyScale.z, 0.001f);
+            Assert.AreEqual(0.85f, ChogBodyAnimator.FlinchHeight);
+            Assert.AreEqual(1.1f, ChogBodyAnimator.FlinchWidth);
+
+            // It springs past its height once, then settles; from a quarter of a second on it is at rest.
+            var overshoot = false;
+            var last = hit.BodyScale.y;
+            for (var t = 0.01f; t < ChogBodyAnimator.FlinchSeconds; t += 0.01f)
+            {
+                var y = ChogBodyAnimator.Pose(0f, 0f, 0f, 0f, 0f, t).BodyScale.y;
+                overshoot |= y > 1.005f;
+                Assert.Less(Mathf.Abs(y - last), 0.06f, "no jump between two hundredths of a second");
+                last = y;
+            }
+            Assert.IsTrue(overshoot, "a spring, not a plain return");
+            Assert.AreEqual(Vector3.one, ChogBodyAnimator.Pose(0f, 0f, 0f, 0f, 0f, 0.25f).BodyScale);
+            Assert.AreEqual(Vector3.one, ChogBodyAnimator.Pose(0f, 0f, 0f, 0f, 0f, -1f).BodyScale);
+
+            // The squash adds to what the body does: a hit while running keeps the run.
+            var running = ChogBodyAnimator.Pose(Quarter, 1f, 0f, 0f, 0f, 0f);
+            Assert.AreEqual(ChogBodyAnimator.Pose(Quarter, 1f, 0f, 0f, 0f).ArmLeftTurn, running.ArmLeftTurn);
+        }
+
+        [Test]
         public void TheStandInBodyIsOnlyATestOptionOfPrivatePages()
         {
             Assert.IsTrue(ChogBody.StandInAsked("http://192.168.1.85:8083/?token=1795&body=standin", false));

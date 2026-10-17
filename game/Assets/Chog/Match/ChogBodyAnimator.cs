@@ -11,12 +11,16 @@ namespace Chog.Match
         public Vector3 HeadTurn;
         public Vector3 ArmLeftTurn;
         public Vector3 ArmRightTurn;
+        // How the whole body is stretched, about its feet: (1, 1, 1) at rest; a hit squashes it.
+        public Vector3 BodyScale;
     }
 
     /// <summary>
     /// Moves a body made of rigid parts, without a skeleton, from what its hero does: it bobs and
     /// swings its arms as it runs, throws both arms forward when it attacks, raises them when its
-    /// team wins and slumps when it loses. It works on any model that has a part named Body
+    /// team wins and slumps when it loses, squashes and springs back when it is hit, and can hold its
+    /// pose for an instant (the hit stop of a blow that involves the local hero: only the pose waits,
+    /// the hero keeps following the simulation). It works on any model that has a part named Body
     /// with, under it, parts whose names end with Head, ArmLeft and ArmRight (any letter case):
     /// the models of the sample are built that way, and so is the Chog body. It replaces the
     /// animation clips of the sample. The model looks along +Z with +Y up, arms hanging along -Y,
@@ -30,12 +34,19 @@ namespace Chog.Match
         // The speed at which the run is at full swing, in units per second.
         public const float FullRunSpeed = 3f;
         public const float AttackSeconds = 0.3f;
+        // A hit squashes the body to this height and this width, and it is back in FlinchSeconds.
+        public const float FlinchHeight = 0.85f;
+        public const float FlinchWidth = 1.1f;
+        public const float FlinchSeconds = 0.25f;
 
         private const float RunBlendPerSecond = 9f;
         private const float MoodSecondsToSettle = 0.45f;
 
         private Transform _body, _head, _armLeft, _armRight;
         private Vector3 _bodyPosition;
+        private Vector3 _bodyScale = Vector3.one;
+        // The height of the feet in the body's own axes: a squash keeps them on the ground.
+        private float _feet;
         private Quaternion _bodyRotation, _headRotation, _armLeftRotation, _armRightRotation;
 
         private float _cycle;
@@ -43,6 +54,11 @@ namespace Chog.Match
         private float _attackLeft;
         private float _mood;
         private float _moodTarget;
+        // Seconds since the last hit (below 0: none since it settled), the clock of the idle moves, and
+        // how long the pose still waits.
+        private float _flinch = -1f;
+        private float _clock;
+        private float _holdLeft;
 
         /// <summary>How fast the hero moves over the ground, in units per second.</summary>
         public float Speed { get; set; }
@@ -79,6 +95,9 @@ namespace Chog.Match
             animator._armLeft = armLeft;
             animator._armRight = armRight;
             animator._bodyPosition = body.localPosition;
+            animator._bodyScale = body.localScale;
+            var drawn = body.GetComponent<MeshFilter>();
+            animator._feet = drawn != null && drawn.sharedMesh != null ? drawn.sharedMesh.bounds.min.y : 0f;
             animator._bodyRotation = body.localRotation;
             animator._headRotation = animator._head == null ? Quaternion.identity : animator._head.localRotation;
             animator._armLeftRotation = armLeft.localRotation;
@@ -88,6 +107,18 @@ namespace Chog.Match
 
         /// <summary>The hero starts an attack: both arms are thrown forward once.</summary>
         public void Attack() => _attackLeft = AttackSeconds;
+
+        /// <summary>The hero was hit: the body squashes and springs back (FlinchSeconds).</summary>
+        public void Flinch() => _flinch = 0f;
+
+        /// <summary>
+        /// The pose waits that long (the hit stop): nothing of the body moves, and the clocks of its run,
+        /// its attack, its flinch and its idle start again where they stopped.
+        /// </summary>
+        public void Hold(float seconds) => _holdLeft = Mathf.Max(_holdLeft, seconds);
+
+        /// <summary>Whether the pose is waiting (Hold).</summary>
+        public bool Holding => _holdLeft > 0f;
 
         /// <summary>The match is won: arms up, hopping, until the body is gone.</summary>
         public void Cheer() => _moodTarget = 1f;
@@ -102,6 +133,13 @@ namespace Chog.Match
         /// when nothing else does.
         /// </summary>
         public static ChogBodyPose Pose(float cycle, float run, float strike, float mood, float time)
+            => Pose(cycle, run, strike, mood, time, -1f);
+
+        /// <summary>
+        /// The pose, with "flinch" the seconds since the body was hit (below 0 or from FlinchSeconds on:
+        /// no squash).
+        /// </summary>
+        public static ChogBodyPose Pose(float cycle, float run, float strike, float mood, float time, float flinch)
         {
             run = Mathf.Clamp01(run);
             var swing = Mathf.Sin(cycle);
@@ -126,12 +164,44 @@ namespace Chog.Match
             var forward = -100f * thrown;
             pose.ArmLeftTurn = new Vector3(swing * 55f * run + forward + 12f * slump, 0f, -150f * cheer + hop * 12f);
             pose.ArmRightTurn = new Vector3(-swing * 55f * run + forward + 12f * slump, 0f, 150f * cheer - hop * 12f);
+
+            // Squashed at once, then a spring that overshoots once and settles.
+            var squash = Squash(flinch);
+            pose.BodyScale = new Vector3(1f + (FlinchWidth - 1f) * squash, 1f - (1f - FlinchHeight) * squash,
+                1f + (FlinchWidth - 1f) * squash);
             return pose;
+        }
+
+        /// <summary>How squashed a body is "seconds" after a hit: 1 at the hit, 0 from FlinchSeconds on.</summary>
+        public static float Squash(float seconds)
+        {
+            if (seconds < 0f || seconds >= FlinchSeconds)
+                return 0f;
+            // A damped spring: about 3.2 swings a second, nearly still by the end of FlinchSeconds; the last
+            // part of the time fades it to exactly nothing so the body never jumps.
+            var spring = Mathf.Exp(-14f * seconds) * Mathf.Cos(seconds * 2f * Mathf.PI * 3.2f);
+            var end = Mathf.Clamp01((FlinchSeconds - seconds) / 0.05f);
+            return spring * end;
         }
 
         private void LateUpdate()
         {
             var delta = Time.deltaTime;
+            if (_holdLeft > 0f)
+            {
+                // The hit stop: the pose of the moment of the blow, its clocks stopped.
+                _holdLeft = Mathf.Max(0f, _holdLeft - delta);
+                Apply(PoseNow());
+                return;
+            }
+
+            _clock += delta;
+            if (_flinch >= 0f)
+            {
+                _flinch += delta;
+                if (_flinch >= FlinchSeconds)
+                    _flinch = -1f;
+            }
             _cycle = Mathf.Repeat(_cycle + Speed / StrideLength * 2f * Mathf.PI * delta, 2f * Mathf.PI);
             _run = Mathf.MoveTowards(_run, Mathf.Clamp01(Speed / FullRunSpeed), RunBlendPerSecond * delta);
             _attackLeft = Mathf.Max(0f, _attackLeft - delta);
@@ -140,12 +210,19 @@ namespace Chog.Match
             if (Speed <= 0f)
                 _cycle = Mathf.MoveTowards(_cycle, _cycle < Mathf.PI ? 0f : 2f * Mathf.PI, 6f * delta);
 
-            Apply(Pose(_cycle, _run, _attackLeft > 0f ? 1f - _attackLeft / AttackSeconds : 0f, _mood, Time.time));
+            Apply(PoseNow());
         }
+
+        private ChogBodyPose PoseNow() =>
+            Pose(_cycle, _run, _attackLeft > 0f ? 1f - _attackLeft / AttackSeconds : 0f, _mood, _clock, _flinch);
 
         private void Apply(ChogBodyPose pose)
         {
-            _body.localPosition = _bodyPosition + pose.BodyOffset;
+            // A squash about the feet: the body is lowered by what its lower half lost.
+            var scale = pose.BodyScale == Vector3.zero ? Vector3.one : pose.BodyScale;
+            _body.localScale = Vector3.Scale(_bodyScale, scale);
+            var keepFeet = _bodyRotation * new Vector3(0f, _feet * _bodyScale.y * (1f - scale.y), 0f);
+            _body.localPosition = _bodyPosition + pose.BodyOffset + keepFeet;
             _body.localRotation = _bodyRotation * Quaternion.Euler(pose.BodyTurn);
             if (_head != null)
                 _head.localRotation = _headRotation * Quaternion.Euler(pose.HeadTurn);

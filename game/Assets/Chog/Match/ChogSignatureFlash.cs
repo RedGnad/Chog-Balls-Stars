@@ -6,7 +6,8 @@ namespace Chog.Match
     /// The moment a hero fires its special: the special comes from its Eyes, so the eyes it wears (its
     /// visor, its headset, its glasses, its laser eyes, or its drawn eyes) pop up large above it in 3D,
     /// turned to the camera, hold for a breath, then rise and shrink away, with a burst of pieces in their
-    /// colour. Drawn with the one material of the heroes, from the library of parts (ChogHeroModel.BuildEyes).
+    /// colour. Drawn with the one material of the heroes, from the library of parts (ChogHeroModel.BuildEyes);
+    /// once gone, kept with its eyes for the next special of that Genesis.
     /// </summary>
     public sealed class ChogSignatureFlash : MonoBehaviour
     {
@@ -19,6 +20,13 @@ namespace Chog.Match
 
         private Transform _eyes;
         private float _age;
+        private int _metadataId;
+        private Color _colour;
+
+        // Flashes that went away, kept with their eyes for the next special of the same Genesis
+        // (ChogEffectPool): at most six heroes in a match, each with its own eyes.
+        private static readonly System.Collections.Generic.Dictionary<int, System.Collections.Generic.Stack<ChogSignatureFlash>> s_free =
+            new System.Collections.Generic.Dictionary<int, System.Collections.Generic.Stack<ChogSignatureFlash>>();
 
         // When each hero last showed its eyes: a special made of several attacks (an echo) shows them once.
         private static readonly System.Collections.Generic.Dictionary<Quantum.EntityRef, float> s_shown =
@@ -38,18 +46,32 @@ namespace Chog.Match
         {
             if (!GenesisEffects.Enabled)
                 return;
-            var host = new GameObject("ChogSignatureFlash");
-            host.transform.position = hero + Vector3.up * Height;
-            var eyes = ChogHeroModel.BuildEyes(metadataId, host.transform, Size, out var colour);
-            if (eyes == null)
+            if (!s_free.TryGetValue(metadataId, out var free))
             {
-                Destroy(host);
-                return;
+                free = new System.Collections.Generic.Stack<ChogSignatureFlash>();
+                s_free[metadataId] = free;
             }
-            var flash = host.AddComponent<ChogSignatureFlash>();
-            flash._eyes = eyes;
-            eyes.localScale = Vector3.zero;
-            ChogImpact.Burst(host.transform.position, colour);
+
+            var flash = ChogEffectPool.Take(free);
+            if (flash == null)
+            {
+                var host = ChogEffectPool.Make("ChogSignatureFlash");
+                var eyes = ChogHeroModel.BuildEyes(metadataId, host.transform, Size, out var made);
+                if (eyes == null)
+                {
+                    Destroy(host);
+                    return;
+                }
+                flash = host.AddComponent<ChogSignatureFlash>();
+                flash._eyes = eyes;
+                flash._metadataId = metadataId;
+                flash._colour = made;
+            }
+
+            flash._age = 0f;
+            flash.transform.position = hero + Vector3.up * Height;
+            flash._eyes.localScale = Vector3.zero;
+            ChogImpact.Burst(flash.transform.position, flash._colour);
         }
 
         private void LateUpdate()
@@ -64,7 +86,10 @@ namespace Chog.Match
                 size = 1f - (_age - GrowSeconds - HoldSeconds) / GoSeconds;
             else
             {
-                Destroy(gameObject);
+                if (s_free.TryGetValue(_metadataId, out var free))
+                    ChogEffectPool.Give(free, this);
+                else
+                    Destroy(gameObject);
                 return;
             }
 

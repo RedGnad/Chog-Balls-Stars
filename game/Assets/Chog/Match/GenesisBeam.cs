@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Quantum;
 using UnityEngine;
 
@@ -6,7 +7,8 @@ namespace Chog.Match
     /// <summary>
     /// The laser of a Genesis with laser eyes, drawn the way the collection draws it: two straight
     /// beams, one per eye, each a dark outline, a flat colour and a lighter core. The beams grow
-    /// from the hero to the head of the attack, then thin out and disappear.
+    /// from the hero to the head of the attack, then thin out and disappear. A beam that disappeared is
+    /// kept and drawn again for the next one (ChogEffectPool).
     /// </summary>
     public sealed class GenesisBeam : MonoBehaviour
     {
@@ -22,6 +24,8 @@ namespace Chog.Match
         private const float HoldSeconds = 0.3f;
         private const float FadeSeconds = 0.25f;
 
+        private static readonly Stack<GenesisBeam> s_free = new Stack<GenesisBeam>();
+
         private readonly LineRenderer[] _lines = new LineRenderer[6];
         private readonly float[] _widths = new float[6];
         private Vector3 _origin;
@@ -30,9 +34,11 @@ namespace Chog.Match
         /// <summary>"thickness" multiplies the width of the beams: 1 for the laser as the eyes draw it.</summary>
         public static GenesisBeam Create(Material material, GenesisEyeLook look, Vector3 origin, float thickness = 1f)
         {
-            var host = new GameObject("GenesisBeam");
-            var beam = host.AddComponent<GenesisBeam>();
+            var beam = ChogEffectPool.Take(s_free);
+            if (beam == null)
+                beam = ChogEffectPool.Make("GenesisBeam").AddComponent<GenesisBeam>();
             beam._origin = origin + Vector3.up * EyeHeight;
+            beam._fadeStarted = -1f;
 
             // Drawn back to front for each eye: outline, colour, core.
             for (var eye = 0; eye < 2; eye++)
@@ -73,7 +79,7 @@ namespace Chog.Match
             var left = Mathf.Clamp01(1f - (Time.time - _fadeStarted - HoldSeconds) / FadeSeconds);
             if (left <= 0f)
             {
-                Destroy(gameObject);
+                ChogEffectPool.Give(s_free, this);
                 return;
             }
 
@@ -81,18 +87,23 @@ namespace Chog.Match
                 _lines[i].widthMultiplier = _widths[i] * left;
         }
 
+        // The line at that place, made once for a beam and set again each time it is drawn.
         private void AddLine(int index, Material material, Color color, float width, int order)
         {
-            var child = new GameObject("Line");
-            child.transform.SetParent(transform, false);
-            var line = child.AddComponent<LineRenderer>();
+            var line = _lines[index];
+            if (line == null)
+            {
+                var child = new GameObject("Line");
+                child.transform.SetParent(transform, false);
+                line = child.AddComponent<LineRenderer>();
+                line.useWorldSpace = true;
+                line.positionCount = 2;
+                line.numCapVertices = 3;
+                line.alignment = LineAlignment.View;
+                line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                line.receiveShadows = false;
+            }
             line.sharedMaterial = material;
-            line.useWorldSpace = true;
-            line.positionCount = 2;
-            line.numCapVertices = 3;
-            line.alignment = LineAlignment.View;
-            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            line.receiveShadows = false;
             line.startColor = color;
             line.endColor = color;
             line.widthMultiplier = width;

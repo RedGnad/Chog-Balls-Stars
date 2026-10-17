@@ -27,6 +27,7 @@ namespace Chog.Match
         private const float Height = 0.9f;
 
         private Transform _object;
+        private int _metadataId = int.MinValue;
         private ChogHeroModel.AttackStyle _style;
         private Color _impact;
         private float _age;
@@ -50,9 +51,14 @@ namespace Chog.Match
 
         private void Show(int metadataId, bool strike)
         {
-            if (_object != null)
-                Destroy(_object.gameObject);
-            _object = ChogHeroModel.BuildAttack(metadataId, transform, out _style, out _impact);
+            // A view the entity view pool hands back for an attack of the same hero keeps its object.
+            if (_object == null || _metadataId != metadataId)
+            {
+                if (_object != null)
+                    Destroy(_object.gameObject);
+                _object = ChogHeroModel.BuildAttack(metadataId, transform, out _style, out _impact);
+                _metadataId = metadataId;
+            }
             _shown = _object != null;
             if (!_shown)
                 return;
