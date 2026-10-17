@@ -537,6 +537,27 @@ is bought later).**
 **Next action:** the owner's match signed in with #1287 and the career read right after; LEND IT tested; the rental v2
 and the career registry built, deployed by the owner and wired; the stand-in for the video.
 
+**17 October 2026, 09:30 to 10:35 (on chain, and the player's path).**
+- **Deployed by the owner** (`contracts/script/DeployRentalAndCareers.s.sol`, checked on chain): ChogRental version 2
+  `0x90c26090aea05a3dc18d6ba8fd80afe8f933bf86` and ChogCareers `0x335bf7bc610645546e2b00de6a9fd0c4709d6111` (owner the
+  development wallet, referee `0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34`, funded with 5 MON by the owner). Render reads
+  both (`render.yaml`). The services send, with the referee's key (`server/src/sender.js`): the careers of each judged
+  match (`careers-onchain.js`), a holder's stop to lending, the close of a rental whose Genesis was sold. A stand-in
+  (`standin.js`, `STAND_INS`, off) lets an NFT the owner keeps play #1287 for the video, never counted for a career.
+  `/api/careers/recent` shows what happened to the last judged matches, since Render's log is not readable from here.
+- **Seen:** the owner's match of 09:43 was credited by the old file careers (the report path works; the match of 16
+  October evening was lost to a restart). After 09:46 the referee sent nothing (nonce 0): the owner's matches fell
+  during five redeploys of that quarter of an hour (most likely; no log). **Not yet seen: a career written on chain.**
+- **The player's path, rebuilt and checked in a muted browser** (build `20261017T082930801Z`, on Render and Vercel):
+  the end of a match has PLAY AGAIN and MENU (Enter, Escape), the score of both teams, the Genesis's career once on
+  Monad; a whole siege played from the public address and left with MENU back to the menu, then a new match entered.
+  The home screen is laid out as an arena game's (hero large at the left and facing the player, wallet at the top
+  right, mode and a large PLAY at the bottom right), on a computer and a phone. The recruit note no longer runs over the
+  team names; the rental and loan screens are opaque.
+- The disk had 1.8 GB free: six merged worktrees removed (`git worktree remove`), 4.9 GB free after.
+**Next action:** a signed match with #1287 and its career on chain; the NFT the owner keeps for the stand-in; the
+"Starting" screen and an automatic start of the team preparation; the rental screens tried with a wallet.
+
 **16 October 2026, 21:40 (the game is Chog Arena, at https://chogarena.vercel.app).**
 - **Name:** the owner named the game Chog Arena (menu title, page name, manifest, share text, sign-in message);
   Chog Genesis stays the collection's name.
