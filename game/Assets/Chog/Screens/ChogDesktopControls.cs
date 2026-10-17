@@ -46,7 +46,8 @@ namespace Chog.Screens
         private void Update()
         {
             QuantumGame game = null;
-            var frame = ControlModeWatcher.Mode == ControlMode.Desktop ? LocalFrame(out game) : null;
+            // Not on the end of a match, which has its own buttons and keys.
+            var frame = ControlModeWatcher.Mode == ControlMode.Desktop && !ChogResultScreen.IsShown ? LocalFrame(out game) : null;
             var hero = frame != null ? LocalHero(frame, game) : EntityRef.None;
             if (hero == EntityRef.None)
             {
