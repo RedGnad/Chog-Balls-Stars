@@ -85,7 +85,14 @@ submitting. Character counts are for the 8,000-character fields.
 
 - Built on Photon's Quantum 3 Twin Stick Shooter sample (its map, recoloured in the Chog night, its
   controls, its bots and its menu framework, restyled), with its Cartoon FX assets still used for some
-  effects.
+  effects. **Open licence point (counted 17 October 2026):** 15 files of Jean Moreno's Cartoon FX are
+  still referenced by ten of the sample's effect prefabs (MeleeAttackVFX, ArrowDamageZoneVFX,
+  DamageZoneVFX, ArrowHitVFX, EnergyImpact, EnergyPulse, KnightBasicAttack, StepsSmoke, Character_Base,
+  CollectibleCoin), several from the legacy Cartoon FX packs, not only the free Remaster pack the
+  sample's page credits; and Photon's sample licence grants its non-code "Assets" for internal
+  development only (`research/research_notes/Audit architecture Photon MOBA Genesis/twin_stick_sample_reuse_licences.md`,
+  KQ2 and KQ5). Before a public repository or a release: replace those effects with our own, or
+  hold a licence for each pack used.
 - Fonts Lilita One, Nunito and Koulen (SIL Open Font License); Koulen as on chog.xyz.
 - Sounds and music: 18 CC0 files (Kenney, OpenGameArt), each with its source in
   `game/Assets/Chog/Audio/LICENSES.md`. The pictograms of the screens are drawn in code.
