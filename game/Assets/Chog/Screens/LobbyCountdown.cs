@@ -10,14 +10,19 @@ namespace Chog.Screens
     /// The clock of the team preparation (mockup "Lobby": STARTS BY ITSELF): the player who hosts the
     /// room sees a gold disc count down from 30 seconds, started again whenever a player joins or
     /// leaves, and the match starts by itself at zero, as START does; START still starts it at once.
-    /// The count waits while this player's wallet is busy with the stakes. The other players read
-    /// that the host starts the match: only the host's game sends the start, as only the host has
-    /// START.
+    /// The count waits while this player's wallet is busy with the stakes. Every player sees the
+    /// count; the host's game starts the match at zero. When the host's game does not (a host who
+    /// left the tab in the background: a browser stops drawing it, so its clock stops, and a public
+    /// room waited 22 minutes in preparation on 17 October), the game of any other player starts it
+    /// a few seconds later. The simulation takes the start from any player and only once (the
+    /// selection system turns itself off), so two games sending it at once start one match.
     /// </summary>
     public sealed class LobbyCountdown : MonoBehaviour
     {
         private const string ObjectName = "ChogLobbyCountdown";
         private const float Seconds = 30f;
+        // How long after zero the other players wait for the host before starting the match themselves.
+        public const float HostGraceSeconds = 8f;
         private static readonly Vector2 Place = new Vector2(0.5f, 0.535f);
 
         private TextMeshProUGUI _number;
@@ -73,21 +78,20 @@ namespace Chog.Screens
             if (GenesisWager.IsBusy)
                 _waited += Time.unscaledDeltaTime;
 
-            _disc.SetActive(hosts);
-            if (!hosts)
-            {
-                _caption.text = "THE HOST STARTS THE MATCH";
-                return;
-            }
-
             var left = Seconds - (Time.unscaledTime - _startedAt - _waited);
             _number.text = Mathf.Max(0, Mathf.CeilToInt(left)).ToString();
             _caption.text = "STARTS BY ITSELF";
-            if (left > 0f || _fired)
+            if (!StartsNow(hosts, left) || _fired)
                 return;
             _fired = true;
-            Debug.Log("CHOG_LOBBY the clock started the match");
+            Debug.Log(hosts ? "CHOG_LOBBY the clock started the match" : "CHOG_LOBBY the host did not start the match, this player's game did");
             _start?.Invoke();
         }
+
+        /// <summary>
+        /// Whether this player's game starts the match with "left" seconds on the clock (below 0 once
+        /// it passed zero): the host's at zero, any other's when the host let the grace pass.
+        /// </summary>
+        public static bool StartsNow(bool hosts, float left) => hosts ? left <= 0f : left <= -HostGraceSeconds;
     }
 }
