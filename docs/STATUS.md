@@ -514,8 +514,18 @@ is bought later).**
   browser plays as that renter with `CHOG_BROWSER_WALLET_KEY`.
 - **Known limits for judging:** careers and records on Render's free plan are lost at each restart of the service
   (each deploy among them); after the sale RENT A HERO is empty unless another holder offers a Genesis.
-**Next action:** the owner's session with #1287 (sign-in, a match in SECOND FORM, RENT IT OUT at 1 $CHOG, LEND IT),
-the test wallet funded and renting #1287 for 30 days, the holder's shots for the video; then where careers are kept.
+- **Questioned by the owner the same morning:** a rental that outlives a sale leaves the buyer a right they cannot
+  see or stop; the reference implementation of ERC-4907 erases the renter on transfer
+  (https://eips.ethereum.org/EIPS/eip-4907), and delegate.xyz tells integrators to check that the delegating wallet
+  still holds the token (https://docs.delegate.xyz/integrate-in-your-project/token-ownership-claiming). Also asked:
+  tests through the screens with a wallet the owner controls, on a test collection, instead of a script wallet. The
+  test-wallet rental above is suspended. Proposed, waiting for the owner: a rental whose right ends with the holding
+  and whose unused days are paid back (payment held by the contract), and a staging setup on Monad testnet (a test
+  collection, test $CHOG, the three contracts, services on this Mac with a second Photon application), the code
+  the same and the addresses set by configuration (today `server/src/chain.js` fixes the collection and chain 143).
+- **Seen at 10:00:** #1287's career on Render still reads 0 matches although the owner says they played it.
+**Next action:** the owner's answer on the rental rule and on the staging setup; the holder's shots for the video
+before the sale; why the owner's match left no career.
 
 **16 October 2026, 21:40 (the game is Chog Arena, at https://chogarena.vercel.app).**
 - **Name:** the owner named the game Chog Arena (menu title, page name, manifest, share text, sign-in message);
