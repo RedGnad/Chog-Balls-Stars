@@ -541,6 +541,36 @@ rental, shop, a staked match) and the video's shots with it, today; Render; the 
 **Next action:** the owner's eye on the sheets and a match on a computer; `?perf=1` on the phone with and without
 `fx=0`; tune the flash sizes from that.
 
+**17 October 2026, 22:30 (aim, towers, core, robustness; deployed: build `20261017T202256588Z`, stamp unchanged).**
+- **Asked by the owner:** lobs "impossible to aim" since a click throws at once; does a held button fire on its own;
+  how do the references do it. Answered (Brawl Stars: drag shows the arc and the point of impact, release throws, tap
+  auto-aims, no hold-to-fire, three ammo; League of Legends: quick cast, quick cast with indicator, normal cast) and
+  the owner chose to follow the references. Then: towers "all turned the same way, down", cores too small, more 3D
+  traits, the terrain and minions (answered: no lane minions, a Brawl Stars Siege bot at most, terrain and bot change
+  the stamp), and "a real audit and research pass" on performance. The owner followed the order by return:
+  performance, aim, towers and core, then traits.
+- **Implemented and deployed:** the mouse's aim shows all the time in a match (`ChogAimGuide`: dots along the very arc
+  of the throw, the landing ring under the pointer within reach, a faint circle of the reach; red without energy;
+  hidden when down, outside play, over a button); a click still throws at once, a held button never repeats. The
+  lob's own shadow and landing ring were drawn under the floor's planks (y 0.03) and never seen: now at 0.18.
+  Towers face the arena and turn their head to the hero they will shoot next (the simulation's rule); the core is
+  drawn 1.5 times larger. `PhotonIdentity` assumes the services ask until they answer and asks again when the
+  question fails (one failed answer at start used to leave a player refused by Photon until a reload). A room whose
+  host is away starts anyway: every player sees the clock and another player's game starts the match 8 s after zero
+  (`LobbyCountdown.StartsNow`). Bars, team indicators and attack colours wait for the local hero when joining a
+  match under way (12 exceptions on the public site). The fight effects (68c336a) went online with this build.
+- **Seen:** matches against bots on this Mac's build (`.artifacts/unity/aim-match-4`, `-5`: the aim at two pointer
+  positions, a lob in flight with its landing ring, a tower turning to its target, the larger core; no exception);
+  the public site loads the build and Photon takes the identity (`live-6`). On the public site a scripted client
+  joined a real room that had waited 22 minutes in team preparation (its host's tab idle): public checks no longer
+  press PLAY. Local services must run with `--photon-auth` (Photon's dashboard refuses anonymous clients).
+- **Audit:** `docs/PERF-AUDIT.md` (phase 1). The phone of 10 October was main-thread bound near 30 fps; no phone
+  measured since the 3D heroes, specials and effects. Quick wins listed (pixel ratio cap, per-frame strings, shader
+  warm-up, cheaper effect shader, Unity physics off, logging) and deeper view work (entity view pooling, canvases).
+- **Not checked:** a phone; the lobby fallback with two players; the trait audit (an agent is on it).
+**Next action:** the perf quick wins and the phone measurement (the owner opens `?perf=1` on a phone); the trait 3D
+audit and fixes; the owner's eye on the aim, the towers and the core.
+
 **17 October 2026, 20:10 (the specials in 3D; on `main`, built `20261017T175516922Z`, not deployed).**
 - **Asked by the owner:** some attacks were "not in 3D, just sprites thrown on the attack". **Implemented**
   (`game/README.md`, "The specials in 3D"): the five specials, which come from the Eyes trait, are 3D objects
