@@ -502,6 +502,32 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**17 October 2026, 17:25 (juice and sound, in the view only; on `main`: 73c65d2, fd11ae1, 9740baf, 634985b).**
+- **Implemented** (`game/README.md`, "Juice and sound"): pooled fight effects; a 90 ms white flash, a flinch (0.85 high,
+  1.1 wide, back in 0.25 s) and, on blows involving the local hero, a 0.06 s hit stop of the poses; damage numbers that
+  pop, coloured by who was hit, sized by the share of health, merged within 0.2 s, taken back when Quantum cancels the
+  blow; a fallen hero that swells where it fell and bursts in its colours, a return with a Back ease; trailing health
+  bars; structures that wobble, flash and burst when they fall; a special-ready pop with a chime; a light camera shake
+  (trauma squared); eight pooled audio voices with variants and pitch 0.92 to 1.08, at most two of a clip per 50 ms;
+  button clicks from `ChogPress.Pressed`; a menu loop and a match loop; Android vibration. Settings on the device:
+  `ChogSounds.MusicVolume` and `SoundVolume`, `ChogCameraShake.Enabled`, `ChogHaptics.Enabled` (the settings screen
+  reads them); `ChogSounds.Reward(step)` for the result screen. 18 CC0 files (Kenney, OpenGameArt), sources and
+  licences in `game/Assets/Chog/Audio/LICENSES.md`; the sample's arena music (2.3 MB, credited to FreePD, which is
+  offline since) is no longer referenced: the build's Sounds went from 2.4 MB to 2.0 MB (Unity's build report).
+- **Seen in preview builds on Photon's cloud** (muted headless browser with Metal, `?perf=1`, siege against bots,
+  build `20261017T152132143Z`, `.artifacts/unity/check-juice-7`): no exception; in about 150 s, 195 hits on heroes,
+  193 flashed (a 3D hero found), 10 on the local hero, 10 hit stops, 42 hits on structures, a tower fell, 35 heroes
+  fell and came back, trauma reached 1.0; 42 pooled objects made and 724 reused; 803 sounds played, 610 refused by
+  the 50 ms rule (mostly the sample's attack sounds of several heroes at once); the music went from the menu loop to
+  the match loop. 123 view tests pass.
+- **Not checked:** anything heard (every launch is muted: levels, the loops' seams, the mix are unheard; the files
+  were picked from measurements); the flash, flinch, pop and shake as a person sees them (still screenshots only);
+  vibration on a phone; the frame rate: in every run that evening frames took about a second once a second, the
+  earlier build `20261017T144416439Z` (before the sounds) included, with the Mac swapping 12.3 to 12.7 GB of 13.3 GB,
+  so no cost can be read from those runs.
+**Next action:** listen to the sounds and the two loops on a computer and a phone and keep or replace them; measure
+`?perf=1` on the phone with and without `?fx=0`; then directional impacts and the attacker's kick (DESIGN-BRIEF, Juice).
+
 **17 October 2026, 16:30 (the recruit's eyes exported and seen turned around, on `recruit-eyes`; not on `main`, not
 built).**
 - **Exported** after the owner freed the disk (5.4 GB free; swap 11.8 GB of 12.3 GB; one Blender, `-t 4`):
