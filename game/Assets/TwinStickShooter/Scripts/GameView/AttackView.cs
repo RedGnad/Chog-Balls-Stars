@@ -9,7 +9,7 @@ namespace TwinStickShooter
     private ColorSetter[] _colorSetters;
     private EntityRef _ownerEntity;
 
-    public bool IsLocal => _ownerEntity == ViewContext.LocalView.EntityRef;
+    public bool IsLocal => ViewContext.LocalView != null && _ownerEntity == ViewContext.LocalView.EntityRef;
 
     public override unsafe void OnActivate(Frame frame)
     {

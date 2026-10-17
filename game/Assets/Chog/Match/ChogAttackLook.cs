@@ -46,6 +46,9 @@ namespace Chog.Match
         private static readonly Dictionary<Color, Mesh> s_landings = new Dictionary<Color, Mesh>();
 
         private Transform _object;
+        // What this look hid of the sample's drawing, to show it again for an attack it does not dress.
+        private readonly List<Renderer> _hidRenderers = new List<Renderer>();
+        private readonly List<GameObject> _hidParticles = new List<GameObject>();
         private int _metadataId = int.MinValue;
         private ChogHeroModel.AttackStyle _style;
         private Color _impact;
@@ -177,14 +180,32 @@ namespace Chog.Match
             _metadataId = metadataId;
             _shown = _object != null;
             if (!_shown)
+            {
+                // A view handed back by the pool shows again what the sample drew, if an earlier attack hid it.
+                foreach (var drawn in _hidRenderers)
+                    if (drawn != null)
+                        drawn.enabled = true;
+                foreach (var particles in _hidParticles)
+                    if (particles != null)
+                        particles.SetActive(true);
+                _hidRenderers.Clear();
+                _hidParticles.Clear();
                 return;
+            }
 
-            // What the sample drew for this attack steps aside.
+            // What the sample drew for this attack steps aside (not this look's own shadow of a lob).
             foreach (var drawn in GetComponentsInChildren<Renderer>(true))
-                if (!drawn.transform.IsChildOf(_object))
+                if (!drawn.transform.IsChildOf(_object) && (_shadow == null || !drawn.transform.IsChildOf(_shadow)) && drawn.enabled)
+                {
                     drawn.enabled = false;
+                    _hidRenderers.Add(drawn);
+                }
             foreach (var particles in GetComponentsInChildren<ParticleSystem>(true))
-                particles.gameObject.SetActive(false);
+                if (particles.gameObject.activeSelf)
+                {
+                    particles.gameObject.SetActive(false);
+                    _hidParticles.Add(particles.gameObject);
+                }
 
             _strike = strike;
             _age = 0f;
