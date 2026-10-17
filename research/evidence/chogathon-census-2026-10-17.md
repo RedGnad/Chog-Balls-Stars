@@ -7,7 +7,7 @@ the page; only public fields: title, links, tech, description; no contact field 
 
 | Submitted (UTC) | Project | App | Video | Code |
 | --- | --- | --- | --- | --- |
-| 2026-10-10T04:29 | Chog World — Your Chog, Your Identity | https://chognftgame.netlify.app/ | no |  |
+| 2026-10-10T04:29 | Chog World : Your Chog, Your Identity | https://chognftgame.netlify.app/ | no |  |
 | 2026-10-10T14:49 | Chog Wallet Tracker | https://gchog.xyz/ | no |  |
 | 2026-10-11T10:03 | Do Not Buy | https://testnet.vibevibe.fun/token/0x28f5e05268e414950d555d9Ac546a03E2612F3eB | no |  |
 | 2026-10-14T19:37 | ChogWorks | https://chogworks.fun | yes |  |
