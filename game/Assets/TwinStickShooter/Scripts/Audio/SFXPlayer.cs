@@ -6,11 +6,12 @@ namespace TwinStickShooter
   {
     public Sound Sound;
 
+    // Through the game's voices (Chog.Match.ChogSounds), not a new object per sound.
     public void PlaySound()
     {
-      if (AudioManager.Instance.IsMuted == false && Sound.Clip != null)
+      if (Sound != null && Sound.Clip != null)
       {
-        AudioSource.PlayClipAtPoint(Sound.Clip, AudioManager.Instance.AudioListenerPos, Sound.Volume);
+        Chog.Match.ChogSounds.PlayClip(Sound.Clip, Sound.Volume);
       }
     }
   }

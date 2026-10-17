@@ -10,7 +10,8 @@ namespace Chog.Match
     /// Chog spikes. Flat cartoon pictures that face the camera, like the heads of the heroes,
     /// painted with the same unlit material as the attacks. Each stands on a base in the colour
     /// of its side (blue for the local player's team, red for the other) under a bar of its
-    /// health; a destroyed one stays as a grey ruin.
+    /// health; a destroyed one stays as a grey ruin. A 3D structure that is hit wobbles like jelly and
+    /// flashes a little, and one that falls bursts into pieces of its colours before the ruin shows.
     /// </summary>
     public sealed class StructureViews : MonoBehaviour
     {
@@ -60,7 +61,20 @@ namespace Chog.Match
             public bool Alarmed;
             // Whether the bar of a 3D model was put over it, which needs the camera.
             public bool BarPlaced;
+            // When it was last hit (below 0: not since it settled), and the size of its model at rest.
+            public float HitAt = -1f;
+            public Vector3 ModelScale = Vector3.one;
         }
+
+        // A hit squashes a structure less than a hero (ChogBodyAnimator.Squash gives the spring): this much
+        // lower and this much wider at the moment of the blow; and it flashes this white for this long.
+        private const float JellyHeight = 0.08f;
+        private const float JellyWidth = 0.06f;
+        private const float HitFlash = 0.45f;
+        private const float HitFlashSeconds = 0.08f;
+        private static readonly int FlashId = Shader.PropertyToID("_Flash");
+        private MaterialPropertyBlock _flashBlock;
+        private readonly List<Renderer> _flashRenderers = new List<Renderer>();
 
         // How long the tower's head stays turned to whom it shot, and how fast it turns.
         private const float AimSeconds = 0.9f;
@@ -99,6 +113,7 @@ namespace Chog.Match
         {
             QuantumEvent.Subscribe<EventStructureShot>(this, OnShot);
             QuantumEvent.Subscribe<EventStructureDestroyed>(this, OnFell);
+            QuantumEvent.Subscribe<EventCharacterDamaged>(this, OnDamaged);
         }
 
         /// <summary>
@@ -128,8 +143,36 @@ namespace Chog.Match
             return kind == EStructureKind.Core ? "YOUR CORE IS UNDER ATTACK" : "YOUR TOWER IS UNDER ATTACK";
         }
 
+        // A structure that is hit wobbles and flashes (its model only; the flat picture stays as it is).
+        private void OnDamaged(EventCharacterDamaged hit)
+        {
+            if (!GenesisEffects.Enabled || !_drawings.TryGetValue(hit.target, out var drawing) || drawing.Model == null || drawing.Ruined)
+                return;
+            drawing.HitAt = Time.time;
+        }
+
+        /// <summary>
+        /// How a structure stands "seconds" after a hit, as a multiplier of its size: lower and wider at once,
+        /// then a spring back (ChogBodyAnimator.Squash); (1, 1, 1) when it is not hit.
+        /// </summary>
+        public static Vector3 Jelly(float seconds)
+        {
+            var squash = ChogBodyAnimator.Squash(seconds);
+            return new Vector3(1f + JellyWidth * squash, 1f - JellyHeight * squash, 1f + JellyWidth * squash);
+        }
+
         private void OnFell(EventStructureDestroyed fell)
         {
+            // It bursts into pieces of its colours where it stood, before the ruin shows.
+            if (_drawings.TryGetValue(fell.Structure, out var fallen) && GenesisEffects.Enabled)
+            {
+                var at = fallen.Root.transform.position;
+                var top = fallen.Kind == EStructureKind.Core ? 1.1f : 1.9f;
+                ChogImpact.Burst(at + Vector3.up * top, Purple, 2.6f, 1.9f, fallen.Side);
+                ChogImpact.Burst(at + Vector3.up * (top * 0.5f), DeepPurple, 2.2f, 1.5f, Cream);
+                ChogImpact.Burst(at + Vector3.up * 0.3f, fallen.Side, 1.8f, 1.2f, Outline);
+                fallen.HitAt = -1f;
+            }
             _notice = NoticeFor(fell.Kind, fell.Team, _localTeam);
             _noticeColour = fell.Team == (_localTeam < 0 ? 0 : _localTeam) ? Theirs : Ours;
             _noticeUntil = Time.time + NoticeSeconds;
@@ -303,6 +346,23 @@ namespace Chog.Match
                     drawing.Head.rotation = Quaternion.Slerp(drawing.Head.rotation, wanted, turn);
                 }
 
+                // The wobble of a hit, and its flash.
+                if (drawing.HitAt >= 0f)
+                {
+                    var since = Time.time - drawing.HitAt;
+                    if (drawing.Ruined || since >= ChogBodyAnimator.FlinchSeconds)
+                    {
+                        drawing.HitAt = -1f;
+                        drawing.Model.localScale = drawing.ModelScale;
+                        Flash(drawing, 0f);
+                    }
+                    else
+                    {
+                        drawing.Model.localScale = Vector3.Scale(drawing.ModelScale, Jelly(since));
+                        Flash(drawing, since < HitFlashSeconds ? HitFlash * (1f - since / HitFlashSeconds) : 0f);
+                    }
+                }
+
                 if (drawing.Heart != null && !drawing.Ruined)
                 {
                     var beats = drawing.Alarmed ? 3.2f : 1.3f;
@@ -399,6 +459,8 @@ namespace Chog.Match
             drawing.Model = ChogStructureModel.Build(drawing.Kind, drawing.Side == Ours, drawing.Ruined, drawing.Root.transform);
             if (drawing.Model == null)
                 return;
+            drawing.HitAt = -1f;
+            drawing.ModelScale = drawing.Model.localScale;
 
             drawing.Head = PartOf(drawing.Model, ChogStructureModel.HeadPart);
             drawing.Eyes = PartOf(drawing.Model, ChogStructureModel.EyesPart);
@@ -410,6 +472,24 @@ namespace Chog.Match
             if (drawing.Heart != null)
                 drawing.Heart.gameObject.SetActive(false);
             drawing.Model.localScale = new Vector3(1f, 0.55f, 1f);
+        }
+
+        // The parts of a 3D structure drawn with the heroes' material turn that white (0: their colours).
+        private void Flash(Drawing drawing, float amount)
+        {
+            if (drawing.Model == null)
+                return;
+            if (_flashBlock == null)
+                _flashBlock = new MaterialPropertyBlock();
+            drawing.Model.GetComponentsInChildren(false, _flashRenderers);
+            foreach (var drawn in _flashRenderers)
+            {
+                if (drawn.sharedMaterial != ChogHeroModel.Material)
+                    continue;
+                drawn.GetPropertyBlock(_flashBlock);
+                _flashBlock.SetFloat(FlashId, amount);
+                drawn.SetPropertyBlock(_flashBlock);
+            }
         }
 
         private static Transform PartOf(Transform model, string name)
