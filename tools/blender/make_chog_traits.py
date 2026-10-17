@@ -89,6 +89,7 @@ from render_chog_body import linear  # noqa: E402
 import chog_trait_faces as faces  # noqa: E402  (eyes and mouths added on 14 October 2026, registered below)
 import chog_trait_bases as bases  # noqa: E402  (the Skull base, batch 7, 15 October 2026)
 import chog_one_of_one as one  # noqa: E402  (the ten 1:1 Genesis, 16 October 2026)
+import chog_trait_accessories as accessories  # noqa: E402  (what a Genesis holds, 17 October 2026)
 
 variants, base = full.variants, full.base
 X, Y, Z, NOWHERE = base.X, base.Y, base.Z, base.NOWHERE
@@ -493,7 +494,7 @@ DARK_EYE = {
 LASER = {
     # A beam leaves each eye level with the ground, straight ahead: how long, how thick (half), how
     # far behind the face it starts.
-    "BEAM_LENGTH": 0.28,
+    "BEAM_LENGTH": 0.34,         # (0.28 until 17 October 2026: the pictures draw the beams long, out of the frame)
     "BEAM_RADIUS": 0.019,
     "BEAM_SUNK": 0.03,
     # (First: six sides, two of them the light core. Seen from the front and from above, where those
@@ -502,6 +503,16 @@ LASER = {
     "BEAM_SIDES": 8,
     "BEAM_CORE": (1,),           # which of its sides is the light core: up, towards the left
     "OUTLINE_THICKNESS": 0.010,
+    # The eye a beam leaves, as the pictures of Side=Right draw it (CHOG #38, #41, #65, #212 fire; #107, #126,
+    # #205, #1241 purple; #72, #329, #875, #1467 green; 17 October 2026): a whole tall dark oval, no brow
+    # across it and no glint, the beam leaving its middle from a hot spot of the beam's colours. Until then
+    # it was the eye of "Normal Eye", cut by a slanted brow: an angry look the pictures of lasers never draw.
+    # Its middle (to the side, above), half width and half height, segments; then the hot spot: the radius of
+    # the glow (the beam's colour) and of the core in it.
+    "EYE_AT": (0.112, 0.010),
+    "EYE_SIZE": (0.045, 0.064),
+    "EYE_SEGMENTS": 14,
+    "GLOW": (0.024, 0.012),
 }
 HAPPY = {
     "AT": (0.110, 0.012),
@@ -1912,14 +1923,31 @@ def build_normal_eye(maker):
     draw_dark_eyes(part, maker.surface, part.named("Dark"), glint=part.named("Glint"))
 
 
+def draw_laser_eyes(part, surface, numbers, dark, glow, core):
+    """The eyes a beam leaves (LASER): a whole tall dark oval each, a hot spot of the beam's colours in its
+    middle. Returns where the middle of each is: (to the side, above)."""
+    half_width, half_height = numbers.EYE_SIZE
+    glow_radius, core_radius = numbers.GLOW
+    middles = []
+    for side in (1.0, -1.0):
+        middle = (side * numbers.EYE_AT[0], numbers.EYE_AT[1])
+        draw_shape(part, surface, dark, oval(middle, half_width, half_height, numbers.EYE_SEGMENTS), DRAWN[0],
+                   middle=middle)
+        draw_shape(part, surface, glow, oval(middle, glow_radius, glow_radius, 10), DRAWN[1], middle=middle)
+        draw_shape(part, surface, core, oval(middle, core_radius, core_radius, 8), DRAWN[2], middle=middle)
+        middles.append(middle)
+    return middles
+
+
 def build_laser(maker):
-    """The dark eyes of "Normal Eye" without their glints, and a short beam leaving each, level with
-    the ground and straight ahead. The game draws the long beam itself when the hero attacks."""
+    """The eyes of a laser as the pictures of Side=Right draw them (draw_laser_eyes), and a short beam
+    leaving each, level with the ground and straight ahead. The game draws the long beam itself when the
+    hero attacks."""
     numbers = maker.numbers(LASER)
     part, surface = maker.part(), maker.surface
     ahead, down = level_axes(maker.head)
     radius, sides = numbers.BEAM_RADIUS, numbers.BEAM_SIDES
-    for middle in draw_dark_eyes(part, surface, part.named("Dark")):
+    for middle in draw_laser_eyes(part, surface, numbers, part.named("Dark"), part.named("Beam"), part.named("Core")):
         start = surface.front(middle[0], middle[1], 0.0)
         stations = ((-numbers.BEAM_SUNK, 0.7), (0.02, 1.0), (numbers.BEAM_LENGTH - 0.03, 1.0),
                     (numbers.BEAM_LENGTH, 0.55))
@@ -2308,6 +2336,8 @@ TRAIT_PARTS = {
     "Head": ("Hat", HATS, "shape", HAT_SHAPES),
     "Eyes": ("Eyes", {**EYES, **faces.EYES, **bases.radioactive_eyes({**EYES, **faces.EYES})}, "kind", EYE_KINDS),
     "Mouth": ("Mouth", {**MOUTHS, **faces.MOUTHS}, "kind", MOUTH_KINDS),
+    # What a Genesis holds in its right hand (chog_trait_accessories.py, 17 October 2026).
+    "Accessory": ("Accessory", accessories.ACCESSORIES, "kind", accessories.ACCESSORY_KINDS),
 }
 # Hats and clothing that a Side draws otherwise (Mon Cap, Russian Hat, Tuxedo): chog_trait_hats.py.
 OF_SIDE.update({"Head": hats_and_clothes.HATS_OF_SIDE, "Body": hats_and_clothes.CLOTHES_OF_SIDE})

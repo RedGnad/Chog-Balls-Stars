@@ -50,7 +50,7 @@ INK = (236, 232, 226)
 QUIET = (156, 152, 158)
 WARN = (240, 150, 120)
 # Traits of a Genesis that no part of make_chog_traits.py draws at all.
-NEVER_MODELLED = ("Accessory", "Aura")
+NEVER_MODELLED = ("Aura",)
 
 
 def font(size):

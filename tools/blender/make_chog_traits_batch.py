@@ -46,11 +46,16 @@ def blender_running():
 
 
 def heavy_job_running():
-    """True while the lock file of the heavy jobs exists and says "busy"."""
+    """True while the lock file of the heavy jobs exists and says "busy", unless it says "busy <holder>" where
+    <holder> is the environment variable CHOG_HEAVY_HOLDER: the caller took the lock itself for this run."""
     if not os.path.isfile(HEAVY_LOCK):
         return False
     with open(HEAVY_LOCK, encoding="utf-8", errors="replace") as source:
-        return "busy" in source.read()
+        said = source.read().strip()
+    holder = os.environ.get("CHOG_HEAVY_HOLDER", "").strip()
+    if holder and said == f"busy {holder}":
+        return False
+    return "busy" in said
 
 
 def wait_until_free():

@@ -132,7 +132,9 @@ FLAT_EYE = {"AT": (0.112, 0.004), "HALF": 0.044, "THICKNESS": 0.017, "SLOPE": 0.
 # (#846, #1214; #1079, #1311; #1313, #1889; 16 October 2026): a large dark socket for each eye, with a short
 # white dash across its middle ("dash"), a round white glint near its top ("glint"), or nothing.
 SOCKET = {"AT": (0.112, 0.008), "SOCKET": (0.062, 0.066), "DASH": (0.030, 0.009), "GLINT": (0.004, 0.026, 0.018, 0.018),
-          "MARK": "", "SEGMENTS": 16}
+          "MARK": "", "SEGMENTS": 16,
+          # MARK "angry": where the brow cuts the socket above its middle (against its half height), its slope.
+          "ANGRY": (0.30, 0.45)}
 
 # White eyes, as the pictures of Side=Left draw "Angry", "Vertical", "Smirk", "Frog", "Retard" and
 # "Worried" (added 15 October 2026, read on the 1000-point pictures of CHOG #29, #91, #175, #63, #111, #2,
@@ -302,6 +304,16 @@ COIN = {
 # wide red lips.)
 CLOWN_MOUTH = {"FROM": (-0.084, -0.076), "TO": (0.116, -0.082), "BEND": -0.036, "RED": (0.040, 0.016),
                "LINE": (0.009, 0.004), "STEPS": 14}
+# "normal smile" as the pictures of Side=Left draw it (CHOG #2, #151, #214, #361, #485, #531, #1193; 17 October
+# 2026): one long smile from under the nose to the far cheek, sagging in its middle and turning up at its far
+# end. Until then those Genesis wore the short smile of Side=Right.
+SMILE_LEFT = {"FROM": (-0.030, -0.078), "TO": (0.122, -0.074), "BEND": -0.030, "THICKNESS": (0.012, 0.007),
+              "HOOK_START": (0.0, 0.0), "HOOK_END": (0.10, 55.0), "STEPS": 12}
+# "Sad" as the pictures of Side=Left draw it (CHOG #46, #71, #131, #152, #182, #247, #1538): a short arch, a
+# frown, beside the nose towards the far cheek, its ends a little turned out. Until then they wore the long
+# slanted line of Side=Right.
+SAD_LEFT = {"FROM": (0.012, -0.112), "TO": (0.090, -0.110), "BEND": 0.034, "THICKNESS": (0.012, 0.008),
+            "HOOK_START": (0.10, -30.0), "HOOK_END": (0.10, 30.0), "STEPS": 10}
 # "Flat": a short straight line.
 FLAT_MOUTH = {"FROM": (0.022, -0.098), "TO": (0.076, -0.090), "BEND": 0.0, "THICKNESS": (0.012, 0.010),
               "HOOK_START": (0.0, 0.0), "HOOK_END": (0.0, 0.0), "STEPS": 4}
@@ -661,7 +673,20 @@ def build_socket_eye(maker):
     part, surface = maker.part(), maker.surface
     for side in (1.0, -1.0):
         middle = (side * numbers.AT[0], numbers.AT[1])
-        disc(part, surface, part.named("Dark"), middle, *numbers.SOCKET, LIFT[0], numbers.SEGMENTS)
+        if numbers.MARK == "angry":
+            # "Angry" on the skulls of Side=Right (#459, #552, #1642, #1667, #1861; 17 October 2026): the socket
+            # cut along its top by a straight brow, lower towards the nose, as "Normal Eye" cuts its eye.
+            cut, slope = numbers.ANGRY
+            half_width, half_height = numbers.SOCKET
+
+            def brow(x):
+                return middle[1] + half_height * cut + slope * (x - middle[0]) * side
+
+            edge = [(x, min(y, brow(x))) for x, y in oval_edge(middle, half_width, half_height, numbers.SEGMENTS)]
+            HOST.draw_shape(part, surface, part.named("Dark"), edge, LIFT[0],
+                            middle=(middle[0], middle[1] - half_height * 0.2))
+        else:
+            disc(part, surface, part.named("Dark"), middle, *numbers.SOCKET, LIFT[0], numbers.SEGMENTS)
         if numbers.MARK == "dash":
             disc(part, surface, part.named("White"), middle, *numbers.DASH, LIFT[1], 10, squareness=4.0)
         elif numbers.MARK == "glint":
@@ -1374,6 +1399,10 @@ EYES_OF_SIDE = {
         "Normal": {"kind": "Socket", "colours": {"Dark": DARK, "White": WHITE}, "unlit": ("Dark", "White")},
         "Up": {"kind": "Socket", "colours": {"Dark": DARK, "White": WHITE}, "unlit": ("Dark", "White"),
                "numbers": {"MARK": "glint"}},
+        # Worn on Side=Right only by five skeletons: dark sockets cut by an angry brow. Until 17 October 2026
+        # they wore the white eyes of "Angry" of Side=Left, which their pictures do not draw.
+        "Angry": {"kind": "Socket", "colours": {"Dark": DARK, "White": WHITE}, "unlit": ("Dark", "White"),
+                  "numbers": {"MARK": "angry"}},
     },
 }
 
@@ -1437,6 +1466,9 @@ MOUTHS_OF_SIDE = {
             "unlit": ("Glint",),
             "numbers": {"AT": (0.020, -0.100)},
         },
+        # Other drawings on Side=Left (17 October 2026, SMILE_LEFT and SAD_LEFT).
+        "normal smile": {"kind": "SmileLeft", "colours": {"Line": DARK}, "unlit": ("Line",)},
+        "Sad": {"kind": "SadLeft", "colours": {"Line": DARK}, "unlit": ("Line",)},
     },
     "Right": {},
 }
@@ -1454,7 +1486,8 @@ EYE_KINDS = {
 MOUTH_KINDS = {
     "Sad": build_line_mouth(SAD), "SmileCurl": build_line_mouth(SMILE_CURL), "Worried": build_worried,
     "LipBite": build_lip_bite, "Grit": build_grit, "Coin": build_coin, "ClownMouth": build_clown_mouth,
-    "FlatMouth": build_line_mouth(FLAT_MOUTH),
+    "FlatMouth": build_line_mouth(FLAT_MOUTH), "SmileLeft": build_line_mouth(SMILE_LEFT),
+    "SadLeft": build_line_mouth(SAD_LEFT),
 }
 
 
