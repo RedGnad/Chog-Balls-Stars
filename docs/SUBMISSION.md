@@ -72,6 +72,18 @@ submitting. Character counts are for the 8,000-character fields.
 
   (The owner decided on 16 October 2026: no loan link for the judges; judges who hold a Chog connect it.)
 
+- **Check it in 30 seconds (draft, every line run on 17 October 2026):**
+
+> The career of a Genesis lives on Monad mainnet, written by our referee after the replay decides the
+> match: https://monadscan.com/address/0x335bf7bc610645546e2b00de6a9fd0c4709d6111 (one such write:
+> https://monadscan.com/tx/0x04a6c37fbad4cabe6910d3257882590b8cc4ba10420dee74da07b8e1b0a4e30c). Read one
+> yourself: `cast call 0x335bf7bc610645546e2b00de6a9fd0c4709d6111
+> "careerOf(uint256)((uint32,uint32,uint32,uint32,uint32,uint16,uint16,uint64))" 1795 --rpc-url
+> https://rpc.monad.xyz` answers matches, wins, draws, rented, as a guest, streak, best streak, last
+> played (for #1287 that day: 3, 2, 0, 1, 1, 1, 1, 1792230364); the game reads the same through
+> https://chogarena.vercel.app/api/career?tokens=1795. The rental, the wager and the shop are the
+> contracts listed in the tech stack above.
+
 ## 04 Why Chog matters (the "NFT gate")
 
 > Take the NFT out and there is no hero: without a Genesis you are a grey recruit with 10% less
