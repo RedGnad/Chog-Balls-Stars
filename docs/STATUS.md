@@ -553,6 +553,30 @@ eyes made to show from above, which is the 3D work, not the camera).
 **Next action:** listen to the sounds and the two loops on a computer and a phone and keep or replace them; measure
 `?perf=1` on the phone with and without `?fx=0`; then directional impacts and the attacker's kick (DESIGN-BRIEF, Juice).
 
+**17 October 2026, 19:00 (deployed, then Photon's limit; the owner's questions on v3, music and attacks).**
+- **Deployed and seen online** (build `20261017T155745998Z` on chogarena.vercel.app and Render, the judge
+  agreeing on the recorded fixtures): the home, hero sheet, collection of 1,969 (42 pages of 48 portraits,
+  one picture each), settings, reveal, scoreboard, team preparation with a 30 s clock that started a match by
+  itself, the first match coach, keycaps, the loading page; a whole 3 minute match played headless to its end
+  screen. A visitor's match on the public site reached team preparation at 18:50.
+- **Found at 18:41: Photon refuses every new application version** ("Too many application versions are in
+  use", 32767; docs/DEPLOY.md, "Photon's limit on application versions"). Production kept working. Fixed for
+  the future (6059de6): the game names itself by a stamp of its simulation (`sim-f4a81f1ddbd919b6` today,
+  the same over two builds), so UI builds open no new version. **Not deployed: a build with that stamp is still
+  refused** (tried 18:42, 18:50, 18:56); a script retries every 20 minutes. No deployment until it passes.
+- **Built, not seen in a match (blocked by the above):** the controller's lobbed basic attack on a high arc
+  with its shadow and a landing ring (tests of the arc pass); `?recruitclass=` on a private page.
+- **Answered the owner:** v3 with permit saves no wallet window (two the first time either way, then one) and
+  about 0.0102 MON once per contract (102 gwei, our 100,000 gas limit), against three redeployments; a relayer
+  saves the need for MON, not windows; a paymaster needs smart accounts MetaMask does not offer on Monad. The
+  only v3 that removes windows is one spender for rent, shop and stakes. Decision is the owner's. Music: a menu
+  loop (new) and a match loop replacing the sample's, both CC0, not heard by anyone yet.
+- **Counted:** every special (the five shapes from the eyes, all 1,969 Genesis) is drawn flat; an agent is
+  making them 3D, with an offline preview page since matches of new builds cannot connect. 15 Cartoon FX files
+  are still used by ten sample effect prefabs (licence point in docs/SUBMISSION.md, section 05).
+**Next action:** when Photon accepts the stamp, deploy the stamp build and see the lob in a match; merge the 3D
+specials; replace the Cartoon FX effects.
+
 **17 October 2026, 17:35 (the redesign, screens: the owner validated the mockups and said go; on `main`, built,
 seen in headless Chrome at 1280x720, not deployed yet).**
 - **Implemented and seen** (builds `20261017T151852241Z` and `20261017T152751287Z`, captures in
