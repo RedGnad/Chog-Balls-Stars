@@ -13,16 +13,17 @@ namespace Chog.Screens
     {
         private const string ObjectName = "RecruitNote";
 
-        // In units of the preparation screen, like the hero card.
-        private const float Width = 900f;
-        private const float Height = 140f;
+        // In units of the preparation screen, like the hero card: the column between the two teams,
+        // so the note never runs over their names (it did at 900 wide).
+        private const float Width = 470f;
+        private const float Height = 210f;
 
         private const string TitleColor = "#FFD27A";
 
         public static string Describe()
         {
-            return "<b><color=" + TitleColor + ">RECRUIT</color></b>  <size=70%>" + (100 - Recruit.HealthPercent) +
-                   "% less health, no Genesis attack.\nTo play a Chog Genesis: connect the wallet that holds it and sign in, or open a link its holder lent you.</size>";
+            return "<b><color=" + TitleColor + ">YOU PLAY A RECRUIT</color></b>\n<size=75%>" + (100 - Recruit.HealthPercent) +
+                   "% less health, no Genesis attack.\nConnect your Genesis on the menu, or rent one, to play it.</size>";
         }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace Chog.Screens
             text.alignment = TextAlignmentOptions.Center;
             text.enableAutoSizing = true;
             text.fontSizeMin = 12f;
-            text.fontSizeMax = 40f;
+            text.fontSizeMax = 34f;
             text.color = Color.white;
             text.text = Describe();
 

@@ -26,7 +26,7 @@ namespace TwinStickShooter
       WinnerText.text = ResultText(LocalTeam(ev), ev.WinnerTeam, winnerName);
 
       // The game's own end screen: the result and the hero played, in 3D (Chog.Screens.ChogResultScreen).
-      if (Chog.Screens.ChogResultScreen.Show(LocalTeam(ev), ev.WinnerTeam, LocalHero(ev)))
+      if (Chog.Screens.ChogResultScreen.Show(LocalTeam(ev), ev.WinnerTeam, LocalHero(ev), LocalToken(ev)))
       {
         GameOverContainer.SetActive(false);
       }
@@ -46,6 +46,22 @@ namespace TwinStickShooter
       }
 
       return Chog.Match.ChogHeroModel.Recruit;
+    }
+
+    // The Genesis the local player played, 0 for a recruit: its career is announced on the end screen.
+    private static int LocalToken(EventGameOver ev)
+    {
+      var frame = ev.Game.Frames.Verified;
+      var characters = frame.Filter<PlayerLink, GenesisHero>();
+      while (characters.Next(out _, out var playerLink, out var genesis))
+      {
+        if (ev.Game.PlayerIsLocal(playerLink.PlayerRef))
+        {
+          return genesis.TokenId;
+        }
+      }
+
+      return 0;
     }
 
     // A player reads the result of their own team; a spectator reads which team won.

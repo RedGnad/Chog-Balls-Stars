@@ -66,7 +66,8 @@ namespace Chog.Screens
         // A band across the screen for a few seconds: what the Genesis has done, this match included.
         private static void ShowRecorded(GenesisCareer career, bool credited)
         {
-            if (!credited)
+            // The end of a match shows the career itself while it is on screen.
+            if (!credited || ChogResultScreen.IsShown)
                 return;
 
             var host = new GameObject("Chog Career Notice", typeof(Canvas), typeof(CanvasScaler));
