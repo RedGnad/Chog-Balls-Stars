@@ -298,6 +298,7 @@ namespace Chog.Screens
         // Set when the player connects a wallet on this page: once it shows a Genesis, the signature
         // that lets the player play it is asked for at once, instead of waiting for a second button.
         private bool _justConnected;
+        private string _signInAskedFor = "";
         private WalletState _lastState;
 
         private void Refresh()
@@ -412,8 +413,13 @@ namespace Chog.Screens
                 : PlayerWallet.SignInProblem.Length > 0 ? "SIGN-IN FAILED, TRY AGAIN"
                 : holds ? (PhotonIdentity.SignInNeededToPlay ? "SIGN IN TO PLAY IT" : "SIGN IN TO RECORD ITS CAREER")
                 : "SIGN IN TO STAKE " + GenesisWager.Currency;
-            if (_justConnected && holds && PhotonIdentity.SignInNeededToPlay && PlayerWallet.SignIn == SignInState.SignedOut)
+            // The signature is asked by itself whenever this wallet has a Genesis to play (held or
+            // rented) and no session: right after connecting, after a rental, after a switch of
+            // account. Once per address in a visit, so a player who closes the wallet is not asked again.
+            if (holds && PhotonIdentity.SignInNeededToPlay && PlayerWallet.SignIn == SignInState.SignedOut
+                && PlayerWallet.SignInProblem.Length == 0 && _signInAskedFor != PlayerWallet.Address)
             {
+                _signInAskedFor = PlayerWallet.Address;
                 _justConnected = false;
                 PlayerWallet.StartSignIn();
             }

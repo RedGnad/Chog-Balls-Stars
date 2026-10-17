@@ -593,9 +593,9 @@ namespace Chog.Match
                     return;
                 }
 
-                PlayerPrefs.SetString(SessionKey, session.session);
-                PlayerPrefs.SetString(SessionAddressKey, address);
-                PlayerPrefs.SetString(SessionExpiryKey, session.expiresAt.ToString(CultureInfo.InvariantCulture));
+                // One session kept per address: switching accounts back and forth asks nothing again.
+                PlayerPrefs.SetString(SessionKey + "." + address, session.session);
+                PlayerPrefs.SetString(SessionExpiryKey + "." + address, session.expiresAt.ToString(CultureInfo.InvariantCulture));
                 PlayerPrefs.Save();
                 Debug.Log("CHOG_WALLET signed in " + ShortAddress(address));
                 SetSignIn(SignInState.SignedIn, session.session, "");
@@ -618,10 +618,17 @@ namespace Chog.Match
             {
                 // A session belongs to one address: another account starts signed out, unless a
                 // session kept from an earlier visit is still good for it.
-                long.TryParse(PlayerPrefs.GetString(SessionExpiryKey, "0"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var expiry);
-                var kept = PlayerPrefs.GetString(SessionKey, "");
-                var usable = IsSessionUsable(kept, PlayerPrefs.GetString(SessionAddressKey, ""), expiry, address,
-                    (long)(DateTime.UtcNow - UnixEpoch).TotalMilliseconds);
+                var nowMs = (long)(DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
+                long.TryParse(PlayerPrefs.GetString(SessionExpiryKey + "." + address, "0"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var expiry);
+                var kept = PlayerPrefs.GetString(SessionKey + "." + address, "");
+                var usable = IsSessionUsable(kept, address, expiry, address, nowMs);
+                if (!usable)
+                {
+                    // The one slot of earlier builds, for the address it was made for.
+                    long.TryParse(PlayerPrefs.GetString(SessionExpiryKey, "0"), NumberStyles.Integer, CultureInfo.InvariantCulture, out expiry);
+                    kept = PlayerPrefs.GetString(SessionKey, "");
+                    usable = IsSessionUsable(kept, PlayerPrefs.GetString(SessionAddressKey, ""), expiry, address, nowMs);
+                }
                 SignIn = usable ? SignInState.SignedIn : SignInState.SignedOut;
                 Session = usable ? kept : "";
                 SignInProblem = "";
@@ -642,6 +649,7 @@ namespace Chog.Match
         public static void ForgetSession()
         {
             PlayerPrefs.DeleteKey(SessionKey);
+            PlayerPrefs.DeleteKey(SessionKey + "." + Address);
             PlayerPrefs.Save();
             SetSignIn(SignInState.SignedOut, "", "");
         }

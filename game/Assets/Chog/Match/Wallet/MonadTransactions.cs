@@ -84,6 +84,21 @@ namespace Chog.Match
         /// </summary>
         public static void SwitchTo(ChainSpec chain, Action then, Action<int, string> fail)
         {
+            // A wallet already on the chain is asked nothing.
+            PlayerWallet.Request("eth_chainId", "[]", (current, readError, readCode) =>
+            {
+                if (readError == null && string.Equals(Unquoted(current), chain.HexId, StringComparison.OrdinalIgnoreCase))
+                {
+                    then();
+                    return;
+                }
+
+                AskToSwitch(chain, then, fail);
+            });
+        }
+
+        private static void AskToSwitch(ChainSpec chain, Action then, Action<int, string> fail)
+        {
             PlayerWallet.Request("wallet_switchEthereumChain", SwitchChainParameters(chain), (switched, error, code) =>
             {
                 if (error == null)
@@ -147,8 +162,11 @@ namespace Chog.Match
                         return;
                     }
 
+                    // A budget rather than the exact amount, so the next payments to this contract ask one
+                    // prompt and not two. The contracts only ever take from the one who calls them, for what
+                    // that player asked (rent, buy, stake); the wallet shows the cap and lets it be changed.
                     approving?.Invoke();
-                    Send(payer, token, ApproveData(spender, amountWei), ApproveGasLimit, "the approval", then, fail);
+                    Send(payer, token, ApproveData(spender, Larger(amountWei, ApprovalBudgetWei)), ApproveGasLimit, "the approval", then, fail);
                 }, fail);
             }, fail);
         }
@@ -242,6 +260,19 @@ namespace Chog.Match
             var whole = BigInteger.Divide(hundredths, 100).ToString(CultureInfo.InvariantCulture);
             var rest = (int)(hundredths % 100);
             return rest == 0 ? whole : whole + "." + (rest % 10 == 0 ? (rest / 10).ToString(CultureInfo.InvariantCulture) : rest.ToString("00", CultureInfo.InvariantCulture));
+        }
+
+        /// <summary>What a contract is allowed to take at once when it is first allowed: 1,000 $CHOG.</summary>
+        public static readonly string ApprovalBudgetWei = WholeToWei(1000);
+
+        /// <summary>The larger of two amounts in the smallest unit, as decimal digits.</summary>
+        public static string Larger(string a, string b)
+        {
+            if (!IsDigits(a))
+                return IsDigits(b) ? b : "0";
+            if (!IsDigits(b))
+                return a;
+            return BigInteger.Parse(a, CultureInfo.InvariantCulture) >= BigInteger.Parse(b, CultureInfo.InvariantCulture) ? a : b;
         }
 
         /// <summary>A whole number of $CHOG in its smallest unit, as decimal digits.</summary>

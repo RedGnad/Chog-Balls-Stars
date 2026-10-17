@@ -80,6 +80,10 @@ namespace Chog.Editor
             // the sample's own was "quantum.unity". Changing it moves what the browser keeps for
             // the game (settings, the wallet choice), so it is settled before anyone plays.
             PlayerSettings.productName = ProductName;
+            // A wallet window takes the focus while the player confirms (a Ledger takes longer than
+            // Photon's 10 s timeout): the game must keep running behind it, or Photon drops the
+            // connection ("Connection failed"). Chogtanks ran the same way.
+            PlayerSettings.runInBackground = true;
 
             // Our own page instead of the engine's: the whole screen on its side at the first
             // touch on a phone, the game's title and icon, an install manifest, and a second try
