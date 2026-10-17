@@ -502,6 +502,24 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**17 October 2026, 16:30 (the recruit's eyes exported and seen turned around, on `recruit-eyes`; not on `main`, not
+built).**
+- **Exported** after the owner freed the disk (5.4 GB free; swap 11.8 GB of 12.3 GB; one Blender, `-t 4`):
+  `export_chog_parts.py -- --check 5000` wrote 1,970 heroes, 495 pieces, 749 materials, 199,204 triangles in the
+  pieces, 123 Genesis built and 1,846 more checked, 0 failed, 0 lacking a part: the counts of `main`. The file
+  differs from `main`'s only in the recruit's record: pieces (0, 18, 2, 3) became (0, 18, 2, 3, 109), 109 being
+  `Eyes_SideEye`; every byte before and after that record is the same. View tests: 90 passed, 0 failed.
+- **Seen turned around** (`render_recruit.py`, from the library itself, before and after;
+  [sheet](../research/evidence/chog-recruit-eyes-turnaround-2026-10-17.jpg), full size in
+  `.artifacts/chog-body/recruit-eyes/recruit_turnaround.png`): from the front, three quarter and both sides the eyes
+  lie on the face, follow its curve, sit level and symmetric about the nose, and glance the same way as on the
+  Genesis. **From the game camera (73 degrees, in front) they barely show**: a few dark points under the fringe,
+  unreadable at phone size. CHOG #112 (the same head and eyes) shows the same, as does every Genesis with drawn
+  eyes: the fringe and the head turned up hide the middle of the face from above. So the recruit no longer has a
+  blank face on the menu, the result screen and the hero card (front views), but in a match it looks as before.
+**Next action:** the owner's eye on the sheet; on a yes, merge `recruit-eyes` and build. Readable eyes from the game
+camera are a separate decision for every hero (a head turned up further, eyes drawn higher or a shorter fringe).
+
 **17 October 2026, 16:15 (the owner: the recruit has no eyes; branch `recruit-eyes`, not in the game).**
 - **Found:** the recruit (number 0 of the library) wears only the body, the bare head and the arms
   (`export_chog_parts.py`); eyes are a trait, so its face shows the fringe and the cheeks and nothing else.

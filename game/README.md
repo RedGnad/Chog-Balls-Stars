@@ -647,7 +647,8 @@ drawn larger than its collision circle overlaps a wall slightly when it stands a
 **Every Genesis of the base Origin (1,869) plays its own 3D hero**: the Chog of `tools/blender`
 (head H3, the crown of leaves its hat lets out, the hat, the eyes, the mouth and the clothing of
 that Genesis, in its skin colour), the look the owner said yes to after batch 6. No picture is laid
-on it. A recruit (a player without a Genesis) wears the same Chog bare, in grey. **Since 16 October
+on it. A recruit (a player without a Genesis) wears the same Chog bare, in grey, with the eyes of "Side
+Eye" (since 17 October: without eyes its face read as blank). **Since 16 October
 the other 100 do too** (the owner's yes to batch 7 and the 1:1): the 60 Skull Genesis wear a skull with
 its jaw, its teeth and a skeleton's bones, the 30 Radioactive a head that runs from one colour to
 another with the skull showing through, and each of the ten 1:1 is a character of its own

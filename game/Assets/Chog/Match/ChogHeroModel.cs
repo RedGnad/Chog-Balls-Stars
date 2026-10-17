@@ -10,7 +10,8 @@ namespace Chog.Match
     /// parts in Resources/ChogParts.bytes (tools/blender/export_chog_parts.py). Each of the four parts
     /// the game moves (Body, Head, armLeft, armRight) is one mesh with its colours in its vertices,
     /// drawn with one material shared by every hero (Resources/ChogHero.shader): four draw calls a
-    /// hero. A recruit (a player without a Genesis) wears the same Chog bare, in grey.
+    /// hero. A recruit (a player without a Genesis) wears the same Chog bare, in grey, with the plain
+    /// eyes of "Side Eye" so that its face is not blank.
     /// The 100 Genesis on another base (Skull, Radioactive, 1:1) are not in the library yet and keep
     /// the earlier look. On a private page, "hero3d=0" shows the earlier look for every hero.
     /// </summary>

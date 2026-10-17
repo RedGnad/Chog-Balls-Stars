@@ -428,10 +428,16 @@ so its face read as blank. The export now gives it the eyes of "Side Eye" (`RECR
 `export_chog_parts.py`), the very part the Genesis of that value wear, no new mesh: a dark eye half closed under
 a straight lid, glancing aside, the Genesis drawing of the official mascot's half-lidded look
 (`chogathon.chog.xyz/chog1.jpg`, the first eyes of the site's picture maker), and the most worn eye part that is
-neither closed nor an object. CHOG #112 wears it on the bare head. **Not exported yet** (16:15 that day the disk
-had 1.0 GB free, under the 3 GB asked before a Blender run): the game's library still has the recruit without
-eyes, and its view test fails until the export is run. `render_recruit.py` renders any hero of the library as
-the game assembles it, turned around, and `make_recruit_sheet.py` lays the pictures on one sheet:
+neither closed nor an object. CHOG #112 wears it on the bare head. Exported at 16:24 with `--check 5000`: 1,970
+heroes, 495 pieces, 749 materials, 123 Genesis built and 1,846 more checked, none failed, none lacking a part (as
+before); the file differs from `main`'s only in the recruit's record, which gains that one piece (6,033 triangles).
+`render_recruit.py` renders any hero of the library as the game assembles it, turned around, and
+`make_recruit_sheet.py` lays the pictures on one sheet
+([before and after](../../research/evidence/chog-recruit-eyes-turnaround-2026-10-17.jpg)). Seen on it: from the
+front, three quarter and both sides the eyes lie on the face, follow its curve and are symmetric. **From the game
+camera (73 degrees) they barely show**: a few dark points under the fringe, unreadable at phone size, exactly as
+on CHOG #112 and every Genesis whose eyes are drawn (batch 2 found it); showing drawn eyes from above would take a
+change of the head or of where every drawn eye sits, for all heroes. The commands:
 
 ```sh
 B=/Applications/Blender.app/Contents/MacOS/Blender
