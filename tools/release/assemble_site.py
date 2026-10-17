@@ -5,6 +5,8 @@
   site/genesis-art/256/  the portraits, one JPEG per Genesis
   site/genesis-art/cut/  what to keep of a portrait to cut the Genesis out of its background,
                          for those that have a cut, and their list (tools/genesis-art/cut_out.py)
+  site/genesis-art/pages/96/  the portraits on pages of 48, for the collection screen
+                         (tools/genesis-art/make_atlas.py)
   site/quantum-db.json   the simulation assets of that build, for the program that plays a match
                          again (the judge must read the assets of the build that is online);
                          beside game/, so it is never served
@@ -35,6 +37,8 @@ ROOT = Path(__file__).resolve().parents[2]
 BUILDS = ROOT / ".artifacts/unity"
 PORTRAITS = ROOT / ".artifacts/genesis-art/256"
 CUTS = ROOT / ".artifacts/genesis-art/cut"
+# The portraits laid on pages of 48 for the collection screen (tools/genesis-art/make_atlas.py).
+PAGES = ROOT / ".artifacts/genesis-art/pages/96"
 SITE = ROOT / "site"
 COLLECTION_SIZE = 1969
 JUDGE_BUILD = ROOT / ".artifacts/dotnet-build/bin/Chog.Quantum.Verifier/release"
@@ -99,7 +103,8 @@ def main():
     game = SITE / "game"
     art = SITE / "genesis-art/256"
     cuts = SITE / "genesis-art/cut"
-    for folder in (game, art, cuts):
+    pages = SITE / "genesis-art/pages/96"
+    for folder in (game, art, cuts, pages):
         if folder.exists():
             shutil.rmtree(folder)
     shutil.copytree(build, game)
@@ -113,6 +118,9 @@ def main():
         shutil.copy2(CUTS / "index.json", cuts / "index.json")
         for metadata_id in cut_ids:
             shutil.copy2(CUTS / f"{metadata_id}.png", cuts / f"{metadata_id}.png")
+    # The pages of the collection screen; without them it shows the portraits one by one.
+    if PAGES.is_dir():
+        shutil.copytree(PAGES, pages)
 
     # Builds made before 11 October 2026 have no simulation assets beside them: such a release
     # is served as before and its matches get no verdict.

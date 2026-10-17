@@ -80,6 +80,18 @@ namespace Chog.Match
             return folder + RelativeFolder;
         }
 
+        /// <summary>
+        /// Folder of the pages of portraits for a game page (tools/genesis-art/make_atlas.py): page p
+        /// holds metadata ids 48 p + 1 to 48 p + 48, eight to a row from the top left, 96 pixels each.
+        /// </summary>
+        public static string PagesBaseUrl(string pageUrl)
+        {
+            var images = BaseUrl(pageUrl);
+            return images.Substring(0, images.Length - RelativeFolder.Length) + PagesFolder;
+        }
+
+        public const string PagesFolder = "genesis-art/pages/96/";
+
         /// <summary>Folder of the cuts for a game page: beside the folder of the images.</summary>
         public static string CutBaseUrl(string pageUrl)
         {

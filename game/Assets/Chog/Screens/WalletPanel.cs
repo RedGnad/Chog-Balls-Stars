@@ -290,11 +290,11 @@ namespace Chog.Screens
             _signIn = MakeButton("SignIn", WideMin, WideMax, out _signInLabel, kind: ChogTheme.ButtonKind.Confirm);
             _signIn.onClick.AddListener(PlayerWallet.StartSignIn);
 
-            // For a visitor without a Genesis: the page where any Genesis shows as its hero card.
+            // For a visitor without a Genesis: every Genesis as a hero (ChogCollection).
             _lookUp = MakeButton("LookUp", new Vector2(0.25f, 0.26f), new Vector2(0.75f, 0.37f), out var lookUpLabel,
                 kind: ChogTheme.ButtonKind.Quiet);
             lookUpLabel.text = "SEE EVERY HERO";
-            _lookUp.onClick.AddListener(PlayerWallet.OpenHeroPage);
+            _lookUp.onClick.AddListener(() => ChogCollection.Open(transform.parent));
 
             // For a connected wallet without a Genesis: the Genesis that holders offer for rent.
             _market = MakeButton("Market", WideMin, WideMax, out var marketLabel, kind: ChogTheme.ButtonKind.Chog);

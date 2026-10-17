@@ -208,7 +208,7 @@ namespace Chog.Screens
         // The rail down the left: the collection, the leaderboard, the rentals, friends, the guide.
         private void BuildRail()
         {
-            Rail(0, "HEROES", ChogTheme.ButtonKind.Secondary, ChogIcons.Icon.Heroes, OpenHeroes);
+            Rail(0, "HEROES", ChogTheme.ButtonKind.Secondary, ChogIcons.Icon.Heroes, () => ChogCollection.Open(_main.transform));
             Rail(1, "TOP", ChogTheme.ButtonKind.Primary, ChogIcons.Icon.Trophy, () => ChogHall.Open(_main.transform));
             Rail(2, "RENT", ChogTheme.ButtonKind.Chog, ChogIcons.Icon.Key, WalletPanel.OpenRentals);
             var friends = Rail(3, "FRIENDS", ChogTheme.ButtonKind.Secondary, ChogIcons.Icon.Friends, () => Call("OnPartyButtonPressed"));
@@ -415,13 +415,13 @@ namespace Chog.Screens
             return amount;
         }
 
-        // HEROES and the stage: the sheet of the Genesis played; a recruit sees every hero on their page.
+        // The stage: the sheet of the Genesis played; a recruit sees every hero instead.
         private void OpenHeroes()
         {
             if (WalletPanel.PlayedTokenId > 0)
                 ChogHeroSheet.Open(_main.transform, WalletPanel.PlayedTokenId);
             else
-                PlayerWallet.OpenHeroPage();
+                ChogCollection.Open(_main.transform);
         }
 
         // The chip: the sample's window that changes the player's name, over everything else.
