@@ -639,6 +639,50 @@ contract ChogRentalTest is Test {
         assertEq(tokenIds.length, 0);
     }
 
+    function test_OneReadListsEveryRentalOnRecordWithWhatEachPartyIsOwed() public {
+        ChogRental.RentalRecord[] memory none = rental.rentalsOnRecord();
+        assertEq(none.length, 0, "nothing before a first rental");
+
+        uint256 other = 16;
+        genesis.give(other, holder);
+        vm.startPrank(holder);
+        rental.offer(HERO, PRICE);
+        rental.offer(other, PRICE);
+        vm.stopPrank();
+        _rent(4);
+        vm.prank(renter);
+        rental.rent(other, 2, PRICE);
+        vm.warp(block.timestamp + 1 days);
+
+        ChogRental.RentalRecord[] memory records = rental.rentalsOnRecord();
+        assertEq(records.length, 2);
+        assertEq(records[0].tokenId, HERO);
+        assertEq(records[0].renter, renter);
+        assertEq(records[0].lender, holder);
+        assertEq(records[0].escrow, 40 ether);
+        assertEq(records[0].earnedSinceSettled, 10 ether);
+        assertTrue(records[0].counting);
+
+        // Sold: still on record, no longer counting, until somebody closes it.
+        genesis.give(HERO, buyer);
+        records = rental.rentalsOnRecord();
+        assertEq(records.length, 2);
+        assertFalse(records[0].counting, "a sold Genesis no longer counts");
+        assertTrue(records[1].counting);
+
+        rental.close(HERO);
+        records = rental.rentalsOnRecord();
+        assertEq(records.length, 1, "a closed rental leaves the record");
+        assertEq(records[0].tokenId, other);
+
+        // Rented again, a Genesis is listed once.
+        vm.prank(buyer);
+        rental.offer(HERO, PRICE);
+        _rent(1);
+        records = rental.rentalsOnRecord();
+        assertEq(records.length, 2);
+    }
+
     function test_TheRentalCannotBeDeployedHalfConfigured() public {
         vm.expectRevert(ChogRental.ZeroAddress.selector);
         new ChogRental(address(0), address(genesis), 0);

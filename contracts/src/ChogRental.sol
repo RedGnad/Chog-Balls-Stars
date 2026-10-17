@@ -40,6 +40,17 @@ contract ChogRental {
         uint256 escrow; // paid and not yet earned: spread evenly from settledAt to until
     }
 
+    /// @notice A rental on record as `rentalsOnRecord` lists it.
+    struct RentalRecord {
+        uint256 tokenId;
+        address renter;
+        address lender;
+        uint64 until;
+        uint256 escrow; // paid and not yet earned, the part below included
+        uint256 earnedSinceSettled; // the holder's part of the escrow up to now
+        bool counting; // the time runs and the holder it pays still holds the Genesis
+    }
+
     uint256 private constant BASIS_POINTS = 10_000;
     /// @notice A renter is never paid up further than this from now.
     uint256 public constant MAX_DAYS = 30;
@@ -63,6 +74,9 @@ contract ChogRental {
     mapping(uint256 tokenId => uint256) private _offeredAt;
     mapping(address renter => uint256[]) private _rentedBy;
     mapping(address renter => mapping(uint256 tokenId => bool)) private _listedFor;
+    // Every Genesis rented at least once, so a single read lists the rentals on record.
+    uint256[] private _everRented;
+    mapping(uint256 tokenId => bool) private _wasRented;
 
     event Offered(uint256 indexed tokenId, address indexed lender, uint256 pricePerDay);
     event Withdrawn(uint256 indexed tokenId);
@@ -204,6 +218,33 @@ contract ChogRental {
         return running.renter == renter && renter != address(0) ? running.until : 0;
     }
 
+    /// @notice Every rental on record, running or waiting to be closed (after a sale or the end of
+    /// its time): what the game needs to show each holder what they earn, each renter what they
+    /// are owed back, and to close a rental whose Genesis was sold, in one read.
+    function rentalsOnRecord() external view returns (RentalRecord[] memory records) {
+        uint256 known = _everRented.length;
+        records = new RentalRecord[](known);
+        uint256 count;
+        for (uint256 index; index < known; ++index) {
+            uint256 tokenId = _everRented[index];
+            Rental memory running = _rentals[tokenId];
+            if (running.renter == address(0)) continue;
+            records[count] = RentalRecord({
+                tokenId: tokenId,
+                renter: running.renter,
+                lender: running.lender,
+                until: running.until,
+                escrow: running.escrow,
+                earnedSinceSettled: _earnedBy(running, block.timestamp),
+                counting: _counts(running, _holderOf(tokenId))
+            });
+            ++count;
+        }
+        assembly ("memory-safe") {
+            mstore(records, count)
+        }
+    }
+
     /// @notice The rental on record for a Genesis, running or not yet closed: who rents it, who is
     /// paid, until when, the payment not yet earned, and the part of it earned since the last
     /// settlement (still in `escrow`).
@@ -256,6 +297,10 @@ contract ChogRental {
         if (!_listedFor[msg.sender][tokenId]) {
             _listedFor[msg.sender][tokenId] = true;
             _rentedBy[msg.sender].push(tokenId);
+        }
+        if (!_wasRented[tokenId]) {
+            _wasRented[tokenId] = true;
+            _everRented.push(tokenId);
         }
 
         _pull(msg.sender, cost);
