@@ -59,7 +59,14 @@ services:
       # The deployed rental contract (contracts/README.md). Leave empty while there is none: the
       # game then offers no rental.
       - key: RENTAL_ADDRESS
-        value: "0x7f1271d43b0e41e2eeddd5290f459fdc6196a19a"
+        # Version 2, deployed on Monad mainnet on 17 October 2026 (contracts/script/DeployRentalAndCareers.s.sol):
+        # one renter at a time, the payment held and earned by the second, the right ends with the holding.
+        # Version 1 (0x7f1271d43b0e41e2eeddd5290f459fdc6196a19a) is no longer read.
+        value: "0x90c26090aea05a3dc18d6ba8fd80afe8f933bf86"
+      # The careers register on Monad mainnet (contracts/src/ChogCareers.sol), written by the referee
+      # after each judged match; deployed on 17 October 2026 with the rental above.
+      - key: CAREERS_ADDRESS
+        value: "0x335bf7bc610645546e2b00de6a9fd0c4709d6111"
       # The deployed wager contract and the key of its referee (contracts/README.md): both or
       # neither. Leave empty while there is none: no match is then staked on.
       - key: WAGER_ADDRESS

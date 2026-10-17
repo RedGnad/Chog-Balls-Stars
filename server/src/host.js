@@ -30,6 +30,9 @@
 //   WAGER_ADDRESS   optional, the deployed wager contract (contracts/src/ChogWager.sol), with
 //   REFEREE_KEY     the key of its referee, 64 hex digits: together or not at all. Without
 //                   them no match is staked on
+//   CAREERS_ADDRESS optional, the careers register on Monad mainnet (contracts/src/ChogCareers.sol);
+//                   needs REFEREE_KEY, whose address writes it and pays its gas. Without it the
+//                   careers are kept in a file of DATA_DIR, lost when a free host restarts
 //   WAGER_NETWORK   "mainnet" (default) or "testnet": the chain the wager is on. The Genesis
 //                   are read on mainnet whatever this says
 //   WAGER_TOKEN     on the testnet, the test token the wager is paid in (contracts/src/testnet/
@@ -51,6 +54,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createApi } from './api.js';
 import { createCareers } from './career.js';
+import { createChainCareers } from './careers-onchain.js';
 import { createChain, DEFAULT_RPC_URLS } from './chain.js';
 import { createJudge } from './judge.js';
 import { createMatches } from './matches.js';
@@ -58,6 +62,7 @@ import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, r
 import { createPhoton } from './photon.js';
 import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
+import { createSender } from './sender.js';
 import { createSessions } from './session.js';
 import { createShop } from './shop.js';
 import { createStatic, movedToPublic } from './static.js';
@@ -87,7 +92,6 @@ const rpcUrls = (environment.RPC_URLS ?? '').split(',').map(url => url.trim()).f
 const chain = createChain({ rpcUrls: rpcUrls.length > 0 ? rpcUrls : DEFAULT_RPC_URLS });
 const shop = createShop({ chain, address: (environment.SHOP_ADDRESS ?? '').trim() });
 const rental = createRental({ chain, address: (environment.RENTAL_ADDRESS ?? '').trim() });
-const careers = createCareers(careerFile(dataFolder));
 const sessions = createSessions({ secret: await sessionSecret(dataFolder, environment.SESSION_SECRET) });
 
 const matchStore = matchFiles(join(dataFolder, 'matches'));
@@ -108,6 +112,19 @@ const wagerPlace = wagerNetwork({
 const wagerChain = !wagerPlace.test && wagerRpcUrls.length === 0 ? chain : createChain({ rpcUrls: wagerPlace.rpcUrls });
 const referee = wagerAddress ? createReferee({ privateKey: refereeKey, chainId: wagerPlace.chainId, wager: wagerAddress }) : undefined;
 if (referee) console.log(`Wager ${wagerAddress} on ${wagerPlace.chainName} (chain ${wagerPlace.chainId}), paid in ${wagerPlace.token}`);
+// What the services send themselves on Monad mainnet, with the referee's key: the careers after
+// each judged match, a holder's stop to lending, the closing of a rental whose Genesis was sold.
+const sender = refereeKey ? createSender({ rpcUrls: rpcUrls.length > 0 ? rpcUrls : DEFAULT_RPC_URLS, privateKey: refereeKey }) : undefined;
+// The careers: on chain when CAREERS_ADDRESS names the register (and the referee can write it),
+// otherwise in a file of the data folder (development, tests).
+const careersAddress = (environment.CAREERS_ADDRESS ?? '').trim();
+if (careersAddress && !sender) {
+  console.error('CAREERS_ADDRESS needs REFEREE_KEY: the referee writes the careers.');
+  process.exit(1);
+}
+const chainCareers = careersAddress ? createChainCareers({ chain, address: careersAddress, sender }) : undefined;
+const careers = chainCareers ?? createCareers(careerFile(dataFolder));
+console.log(chainCareers ? `Careers on chain at ${careersAddress}, written by ${sender.address}` : `Careers in ${dataFolder}`);
 // The judge: the program that plays a match again. An assembled site carries it with the
 // assets and the tables of its build (tools/release/assemble_site.py); the settings name
 // another one. Without a program, or without the assets, no match gets a verdict.
@@ -139,6 +156,28 @@ const judge = verifier && (await exists(database))
 // Stakes without a judge would only ever be given back after an hour: say so at the start.
 if (referee && !judge) console.warn('WAGER_ADDRESS is set without VERIFIER_DLL: no match will get a verdict, stakes can only be refunded.');
 
+// A judged match goes on chain once: the careers of the Genesis that played it.
+const recorded = new Set();
+async function judgeAndRecord(gameId) {
+  const verdict = await judge.judge(gameId);
+  if (verdict && chainCareers && !recorded.has(gameId)) {
+    recorded.add(gameId);
+    const match = await matches.get(gameId);
+    chainCareers.recordMatch(gameId, verdict, match?.admissions ?? [])
+      .then(result => console.log(`Careers of ${gameId}: ${result.recorded ? 'recorded ' + result.hash : 'nothing recorded (' + result.reason + ')'}`))
+      .catch(error => console.warn(`Careers of ${gameId} not recorded: ${error.message}`));
+  }
+  return verdict;
+}
+
+// A rental whose Genesis was sold is closed soon after, so its renter is paid back the time not
+// delivered: one read a minute, a transaction only when there is one to close.
+if (rental.address && sender) {
+  setInterval(() => {
+    rental.closeSold(sender).catch(error => console.warn(`Sold rentals not closed: ${error.message}`));
+  }, 60000).unref();
+}
+
 const api = createApi({
   publicOrigin,
   chain,
@@ -149,7 +188,7 @@ const api = createApi({
   photon: createPhoton({
     secret: await photonSecret(dataFolder, environment.PHOTON_SECRET),
     sessions, careers, chain, shop, rental, matches, build,
-    onReplayEnded: judge ? gameId => judge.judge(gameId) : undefined,
+    onReplayEnded: judge ? gameId => judgeAndRecord(gameId) : undefined,
   }),
   build,
   photonAuthentication: environment.PHOTON_AUTH === '1',

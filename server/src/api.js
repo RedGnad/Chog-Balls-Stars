@@ -176,6 +176,15 @@ export function createApi({ chain, sessions, careers, shop, rental, photon, phot
       return json(200, { address: address.toLowerCase(), rentals: rental ? await rental.rentedBy(address) : [] });
     },
 
+    // The money of an address in the rental: what it earned as a holder and may claim, what it is
+    // owed back as a renter, its rentals both ways and the token ids a claim must name. Public,
+    // as everything on the chain is.
+    'GET /api/rental/account': async (request, url) => {
+      const address = url.searchParams.get('address');
+      if (!isAddress(address)) return failure(400, 'bad_address', 'address must be 0x followed by 40 hex digits');
+      return json(200, rental && rental.account ? await rental.account(address) : { enabled: false });
+    },
+
     // What is sold for $CHOG: the contract to pay, the token, the item and its price, read on
     // the chain; {enabled: false} when no shop is set up or the item is not on sale.
     'GET /api/shop': async () => json(200, shop ? await shop.describe() : { enabled: false }),

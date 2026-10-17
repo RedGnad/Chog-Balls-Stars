@@ -1,7 +1,10 @@
-// What the game reads from the rental contract (contracts/src/ChogRental.sol): which Genesis
-// their holders offer for rent and at what price a day in $CHOG, and which Genesis an address
-// has rented. The services only read: offering, taking an offer back and renting are
-// transactions the player's wallet sends to the contract, and the chain is the record of them.
+// What the game reads from the rental contract (contracts/src/ChogRental.sol, version 2): which
+// Genesis their holders offer for rent and at what price a day in $CHOG, which Genesis an address
+// rents, and the money each party may take out (what a holder earned, what a renter is owed back).
+// Offering, renting, ending early and claiming are transactions the player's wallet sends; the
+// only one these services send is the closing of a rental whose Genesis was sold, so the renter is
+// paid back the time not delivered and the seller is paid no further (the contract cannot see a
+// sale by itself).
 //
 // There is no rental until the contract is deployed and its address given to the services.
 
@@ -21,6 +24,13 @@ const BURNED_SHARE = selector('burnedShare()');
 const STANDING_OFFERS = selector('standingOffers()');
 const RENTALS_OF = selector('rentalsOf(address)');
 const IS_RENTING = selector('isRenting(uint256,address)');
+const RENTALS_ON_RECORD = selector('rentalsOnRecord()');
+const EARNINGS = selector('earnings(address)');
+const REFUNDS = selector('refunds(address)');
+const OFFER_OF = selector('offerOf(uint256)');
+const CLOSE = selector('close(uint256)');
+// A rental on record is seven words: tokenId, renter, lender, until, escrow, earnedSinceSettled, counting.
+const RECORD_WORDS = 7;
 const OFFERS_KEPT_MS = 10000;
 
 /**
@@ -109,5 +119,93 @@ export function createRental({ chain, address, now = Date.now }) {
     return typeof answer === 'string' && answer.length === 66 && BigInt(answer) === 1n;
   }
 
-  return { describe, offers, rentedBy, isRenting, address: rental };
+  /**
+   * Every rental on record, running or waiting to be closed: token id, renter, the holder who is
+   * paid, the second it ends, the payment held, the part earned since the last settlement, and
+   * whether it still counts (its time runs and that holder still holds the Genesis).
+   */
+  async function records() {
+    if (!rental) return [];
+    const answer = await chain.call(rental, '0x' + RENTALS_ON_RECORD);
+    if (typeof answer !== 'string' || !answer.startsWith('0x')) throw new Error(`rentalsOnRecord() returned ${String(answer).slice(0, 80)}`);
+    const raw = answer.slice(2);
+    const start = parseInt(raw.slice(0, 64), 16) * 2;
+    const count = parseInt(raw.slice(start, start + 64), 16);
+    if (!Number.isInteger(count) || raw.length < start + 64 + count * RECORD_WORDS * 64) throw new Error('rentalsOnRecord() is cut short');
+    return Array.from({ length: count }, (_, index) => {
+      const at = start + 64 + index * RECORD_WORDS * 64;
+      const field = position => raw.slice(at + position * 64, at + (position + 1) * 64);
+      return {
+        tokenId: parseInt(field(0), 16),
+        renter: '0x' + field(1).slice(-40),
+        lender: '0x' + field(2).slice(-40),
+        until: parseInt(field(3), 16),
+        escrow: BigInt('0x' + field(4)).toString(),
+        earned: BigInt('0x' + field(5)).toString(),
+        counting: BigInt('0x' + field(6)) === 1n,
+      };
+    });
+  }
+
+  /**
+   * What an address may see of its money in the rental: what it earned as a holder and may claim
+   * (before the burned share), what it is owed back as a renter, the rentals it is paid for, and
+   * those it pays for with the price a day it would add days at.
+   */
+  async function account(address) {
+    if (!rental || !isAddress(address)) return { enabled: Boolean(rental) };
+    const who = address.toLowerCase();
+    const [earnings, refunds, onRecord] = await Promise.all([
+      chain.call(rental, '0x' + EARNINGS + word(who)),
+      chain.call(rental, '0x' + REFUNDS + word(who)),
+      records(),
+    ]);
+    const lent = onRecord.filter(record => record.lender === who);
+    const rented = onRecord.filter(record => record.renter === who);
+    // What the holder may claim now: what was moved to their earnings plus what their rentals earned since.
+    const claimable = lent.reduce((sum, record) => sum + BigInt(record.earned), BigInt(earnings ?? '0x0'));
+    // A renter whose Genesis was sold, or whose time is over, gets the rest back once it is closed: claiming closes it.
+    const owedBack = rented
+      .filter(record => !record.counting)
+      .reduce((sum, record) => sum + BigInt(record.escrow) - BigInt(record.earned), BigInt(refunds ?? '0x0'));
+    const prices = await Promise.all(rented.map(record => chain.call(rental, '0x' + OFFER_OF + word(record.tokenId))));
+    return {
+      enabled: true,
+      address: who,
+      earned: claimable.toString(),
+      owedBack: owedBack.toString(),
+      // The token ids a claim must name so that their rentals are settled or closed first.
+      toSettle: [...new Set([...lent, ...rented].map(record => record.tokenId))].sort((a, b) => a - b),
+      lent: lent.map(({ tokenId, renter, until, counting }) => ({ tokenId, renter, until, counting })),
+      rented: rented.map(({ tokenId, lender, until, counting }, index) => {
+        // offerOf answers three words: whether the offer stands, its price a day, its author.
+        const answer = prices[index];
+        const price = typeof answer === 'string' && answer.length >= 2 + 64 * 3 ? BigInt('0x' + answer.slice(66, 130)).toString() : '0';
+        return { tokenId, lender, until, counting, pricePerDay: price };
+      }),
+    };
+  }
+
+  /**
+   * Closes, with the referee's key, every rental on record whose Genesis left the holder it pays
+   * while its time still ran: the renter is then owed the time not delivered. Answers the token
+   * ids it closed.
+   */
+  async function closeSold(sender) {
+    if (!rental || !sender) return [];
+    const nowSeconds = Math.floor(now() / 1000);
+    const sold = (await records()).filter(record => !record.counting && record.until > nowSeconds);
+    const closed = [];
+    for (const record of sold) {
+      try {
+        const sent = await sender.transact({ to: rental, data: '0x' + CLOSE + word(record.tokenId), purpose: `the close of the rental of ${record.tokenId}` });
+        if (sent.ok !== false) closed.push(record.tokenId);
+      } catch (error) {
+        console.warn(`The rental of ${record.tokenId} could not be closed: ${error.message}`);
+      }
+    }
+    return closed;
+  }
+
+  return { describe, offers, rentedBy, isRenting, records, account, closeSold, address: rental };
 }
