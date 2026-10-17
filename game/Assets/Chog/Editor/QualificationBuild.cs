@@ -22,6 +22,11 @@ namespace Chog.Editor
         // The page the game is served in: Assets/WebGLTemplates/Chog.
         private const string PageTemplate = "PROJECT:Chog";
 
+        // The stamp of the simulation a build carries (Chog.Screens.BuildIdentity reads it), and the
+        // copy beside the build that the assembled site records (tools/release/assemble_site.py).
+        private const string SimulationStampAsset = "Assets/Chog/Resources/ChogSimulationStamp.txt";
+        private const string SimulationStampFile = "simulation.txt";
+
         [Serializable]
         private sealed class BuildEvidence
         {
@@ -94,6 +99,18 @@ namespace Chog.Editor
             // (Chog.Screens.BuildIdentity), what the page compares with the build its server
             // serves, and the start of the folder's name, which the assembled site records.
             // The project's own version is put back afterwards, so a build changes no setting.
+            // The simulation's assets first, then its stamp: builds whose simulation is the same (its
+            // code, Quantum's own assemblies, its assets) give Photon the same name and meet, so a
+            // build that changes only screens or looks opens no new version of the application on
+            // Photon, which allows an application only so many in parallel.
+            var simulationAssets = Path.Combine(runDirectory, "quantum-db.json");
+            ExportSimulationAssets(simulationAssets);
+            var simulation = SimulationStamp(simulationAssets);
+            File.WriteAllText(Path.Combine(runDirectory, SimulationStampFile), simulation, new UTF8Encoding(false));
+            File.WriteAllText(Path.GetFullPath(Path.Combine(Application.dataPath, "..", SimulationStampAsset)), simulation, new UTF8Encoding(false));
+            AssetDatabase.ImportAsset(SimulationStampAsset, ImportAssetOptions.ForceUpdate);
+            Debug.Log("CHOG simulation stamp " + simulation);
+
             var projectVersion = PlayerSettings.bundleVersion;
             PlayerSettings.bundleVersion = stamp;
             UnityEditor.Build.Reporting.BuildReport report;
@@ -132,11 +149,43 @@ namespace Chog.Editor
             if (summary.result != BuildResult.Succeeded)
                 throw new BuildFailedException("WebGL build failed. See " + evidencePath);
 
-            // The simulation's assets as this build has them, beside the build: a match of this
-            // build is played again outside the game with exactly these (tools/quantum, "verify").
-            ExportSimulationAssets(Path.Combine(runDirectory, "quantum-db.json"));
-
+            // The simulation's assets as this build has them (written above, before the stamp) stay
+            // beside the build: a match of this build is played again outside the game with exactly
+            // these (tools/quantum, "verify").
             return evidencePath;
+        }
+
+        /// <summary>
+        /// Sixteen hex digits of a SHA-256 over what decides how a match plays: the simulation's code
+        /// and schema (Assets/QuantumUser/Simulation, its .cs and .qtn files), Quantum's own assemblies
+        /// (Assets/Photon/Quantum/Assemblies) and the exported simulation assets, each file by its path
+        /// and its bytes, in the order of their paths.
+        /// </summary>
+        public static string SimulationStamp(string simulationAssets)
+        {
+            var project = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+            var files = new List<string>();
+            files.AddRange(Directory.GetFiles(Path.Combine(Application.dataPath, "QuantumUser", "Simulation"), "*.*", SearchOption.AllDirectories)
+                .Where(file => file.EndsWith(".cs", StringComparison.Ordinal) || file.EndsWith(".qtn", StringComparison.Ordinal)));
+            var quantum = Path.Combine(Application.dataPath, "Photon", "Quantum", "Assemblies");
+            if (Directory.Exists(quantum))
+                files.AddRange(Directory.GetFiles(quantum, "*.dll", SearchOption.AllDirectories));
+            var named = files.Select(file => (name: Path.GetRelativePath(project, file).Replace('\\', '/'), file))
+                .OrderBy(entry => entry.name, StringComparer.Ordinal).ToList();
+            named.Add(("quantum-db.json", simulationAssets));
+
+            using (var hash = System.Security.Cryptography.SHA256.Create())
+            {
+                foreach (var (name, file) in named)
+                {
+                    var nameBytes = Encoding.UTF8.GetBytes(name + "\n");
+                    hash.TransformBlock(nameBytes, 0, nameBytes.Length, null, 0);
+                    var bytes = File.ReadAllBytes(file);
+                    hash.TransformBlock(bytes, 0, bytes.Length, null, 0);
+                }
+                hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+                return string.Concat(hash.Hash.Take(8).Select(b => b.ToString("x2")));
+            }
         }
 
         // What the engine's own export writes (QuantumUnityDBUtilities.ExportAsJson). That one

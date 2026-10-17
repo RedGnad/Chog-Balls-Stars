@@ -64,7 +64,7 @@ import { createChainCareers } from './careers-onchain.js';
 import { createChain, DEFAULT_RPC_URLS } from './chain.js';
 import { createJudge } from './judge.js';
 import { createMatches } from './matches.js';
-import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, reownProjectId, servedBuild, sessionSecret } from './node.js';
+import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, reownProjectId, servedBuild, servedPhotonVersion, sessionSecret } from './node.js';
 import { createPhoton } from './photon.js';
 import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
@@ -149,13 +149,16 @@ if (verifier && !(await exists(database))) {
 // The build served here, read each time it is needed: the site folder can be assembled again
 // while this program runs, and the game and its judge change together there.
 const build = () => servedBuild(siteFolder);
+// What its pages tell Photon (Chog.Screens.BuildIdentity): rooms and matches are compared with that.
+const photonVersion = () => servedPhotonVersion(siteFolder);
+console.log(`Photon names this game ${(await photonVersion()) || '(any)'}.`);
 console.log((await build())
   ? `Serving the build ${await build()}: a room or a match of another build is refused.`
   : 'The site folder names no build (no RELEASE.json): matches of any build are accepted and judged.');
 const judge = verifier && (await exists(database))
   ? createJudge({
     matches,
-    build,
+    build: photonVersion,
     replay: dotnetReplay({
       dotnet: environment.DOTNET ?? 'dotnet', verifier: resolve(verifier), database, lut: tables, matchesRoot: matchStore.root,
     }),
@@ -224,7 +227,7 @@ const api = createApi({
   sessions,
   photon: createPhoton({
     secret: await photonSecret(dataFolder, environment.PHOTON_SECRET),
-    sessions, careers, chain, shop, rental, standIns, matches, build,
+    sessions, careers, chain, shop, rental, standIns, matches, build: photonVersion,
     previewBuilds: (environment.PREVIEW_BUILDS ?? '').trim(),
     onReplayEnded: judge ? gameId => judgeAndRecord(gameId) : undefined,
   }),

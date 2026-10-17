@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Chog.Match
@@ -11,6 +12,10 @@ namespace Chog.Match
     /// it goes and what it hits, is the simulation's and does not change. A thrown object turns as its
     /// style says; a strike (the attack of the brute, which does not travel) pops out in front, turns
     /// and fades; where an attack ends, a few small pieces in its colour fly out (ChogImpact).
+    /// A lobbed attack (the controller's, which the simulation sends to a point on the ground) flies on
+    /// a high arc instead of the straight line of the ranger's: higher the farther it goes, larger at
+    /// its top, its shadow running on the floor under it, and a ring in the colour of its side on the
+    /// spot where it will land from the moment it is thrown, as arena brawlers mark their throwers.
     /// </summary>
     public sealed class ChogAttackLook : MonoBehaviour
     {
@@ -25,6 +30,17 @@ namespace Chog.Match
         private const float StrikeSeconds = 0.25f;
         // Above the ground, at the height of the hands of a hero.
         private const float Height = 0.9f;
+        // A lob: the top of its arc for a throw of no length, and what each unit of length adds.
+        private const float LobLowest = 1.6f;
+        private const float LobPerUnit = 0.45f;
+        private const float LobGrowAtTop = 0.3f;
+        private const float LandingRadius = 1.1f;
+        private const float ShadowRadius = 0.6f;
+        private const float OnFloor = 0.03f;
+
+        private static Material s_ground;
+        private static Mesh s_shadow;
+        private static readonly Dictionary<Color, Mesh> s_landings = new Dictionary<Color, Mesh>();
 
         private Transform _object;
         private int _metadataId = int.MinValue;
@@ -33,13 +49,26 @@ namespace Chog.Match
         private float _age;
         private bool _strike;
         private bool _shown;
+        private bool _lob;
+        private Vector3 _lobStart;
+        private Vector3 _lobTarget;
+        private float _lobHeight;
+        private Transform _shadow;
+        private Transform _landing;
+        private Color _landingColour;
 
         /// <summary>
         /// Dresses the view of an attack whose data is named "dataName", thrown by the hero of
         /// "metadataId" (ChogHeroModel.Recruit for a recruit, below 0 for no hero). Does nothing for an
         /// attack that is not a basic attack, or a hero the library does not know.
         /// </summary>
-        public static void Dress(Transform view, string dataName, int metadataId)
+        public static void Dress(Transform view, string dataName, int metadataId) => Dress(view, dataName, metadataId, null, Color.white);
+
+        /// <summary>
+        /// The same, for an attack that is lobbed to "landing" (a point on the floor), its ring drawn in
+        /// "side", the colour of the thrower's side (ChogTeamRing.Self, Ally or Enemy).
+        /// </summary>
+        public static void Dress(Transform view, string dataName, int metadataId, Vector3? landing, Color side)
         {
             if (view == null || metadataId < 0 || !GenesisEffects.Enabled || System.Array.IndexOf(Basic, dataName) < 0)
                 return;
@@ -47,6 +76,88 @@ namespace Chog.Match
             if (look == null)
                 look = view.gameObject.AddComponent<ChogAttackLook>();
             look.Show(metadataId, dataName == Strike);
+            look.Lob(landing, side);
+        }
+
+        /// <summary>How high a lob flies at its top, for a throw of "length" units: higher the farther.</summary>
+        public static float LobHeight(float length) => LobLowest + LobPerUnit * Mathf.Max(0f, length);
+
+        /// <summary>Height above its start of a lob of top "height" at "done", from 0 (thrown) to 1 (landed).</summary>
+        public static float LobRise(float height, float done)
+        {
+            done = Mathf.Clamp01(done);
+            return 4f * height * done * (1f - done);
+        }
+
+        private void Lob(Vector3? landing, Color side)
+        {
+            _lob = landing.HasValue && _shown && !_strike;
+            if (!_lob)
+            {
+                Hide();
+                return;
+            }
+
+            _lobStart = transform.position;
+            _lobTarget = new Vector3(landing.Value.x, _lobStart.y, landing.Value.z);
+            _lobHeight = LobHeight(Vector3.Distance(_lobStart, _lobTarget));
+            var ground = Ground();
+            if (ground == null)
+                return;
+
+            // Its shadow runs on the floor under it.
+            if (_shadow == null)
+            {
+                if (s_shadow == null)
+                    s_shadow = GroundMeshes.Build("ChogLobShadow", ShadowRadius, Color.clear, true, false);
+                _shadow = Flat("Lob Shadow", s_shadow, ground, transform);
+            }
+            _shadow.gameObject.SetActive(true);
+
+            // Where it will land, from the moment it is thrown; not a child, as the attack moves.
+            if (_landing == null || _landingColour != side)
+            {
+                if (_landing != null)
+                    Destroy(_landing.gameObject);
+                if (!s_landings.TryGetValue(side, out var ring))
+                    s_landings[side] = ring = GroundMeshes.Build("ChogLobLanding", LandingRadius, side, false, true);
+                _landing = Flat("Lob Landing", ring, ground, null);
+                _landingColour = side;
+            }
+            _landing.position = new Vector3(_lobTarget.x, OnFloor, _lobTarget.z);
+            _landing.localScale = Vector3.zero;
+            _landing.gameObject.SetActive(true);
+        }
+
+        private static Material Ground()
+        {
+            if (s_ground != null)
+                return s_ground;
+            var shader = Resources.Load<Shader>(ChogTeamRing.ShaderResource);
+            if (shader == null || !shader.isSupported)
+                return null;
+            s_ground = new Material(shader) { name = "ChogLobGround" };
+            return s_ground;
+        }
+
+        private static Transform Flat(string name, Mesh mesh, Material material, Transform parent)
+        {
+            var flat = new GameObject(name, typeof(MeshFilter), typeof(MeshRenderer));
+            flat.transform.SetParent(parent, false);
+            flat.GetComponent<MeshFilter>().sharedMesh = mesh;
+            var drawn = flat.GetComponent<MeshRenderer>();
+            drawn.sharedMaterial = material;
+            drawn.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            drawn.receiveShadows = false;
+            return flat.transform;
+        }
+
+        private void Hide()
+        {
+            if (_shadow != null)
+                _shadow.gameObject.SetActive(false);
+            if (_landing != null)
+                _landing.gameObject.SetActive(false);
         }
 
         private void Show(int metadataId, bool strike)
@@ -91,6 +202,29 @@ namespace Chog.Match
                 size *= 1.3f * Mathf.Sin(Mathf.PI * Mathf.Min(1f, t * 1.1f + 0.05f));
                 _object.localRotation = Quaternion.Euler(0f, 360f * t, 0f) * Rest();
             }
+            else if (_lob)
+            {
+                // The simulation moves the attack along the floor; the arc is drawn over it.
+                var whole = Vector3.Distance(_lobStart, _lobTarget);
+                var flat = new Vector3(transform.position.x, _lobStart.y, transform.position.z);
+                var done = whole < 0.01f ? 1f : Mathf.Clamp01(Vector3.Distance(_lobStart, flat) / whole);
+                var top = Mathf.Sin(Mathf.PI * done);
+                _object.localPosition = new Vector3(0f, Height + LobRise(_lobHeight, done), 0f);
+                size *= grown * (1f + LobGrowAtTop * top);
+                // Thrown end over end, as a thing that is tossed.
+                _object.localRotation = Quaternion.Euler(TumbleDegreesPerSecond * 0.6f * _age, 0f, 0f) * Rest();
+                if (_shadow != null)
+                {
+                    _shadow.localPosition = new Vector3(0f, OnFloor - transform.position.y, 0f);
+                    _shadow.localScale = Vector3.one * Mathf.Lerp(1f, 0.55f, top);
+                }
+                if (_landing != null)
+                {
+                    // In at once, then a slow beat until it lands.
+                    var into = Mathf.Clamp01(_age / 0.12f);
+                    _landing.localScale = Vector3.one * into * (0.92f + 0.08f * Mathf.Sin(_age * 12f));
+                }
+            }
             else
             {
                 size *= grown;
@@ -123,10 +257,18 @@ namespace Chog.Match
         // Where the attack ends (it hit, or it went as far as it goes), its pieces fly out.
         private void OnDisable()
         {
+            Hide();
             if (!_shown || _object == null || !gameObject.scene.isLoaded)
                 return;
             _shown = false;
-            ChogImpact.Burst(_object.position, _impact);
+            // A lob bursts on the floor where it landed.
+            ChogImpact.Burst(_lob ? new Vector3(_object.position.x, Height * 0.5f, _object.position.z) : _object.position, _impact);
+        }
+
+        private void OnDestroy()
+        {
+            if (_landing != null)
+                Destroy(_landing.gameObject);
         }
     }
 }

@@ -14,7 +14,7 @@
                          .NET 8 runtime) and site/judge/lut/, the tables the simulation reads.
                          It is built here, now, from the simulation sources: assemble right
                          after the build, so the judge and the game run the same rules
-  site/RELEASE.json      which build this is and when it was assembled
+  site/RELEASE.json      which build this is, the stamp of its simulation, and when it was assembled
 
   python3 tools/release/assemble_site.py --build 20261009T115508836Z-aa75436b16954bc99c5a8b98c713b4b0
   python3 tools/release/assemble_site.py --latest
@@ -143,6 +143,11 @@ def main():
         "simulationAssets": assets.is_file(),
         "judge": has_judge,
     }
+    # The stamp of the build's simulation (QualificationBuild): what its pages tell Photon, so what
+    # the services compare rooms and matches with (servedPhotonVersion in server/src/node.js).
+    simulation = build.parent / "simulation.txt"
+    if simulation.is_file():
+        release["simulation"] = simulation.read_text(encoding="utf-8").strip()
     (SITE / "RELEASE.json").write_text(json.dumps(release, indent=1) + "\n", encoding="utf-8")
 
     size = sum(f.stat().st_size for f in SITE.rglob("*") if f.is_file())

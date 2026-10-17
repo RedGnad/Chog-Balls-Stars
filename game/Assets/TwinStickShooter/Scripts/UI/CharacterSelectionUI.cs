@@ -231,6 +231,16 @@ namespace TwinStickShooter
 
         Chog.Screens.RecruitNote.Show((RectTransform)_classButtons[0].transform, center, Teams[0].TeamCharacters[0]);
         _recruitNoteShown = true;
+
+        // A test option of a page served from this computer ("?recruitclass=2"): the recruit plays
+        // that class, to look at its attacks without a Genesis of it.
+        var url = Application.absoluteURL ?? "";
+        var chosen = Chog.Screens.MatchModeChoice.QueryValue(url, "recruitclass");
+        if (Chog.Match.LocalGenesis.TestEntriesAllowed(url, Application.isEditor) && int.TryParse(chosen, out var index)
+            && index >= 0 && index < _classButtons.Length)
+        {
+          SelectCharacterClicked(_classButtons[index].CharacterPrototype, _classButtons[index].SelectButton);
+        }
         return;
       }
     }

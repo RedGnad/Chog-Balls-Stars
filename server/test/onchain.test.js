@@ -113,3 +113,17 @@ test('a stand-in plays its Genesis only while its NFT is held, and a setting mus
   assert.deepEqual(await standIns.genesisOf(keeper), [], 'sold, the stand-in no longer plays');
   assert.deepEqual(await createStandIns({ chain, setting: '' }).genesisOf(keeper), []);
 });
+
+test('the services compare rooms with the stamp of the served simulation, or the build before stamps', async () => {
+  const { servedPhotonVersion } = await import('../src/node.js');
+  const { mkdtemp, writeFile } = await import('node:fs/promises');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const site = await mkdtemp(join(tmpdir(), 'chog-site-'));
+  await writeFile(join(site, 'RELEASE.json'), JSON.stringify({ build: '20261017T155745998Z-483d', simulation: '0123456789abcdef' }));
+  assert.equal(await servedPhotonVersion(site), 'sim-0123456789abcdef');
+  await writeFile(join(site, 'RELEASE.json'), JSON.stringify({ build: '20261017T155745998Z-483d' }));
+  assert.equal(await servedPhotonVersion(site), '20261017T155745998Z');
+  await writeFile(join(site, 'RELEASE.json'), JSON.stringify({ build: '20261017T155745998Z-483d', simulation: 'not a stamp' }));
+  assert.equal(await servedPhotonVersion(site), '20261017T155745998Z');
+});

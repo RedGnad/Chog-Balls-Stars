@@ -124,6 +124,22 @@ export async function reownProjectId(dataFolder, given) {
  * RELEASE.json (tools/release/assemble_site.py), which is also the version that build gives
  * Photon. None for a folder that was not assembled: nothing is then compared with it.
  */
+/**
+ * The name the served build gives Photon before its mode: "sim-" and the stamp of its simulation
+ * when the assembled site records one (RELEASE.json "simulation", written by the build script into
+ * simulation.txt), so every build of that simulation meets in the same rooms and is judged here;
+ * the build's own stamp otherwise, as builds named themselves before 17 October 2026.
+ */
+export async function servedPhotonVersion(siteFolder) {
+  try {
+    const { simulation } = JSON.parse(await readFile(join(siteFolder, 'RELEASE.json'), 'utf8'));
+    if (typeof simulation === 'string' && /^[0-9a-f]{16}$/.test(simulation)) return `sim-${simulation}`;
+  } catch {
+    // No release: the build's own stamp, below, says the same.
+  }
+  return servedBuild(siteFolder);
+}
+
 export async function servedBuild(siteFolder) {
   try {
     const { build } = JSON.parse(await readFile(join(siteFolder, 'RELEASE.json'), 'utf8'));
