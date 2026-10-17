@@ -322,6 +322,13 @@ namespace Chog.Match
             ChogWalletLeaveFor(GameServices.HeroPageUrl(Application.absoluteURL));
         }
 
+        /// <summary>Copies a link to the clipboard; "done" receives "copied" or "failed".</summary>
+        public static void CopyLink(string url, Action<string> done)
+        {
+            // The bridge reads this prefix of the text as "copy, do not share" (ChogWallet.jslib).
+            ShareLink("copy:", url, done);
+        }
+
         /// <summary>
         /// Hands a link to the share sheet of the phone, or copies it where there is none;
         /// "done" receives "shared", "copied" or "failed".

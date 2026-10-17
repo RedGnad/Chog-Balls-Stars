@@ -127,6 +127,22 @@ namespace Chog.Match
             });
         }
 
+        /// <summary>Copies the link, as a computer does best; the outcome comes back as a notice.</summary>
+        public static void Copy()
+        {
+            if (State != LoanState.Ready)
+                return;
+
+            PlayerWallet.CopyLink(Link, outcome =>
+            {
+                if (State != LoanState.Ready)
+                    return;
+
+                Set(LoanState.Ready, TokenId, Link, ExpiresAtMs,
+                    outcome == "copied" ? "Link copied: paste it in another browser or send it." : "The link could not be copied from here.");
+            });
+        }
+
         /// <summary>Leaves the lending screen; links already handed out keep working.</summary>
         public static void Close()
         {

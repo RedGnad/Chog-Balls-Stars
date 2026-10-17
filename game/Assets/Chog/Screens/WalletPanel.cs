@@ -116,6 +116,7 @@ namespace Chog.Screens
         private TextMeshProUGUI _loanLink;
         private TextMeshProUGUI _loanNotice;
         private Button _share;
+        private TextMeshProUGUI _shareLabel;
         private Button _stop;
 
         private sealed class Slot
@@ -270,9 +271,15 @@ namespace Chog.Screens
             _loanLink.richText = false;
             _loanNotice = Text("Notice", new Vector2(0.04f, 0.25f), new Vector2(0.96f, 0.34f), TextAlignmentOptions.Left, AccentColor, 38f, cover);
 
-            _share = MakeButton("Share", new Vector2(0.04f, 0.05f), new Vector2(0.44f, 0.22f), out var shareLabel, cover);
-            shareLabel.text = "SHARE THE LINK";
-            _share.onClick.AddListener(() => GenesisLoan.Share(NameOf(GenesisLoan.TokenId)));
+            _share = MakeButton("Share", new Vector2(0.04f, 0.05f), new Vector2(0.44f, 0.22f), out _shareLabel, cover);
+            // A computer copies the link; a phone hands it to its share sheet.
+            _share.onClick.AddListener(() =>
+            {
+                if (ControlModeWatcher.Mode == ControlMode.Desktop)
+                    GenesisLoan.Copy();
+                else
+                    GenesisLoan.Share(NameOf(GenesisLoan.TokenId));
+            });
             _stop = MakeButton("Stop", new Vector2(0.47f, 0.05f), new Vector2(0.77f, 0.22f), out var stopLabel, cover);
             _stop.GetComponent<Image>().color = QuietColor;
             stopLabel.text = "STOP LENDING";
@@ -531,6 +538,7 @@ namespace Chog.Screens
             _loanLink.text = loan == LoanState.Ready ? GenesisLoan.Link : "";
             _loanNotice.text = loan == LoanState.Ready ? GenesisLoan.Notice : "";
             _share.gameObject.SetActive(loan == LoanState.Ready);
+            _shareLabel.text = ControlModeWatcher.Mode == ControlMode.Desktop ? "COPY THE LINK" : "SHARE THE LINK";
             _stop.gameObject.SetActive(loan == LoanState.Ready);
         }
 

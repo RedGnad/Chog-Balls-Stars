@@ -161,8 +161,11 @@ mergeInto(LibraryManager.library, {
       }
     };
 
-    if (typeof navigator.share === 'function') {
-      navigator.share({ title: 'Chog Genesis', text: text, url: url }).then(function () {
+    // "copy:" before the text asks for a copy whatever the browser offers: a computer's share
+    // sheet (macOS) does not always offer to copy a link.
+    var copyOnly = text.indexOf('copy:') === 0;
+    if (!copyOnly && typeof navigator.share === 'function') {
+      navigator.share({ title: 'Chog Arena', text: text, url: url }).then(function () {
         answer('shared');
       }).catch(function (error) {
         // The player closed the sheet: nothing to report. Anything else falls back to a copy.
