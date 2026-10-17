@@ -1,3 +1,4 @@
+using Chog.Match;
 using Quantum.Menu;
 using TMPro;
 using UnityEngine;
@@ -114,32 +115,20 @@ namespace Chog.Screens
             if (main == null || main.transform.Find(ButtonName) != null)
                 return;
 
-            // Beside PLAY, at the bottom right of the home screen.
-            var area = new GameObject(ButtonName, typeof(RectTransform), typeof(Image), typeof(Button));
-            var rect = (RectTransform)area.transform;
-            rect.SetParent(main.transform, false);
-            rect.anchorMin = new Vector2(0.44f, 0.135f);
-            rect.anchorMax = new Vector2(0.60f, 0.285f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-            var button = area.GetComponent<Button>();
-            button.targetGraphic = area.GetComponent<Image>();
+            // Beside PLAY, at the bottom right of the home screen: the mode's pictogram, its name, and what a tap does.
+            var button = ChogUi.Button(ButtonName, main.transform, new Vector2(0.60f, 0.115f), new Vector2(0.757f, 0.278f),
+                ChogTheme.ButtonKind.Quiet, "", 44f);
+            var icon = ChogUi.Icon("Icon", button.transform, IconOf(Chosen), new Vector2(0.3f, 0.56f), new Vector2(0.7f, 0.92f));
+            var name = ChogUi.Title("Label", button.transform, new Vector2(0.06f, 0.24f), new Vector2(0.94f, 0.58f), 50f);
+            var hint = ChogUi.Number("Hint", button.transform, new Vector2(0.06f, 0.08f), new Vector2(0.94f, 0.25f), 20f,
+                TextAlignmentOptions.Center, ChogTheme.Hex("D9D2FF"), false);
+            hint.text = "TAP TO CHANGE";
 
-            var label = new GameObject("Label", typeof(RectTransform)).AddComponent<TextMeshProUGUI>();
-            var labelArea = label.rectTransform;
-            labelArea.SetParent(rect, false);
-            labelArea.anchorMin = Vector2.zero;
-            labelArea.anchorMax = Vector2.one;
-            labelArea.offsetMin = new Vector2(4f, 2f);
-            labelArea.offsetMax = new Vector2(-4f, -2f);
-            label.alignment = TextAlignmentOptions.Center;
-            label.enableAutoSizing = true;
-            label.fontSizeMin = 10f;
-            label.fontSizeMax = 44f;
-            label.raycastTarget = false;
-            ChogTheme.Style(button, ChogTheme.ButtonKind.Quiet);
-
-            void Show() => label.text = "<size=50%>MODE, TAP TO CHANGE</size>\n" + LabelOf(Chosen);
+            void Show()
+            {
+                name.text = LabelOf(Chosen);
+                icon.sprite = ChogIcons.Get(IconOf(Chosen));
+            }
             Show();
             button.onClick.AddListener(() =>
             {
@@ -147,5 +136,7 @@ namespace Chog.Screens
                 Show();
             });
         }
+
+        private static ChogIcons.Icon IconOf(EMatchMode mode) => mode == EMatchMode.Coins ? ChogIcons.Icon.Coin : ChogIcons.Icon.Tower;
     }
 }

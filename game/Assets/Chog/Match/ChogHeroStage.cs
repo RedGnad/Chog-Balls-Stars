@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Chog.Match
@@ -11,8 +12,11 @@ namespace Chog.Match
     /// of a match. Each stage stands far from the arena and from the other stages, so no camera sees
     /// anything else.
     /// </summary>
-    public sealed class ChogHeroStage : MonoBehaviour
+    public sealed class ChogHeroStage : MonoBehaviour, IDragHandler
     {
+        // Degrees the hero turns for a drag across the whole stage.
+        private const float DragDegrees = 300f;
+
         // The hero sways about the three-quarter view, as a showcase does, instead of turning its back.
         private const float SwayDegrees = 40f;
         private const float SwaySeconds = 7f;
@@ -36,6 +40,14 @@ namespace Chog.Match
         private ChogBodyAnimator _body;
         private int _showing = -1;
         private bool _turns = true;
+        // What dragging added to the hero's turn.
+        private float _turned;
+
+        /// <summary>Whether a finger or the mouse can turn the hero by dragging across the stage.</summary>
+        public bool Draggable
+        {
+            set => _shown.raycastTarget = value;
+        }
 
         /// <summary>The number of the Genesis shown (ChogHeroModel.Recruit for the grey Chog), -1 for none.</summary>
         public int Showing => _showing;
@@ -148,7 +160,13 @@ namespace Chog.Match
             _camera.transform.localPosition = new Vector3(0f, height * 0.36f, 0f) - turn * Vector3.forward * distance;
 
             if (_turns)
-                _hero.localRotation = Quaternion.Euler(0f, StartTurn + SwayDegrees * Mathf.Sin(Time.unscaledTime * 2f * Mathf.PI / SwaySeconds), 0f);
+                _hero.localRotation = Quaternion.Euler(0f, StartTurn + _turned + SwayDegrees * Mathf.Sin(Time.unscaledTime * 2f * Mathf.PI / SwaySeconds), 0f);
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            var width = Mathf.Max(1f, PixelSize(_shown.rectTransform).x);
+            _turned -= eventData.delta.x / width * DragDegrees;
         }
 
         // The camera draws only while the stage is on screen: a hidden menu costs nothing in a match.
@@ -185,16 +203,17 @@ namespace Chog.Match
 
         private static Mesh s_pedestal;
 
-        // A low round pedestal in the colours of the game: a lilac top, a darker side, the dark outline
-        // ring around its top edge, in the vertex colours ChogHero.shader reads (lit, alpha 1).
+        // A low round pedestal in the gold of the home screen (docs/DESIGN-BRIEF.md): a light gold top, a
+        // deeper side, the dark outline ring around its top edge, in the vertex colours ChogHero.shader
+        // reads (lit, alpha 1).
         private static Mesh PedestalMesh()
         {
             if (s_pedestal != null)
                 return s_pedestal;
 
             const int sides = 48;
-            var top = new Color(0.55f, 0.47f, 0.86f, 1f);
-            var side = new Color(0.33f, 0.26f, 0.60f, 1f);
+            var top = new Color(0.98f, 0.72f, 0.22f, 1f);
+            var side = new Color(0.72f, 0.40f, 0.02f, 1f);
             var line = new Color(0.07f, 0.04f, 0.10f, 0.6f);   // unlit
             var vertices = new List<Vector3>();
             var normals = new List<Vector3>();

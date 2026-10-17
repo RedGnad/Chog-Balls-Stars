@@ -19,7 +19,9 @@ namespace Chog.Screens
         public static readonly Color Night = Hex("0E0B1A");
         public static readonly Color NightHigh = Hex("1E1640");
         public static readonly Color Card = Hex("161228");
-        public static readonly Color CardRaised = Hex("221A42");
+        public static readonly Color CardRaised = Hex("2C2264");
+        /// <summary>The fill of a card that lies on the night (AsCard).</summary>
+        public static readonly Color CardFill = Hex("211A4C");
         public static readonly Color Line = new Color(169f / 255f, 155f / 255f, 252f / 255f, 0.35f);
         public static readonly Color Purple = Hex("836EF9");
         public static readonly Color PurpleSoft = Hex("A99BFC");
@@ -242,17 +244,25 @@ namespace Chog.Screens
         }
 
         /// <summary>
-        /// A card: a dark rounded panel with a thin lavender line around it. Its colours are in the
-        /// sprite: the Image is left white.
+        /// A card (docs/DESIGN-BRIEF.md): a deep purple rounded panel outlined in ink like the buttons, with
+        /// a hard dark shadow under it; raised, a lighter purple for what lies over another card. Its
+        /// colours are in the sprite: the Image is left white.
         /// </summary>
         public static void AsCard(Image image, bool raised = false)
         {
             if (image == null)
                 return;
-            var fill = raised ? CardRaised : new Color(Card.r, Card.g, Card.b, 0.95f);
-            image.sprite = ChogSprites.Rounded(24, 3, new Color(Line.r, Line.g, Line.b, 0.6f), fill);
+            var fill = raised ? CardRaised : new Color(CardFill.r, CardFill.g, CardFill.b, 0.96f);
+            image.sprite = ChogSprites.Rounded(24, 3, Ink, fill);
             image.type = Image.Type.Sliced;
+            image.pixelsPerUnitMultiplier = 0.8f;
             image.color = Color.white;
+            var shadow = image.GetComponent<Shadow>();
+            if (shadow == null)
+                shadow = image.gameObject.AddComponent<Shadow>();
+            shadow.effectColor = new Color(0.04f, 0.02f, 0.09f, 0.55f);
+            shadow.effectDistance = new Vector2(0f, -8f);
+            shadow.useGraphicAlpha = true;
         }
 
         /// <summary>

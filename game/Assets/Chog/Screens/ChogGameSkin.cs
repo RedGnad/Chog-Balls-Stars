@@ -32,11 +32,15 @@ namespace Chog.Screens
                 var selection = Find(root.transform, "CharacterSelection");
                 if (selection != null)
                     DressPreparation(selection);
-                foreach (var canvas in new[] { "GameplayCanvas", "GameModeCanvas", "TeamStrategyCanvas" })
+                foreach (var canvas in new[] { "GameplayCanvas", "GameModeCanvas", "TeamStrategyCanvas", "UIButtonsCanvas" })
                 {
                     var found = Find(root.transform, canvas);
-                    if (found != null)
-                        DressTexts(found);
+                    if (found == null)
+                        continue;
+                    DressTexts(found);
+                    // What the match screens are made of, written to the console with "?uitree=1".
+                    if ((Application.absoluteURL ?? "").Contains("uitree=1"))
+                        ChogMenuSkin.LogTree(found, 0);
                 }
 
                 // The sticks of the touch controls, in the colours of the game: moving in lavender, the

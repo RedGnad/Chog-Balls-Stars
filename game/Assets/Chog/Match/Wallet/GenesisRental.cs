@@ -112,6 +112,11 @@ namespace Chog.Match
         /// <summary>What the connected wallet is owed back as a renter, in the smallest unit of $CHOG.</summary>
         public static string OwedBackWei { get; private set; } = "0";
 
+        private static string s_balanceWei = "";
+
+        /// <summary>The $CHOG the connected wallet holds, in its smallest unit, as last read; empty when not read.</summary>
+        public static string BalanceWei => AccountRead() ? s_balanceWei : "";
+
         public static RentalState State { get; private set; } = RentalState.Unknown;
 
         /// <summary>The rental contract and the $CHOG token, as the services gave them.</summary>
@@ -194,6 +199,7 @@ namespace Chog.Match
             public string address;
             public string earned;
             public string owedBack;
+            public string balance;
             public int[] toSettle;
             public AccountEntry[] lent;
             public AccountEntry[] rented;
@@ -395,6 +401,7 @@ namespace Chog.Match
                 {
                     EarnedWei = MonadTransactions.IsDigits(answer.earned) ? answer.earned : "0";
                     OwedBackWei = MonadTransactions.IsDigits(answer.owedBack) ? answer.owedBack : "0";
+                    s_balanceWei = MonadTransactions.IsDigits(answer.balance) ? answer.balance : "";
                     s_toSettle = answer.toSettle ?? NoTokens;
                     MineRented.Clear();
                     MineLent.Clear();

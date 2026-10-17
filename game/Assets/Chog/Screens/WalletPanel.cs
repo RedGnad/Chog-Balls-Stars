@@ -11,14 +11,16 @@ using Button = UnityEngine.UI.Button;
 namespace Chog.Screens
 {
     /// <summary>
-    /// The panel of the main menu that says which hero the player enters with. A holder connects
-    /// the wallet of the browser, picks, among the Chog Genesis that wallet holds or rents, the
-    /// one to play, signs in so its career is recorded, and can lend it with a link or offer it
-    /// for rent in $CHOG. Any connected wallet can rent a Genesis that is offered. A guest who
-    /// came with a link sees the Genesis they were lent. Anyone else reads what a recruit is.
-    /// It shows the state kept by PlayerWallet, GuestPass, GenesisLoan, GenesisRental and
-    /// GenesisCareers and builds its few elements in code, as a child of the menu's main screen,
-    /// so it appears and leaves with it. The two screens of the rental are in WalletPanel.Rental.cs.
+    /// The card of the home screen that says which hero the player enters with. A holder connects
+    /// the wallet of the browser, picks, among the Chog Genesis that wallet holds or rents, the one
+    /// to play, and signs in so its career is recorded; the card then shows that Genesis's mastery
+    /// road. Any connected wallet can rent a Genesis that is offered. A guest who came with a link
+    /// sees the Genesis they were lent. Anyone else reads what a recruit is. Lending a Genesis,
+    /// offering it for rent and renting one open in a window over the whole menu (the hero sheet,
+    /// ChogHeroSheet, and RENT on the home screen open them). It shows the state kept by
+    /// PlayerWallet, GuestPass, GenesisLoan, GenesisRental and GenesisCareers and builds its
+    /// elements in code, as a child of the menu's main screen, so it appears and leaves with it.
+    /// The two screens of the rental are in WalletPanel.Rental.cs.
     /// </summary>
     public sealed partial class WalletPanel : MonoBehaviour
     {
@@ -26,46 +28,42 @@ namespace Chog.Screens
         private const string RosterResource = "GenesisRoster";
         private const int SlotsPerPage = 6;
 
-        // Share of the main screen the panel takes: right of the hero, under the player name, over the mode and PLAY.
-        private static readonly Vector2 PanelMin = new Vector2(0.44f, 0.32f);
-        private static readonly Vector2 PanelMax = new Vector2(0.97f, 0.80f);
+        // Share of the main screen the card takes: the right column of the home screen (ChogHome), under
+        // the wallet and over the mode and PLAY.
+        private static readonly Vector2 PanelMin = new Vector2(0.60f, 0.30f);
+        private static readonly Vector2 PanelMax = new Vector2(0.98f, 0.855f);
 
-        // The career line: the whole width, or the room left by the buttons that lend and rent out.
-        private static readonly Vector2 CareerMin = new Vector2(0.04f, 0.03f);
-        private static readonly Vector2 CareerMax = new Vector2(0.96f, 0.18f);
-        private static readonly Vector2 CareerMaxBesideLend = new Vector2(0.72f, 0.18f);
-        private static readonly Vector2 CareerMaxBesideRentOut = new Vector2(0.50f, 0.18f);
+        // Without a Genesis to play: the main button wide, or beside the one for any other wallet app.
+        private static readonly Vector2 ConnectMin = new Vector2(0.20f, 0.05f);
+        private static readonly Vector2 ConnectMax = new Vector2(0.80f, 0.22f);
+        private static readonly Vector2 ConnectBesideOtherMax = new Vector2(0.62f, 0.22f);
+        private static readonly Vector2 ConnectBesideOtherMin = new Vector2(0.04f, 0.05f);
 
-        // The button that signs in: wide, or beside the button that rents out.
         // A wallet without a Genesis may both rent one and sign in to stake: the two side by side.
-        private static readonly Vector2 MarketBesideSignInMin = new Vector2(0.04f, 0.035f);
-        private static readonly Vector2 MarketBesideSignInMax = new Vector2(0.48f, 0.20f);
-        private static readonly Vector2 SignInBesideMarketMin = new Vector2(0.52f, 0.035f);
-        private static readonly Vector2 SignInBesideMarketMax = new Vector2(0.96f, 0.20f);
-        private static readonly Vector2 SignInMin = new Vector2(0.14f, 0.035f);
-        private static readonly Vector2 SignInMax = new Vector2(0.86f, 0.175f);
-        private static readonly Vector2 SignInMinBesideRentOut = new Vector2(0.04f, 0.035f);
-        private static readonly Vector2 SignInMaxBesideRentOut = new Vector2(0.50f, 0.175f);
+        private static readonly Vector2 MarketBesideSignInMin = new Vector2(0.04f, 0.05f);
+        private static readonly Vector2 MarketBesideSignInMax = new Vector2(0.48f, 0.22f);
+        private static readonly Vector2 SignInBesideMarketMin = new Vector2(0.52f, 0.05f);
+        private static readonly Vector2 SignInBesideMarketMax = new Vector2(0.96f, 0.22f);
+        private static readonly Vector2 WideMin = new Vector2(0.20f, 0.05f);
+        private static readonly Vector2 WideMax = new Vector2(0.80f, 0.22f);
 
-        // The title: the whole room left of the address, or the room left by the button that opens the offers.
-        private static readonly Vector2 TitleMax = new Vector2(0.62f, 0.98f);
-        private static readonly Vector2 TitleMaxBesideMarket = new Vector2(0.39f, 0.98f);
+        // With a Genesis to play: its mastery road on top, the Genesis of the wallet under it.
+        private static readonly Vector2 RoadMin = new Vector2(0.03f, 0.47f);
+        private static readonly Vector2 RoadMax = new Vector2(0.97f, 0.97f);
+        private static readonly Vector2 RosterMin = new Vector2(0f, 0f);
+        private static readonly Vector2 RosterMax = new Vector2(1f, 0.44f);
 
-        // The name and kit of the Genesis played: the whole width, or the room left by the form button.
-        private static readonly Vector2 ChosenMin = new Vector2(0.04f, 0.19f);
-        private static readonly Vector2 ChosenMax = new Vector2(0.96f, 0.41f);
-        private static readonly Vector2 ChosenMaxBesideForm = new Vector2(0.68f, 0.41f);
+        // The window the screens that lend, rent out and rent open in, over the whole menu.
+        private static readonly Vector2 ModalMin = new Vector2(0.15f, 0.07f);
+        private static readonly Vector2 ModalMax = new Vector2(0.85f, 0.93f);
 
         // The colours of ChogTheme (the Chog identity): the cheek pink for the thing to do, a muted
         // purple for the others, white letters on both.
-        private static readonly Color PanelColor = ChogTheme.Card;
-        private static readonly Color CoverColor = ChogTheme.Card;
         private static readonly Color AccentColor = ChogTheme.Cheek;
         private static readonly Color ButtonTextColor = Color.white;
         private static readonly Color QuietColor = ChogTheme.Quiet;
         private static readonly Color MutedColor = ChogTheme.Muted;
         private static readonly Color WaitingColor = new Color(0.25f, 0.25f, 0.3f, 0.85f);
-        private static readonly Color LockedColor = new Color(0.45f, 0.47f, 0.55f, 1f);
         private const string CareerColor = "#FFD27A";
         private const string LabelColor = "#A9ADC2";
 
@@ -78,9 +76,6 @@ namespace Chog.Screens
         private TextMeshProUGUI _title;
         private TextMeshProUGUI _address;
         private TextMeshProUGUI _message;
-        private TextMeshProUGUI _chosen;
-        private TextMeshProUGUI _career;
-        private TextMeshProUGUI _pageLabel;
         private Button _connect;
         private TextMeshProUGUI _connectLabel;
         // On a phone, beside OPEN IN METAMASK: the window where any other wallet app is picked.
@@ -88,20 +83,34 @@ namespace Chog.Screens
         private Button _signIn;
         private TextMeshProUGUI _signInLabel;
         private Button _lookUp;
-        private Button _lend;
-        private Button _rentOut;
-        private TextMeshProUGUI _rentOutLabel;
         private Button _market;
-        private Button _form;
-        private TextMeshProUGUI _formLabel;
         // The Genesis the panel shows as the one played, 0 for none.
         private int _played;
 
+        // With a Genesis to play: its mastery road, then the Genesis of the wallet.
+        private MasteryRoad _road;
+        private RectTransform _rosterArea;
+        private TextMeshProUGUI _rosterTitle;
+        private TextMeshProUGUI _rosterInfo;
+
+        // The window over the whole menu where the screens that lend, rent out and rent open.
+        private GameObject _modal;
+        private RectTransform _modalCard;
+
+        private static WalletPanel s_current;
+
         /// <summary>
         /// The number shown in the name of the Genesis the menu says will be played (its metadata id),
-        /// 0 when the player enters as a recruit. The menu's hero stage shows it (ChogMenuSkin).
+        /// 0 when the player enters as a recruit. The menu's hero stage shows it (ChogHome).
         /// </summary>
         public static int PlayedMetadataId { get; private set; }
+
+        /// <summary>The token id of the Genesis the menu says will be played, 0 for a recruit.</summary>
+        public static int PlayedTokenId { get; private set; }
+
+        /// <summary>Raised when the Genesis the menu says will be played changes.</summary>
+        public static event Action PlayedChanged;
+
         private Button _previous;
         private Button _next;
         private readonly Slot[] _slots = new Slot[SlotsPerPage];
@@ -113,8 +122,12 @@ namespace Chog.Screens
         private int _careerAskedFor;
         // Whose purchases were last asked for, in the same words.
         private string _purchasesOf = "";
+        // The $CHOG account (balance, earnings) was last read for this address.
+        private string _accountOf = "";
+        // RENT was tapped before a wallet was connected: the offers open once it is.
+        private bool _marketWhenReady;
 
-        // The screen that lends a Genesis, laid over the panel.
+        // The screen that lends a Genesis, laid over the menu.
         private GameObject _loanView;
         private TextMeshProUGUI _loanTitle;
         private TextMeshProUGUI _loanText;
@@ -158,8 +171,64 @@ namespace Chog.Screens
             panel.AddComponent<WalletPanel>().Build();
         }
 
+        /// <summary>
+        /// The offers of Genesis for rent (RENT on the home screen). Without a connected wallet, the
+        /// wallet is asked first and the offers open once it answers.
+        /// </summary>
+        public static void OpenRentals()
+        {
+            if (s_current == null)
+                return;
+            if (PlayerWallet.State == WalletState.Ready)
+            {
+                s_current.OpenMarket();
+                return;
+            }
+            s_current._marketWhenReady = true;
+            OnMainButton();
+        }
+
+        /// <summary>The offers, with this Genesis picked (a hero sheet's RENT IT).</summary>
+        public static void OpenRentalOf(int tokenId)
+        {
+            OpenRentals();
+            if (s_current != null && s_current._marketOpen)
+            {
+                s_current._marketPick = tokenId;
+                s_current.Refresh();
+            }
+        }
+
+        /// <summary>The screen where a holder offers this Genesis for rent (a hero sheet's RENT OUT).</summary>
+        public static void OpenOfferOf(int tokenId) => s_current?.OpenOffer(tokenId);
+
+        /// <summary>Connects the wallet, or opens the game in the wallet's browser on a phone without one.</summary>
+        public static void ConnectWallet() => OnMainButton();
+
+        /// <summary>The words of the main button of a wallet that is not ready: what tapping it does.</summary>
+        public static string ConnectWords()
+        {
+            var state = PlayerWallet.State;
+            if (PlayerWallet.CanOpenInWalletBrowser)
+                return "OPEN IN METAMASK";
+            switch (state)
+            {
+                case WalletState.Connecting:
+                    return "ANSWER IN YOUR WALLET";
+                case WalletState.Reading:
+                    return "READING...";
+                case WalletState.NoProvider:
+                    return "NO WALLET HERE";
+                case WalletState.Failed:
+                    return "TRY AGAIN";
+                default:
+                    return "CONNECT WALLET";
+            }
+        }
+
         private void OnEnable()
         {
+            s_current = this;
             PlayerWallet.Changed += Refresh;
             GenesisCareers.Changed += Refresh;
             GuestPass.Changed += Refresh;
@@ -170,10 +239,11 @@ namespace Chog.Screens
             GenesisWager.Changed += Refresh;
             if (_title != null)
             {
-                // Back on the menu, for instance after a match: the careers may have moved.
+                // Back on the menu, for instance after a match: the careers and the money may have moved.
                 _careersOf = "";
                 _careerAskedFor = 0;
                 _purchasesOf = "";
+                _accountOf = "";
                 Refresh();
             }
         }
@@ -188,10 +258,14 @@ namespace Chog.Screens
             GenesisShop.Changed -= Refresh;
             GenesisRental.Changed -= Refresh;
             GenesisWager.Changed -= Refresh;
+            // The window of the panel belongs to the main screen: it leaves with it.
+            if (_modal != null)
+                _modal.SetActive(false);
         }
 
         private void Build()
         {
+            s_current = this;
             _roster = Resources.Load<GenesisRoster>(RosterResource);
 
             var area = (RectTransform)transform;
@@ -199,84 +273,85 @@ namespace Chog.Screens
             area.anchorMax = PanelMax;
             area.offsetMin = Vector2.zero;
             area.offsetMax = Vector2.zero;
-            GetComponent<Image>().color = PanelColor;
             ChogTheme.AsCard(GetComponent<Image>());
 
-            // Sizes are in units of the menu canvas, about twice the pixels of a phone in landscape.
-            _title = Text("Title", new Vector2(0.04f, 0.86f), TitleMax, TextAlignmentOptions.Left, Color.white, 60f);
+            // Without a Genesis to play: what to do to play one.
+            _title = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.60f, 0.97f), TextAlignmentOptions.Left, Color.white, 56f);
             ChogTheme.AsTitle(_title);
-            _address = Text("Address", new Vector2(0.62f, 0.86f), new Vector2(0.96f, 0.98f), TextAlignmentOptions.Right, MutedColor, 40f);
-            _message = Text("Message", new Vector2(0.04f, 0.41f), new Vector2(0.96f, 0.84f), TextAlignmentOptions.TopLeft, Color.white, 44f);
-            _pageLabel = Text("Page", new Vector2(0.10f, 0.41f), new Vector2(0.90f, 0.48f), TextAlignmentOptions.Center, MutedColor, 30f);
-            _chosen = Text("Chosen", ChosenMin, ChosenMax, TextAlignmentOptions.Center, Color.white, 54f);
-            _career = Text("Career", CareerMin, CareerMax, TextAlignmentOptions.Center, Color.white, 40f);
+            _address = Text("Address", new Vector2(0.62f, 0.86f), new Vector2(0.96f, 0.97f), TextAlignmentOptions.Right, MutedColor, 36f);
+            _message = Text("Message", new Vector2(0.04f, 0.40f), new Vector2(0.96f, 0.84f), TextAlignmentOptions.TopLeft, Color.white, 40f);
 
-            _connect = MakeButton("Connect", new Vector2(0.27f, 0.06f), new Vector2(0.73f, 0.25f), out _connectLabel);
+            _connect = MakeButton("Connect", ConnectMin, ConnectMax, out _connectLabel, kind: ChogTheme.ButtonKind.Secondary);
             _connect.onClick.AddListener(OnMainButton);
-            _otherApp = MakeButton("OtherApp", new Vector2(0.74f, 0.06f), new Vector2(0.96f, 0.25f), out var otherAppLabel);
-            _otherApp.GetComponent<Image>().color = QuietColor;
+            _otherApp = MakeButton("OtherApp", new Vector2(0.64f, 0.05f), new Vector2(0.96f, 0.22f), out var otherAppLabel,
+                kind: ChogTheme.ButtonKind.Quiet);
             otherAppLabel.text = "OTHER WALLET";
             _otherApp.onClick.AddListener(PlayerWallet.Connect);
-            _signIn = MakeButton("SignIn", SignInMin, SignInMax, out _signInLabel);
+            _signIn = MakeButton("SignIn", WideMin, WideMax, out _signInLabel, kind: ChogTheme.ButtonKind.Confirm);
             _signIn.onClick.AddListener(PlayerWallet.StartSignIn);
 
             // For a visitor without a Genesis: the page where any Genesis shows as its hero card.
-            _lookUp = MakeButton("LookUp", new Vector2(0.27f, 0.27f), new Vector2(0.73f, 0.38f), out var lookUpLabel);
-            _lookUp.GetComponent<Image>().color = QuietColor;
+            _lookUp = MakeButton("LookUp", new Vector2(0.25f, 0.26f), new Vector2(0.75f, 0.37f), out var lookUpLabel,
+                kind: ChogTheme.ButtonKind.Quiet);
             lookUpLabel.text = "SEE EVERY HERO";
             _lookUp.onClick.AddListener(PlayerWallet.OpenHeroPage);
 
-            // For a signed-in holder, beside the career: lend the chosen Genesis with a link.
-            _lend = MakeButton("Lend", new Vector2(0.74f, 0.045f), new Vector2(0.96f, 0.165f), out var lendLabel);
-            _lend.GetComponent<Image>().color = QuietColor;
-            lendLabel.text = "LEND IT";
-            _lend.onClick.AddListener(() => GenesisLoan.Lend(PlayerWallet.ChosenTokenId));
-
-            // For a holder, left of it: offer the chosen Genesis for rent in $CHOG, when a rental is set up.
-            _rentOut = MakeButton("RentOut", new Vector2(0.52f, 0.045f), new Vector2(0.73f, 0.165f), out _rentOutLabel);
-            _rentOut.GetComponent<Image>().color = QuietColor;
-            _rentOut.onClick.AddListener(() => OpenOffer(_played));
-
-            // For any connected wallet: the Genesis that holders offer for rent.
-            _market = MakeButton("Market", MarketSmallMin, MarketSmallMax, out var marketLabel);
+            // For a connected wallet without a Genesis: the Genesis that holders offer for rent.
+            _market = MakeButton("Market", WideMin, WideMax, out var marketLabel, kind: ChogTheme.ButtonKind.Chog);
             marketLabel.text = "RENT A HERO";
             _market.onClick.AddListener(OpenMarket);
 
-            // Beside the Genesis played: which form of its attack it enters with. A button once
-            // mastery unlocked the second form, and the level to reach before that.
-            _form = MakeButton("Form", new Vector2(0.70f, 0.215f), new Vector2(0.96f, 0.385f), out _formLabel);
-            _form.onClick.AddListener(OnFormButton);
+            // With a Genesis to play: its mastery, then the Genesis of the wallet, picked by a tap.
+            _road = MasteryRoad.Create(transform, RoadMin, RoadMax);
+            _rosterArea = Child("Roster", transform, RosterMin, RosterMax);
+            var line = ChogUi.Plate("Line", _rosterArea, new Vector2(0.04f, 0.985f), new Vector2(0.96f, 1f), ChogTheme.Line, 2);
+            line.sprite = null;
+            _rosterTitle = ChogUi.Title("Title", _rosterArea, new Vector2(0.04f, 0.72f), new Vector2(0.50f, 0.95f), 36f, TextAlignmentOptions.Left);
+            _rosterInfo = ChogUi.Body("Info", _rosterArea, new Vector2(0.46f, 0.72f), new Vector2(0.96f, 0.95f), 26f, TextAlignmentOptions.Right,
+                ChogTheme.PurpleSoft);
 
-            _previous = MakeButton("Previous", new Vector2(0.01f, 0.54f), new Vector2(0.07f, 0.78f), out var previousLabel);
+            _previous = MakeButton("Previous", new Vector2(0.01f, 0.14f), new Vector2(0.075f, 0.62f), out var previousLabel, _rosterArea,
+                ChogTheme.ButtonKind.Quiet);
             previousLabel.text = "<";
             _previous.onClick.AddListener(() => TurnPage(-1));
-            _next = MakeButton("Next", new Vector2(0.93f, 0.54f), new Vector2(0.99f, 0.78f), out var nextLabel);
+            _next = MakeButton("Next", new Vector2(0.925f, 0.14f), new Vector2(0.99f, 0.62f), out var nextLabel, _rosterArea,
+                ChogTheme.ButtonKind.Quiet);
             nextLabel.text = ">";
             _next.onClick.AddListener(() => TurnPage(1));
 
             for (var i = 0; i < SlotsPerPage; i++)
-                _slots[i] = MakeSlot(i, (RectTransform)transform, PlayerWallet.Choose);
+                _slots[i] = MakeSlot(i, _rosterArea, PlayerWallet.Choose, 0.04f, 0.70f);
+
+            // The window: a dim over the whole menu (a tap on it closes what is open), a card in the middle.
+            var dim = ChogUi.Dim("ChogWalletWindow", transform.parent, 0.84f);
+            dim.gameObject.AddComponent<Button>().onClick.AddListener(CloseWindow);
+            _modal = dim.gameObject;
+            _modalCard = Child("Card", _modal.transform, ModalMin, ModalMax);
+            // The card itself takes the taps, so only a tap beside it closes the window.
+            _modalCard.gameObject.AddComponent<Image>().color = Color.clear;
+            _modal.SetActive(false);
 
             BuildLoanView();
             BuildRentalViews();
             Refresh();
         }
 
-        // Laid over the whole panel while a Genesis is being lent; it takes the taps of what it covers.
+        // Laid over the menu while a Genesis is being lent; it takes the taps of what it covers.
         private void BuildLoanView()
         {
-            var cover = Child("Loan", transform, Vector2.zero, Vector2.one);
-            ChogTheme.AsCard(cover.gameObject.AddComponent<Image>(), raised: true); // Opaque: nothing of the panel under it shows through.
+            var cover = Child("Loan", _modalCard, Vector2.zero, Vector2.one);
+            ChogTheme.AsCard(cover.gameObject.AddComponent<Image>(), raised: true);
             _loanView = cover.gameObject;
 
-            _loanTitle = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.96f, 0.98f), TextAlignmentOptions.Left, Color.white, 60f, cover);
+            _loanTitle = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.96f, 0.97f), TextAlignmentOptions.Left, Color.white, 60f, cover);
             ChogTheme.AsTitle(_loanTitle);
             _loanText = Text("Text", new Vector2(0.04f, 0.50f), new Vector2(0.96f, 0.84f), TextAlignmentOptions.TopLeft, Color.white, 42f, cover);
             _loanLink = Text("Link", new Vector2(0.04f, 0.35f), new Vector2(0.96f, 0.49f), TextAlignmentOptions.TopLeft, MutedColor, 26f, cover);
             _loanLink.richText = false;
-            _loanNotice = Text("Notice", new Vector2(0.04f, 0.25f), new Vector2(0.96f, 0.34f), TextAlignmentOptions.Left, AccentColor, 38f, cover);
+            _loanNotice = Text("Notice", new Vector2(0.04f, 0.25f), new Vector2(0.96f, 0.34f), TextAlignmentOptions.Left, ChogTheme.Ok, 38f, cover);
 
-            _share = MakeButton("Share", new Vector2(0.04f, 0.05f), new Vector2(0.44f, 0.22f), out _shareLabel, cover);
+            _share = MakeButton("Share", new Vector2(0.04f, 0.05f), new Vector2(0.44f, 0.20f), out _shareLabel, cover,
+                ChogTheme.ButtonKind.Confirm);
             // A computer copies the link; a phone hands it to its share sheet.
             _share.onClick.AddListener(() =>
             {
@@ -285,14 +360,20 @@ namespace Chog.Screens
                 else
                     GenesisLoan.Share(NameOf(GenesisLoan.TokenId));
             });
-            _stop = MakeButton("Stop", new Vector2(0.47f, 0.05f), new Vector2(0.77f, 0.22f), out var stopLabel, cover);
-            _stop.GetComponent<Image>().color = QuietColor;
+            _stop = MakeButton("Stop", new Vector2(0.47f, 0.05f), new Vector2(0.77f, 0.20f), out var stopLabel, cover, ChogTheme.ButtonKind.Danger);
             stopLabel.text = "STOP LENDING";
             _stop.onClick.AddListener(GenesisLoan.Stop);
-            var back = MakeButton("Back", new Vector2(0.80f, 0.05f), new Vector2(0.96f, 0.22f), out var backLabel, cover);
-            back.GetComponent<Image>().color = QuietColor;
+            var back = MakeButton("Back", new Vector2(0.80f, 0.05f), new Vector2(0.96f, 0.20f), out var backLabel, cover, ChogTheme.ButtonKind.Quiet);
             backLabel.text = "BACK";
             back.onClick.AddListener(GenesisLoan.Close);
+        }
+
+        // A tap beside the window's card: what is open closes, as its BACK does.
+        private void CloseWindow()
+        {
+            if (GenesisLoan.State != LoanState.Idle)
+                GenesisLoan.Close();
+            CloseRentalViews();
         }
 
         // Set when the player connects a wallet on this page: once it shows a Genesis, the signature
@@ -335,26 +416,49 @@ namespace Chog.Screens
                 GenesisShop.ReadOwned(holds ? tokens : new[] { GuestPass.TokenId });
             }
 
-            _title.text = holds ? (PlayerWallet.Tokens.Length > 0 ? "YOUR GENESIS" : "YOUR RENTED GENESIS")
-                : guest ? "YOU ARE A GUEST" : "PLAY YOUR GENESIS";
-            _address.text = guest ? "lent by " + PlayerWallet.ShortAddress(GuestPass.Lender) : PlayerWallet.ShortAddress(PlayerWallet.Address);
-            _message.text = holds || guest ? "" : checkingPass ? "Checking your invitation..." : PassProblem() + MessageFor(state);
+            // The $CHOG of a connected wallet (its balance on the home screen, what it may claim).
+            if (state == WalletState.Ready && GenesisRental.State == RentalState.Open && _accountOf != PlayerWallet.Address)
+            {
+                _accountOf = PlayerWallet.Address;
+                GenesisRental.ReadAccount();
+            }
+
+            // RENT was tapped before the wallet answered: the offers open now, or never if it did not connect.
+            if (_marketWhenReady && state == WalletState.Ready && GenesisRental.State == RentalState.Open)
+            {
+                _marketWhenReady = false;
+                OpenMarket();
+                return;
+            }
+            if (state == WalletState.Failed || state == WalletState.NoProvider)
+                _marketWhenReady = false;
+
+            var playing = holds || guest;
+            _road.gameObject.SetActive(playing);
+            _rosterArea.gameObject.SetActive(playing);
+            _title.gameObject.SetActive(!playing);
+            _address.gameObject.SetActive(!playing);
+            _message.gameObject.SetActive(!playing);
+
+            _title.text = checkingPass ? "ONE MOMENT" : state == WalletState.Ready ? "NO GENESIS HERE" : "PLAY YOUR GENESIS";
+            _address.text = PlayerWallet.ShortAddress(PlayerWallet.Address);
+            _message.text = playing ? "" : checkingPass ? "Checking your invitation..." : PassProblem() + MessageFor(state);
             // On a phone browser without a wallet, the same button reopens the game where one is.
             var canOpen = PlayerWallet.CanOpenInWalletBrowser;
             _connectLabel.text = canOpen ? "OPEN IN METAMASK" : state == WalletState.Failed ? "TRY AGAIN" : "CONNECT WALLET";
             _connect.gameObject.SetActive(!guest && !checkingPass && (canOpen || state == WalletState.Disconnected || state == WalletState.Failed));
-            _otherApp.gameObject.SetActive(!guest && !checkingPass && canOpen && PlayerWallet.ThroughApp);
+            var other = !guest && !checkingPass && canOpen && PlayerWallet.ThroughApp;
+            _otherApp.gameObject.SetActive(other);
+            var connectArea = (RectTransform)_connect.transform;
+            connectArea.anchorMin = other ? ConnectBesideOtherMin : ConnectMin;
+            connectArea.anchorMax = other ? ConnectBesideOtherMax : ConnectMax;
             _lookUp.gameObject.SetActive(!holds && !guest && !checkingPass && state != WalletState.Connecting && state != WalletState.Reading);
 
-            // A connected wallet can rent a Genesis that is offered: a large button when it has
-            // none to play, a small one beside the title when it has.
+            // A connected wallet without a Genesis to play can rent one that is offered.
             var canRent = state == WalletState.Ready && GenesisRental.State == RentalState.Open && !checkingPass;
             var large = canRent && !holds && !guest;
-            _market.gameObject.SetActive(canRent);
+            _market.gameObject.SetActive(large);
             var marketArea = (RectTransform)_market.transform;
-            marketArea.anchorMin = large ? MarketLargeMin : MarketSmallMin;
-            marketArea.anchorMax = large ? MarketLargeMax : MarketSmallMax;
-            _title.rectTransform.anchorMax = canRent && !large ? TitleMaxBesideMarket : TitleMax;
 
             // A new choice opens its page; turning pages by hand is otherwise left alone.
             var pages = holds ? (tokens.Length + SlotsPerPage - 1) / SlotsPerPage : 0;
@@ -384,30 +488,54 @@ namespace Chog.Screens
             _next.gameObject.SetActive(pages > 1);
             _previous.interactable = _page > 0;
             _next.interactable = _page < pages - 1;
-            _pageLabel.text = !holds || tokens.Length < 2 ? ""
-                : (pages > 1 ? (_page + 1) + " / " + pages + "   " : "") + "tap a Genesis to play it";
-            _chosen.text = played > 0 ? DescribeChoice(played) : "";
+
+            var previouslyPlayed = PlayedTokenId;
             _played = played;
+            PlayedTokenId = played;
             var playedIndex = played > 0 && _roster != null ? _roster.IndexOf(played) : -1;
             PlayedMetadataId = playedIndex >= 0 ? _roster.Entries[playedIndex].MetadataId : 0;
-            RefreshForm(played);
+            if (previouslyPlayed != played)
+                PlayedChanged?.Invoke();
 
-            // Signed in, the career of the chosen Genesis and the way to lend it; otherwise the
-            // way to have a career recorded. A guest reads how long the loan lasts.
+            // The mastery of the Genesis played, as its career on Monad says.
+            if (playing)
+            {
+                GenesisCareers.TryGet(played, out var career);
+                _road.Show(career, playedIndex >= 0 && _roster.HasSecondForm(_roster.Entries[playedIndex].Shape));
+            }
+
+            _rosterTitle.text = guest ? "LENT TO YOU" : PlayerWallet.Tokens.Length > 0 ? "YOUR GENESIS" : "YOUR RENTED GENESIS";
+            _rosterInfo.text = guest ? "by " + PlayerWallet.ShortAddress(GuestPass.Lender) + ", " + GuestPass.TimeLeft(GuestPass.ExpiresAtMs, NowMs()) + " left"
+                : rents ? "rented, " + GenesisRental.TimeLeft(GenesisRental.RentedUntilSeconds(played), NowMs() / 1000) + " left"
+                : tokens.Length > 1 ? (pages > 1 ? (_page + 1) + " / " + pages + "   " : "") + "tap one to play it"
+                : "";
+
+            // Signed in, the career of the Genesis is recorded; a wallet without a Genesis signs in
+            // where matches are staked on, to stake as a recruit.
             var signedIn = PlayerWallet.SignIn == SignInState.SignedIn;
-            var canRentOut = owns && GenesisRental.State == RentalState.Open;
-            // Where matches are staked on, a wallet without a Genesis signs in too: it stakes as a recruit.
             var signsInToStake = !holds && !guest && !checkingPass && state == WalletState.Ready && GenesisWager.State == WagerState.Open;
             _signIn.gameObject.SetActive((holds || signsInToStake) && !signedIn);
             var signInArea = (RectTransform)_signIn.transform;
-            var besideMarket = large && signsInToStake && !signedIn;
-            signInArea.anchorMin = besideMarket ? SignInBesideMarketMin : canRentOut ? SignInMinBesideRentOut : SignInMin;
-            signInArea.anchorMax = besideMarket ? SignInBesideMarketMax : canRentOut ? SignInMaxBesideRentOut : SignInMax;
-            if (besideMarket)
+            if (holds)
             {
-                marketArea.anchorMin = MarketBesideSignInMin;
-                marketArea.anchorMax = MarketBesideSignInMax;
+                // Over the right of the roster's title line.
+                _signIn.transform.SetParent(_rosterArea, false);
+                signInArea.anchorMin = new Vector2(0.48f, 0.72f);
+                signInArea.anchorMax = new Vector2(0.96f, 0.99f);
+                _rosterInfo.gameObject.SetActive(signedIn);
             }
+            else
+            {
+                _signIn.transform.SetParent(transform, false);
+                var besideMarket = large && signsInToStake && !signedIn;
+                signInArea.anchorMin = besideMarket ? SignInBesideMarketMin : WideMin;
+                signInArea.anchorMax = besideMarket ? SignInBesideMarketMax : WideMax;
+                marketArea.anchorMin = besideMarket ? MarketBesideSignInMin : WideMin;
+                marketArea.anchorMax = besideMarket ? MarketBesideSignInMax : WideMax;
+                _rosterInfo.gameObject.SetActive(true);
+            }
+            signInArea.offsetMin = Vector2.zero;
+            signInArea.offsetMax = Vector2.zero;
             _signIn.interactable = PlayerWallet.SignIn != SignInState.Asking;
             _signInLabel.text = PlayerWallet.SignIn == SignInState.Asking ? "ANSWER IN YOUR WALLET..."
                 : PlayerWallet.SignInProblem.Length > 0 ? "SIGN-IN FAILED, TRY AGAIN"
@@ -423,22 +551,6 @@ namespace Chog.Screens
                 _justConnected = false;
                 PlayerWallet.StartSignIn();
             }
-            var canLend = owns && signedIn && GenesisLoan.CanLend(played);
-            _lend.gameObject.SetActive(canLend);
-            _rentOut.gameObject.SetActive(canRentOut);
-            if (canRentOut)
-            {
-                var lentUntil = GenesisRental.LentUntilSeconds(played);
-                _rentOutLabel.text = lentUntil > 0
-                    ? "<size=55%>RENTED FOR</size>\n" + GenesisRental.TimeLeft(lentUntil, NowMs() / 1000).ToUpperInvariant()
-                    : GenesisRental.TryGetOffer(played, out var offered)
-                        ? "<size=55%>RENTED OUT AT</size>\n" + MonadTransactions.PriceText(offered.PricePerDayWei) + " A DAY"
-                        : "RENT IT OUT";
-            }
-
-            _career.rectTransform.anchorMax = canRentOut ? CareerMaxBesideRentOut : canLend ? CareerMaxBesideLend : CareerMax;
-            _career.text = holds && signedIn ? (rents ? DescribeRental(played) + "   " : "") + DescribeCareer(played)
-                : guest ? DescribeLoan() + "   " + DescribeCareer(played) : "";
 
             // A wallet with more Genesis than one read covers: the chosen one is asked for by itself.
             var chosen = PlayerWallet.ChosenTokenId;
@@ -450,84 +562,12 @@ namespace Chog.Screens
 
             RefreshLoanView();
             RefreshRentalViews();
-        }
 
-        // The form of the attack the played Genesis enters with: picked by a tap once its mastery
-        // unlocked the second form; before that the button says what to reach.
-        private void RefreshForm(int played)
-        {
-            var index = played > 0 && _roster != null ? _roster.IndexOf(played) : -1;
-            var hasForms = index >= 0 && _roster.HasSecondForm(_roster.Entries[index].Shape);
-            _form.gameObject.SetActive(hasForms);
-            _chosen.rectTransform.anchorMax = hasForms ? ChosenMaxBesideForm : ChosenMax;
-            if (!hasForms)
-                return;
-
-            var unlocked = GenesisForms.IsUnlockedFor(played);
-            // The second form is sold, when a shop is open, to a connected wallet for a Genesis
-            // it holds; a guest waits for mastery or for the holder to buy it.
-            var canBuy = !unlocked && GenesisShop.State == ShopState.Open && PlayerWallet.State == WalletState.Ready
-                         && Array.IndexOf(PlayerWallet.Tokens, played) >= 0;
-            var mine = GenesisShop.PurchaseTokenId == played;
-            var buying = canBuy && mine && GenesisShop.IsBusy;
-            var failed = canBuy && mine && GenesisShop.Purchase == PurchaseState.Failed;
-
-            _form.interactable = unlocked || (canBuy && !GenesisShop.IsBusy);
-            _form.GetComponent<Image>().color = unlocked ? QuietColor : canBuy ? AccentColor : LockedColor;
-            if (unlocked)
-            {
-                // Which of the two forms is equipped, said in words: the names alone do not tell.
-                var picked = GenesisForms.Picked(played);
-                _formLabel.text = "<size=55%>" + (picked == 1 ? "SECOND FORM, TAP FOR THE FIRST" : "FIRST FORM, TAP FOR THE SECOND") +
-                                  "</size>\n" + _roster.FormName(_roster.Entries[index].Shape, picked).ToUpperInvariant();
-            }
-            else if (buying)
-            {
-                _formLabel.text = "<size=55%>ANSWER IN YOUR WALLET</size>\n" + PurchaseStep(GenesisShop.Purchase);
-            }
-            else if (failed)
-            {
-                _formLabel.text = "<size=55%>NOT BOUGHT</size>\nTRY AGAIN";
-                _pageLabel.text = "<color=#FF9C8A>" + GenesisShop.Problem + "</color>";
-            }
-            else if (canBuy)
-            {
-                _formLabel.text = "<size=55%>MASTERY " + GenesisForms.UnlockLevel + ", OR NOW FOR</size>\n" +
-                                  MonadTransactions.PriceText(GenesisShop.PriceWei) + " $CHOG";
-            }
-            else
-            {
-                _formLabel.text = "<size=55%>SECOND FORM AT</size>\nMASTERY " + GenesisForms.UnlockLevel;
-            }
-        }
-
-        // What the wallet is being asked, in the order of a purchase.
-        private static string PurchaseStep(PurchaseState step)
-        {
-            switch (step)
-            {
-                case PurchaseState.Switching:
-                    return "MONAD...";
-                case PurchaseState.Approving:
-                    return "1/2 ALLOW";
-                case PurchaseState.Buying:
-                    return "2/2 BUY";
-                default:
-                    return "CONFIRMING";
-            }
-        }
-
-        // The form button: switches the form once it is unlocked, buys it before that.
-        private void OnFormButton()
-        {
-            if (GenesisForms.IsUnlockedFor(_played))
-            {
-                GenesisForms.Pick(_played, 1 - GenesisForms.Picked(_played));
-                return;
-            }
-
-            GenesisShop.Dismiss();
-            GenesisShop.Buy(_played);
+            // The window shows while one of its screens is open, over everything else of the menu.
+            var open = _loanView.activeSelf || _offerView.activeSelf || _marketView.activeSelf;
+            if (open && !_modal.activeSelf)
+                _modal.transform.SetAsLastSibling();
+            _modal.SetActive(open);
         }
 
         private void RefreshLoanView()
@@ -623,29 +663,6 @@ namespace Chog.Screens
             return "<b>" + GenesisHeroCard.DisplayName(hero) + "</b>\n<size=70%>" + kit.ToUpperInvariant() + "</size>";
         }
 
-        // Mastery and matches; the badges are on the hero card, where there is room for their names.
-        private static string DescribeCareer(int tokenId)
-        {
-            if (!GenesisCareers.TryGet(tokenId, out var career))
-                return "";
-
-            var mastery = GenesisCareers.DescribeMastery(career);
-            return (mastery.Length == 0 ? "" : "<color=" + CareerColor + ">" + mastery.ToUpperInvariant() + "</color>   ") +
-                   "<size=70%><color=" + LabelColor + ">CAREER</color></size>  <color=" + CareerColor + ">" +
-                   GenesisCareers.DescribeMatches(career) + "</color>";
-        }
-
-        private static string DescribeLoan()
-        {
-            return "<size=70%><color=" + LabelColor + ">YOURS FOR</color></size>  " + GuestPass.TimeLeft(GuestPass.ExpiresAtMs, NowMs());
-        }
-
-        private static string DescribeRental(int tokenId)
-        {
-            return "<size=70%><color=" + LabelColor + ">RENTED FOR</color></size>  " +
-                   GenesisRental.TimeLeft(GenesisRental.RentedUntilSeconds(tokenId), NowMs() / 1000);
-        }
-
         private void TurnPage(int direction)
         {
             _page += direction;
@@ -660,7 +677,7 @@ namespace Chog.Screens
             if (tokenId <= 0)
                 return;
 
-            slot.Ring.color = tokenId == played ? AccentColor : Color.clear;
+            slot.Ring.color = tokenId == played ? ChogTheme.Action : Color.clear;
             var metadataId = index < 0 ? 0 : _roster.Entries[index].MetadataId;
             if (metadataId == slot.MetadataId)
                 return;
@@ -679,13 +696,13 @@ namespace Chog.Screens
             });
         }
 
-        private Slot MakeSlot(int position, RectTransform parent, Action<int> tapped)
+        private Slot MakeSlot(int position, RectTransform parent, Action<int> tapped, float bottom = 0.48f, float top = 0.85f)
         {
             // Six equal cells between the two page arrows; each holds a square, whatever the screen.
             const float left = 0.08f, right = 0.92f;
             var width = (right - left) / SlotsPerPage;
-            var cell = Child("Slot" + position, parent, new Vector2(left + position * width, 0.48f),
-                new Vector2(left + (position + 1) * width, 0.85f));
+            var cell = Child("Slot" + position, parent, new Vector2(left + position * width, bottom),
+                new Vector2(left + (position + 1) * width, top));
             var hit = cell.gameObject.AddComponent<Image>();
             hit.color = Color.clear;
             var slot = new Slot { Root = cell.gameObject };
@@ -725,15 +742,15 @@ namespace Chog.Screens
             return image;
         }
 
-        private Button MakeButton(string name, Vector2 min, Vector2 max, out TextMeshProUGUI label, RectTransform parent = null)
+        private Button MakeButton(string name, Vector2 min, Vector2 max, out TextMeshProUGUI label, RectTransform parent = null,
+                                  ChogTheme.ButtonKind kind = ChogTheme.ButtonKind.Chog)
         {
             var area = Child(name, parent == null ? transform : parent, min, max);
             var background = area.gameObject.AddComponent<Image>();
-            background.color = AccentColor;
             var button = area.gameObject.AddComponent<Button>();
             button.targetGraphic = background;
             label = Text("Label", new Vector2(0.04f, 0.1f), new Vector2(0.96f, 0.9f), TextAlignmentOptions.Center, ButtonTextColor, 52f, area);
-            ChogTheme.Shape(button);
+            ChogTheme.Style(button, kind);
             return button;
         }
 

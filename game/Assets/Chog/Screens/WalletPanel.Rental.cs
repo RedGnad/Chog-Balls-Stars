@@ -8,7 +8,7 @@ using Button = UnityEngine.UI.Button;
 namespace Chog.Screens
 {
     /// <summary>
-    /// The two screens of the rental, laid over the wallet panel like the screen that lends: one
+    /// The two screens of the rental, in the window of the wallet panel like the screen that lends: one
     /// where a holder offers the chosen Genesis at a price a day in $CHOG, changes that price or
     /// takes the offer back, sees who rents it and claims what it earned; and one where any
     /// connected wallet picks a Genesis that is offered, a number of days, and pays, adds days to
@@ -17,12 +17,6 @@ namespace Chog.Screens
     /// </summary>
     public sealed partial class WalletPanel
     {
-        // The button that opens the offers: beside the title, or large where the button that connects stands.
-        private static readonly Vector2 MarketSmallMin = new Vector2(0.40f, 0.875f);
-        private static readonly Vector2 MarketSmallMax = new Vector2(0.61f, 0.975f);
-        private static readonly Vector2 MarketLargeMin = new Vector2(0.27f, 0.06f);
-        private static readonly Vector2 MarketLargeMax = new Vector2(0.73f, 0.25f);
-
         private static readonly Color TagColor = new Color(0.04f, 0.05f, 0.1f, 0.85f);
         private const string ProblemColor = "#FF9C8A";
 
@@ -78,7 +72,7 @@ namespace Chog.Screens
 
         private void BuildOfferView()
         {
-            var cover = Child("Offer", transform, Vector2.zero, Vector2.one);
+            var cover = Child("Offer", _modalCard, Vector2.zero, Vector2.one);
             ChogTheme.AsCard(cover.gameObject.AddComponent<Image>(), raised: true); // Opaque: nothing of the panel under it shows through.
             _offerView = cover.gameObject;
 
@@ -127,7 +121,7 @@ namespace Chog.Screens
 
         private void BuildMarketView()
         {
-            var cover = Child("Market", transform, Vector2.zero, Vector2.one);
+            var cover = Child("Market", _modalCard, Vector2.zero, Vector2.one);
             ChogTheme.AsCard(cover.gameObject.AddComponent<Image>(), raised: true); // Opaque: nothing of the panel under it shows through.
             _marketView = cover.gameObject;
 

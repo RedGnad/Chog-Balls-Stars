@@ -11,11 +11,13 @@ using Button = UnityEngine.UI.Button;
 namespace Chog.Screens
 {
     /// <summary>
-    /// The end of a match, in the game's look: the result in large Koulen letters and, beside it, the
-    /// player's own hero in 3D (ChogHeroStage), cheering after a win, slumping after a loss, its name under
-    /// it; the score of both teams; for a Genesis, its career once the referee has written this match
-    /// on Monad (GenesisCareers.Recorded); and the way on: PLAY AGAIN, which leaves this match and looks
-    /// for the next one at once, or MENU. On a computer Enter plays again and Escape goes to the menu.
+    /// The end of a match, as the validated mockup "Result" lays it out: the player's team in blue at
+    /// the left and the other in red at the right, the result in large outlined letters, the score of
+    /// both teams; the player's own hero in 3D on its gold pedestal (ChogHeroStage), cheering after a win,
+    /// slumping after a loss; for a Genesis, its mastery road, which moves and says what this match
+    /// added once the referee has written it on Monad (GenesisCareers.Recorded); and the way on: PLAY
+    /// AGAIN, which leaves this match and looks for the next one at once, or HOME. On a computer Enter
+    /// plays again and Escape goes home.
     /// It takes the place of the sample's one line of text (CoinGrabUI), which left the end of a match
     /// without a way out. A spectator, who plays no hero, reads which team won, without a hero.
     /// </summary>
@@ -48,65 +50,98 @@ namespace Chog.Screens
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 0.5f;
 
-            var dim = Child<Image>("Dim", host.transform, Vector2.zero, Vector2.one);
-            dim.color = new Color(ChogTheme.Night.r, ChogTheme.Night.g, ChogTheme.Night.b, 0.82f);
-            // The dim takes every click, so nothing of the match behind it is touched any more.
-            dim.raycastTarget = true;
-
-            var card = Child<Image>("Card", host.transform, new Vector2(0.12f, 0.10f), new Vector2(0.88f, 0.90f));
-            ChogTheme.AsCard(card);
-            card.raycastTarget = false;
-
             var playing = localTeam >= 0;
             var won = playing && localTeam == winnerTeam;
-            var textLeft = 0.06f;
+
+            // The player's team in blue at the left, the other in red at the right, a dark seam between.
+            // The back takes every click, so nothing of the match behind it is touched any more.
+            var back = ChogUi.Area("Back", host.transform, Vector2.zero, Vector2.one).gameObject.AddComponent<Image>();
+            back.color = ChogTheme.Night;
+            Half(host.transform, "Ours", 0f, ChogTheme.Hex("1F4FA6"), ChogTheme.Ally);
+            Half(host.transform, "Theirs", 0.5f, ChogTheme.Hex("6A1F3A"), ChogTheme.Hex("B8455F"));
+            var seam = ChogUi.Area("Seam", host.transform, new Vector2(0.47f, 0f), new Vector2(0.53f, 1f)).gameObject.AddComponent<Image>();
+            seam.sprite = ChogSprites.Disc(64, 1f);
+            seam.color = new Color(ChogTheme.Ink.r, ChogTheme.Ink.g, ChogTheme.Ink.b, 0.55f);
+            seam.raycastTarget = false;
+
+            var title = ChogUi.Title("Result", host.transform, new Vector2(0.1f, 0.83f), new Vector2(0.9f, 0.985f), 150f);
+            title.color = !playing ? ChogTheme.Text : won ? ChogTheme.Hex("FFE27A") : ChogTheme.Hex("E9E4FF");
+            title.text = !playing ? (winnerTeam == 0 ? "LEFT TEAM WINS" : "RIGHT TEAM WINS") : won ? "VICTORY!" : "DEFEAT";
+            title.textWrappingMode = TextWrappingModes.NoWrap;
+            title.rectTransform.localRotation = Quaternion.Euler(0f, 0f, won ? 3f : 0f);
+            var score = ChogUi.Title("Score", host.transform, new Vector2(0.1f, 0.765f), new Vector2(0.9f, 0.835f), 40f);
+            score.text = ScoreLine(playing ? localTeam : 0, playing);
+
             if (playing && ChogHeroModel.Has(metadataId))
             {
-                var glow = Child<Image>("Glow", card.transform, new Vector2(0.02f, 0.06f), new Vector2(0.46f, 0.52f));
+                var glow = ChogUi.Area("Glow", host.transform, new Vector2(0.04f, 0.22f), new Vector2(0.46f, 0.80f)).gameObject.AddComponent<Image>();
                 glow.sprite = ChogSprites.Disc(128, 1f);
-                glow.color = won ? new Color(1f, 0.85f, 0.3f, 0.35f) : new Color(0.51f, 0.43f, 0.98f, 0.25f);
+                glow.color = won ? new Color(1f, 0.90f, 0.63f, 0.45f) : new Color(0.75f, 0.70f, 1f, 0.22f);
                 glow.raycastTarget = false;
-                var stageArea = new GameObject("Hero", typeof(RectTransform)).GetComponent<RectTransform>();
-                Stretch(stageArea, card.transform, new Vector2(0.02f, 0.12f), new Vector2(0.46f, 0.98f));
-                var stage = ChogHeroStage.Create(stageArea);
+                var stage = ChogHeroStage.Create(ChogUi.Area("Hero", host.transform, new Vector2(0.08f, 0.30f), new Vector2(0.42f, 0.76f)));
                 stage.Show(metadataId);
                 stage.Mood(won);
 
-                var name = Text("Name", card.transform, new Vector2(0.02f, 0.02f), new Vector2(0.46f, 0.13f), 52f);
-                ChogTheme.AsTitle(name);
-                name.color = ChogTheme.Cream;
+                var name = ChogUi.Title("Name", host.transform, new Vector2(0.06f, 0.21f), new Vector2(0.44f, 0.30f), 50f);
                 var attack = ChogHeroModel.AttackLine(metadataId);
                 name.text = (metadataId == ChogHeroModel.Recruit ? "RECRUIT" : "CHOG #" + metadataId)
-                            + (attack.Length > 0 ? "\n<size=45%><color=#A99BFC>" + attack + "</color></size>" : "");
-                textLeft = 0.48f;
+                            + (attack.Length > 0 ? "\n<size=48%><color=#E9E4FF>" + attack.ToUpperInvariant() + "</color></size>" : "");
             }
 
-            var title = Text("Result", card.transform, new Vector2(textLeft, 0.64f), new Vector2(0.96f, 0.95f), 180f);
-            ChogTheme.AsTitle(title);
-            title.color = !playing ? ChogTheme.Text : won ? ChogTheme.Gold : ChogTheme.PurpleSoft;
-            title.text = !playing ? (winnerTeam == 0 ? "LEFT TEAM WINS" : "RIGHT TEAM WINS") : won ? "VICTORY!" : "DEFEAT";
-
-            var score = Text("Score", card.transform, new Vector2(textLeft, 0.50f), new Vector2(0.96f, 0.64f), 64f);
-            ChogTheme.AsTitle(score);
-            score.color = ChogTheme.Text;
-            score.text = ScoreLine(playing ? localTeam : 0, playing);
-
-            var career = Text("Career", card.transform, new Vector2(textLeft, 0.30f), new Vector2(0.96f, 0.50f), 44f);
-            ChogTheme.AsBody(career);
-            career.color = ChogTheme.Muted;
-            career.text = !playing ? ""
-                : tokenId > 0 ? "Your Genesis's career is being written on Monad..."
-                : "Play a Genesis to give it a career: connect the wallet that holds it, or rent one.";
-
-            var again = MakeButton("PlayAgain", card.transform, new Vector2(textLeft + 0.02f, 0.08f), new Vector2(textLeft + 0.29f, 0.25f), "PLAY AGAIN", ChogTheme.ButtonKind.Primary);
-            var menu = MakeButton("Menu", card.transform, new Vector2(textLeft + 0.31f, 0.08f), new Vector2(0.94f, 0.25f), "MENU", ChogTheme.ButtonKind.Quiet);
-
-            var controls = host.AddComponent<ResultControls>();
-            controls.Career = career;
+            // For a Genesis, its mastery road and whether this match is written on Monad; for a recruit,
+            // how to have a career.
+            ResultControls controls;
+            var card = ChogUi.Card("Card", host.transform, new Vector2(0.545f, 0.26f), new Vector2(0.97f, 0.74f), raised: true);
+            card.gameObject.SetActive(playing);
+            controls = host.AddComponent<ResultControls>();
             controls.TokenId = tokenId;
+            if (tokenId > 0)
+            {
+                controls.Road = MasteryRoad.Create(card.transform, new Vector2(0.03f, 0.24f), new Vector2(0.97f, 0.97f));
+                var chip = ChogUi.Plate("Monad", card.transform, new Vector2(0.03f, 0.04f), new Vector2(0.97f, 0.20f),
+                    new Color(0.08f, 0.06f, 0.14f, 0.6f), 12);
+                controls.Tick = ChogUi.Icon("Tick", chip.transform, ChogIcons.Icon.Check, new Vector2(0.015f, 0.12f), new Vector2(0.09f, 0.88f));
+                controls.Tick.enabled = false;
+                controls.Career = ChogUi.Body("Career", chip.transform, new Vector2(0.10f, 0.08f), new Vector2(0.70f, 0.92f), 30f);
+                controls.Career.text = "Writing this match on Monad...";
+                controls.Gained = ChogUi.Title("Gained", chip.transform, new Vector2(0.62f, 0.08f), new Vector2(0.97f, 0.92f), 40f,
+                    TextAlignmentOptions.Right, ChogTheme.Hex("9BF7A8"));
+                if (GenesisCareers.TryGet(tokenId, out var before))
+                {
+                    controls.PointsBefore = before.mastery != null ? before.mastery.points : -1;
+                    controls.Road.Show(before, MasteryRoad.HasSecondForm(tokenId));
+                }
+                else
+                {
+                    controls.Road.Show(null, MasteryRoad.HasSecondForm(tokenId));
+                }
+            }
+            else
+            {
+                var text = ChogUi.Body("Career", card.transform, new Vector2(0.06f, 0.1f), new Vector2(0.94f, 0.9f), 42f, TextAlignmentOptions.Center);
+                text.text = "A recruit has no career.\nPlay a Genesis to give it one on Monad: connect the wallet that holds it, or rent one.";
+            }
+
+            var again = ChogUi.Button("PlayAgain", host.transform, new Vector2(0.545f, 0.09f), new Vector2(0.80f, 0.215f), ChogTheme.ButtonKind.Primary,
+                "PLAY AGAIN", 60f);
+            var menu = ChogUi.Button("Menu", host.transform, new Vector2(0.815f, 0.09f), new Vector2(0.97f, 0.215f), ChogTheme.ButtonKind.Secondary,
+                "HOME", 52f);
+            ChogTheme.ImageOf(menu).color = ChogTheme.Ally;
+            if (ControlModeWatcher.Mode == ControlMode.Desktop)
+                ChogUi.Body("Keys", host.transform, new Vector2(0.545f, 0.035f), new Vector2(0.97f, 0.08f), 24f, TextAlignmentOptions.Center,
+                    ChogTheme.Hex("E9E4FF")).text = "ENTER plays again, ESCAPE goes home";
+
             again.onClick.AddListener(() => controls.Leave(true));
             menu.onClick.AddListener(() => controls.Leave(false));
             return true;
+        }
+
+        // Half of the screen in a team's colour, darker at the bottom.
+        private static void Half(Transform parent, string name, float left, Color bottom, Color top)
+        {
+            var half = ChogUi.Area(name, parent, new Vector2(left, 0f), new Vector2(left + 0.5f, 1f)).gameObject.AddComponent<Image>();
+            half.sprite = ChogSprites.Gradient(bottom, top);
+            half.raycastTarget = false;
         }
 
         // "YOUR TEAM 99 - 80 THEM" in damage to the structures (a siege) or coins, from the last verified frame.
@@ -127,17 +162,6 @@ namespace Chog.Screens
                 : "LEFT " + teams[0].Score + "  -  " + teams[1].Score + " RIGHT  <size=55%>" + unit + "</size>";
         }
 
-        private static Button MakeButton(string name, Transform parent, Vector2 min, Vector2 max, string text, ChogTheme.ButtonKind kind)
-        {
-            var back = Child<Image>(name, parent, min, max);
-            back.raycastTarget = true;
-            var button = back.gameObject.AddComponent<Button>();
-            button.targetGraphic = back;
-            var label = Text("Label", back.transform, new Vector2(0.04f, 0.1f), new Vector2(0.96f, 0.9f), 64f);
-            label.text = text;
-            ChogTheme.Style(button, kind);
-            return button;
-        }
 
         /// <summary>
         /// Leaves the match as the menu's own leave button does (QuantumMenuUIGameplay), shows the menu
@@ -167,7 +191,11 @@ namespace Chog.Screens
         private sealed class ResultControls : MonoBehaviour
         {
             public TextMeshProUGUI Career;
+            public TextMeshProUGUI Gained;
+            public Image Tick;
+            public MasteryRoad Road;
             public int TokenId;
+            public int PointsBefore = -1;
             private float _shownAt;
             private bool _leaving;
 
@@ -183,8 +211,25 @@ namespace Chog.Screens
             {
                 if (Career == null || career == null || career.tokenId != TokenId || !credited)
                     return;
-                Career.color = ChogTheme.Text;
-                Career.text = "<color=#5CE68A>Recorded on Monad.</color>  " + GenesisCareers.DescribeAll(career);
+                Career.text = "Recorded on Monad";
+                Tick.enabled = true;
+                Road.Show(career, MasteryRoad.HasSecondForm(TokenId));
+                // What this match added, when the career before it was known.
+                var after = career.mastery != null ? career.mastery.points : -1;
+                var gained = PointsBefore >= 0 && after > PointsBefore ? after - PointsBefore : 0;
+                if (gained > 0)
+                    Gained.text = "+" + gained + " MASTERY";
+                StartCoroutine(Chimes(Mathf.Max(1, gained)));
+            }
+
+            // One chime for the record, a note higher for each point it added.
+            private System.Collections.IEnumerator Chimes(int count)
+            {
+                for (var step = 0; step < count; step++)
+                {
+                    ChogSounds.Reward(step);
+                    yield return new WaitForSecondsRealtime(0.18f);
+                }
             }
 
             private void Update()
@@ -211,32 +256,7 @@ namespace Chog.Screens
             }
         }
 
-        private static T Child<T>(string name, Transform parent, Vector2 min, Vector2 max) where T : Component
-        {
-            var thing = new GameObject(name, typeof(RectTransform));
-            Stretch((RectTransform)thing.transform, parent, min, max);
-            return thing.AddComponent<T>();
-        }
 
-        private static TextMeshProUGUI Text(string name, Transform parent, Vector2 min, Vector2 max, float largest)
-        {
-            var text = Child<TextMeshProUGUI>(name, parent, min, max);
-            text.alignment = TextAlignmentOptions.Center;
-            text.enableAutoSizing = true;
-            text.fontSizeMin = 18f;
-            text.fontSizeMax = largest;
-            text.raycastTarget = false;
-            text.richText = true;
-            return text;
-        }
 
-        private static void Stretch(RectTransform area, Transform parent, Vector2 min, Vector2 max)
-        {
-            area.SetParent(parent, false);
-            area.anchorMin = min;
-            area.anchorMax = max;
-            area.offsetMin = Vector2.zero;
-            area.offsetMax = Vector2.zero;
-        }
     }
 }

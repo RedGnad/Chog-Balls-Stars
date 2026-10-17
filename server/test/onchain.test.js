@@ -74,15 +74,17 @@ test('the money of an address in the rental is read from the records on chain', 
     earnings: '0x' + word(4n * 10n ** 18n),
     refunds: '0x' + word(0),
     offerOf: '0x' + word(1) + word(10n ** 19n) + word('0x' + 'a'.repeat(40)),
+    balanceOf: '0x' + word(39n * 10n ** 18n),
   };
   const chain = {
     // earnings(address), refunds(address) and offerOf(uint256) by their selectors; the one read without arguments is rentalsOnRecord().
-    call: async (to, data) => answers[{ '0x543fd313': 'earnings', '0xbc3da535': 'refunds', '0xa3cb2f44': 'offerOf' }[data.slice(0, 10)] ?? 'rentalsOnRecord'],
+    call: async (to, data) => answers[{ '0x543fd313': 'earnings', '0xbc3da535': 'refunds', '0xa3cb2f44': 'offerOf', '0x70a08231': 'balanceOf' }[data.slice(0, 10)] ?? 'rentalsOnRecord'],
   };
   const rental = createRental({ chain, address: '0x' + '9'.repeat(40) });
   const asHolder = await rental.account(holder);
   assert.equal(asHolder.earned, (14n * 10n ** 18n).toString(), 'earned before plus earned since on its running rental');
   assert.equal(asHolder.owedBack, '0');
+  assert.equal(asHolder.balance, (39n * 10n ** 18n).toString(), 'the $CHOG it holds');
   assert.deepEqual(asHolder.lent.map(rented => rented.tokenId), [1795]);
   assert.deepEqual(asHolder.toSettle, [1795]);
 

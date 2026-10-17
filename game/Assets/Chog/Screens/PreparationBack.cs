@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace Chog.Screens
 {
     /// <summary>
-    /// BACK TO MENU on the team preparation screen, at its bottom right: leaves the room the way the
+    /// CANCEL, in the red of closing, on the team preparation screen at its bottom right: leaves the room the way the
     /// end of a match does (ChogResultScreen.LeaveMatch). The sample's only way out of that screen was
     /// the settings wheel, which players did not find. Escape does the same on a computer.
     /// </summary>
@@ -32,7 +32,7 @@ namespace Chog.Screens
             var label = Object.Instantiate(template, rect);
             label.name = "Label";
             label.raycastTarget = false;
-            label.text = "BACK TO MENU";
+            label.text = "CANCEL";
             label.alignment = TextAlignmentOptions.Center;
             label.enableAutoSizing = true;
             label.fontSizeMin = 12f;
@@ -44,7 +44,7 @@ namespace Chog.Screens
             labelArea.offsetMax = new Vector2(-6f, -2f);
             labelArea.pivot = new Vector2(0.5f, 0.5f);
             label.gameObject.SetActive(true);
-            ChogTheme.Style(button, ChogTheme.ButtonKind.Quiet);
+            ChogTheme.Style(button, ChogTheme.ButtonKind.Danger);
 
             var keys = area.AddComponent<EscapeKey>();
             button.onClick.AddListener(keys.Leave);

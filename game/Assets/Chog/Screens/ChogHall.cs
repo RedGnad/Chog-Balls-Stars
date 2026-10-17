@@ -3,13 +3,12 @@ using Quantum.Menu;
 using GenesisRoster = Quantum.GenesisRoster;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Chog.Screens
 {
     /// <summary>
-    /// The leaderboard of the collection: a TOP GENESIS button beside HOW TO PLAY opens the Genesis with
+    /// The leaderboard of the collection: TOP on the home screen (ChogHome) opens the Genesis with
     /// the most wins, as the game services keep their careers (GenesisCareers.ReadTop), each with its
     /// picture, its wins, its matches and its mastery. Read each time it opens; nothing is shown that
     /// the services did not send: with no match recorded yet it says so.
@@ -17,7 +16,6 @@ namespace Chog.Screens
     public sealed class ChogHall : MonoBehaviour
     {
         private const string ObjectName = "ChogHall";
-        private const string ButtonName = "ChogHallButton";
         private const string RosterResource = "GenesisRoster";
         private const int Columns = 2;
         private const int RowsPerColumn = GenesisCareers.TopCount / Columns;
@@ -28,37 +26,8 @@ namespace Chog.Screens
         private RectTransform[] _rows;
         private GenesisRoster _roster;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void Watch()
-        {
-            SceneManager.sceneLoaded += (scene, mode) => Attach();
-            Attach();
-        }
-
-        private static void Attach()
-        {
-            var main = FindAnyObjectByType<QuantumMenuUIMain>(FindObjectsInactive.Include);
-            if (main == null || main.transform.Find(ButtonName) != null)
-                return;
-
-            // TOP GENESIS, beside HOW TO PLAY (ChogGuide) under the play buttons.
-            var area = new GameObject(ButtonName, typeof(RectTransform), typeof(Image), typeof(Button));
-            var rect = (RectTransform)area.transform;
-            rect.SetParent(main.transform, false);
-            rect.anchorMin = new Vector2(0.20f, 0.04f);
-            rect.anchorMax = new Vector2(0.34f, 0.11f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-            var button = area.GetComponent<Button>();
-            button.targetGraphic = area.GetComponent<Image>();
-            var label = Text("Label", rect, Vector2.zero, Vector2.one, 30f);
-            label.fontSizeMin = 12f;
-            label.text = "TOP GENESIS";
-            ChogTheme.Style(button, ChogTheme.ButtonKind.Quiet);
-            button.onClick.AddListener(() => Open(main.transform));
-        }
-
-        private static void Open(Transform main)
+        /// <summary>The hall over the main screen of the menu (TOP on the home screen, ChogHome).</summary>
+        public static void Open(Transform main)
         {
             var existing = main.Find(ObjectName);
             var hall = existing != null ? existing.GetComponent<ChogHall>() : null;
@@ -112,7 +81,10 @@ namespace Chog.Screens
                 var y = top - (line + 1) * rowHeight;
                 var row = Child<Image>("Row" + (i + 1), card.transform,
                     new Vector2(x, y + rowHeight * 0.06f), new Vector2(x + columnWidth, y + rowHeight * 0.94f));
-                row.color = ChogTheme.Card;
+                // A dark rounded plate; the first three ringed in gold, as a podium.
+                row.sprite = ChogSprites.Rounded(14, 3, i < 3 ? ChogTheme.Action : ChogTheme.Line, new Color(0.08f, 0.06f, 0.14f, 0.6f));
+                row.type = Image.Type.Sliced;
+                row.pixelsPerUnitMultiplier = 0.9f;
                 row.raycastTarget = false;
                 var rank = Text("Rank", row.transform, new Vector2(0f, 0f), new Vector2(0.11f, 1f), 48f);
                 ChogTheme.AsTitle(rank);
@@ -139,7 +111,7 @@ namespace Chog.Screens
             var closeButton = close.gameObject.AddComponent<Button>();
             closeButton.targetGraphic = close;
             Text("Label", close.transform, Vector2.zero, Vector2.one, 40f).text = "CLOSE";
-            ChogTheme.Style(closeButton, ChogTheme.ButtonKind.Primary);
+            ChogTheme.Style(closeButton, ChogTheme.ButtonKind.Quiet);
             closeButton.onClick.AddListener(() => gameObject.SetActive(false));
         }
 

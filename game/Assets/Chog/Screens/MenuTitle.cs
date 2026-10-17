@@ -65,16 +65,16 @@ namespace Chog.Screens
             var place = logo.rectTransform;
             area.SetParent(place.parent, false);
             area.SetSiblingIndex(place.GetSiblingIndex());
-            area.anchorMin = place.anchorMin;
-            area.anchorMax = place.anchorMax;
-            area.pivot = place.pivot;
-            // A little higher and taller than the logo was: the sample writes the region under it.
-            area.anchoredPosition = place.anchoredPosition + new Vector2(0f, place.sizeDelta.y * 0.45f);
-            area.sizeDelta = new Vector2(place.sizeDelta.x * 1.7f, place.sizeDelta.y * 1.25f);
+            // At the top of the home screen, in the middle, between the player's chip and the wallet (ChogHome).
+            area.anchorMin = new Vector2(0.5f, 1f);
+            area.anchorMax = new Vector2(0.5f, 1f);
+            area.pivot = new Vector2(0.5f, 1f);
+            area.anchoredPosition = new Vector2(0f, -26f);
+            area.sizeDelta = new Vector2(520f, 92f);
 
             title.raycastTarget = false;
             title.richText = true;
-            title.alignment = TextAlignmentOptions.Left;
+            title.alignment = TextAlignmentOptions.Center;
             title.textWrappingMode = TextWrappingModes.NoWrap;
             title.enableAutoSizing = true;
             title.fontSizeMin = 14f;
@@ -82,7 +82,7 @@ namespace Chog.Screens
             title.color = ChogTheme.Cream;
             // The game's name in the logo's letters (Koulen, outlined), as on chog.xyz.
             ChogTheme.AsLogo(title);
-            title.text = Title + "\n<size=40%><color=#A99BFC>" + Tagline + "</color></size>";
+            title.text = Title;
         }
     }
 }

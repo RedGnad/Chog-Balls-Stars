@@ -29,6 +29,7 @@ const EARNINGS = selector('earnings(address)');
 const REFUNDS = selector('refunds(address)');
 const OFFER_OF = selector('offerOf(uint256)');
 const CLOSE = selector('close(uint256)');
+const BALANCE_OF = selector('balanceOf(address)');
 // A rental on record is seven words: tokenId, renter, lender, until, escrow, earnedSinceSettled, counting.
 const RECORD_WORDS = 7;
 const OFFERS_KEPT_MS = 10000;
@@ -155,10 +156,12 @@ export function createRental({ chain, address, now = Date.now }) {
   async function account(address) {
     if (!rental || !isAddress(address)) return { enabled: Boolean(rental) };
     const who = address.toLowerCase();
-    const [earnings, refunds, onRecord] = await Promise.all([
+    const [earnings, refunds, onRecord, balance] = await Promise.all([
       chain.call(rental, '0x' + EARNINGS + word(who)),
       chain.call(rental, '0x' + REFUNDS + word(who)),
       records(),
+      // The $CHOG the address holds, for the menu; the rest of the account does not wait on it.
+      chain.call(CHOG_TOKEN, '0x' + BALANCE_OF + word(who)).catch(() => null),
     ]);
     const lent = onRecord.filter(record => record.lender === who);
     const rented = onRecord.filter(record => record.renter === who);
@@ -179,6 +182,7 @@ export function createRental({ chain, address, now = Date.now }) {
     return {
       enabled: true,
       address: who,
+      balance: typeof balance === 'string' && /^0x[0-9a-fA-F]+$/.test(balance) ? BigInt(balance).toString() : '',
       earned: claimable.toString(),
       owedBack: owedBack.toString(),
       // The token ids a claim must name so that their rentals are settled or closed first.

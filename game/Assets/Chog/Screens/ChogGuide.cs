@@ -9,14 +9,13 @@ namespace Chog.Screens
 {
     /// <summary>
     /// Three short cards over the menu the first time the game is opened: what a Genesis does in the game,
-    /// how to fight on a phone and on a computer, how a match is won. A HOW TO PLAY button under the play
-    /// buttons brings them back. Seen once per browser (PlayerPrefs). A page measured or tested by script
+    /// how to fight on a phone and on a computer, how a match is won. GUIDE on the home screen (ChogHome)
+    /// brings them back. Seen once per browser (PlayerPrefs). A page measured or tested by script
     /// (its address carries "perf=1" or "noguide=1") never shows them, so the scripted taps reach the menu.
     /// </summary>
     public sealed class ChogGuide : MonoBehaviour
     {
         private const string ObjectName = "ChogGuide";
-        private const string ButtonName = "ChogGuideButton";
         private const string SeenKey = "chog.guide.seen";
 
         private static readonly (string Title, string Text)[] Cards =
@@ -58,40 +57,16 @@ namespace Chog.Screens
         private static void Attach()
         {
             var main = FindAnyObjectByType<QuantumMenuUIMain>(FindObjectsInactive.Include);
-            if (main == null || main.transform.Find(ButtonName) != null)
+            if (main == null || main.transform.Find(ObjectName) != null)
                 return;
 
-            // HOW TO PLAY, under the play buttons of the left column (ChogMenuSkin).
-            var area = new GameObject(ButtonName, typeof(RectTransform), typeof(Image), typeof(Button));
-            var rect = (RectTransform)area.transform;
-            rect.SetParent(main.transform, false);
-            rect.anchorMin = new Vector2(0.04f, 0.04f);
-            rect.anchorMax = new Vector2(0.18f, 0.11f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-            var button = area.GetComponent<Button>();
-            button.targetGraphic = area.GetComponent<Image>();
-            var label = new GameObject("Label", typeof(RectTransform)).AddComponent<TextMeshProUGUI>();
-            var labelArea = label.rectTransform;
-            labelArea.SetParent(rect, false);
-            labelArea.anchorMin = Vector2.zero;
-            labelArea.anchorMax = Vector2.one;
-            labelArea.offsetMin = Vector2.zero;
-            labelArea.offsetMax = Vector2.zero;
-            label.alignment = TextAlignmentOptions.Center;
-            label.enableAutoSizing = true;
-            label.fontSizeMin = 12f;
-            label.fontSizeMax = 30f;
-            label.text = "HOW TO PLAY";
-            label.raycastTarget = false;
-            ChogTheme.Style(button, ChogTheme.ButtonKind.Quiet);
-            button.onClick.AddListener(() => Open(main.transform));
-
+            // A first visit opens the guide by itself; GUIDE on the home screen (ChogHome) opens it again.
             if (!Scripted() && PlayerPrefs.GetInt(SeenKey, 0) == 0)
                 Open(main.transform);
         }
 
-        private static void Open(Transform main)
+        /// <summary>The guide over the main screen of the menu, from its first page.</summary>
+        public static void Open(Transform main)
         {
             var existing = main.Find(ObjectName);
             if (existing != null)
