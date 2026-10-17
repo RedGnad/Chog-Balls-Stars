@@ -101,28 +101,42 @@ namespace TwinStickShooter
       _previewsContainer.transform.LookAt(transform.position +
                                           new Vector3(aimNormalized.X.AsFloat, 0, aimNormalized.Y.AsFloat));
 
+      EAttributeType type = isSpecial ? EAttributeType.Special : EAttributeType.Energy;
+      float attackLoad = AttributesHelper.GetCurrentValue(frame, ViewContext.LocalView.EntityRef, type).AsFloat;
+      bool ready = attackLoad >= GetSkillCost(frame, ViewContext.LocalView.EntityRef, isSpecial);
+
+      bool guided = false;
       if (previewType == EPreviewType.Ballistic)
       {
+        // Held from the predicted position, as the aim of a mouse is, so the ring stays under the
+        // pointer; the throw leaves from the hero as drawn.
         Transform2D characterTransform = frame.Get<Transform2D>(ViewContext.LocalView.EntityRef);
         var circlePosition = characterTransform.Position +
                              aim.Normalized * Mathf.Clamp(aim.Magnitude.AsFloat, 0, maxDistance.AsFloat).ToFP();
         _ballisticPreviewCircle.transform.position =
           new Vector3(circlePosition.X.AsFloat, .2f, circlePosition.Y.AsFloat);
+        // The arc the throw will fly and where it lands (Chog.Match.ChogAimGuide), in place of the
+        // sample's flat arrow and circle.
+        guided = Chog.Match.ChogAimGuide.ShowLob(ViewContext.LocalView.transform.position,
+          new Vector3(circlePosition.X.AsFloat, 0f, circlePosition.Y.AsFloat), maxDistance.AsFloat, ready);
+        _ballisticPreview.SetActive(!guided);
+        _ballisticPreviewCircle.SetActive(!guided);
+      }
+      if (!guided)
+      {
+        Chog.Match.ChogAimGuide.Hide();
       }
 
-      EAttributeType type = isSpecial ? EAttributeType.Special : EAttributeType.Energy;
-      float attackLoad = AttributesHelper.GetCurrentValue(frame, ViewContext.LocalView.EntityRef, type).AsFloat;
       foreach (var mesh in _meshRenderer)
       {
-        if (attackLoad < GetSkillCost(frame, ViewContext.LocalView.EntityRef, isSpecial))
-        {
-          mesh.material.color = _blockedMaterialColor;
-        }
-        else
-        {
-          mesh.material.color = _standardAimMaterialColor;
-        }
+        mesh.material.color = ready ? _standardAimMaterialColor : _blockedMaterialColor;
       }
+    }
+
+    public override void OnDisable()
+    {
+      base.OnDisable();
+      Chog.Match.ChogAimGuide.Hide();
     }
 
     private float GetSkillCost(Frame frame, EntityRef character, bool isSpecial)

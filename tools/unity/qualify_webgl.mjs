@@ -232,6 +232,17 @@ try {
     await sleep(Number(process.env[`CHOG_BROWSER_AFTER_CLICK_${number}_MS`]||10000));
     await screenshot(`browser-after-click-${number}.png`);
   }
+  if(process.env.CHOG_BROWSER_POINTER){
+    // "x,y[;x,y...]": move the mouse there without a button, as a player aiming, and capture the
+    // aim the game draws at each point (browser-pointer-<n>.png).
+    const points=process.env.CHOG_BROWSER_POINTER.split(';').map(point=>point.split(',').map(Number));
+    for(let index=0;index<points.length;index++){
+      const [x,y]=points[index];
+      await command('Input.dispatchMouseEvent',{type:'mouseMoved',x,y,button:'none',buttons:0});
+      await sleep(Number(process.env.CHOG_BROWSER_POINTER_MS||700));
+      await screenshot(`browser-pointer-${index+1}.png`);
+    }
+  }
   if(process.env.CHOG_BROWSER_HOLD_KEY){
     // Hold one movement key (w, a, s or d) after the clicks, then capture where the character went.
     const key=process.env.CHOG_BROWSER_HOLD_KEY.toLowerCase(),code='Key'+key.toUpperCase(),vk=key.toUpperCase().charCodeAt(0);

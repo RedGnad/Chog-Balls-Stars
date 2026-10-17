@@ -37,7 +37,9 @@ namespace Chog.Match
         private const float LobGrowAtTop = 0.3f;
         private const float LandingRadius = 1.1f;
         private const float ShadowRadius = 0.6f;
-        private const float OnFloor = 0.03f;
+        // On the floor, whose planks stand above y = 0 (ChogTeamRing.Lift): lower, the shadow and the
+        // landing ring were hidden under the planks.
+        private const float OnFloor = 0.18f;
 
         private static Material s_ground;
         private static Mesh s_shadow;
