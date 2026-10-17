@@ -502,6 +502,45 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**17 October 2026, 21:55 (the effects of a fight; on `main`: 68c336a, built `20261017T193628403Z`, not deployed).**
+- **Asked by the owner:** the licence is no problem (non-profit MVP) and "effects come from a Chog" is a direction:
+  explosions, flashes with light, lightning are welcome as long as they respect the traits. **Implemented**
+  (`game/README.md`, "The effects of a fight"): every effect is picked and coloured by a trait (`ChogFxRecipes`,
+  `ChogFxKit`). The object of the hat bursts in its own way where a basic attack ends (cloth and a puff for a cap,
+  coins and sparkles for a coin, lightning from the top of the screen for a Thunder Cap, snow and ice for a
+  snowball, and so on for every object); a special flashes at the caster's eyes in their colours, shows its Aura
+  (lightning from the eyes for haste) and its rarity (echo rings, Skull, Radioactive, 1:1); the Aura hits its
+  target with fire, ice, stars, sparks, electricity, smoke or bubbles, with flames, runes or a poison cloud while
+  it lasts; falls, returns, structure hits and structure falls (blasts, a shock wave, smoke; the core's heart
+  breaks under a BOOM) have theirs. 23 Cartoon FX Remaster prefabs copied into
+  `game/Assets/Chog/Effects/Resources/ChogFx`, pooled and recoloured; light faked with additive flares, rings and
+  columns (`ChogLight`) and flickering bolts (`ChogLightning`); no real-time light. A lighter path for phones and
+  any quality below Good. View code only: the simulation stamp is unchanged (`f4a81f1ddbd919b6`).
+- **Seen** (muted headless Chrome on the Mac's GPU): on a new private test page, `?impacts=1`, `=aura`, `=big`
+  (`ChogImpactsViewer`, each case looped and frozen at chosen moments, before and after on one build with
+  `fxlevel=0`), on `?specials=1`, and in matches against bots on Photon's cloud:
+  [impacts](../research/evidence/fight-fx-impacts-before-after-2026-10-17.jpg) (with the phone's path),
+  [auras](../research/evidence/fight-fx-auras-before-after-2026-10-17.jpg),
+  [big moments](../research/evidence/fight-fx-big-moments-2026-10-17.jpg),
+  [specials](../research/evidence/fight-fx-specials-film-2026-10-17.jpg),
+  [matches](../research/evidence/fight-fx-match-before-after-2026-10-17.jpg). No exception in any console. 147
+  view tests pass (9 new, `ChogFxTests`).
+- **Measured** (`?perf=1`, 123 s of a match each, M1 with Metal, the Mac swapping 11 to 12 GB): main thread busy
+  median and 95th percentile 4.7 / 6.9 and 4.6 / 7.6 ms with the effects, 4.6 / 7.1 and 4.7 / 7.0 with `fx=0`,
+  4.4 / 7.5 and 4.5 / 6.8 on the phone's path; the build of before 4.2 / 6.4 (its effects) and 4.5 / 6.7 (`fx=0`).
+  Frame 17.0 ms (60 Hz) everywhere, worst 284 ms once with the effects, 45 to 69 ms otherwise. No difference out of
+  the noise. About ten particle effects start a second in such a match, the cap of 40 skips about 6% of them; the
+  managed heap is up to about 7 MB larger; the build's data grew by 0.53 MB compressed.
+- **Found on the way:** a lob's end was placed at an absolute height, wrong on any page whose floor is not at 0
+  (fixed); a bolt straight from the sky is seen end on by the 75 degree camera, so bolts come down from the top of
+  the screen; the first explosions were the size of a third of the screen (cut to about a tower and a half). Once,
+  a test page connected to Photon without asking its identity ("Authentication type 'None' not supported", 21:25);
+  the next four connected normally; not investigated.
+- **Not checked:** a phone (GPU overdraw of the additive flares and particles, the lighter path on a real device),
+  the owner's eye on how loud the flashes are in a busy fight, the lasting effects on a target that moves fast.
+**Next action:** the owner's eye on the sheets and a match on a computer; `?perf=1` on the phone with and without
+`fx=0`; tune the flash sizes from that.
+
 **17 October 2026, 20:10 (the specials in 3D; on `main`, built `20261017T175516922Z`, not deployed).**
 - **Asked by the owner:** some attacks were "not in 3D, just sprites thrown on the attack". **Implemented**
   (`game/README.md`, "The specials in 3D"): the five specials, which come from the Eyes trait, are 3D objects
