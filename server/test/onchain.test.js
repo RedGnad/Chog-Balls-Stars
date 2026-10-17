@@ -93,3 +93,21 @@ test('the money of an address in the rental is read from the records on chain', 
   ]);
   assert.deepEqual(asRenter.toSettle, [16, 1795]);
 });
+
+test('a stand-in plays its Genesis only while its NFT is held, and a setting must be well formed', async () => {
+  const { createStandIns, parseStandIns } = await import('../src/standin.js');
+  assert.deepEqual(parseStandIns(''), []);
+  assert.throws(() => parseStandIns('0x123:1=1795'));
+  assert.throws(() => parseStandIns('0x' + 'c'.repeat(40) + ':1=1970'));
+
+  const keeper = '0x' + 'd'.repeat(40);
+  let holder = keeper;
+  const chain = { call: async () => '0x' + word(holder) };
+  const standIns = createStandIns({ chain, setting: '0x' + 'c'.repeat(40) + ':42=1795' });
+  assert.deepEqual(await standIns.genesisOf(keeper), [1795]);
+  assert.equal(await standIns.standsIn(keeper, 1795), true);
+  assert.equal(await standIns.standsIn(keeper, 16), false);
+  holder = '0x' + 'e'.repeat(40);
+  assert.deepEqual(await standIns.genesisOf(keeper), [], 'sold, the stand-in no longer plays');
+  assert.deepEqual(await createStandIns({ chain, setting: '' }).genesisOf(keeper), []);
+});

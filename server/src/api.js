@@ -60,7 +60,7 @@ async function bodyOf(request) {
  *   beside these services, or a function that reads it; empty when they do not know
  * @returns {(request: Request) => Promise<Response>}
  */
-export function createApi({ chain, sessions, careers, shop, rental, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
+export function createApi({ chain, sessions, careers, shop, rental, standIns, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
   // The page a wallet is asked to trust: it is written in the message the player signs.
   function pageOf(request, url) {
     const origin = publicOrigin
@@ -97,9 +97,12 @@ export function createApi({ chain, sessions, careers, shop, rental, photon, phot
       const address = url.searchParams.get('address');
       if (!isAddress(address)) return failure(400, 'bad_address', 'address must be 0x followed by 40 hex digits');
       const owned = await chain.ownedBy(address);
+      // A Genesis this address plays through a stand-in it holds (standin.js) is listed with its own.
+      const standingIn = standIns ? await standIns.genesisOf(address) : [];
+      const tokens = [...new Set([...owned.tokens, ...standingIn])].sort((a, b) => a - b);
       return json(200, {
         address: address.toLowerCase(), chainId: CHAIN_ID, contract: GENESIS,
-        tokens: owned.tokens, block: owned.block,
+        tokens, block: owned.block, ...(standingIn.length > 0 ? { standIns: standingIn } : {}),
       });
     },
 

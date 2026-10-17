@@ -59,7 +59,7 @@ const refused = (error, message) => ({ status: 400, body: { Status: 400, Error: 
  *   room of another build is refused. Empty when the services do not know what they serve:
  *   every room is then accepted
  */
-export function createPhoton({ secret, sessions, careers, chain, shop, rental, matches, onReplayEnded, build = '' }) {
+export function createPhoton({ secret, sessions, careers, chain, shop, rental, standIns, matches, onReplayEnded, build = '' }) {
   if (typeof secret !== 'string' || secret.length < 32) throw new Error('The Photon secret must be at least 32 characters');
   const servedNow = typeof build === 'function' ? build : async () => build;
 
@@ -87,12 +87,14 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, m
     return { status: 200, body: { ResultCode: 1, UserId: randomName('visitor-'), AuthCookie: { visitor: true } } };
   }
 
-  // How the player behind a cookie may play that Genesis now: 'holder', 'renter', 'guest', or null.
+  // How the player behind a cookie may play that Genesis now: 'holder', 'renter', 'guest',
+  // 'stand-in' (standin.js: never counted for a career), or null.
   async function rightTo(tokenId, cookie) {
     if (!Number.isInteger(tokenId) || tokenId < 1 || tokenId > LAST_TOKEN_ID) return null;
     if (isAddress(cookie?.address)) {
       if ((await chain.holds(cookie.address, tokenId)).holds) return 'holder';
-      return rental && await rental.isRenting(tokenId, cookie.address) ? 'renter' : null;
+      if (rental && await rental.isRenting(tokenId, cookie.address)) return 'renter';
+      return standIns && await standIns.standsIn(cookie.address, tokenId) ? 'stand-in' : null;
     }
     const pass = cookie?.pass;
     if (pass && pass.tokenId === tokenId && isAddress(pass.lender)) {
@@ -128,7 +130,7 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, m
     await matches.admitted(request.GameId, {
       userId: request.UserId, actorNr: numberOf(request.ActorNr), playerSlot: numberOf(request.PlayerSlot),
       address: isAddress(cookie.address) ? cookie.address : null, lender: right === 'guest' ? cookie.pass.lender : null,
-      right, tokenId, form, askedToken, askedForm,
+      right, tokenId, form, askedToken, askedForm, ...(right === 'stand-in' ? { standIn: true } : {}),
     });
 
     if (!asked || typeof asked !== 'object') return accepted();

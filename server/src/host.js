@@ -30,6 +30,9 @@
 //   WAGER_ADDRESS   optional, the deployed wager contract (contracts/src/ChogWager.sol), with
 //   REFEREE_KEY     the key of its referee, 64 hex digits: together or not at all. Without
 //                   them no match is staked on
+//   STAND_INS       optional, "0xCollection:tokenId=genesisTokenId[,...]": the holder of that NFT
+//                   plays that Genesis without holding it, to film or test it (standin.js); it
+//                   writes no career. Empty in the public game
 //   CAREERS_ADDRESS optional, the careers register on Monad mainnet (contracts/src/ChogCareers.sol);
 //                   needs REFEREE_KEY, whose address writes it and pays its gas. Without it the
 //                   careers are kept in a file of DATA_DIR, lost when a free host restarts
@@ -65,6 +68,7 @@ import { createRental } from './rental.js';
 import { createSender } from './sender.js';
 import { createSessions } from './session.js';
 import { createShop } from './shop.js';
+import { createStandIns } from './standin.js';
 import { createStatic, movedToPublic } from './static.js';
 import { createWager, wagerNetwork } from './wager.js';
 
@@ -92,6 +96,7 @@ const rpcUrls = (environment.RPC_URLS ?? '').split(',').map(url => url.trim()).f
 const chain = createChain({ rpcUrls: rpcUrls.length > 0 ? rpcUrls : DEFAULT_RPC_URLS });
 const shop = createShop({ chain, address: (environment.SHOP_ADDRESS ?? '').trim() });
 const rental = createRental({ chain, address: (environment.RENTAL_ADDRESS ?? '').trim() });
+const standIns = createStandIns({ chain, setting: environment.STAND_INS ?? '' });
 const sessions = createSessions({ secret: await sessionSecret(dataFolder, environment.SESSION_SECRET) });
 
 const matchStore = matchFiles(join(dataFolder, 'matches'));
@@ -183,11 +188,12 @@ const api = createApi({
   chain,
   shop,
   rental,
+  standIns,
   careers,
   sessions,
   photon: createPhoton({
     secret: await photonSecret(dataFolder, environment.PHOTON_SECRET),
-    sessions, careers, chain, shop, rental, matches, build,
+    sessions, careers, chain, shop, rental, standIns, matches, build,
     onReplayEnded: judge ? gameId => judgeAndRecord(gameId) : undefined,
   }),
   build,
