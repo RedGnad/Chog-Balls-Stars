@@ -553,6 +553,16 @@ eyes made to show from above, which is the 3D work, not the camera).
 **Next action:** listen to the sounds and the two loops on a computer and a phone and keep or replace them; measure
 `?perf=1` on the phone with and without `?fx=0`; then directional impacts and the attacker's kick (DESIGN-BRIEF, Juice).
 
+**17 October 2026, 19:25 (Photon accepts again; the stamp build is online).**
+- Photon refused new versions from 18:41 to at least 18:56 and accepted again at 19:17 (the retry script): the
+  limit counts versions in use over some time, about half an hour here; Photon publishes no figure.
+- **Deployed** build `20261017T165404384Z`, the first that names itself to Photon `sim-f4a81f1ddbd919b6`
+  (RELEASE.json `simulation`); Render serves it; a visitor's match on the public site started at 19:23 (an
+  admission recorded, the scoreboard running). The judge agrees on the recorded fixtures.
+- **The controller's lob:** a whole match with five controller bots and a recruit controller ran with no
+  exception in the console; the arc, shadow and landing ring were **not** made out in the captures (the
+  headless film is too coarse for a throw). To see on a real screen.
+
 **17 October 2026, 19:00 (deployed, then Photon's limit; the owner's questions on v3, music and attacks).**
 - **Deployed and seen online** (build `20261017T155745998Z` on chogarena.vercel.app and Render, the judge
   agreeing on the recorded fixtures): the home, hero sheet, collection of 1,969 (42 pages of 48 portraits,
