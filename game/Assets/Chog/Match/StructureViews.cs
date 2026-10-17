@@ -59,6 +59,9 @@ namespace Chog.Match
             public Vector3 AimAt;
             public float AimUntil;
             public bool Alarmed;
+            // Whom a tower watches between its shots: the hero it shoots next, as the simulation picks it.
+            public bool Watching;
+            public Vector3 WatchAt;
             // Whether the bar of a 3D model was put over it, which needs the camera.
             public bool BarPlaced;
             // When it was last hit (below 0: not since it settled), and the size of its model at rest.
@@ -80,6 +83,12 @@ namespace Chog.Match
         private static readonly int FlashId = Shader.PropertyToID("_Flash");
         private MaterialPropertyBlock _flashBlock;
         private readonly List<Renderer> _flashRenderers = new List<Renderer>();
+
+        // The core is drawn this much larger than its model: the owner found it too small to notice
+        // (17 October), while it is what a team loses the match with. Its collision circle stays 0.75.
+        public const float CoreScale = 1.5f;
+        // How much the heart of a core swells on each beat.
+        private const float HeartBeat = 0.14f;
 
         // How long the tower's head stays turned to whom it shot, and how fast it turns.
         private const float AimSeconds = 0.9f;
@@ -312,6 +321,8 @@ namespace Chog.Match
 
                     drawing.Seen = true;
                     drawing.Root.transform.position = place.Position.ToUnityVector3();
+                    drawing.Watching = !health.IsDead && structure.Range > 0
+                                       && NextTarget(frame, team.Index, place.Position, structure.Range, out drawing.WatchAt);
                     drawing.Alarmed = !health.IsDead && structure.AlarmUntil > now;
                     if (health.IsDead != drawing.Ruined)
                     {
@@ -351,8 +362,9 @@ namespace Chog.Match
             if (_camera == null)
                 return;
 
-            // A 3D model faces the camera across the ground; the tower turns its head to whom it shoots,
-            // the heart of the core beats, faster while it is hit.
+            // A tower faces the middle of the arena, so the two sides face each other, and turns its head
+            // to whom it shoots next (the owner, 17 October: the towers "all looked down"); a core faces
+            // the camera, its heart seen from the front; the heart beats, faster while it is hit.
             var toCamera = -_camera.forward;
             toCamera.y = 0f;
             var facing = toCamera.sqrMagnitude > 1e-4f ? Quaternion.LookRotation(toCamera.normalized) : Quaternion.identity;
@@ -363,15 +375,19 @@ namespace Chog.Match
                 if (drawing.Model == null)
                     continue;
 
-                drawing.Model.rotation = facing;
+                var middle = drawing.Kind == EStructureKind.Tower ? TowardTheMiddle(drawing.Root.transform.position) : Vector3.zero;
+                var rest = middle != Vector3.zero ? Quaternion.LookRotation(middle) : facing;
+                drawing.Model.rotation = rest;
                 if (!drawing.BarPlaced)
                     PlaceBar(drawing);
                 if (drawing.Head != null && !drawing.Ruined)
                 {
-                    var wanted = facing;
-                    if (Time.time < drawing.AimUntil)
+                    var wanted = rest;
+                    var watched = Time.time < drawing.AimUntil ? drawing.AimAt
+                        : drawing.Watching ? drawing.WatchAt : (Vector3?)null;
+                    if (watched.HasValue)
                     {
-                        var toTarget = drawing.AimAt - drawing.Head.position;
+                        var toTarget = watched.Value - drawing.Head.position;
                         toTarget.y = 0f;
                         if (toTarget.sqrMagnitude > 1e-4f)
                             wanted = Quaternion.LookRotation(toTarget.normalized);
@@ -400,7 +416,7 @@ namespace Chog.Match
                 {
                     var beats = drawing.Alarmed ? 3.2f : 1.3f;
                     var pulse = Mathf.Pow(Mathf.Abs(Mathf.Sin(Time.time * Mathf.PI * beats)), 6f);
-                    drawing.Heart.localScale = Vector3.one * (1f + 0.08f * pulse);
+                    drawing.Heart.localScale = Vector3.one * (1f + HeartBeat * pulse);
                 }
             }
         }
@@ -501,6 +517,8 @@ namespace Chog.Match
             if (drawing.Model == null)
                 return;
             drawing.HitAt = -1f;
+            if (drawing.Kind == EStructureKind.Core)
+                drawing.Model.localScale *= CoreScale;
             drawing.ModelScale = drawing.Model.localScale;
 
             drawing.Head = PartOf(drawing.Model, ChogStructureModel.HeadPart);
@@ -512,7 +530,39 @@ namespace Chog.Match
                 drawing.Head.gameObject.SetActive(false);
             if (drawing.Heart != null)
                 drawing.Heart.gameObject.SetActive(false);
-            drawing.Model.localScale = new Vector3(1f, 0.55f, 1f);
+            drawing.Model.localScale = Vector3.Scale(drawing.ModelScale, new Vector3(1f, 0.55f, 1f));
+        }
+
+        /// <summary>
+        /// The way, on the ground, from a structure standing at "at" to the middle of the arena (the origin,
+        /// between the two sides); zero at the very middle.
+        /// </summary>
+        public static Vector3 TowardTheMiddle(Vector3 at)
+        {
+            var toMiddle = new Vector3(-at.x, 0f, -at.z);
+            return toMiddle.sqrMagnitude > 1e-4f ? toMiddle.normalized : Vector3.zero;
+        }
+
+        // The hero a tower of "team" at "from" shoots next, as Structures.Shoot in the simulation picks it:
+        // the nearest living hero of another team within "range", the first found at equal distance.
+        private static bool NextTarget(Frame frame, int team, Photon.Deterministic.FPVector2 from, Photon.Deterministic.FP range, out Vector3 at)
+        {
+            at = default;
+            var found = false;
+            var nearest = range * range;
+            var heroes = frame.Filter<Character, Transform2D, TeamInfo, Health>();
+            while (heroes.Next(out _, out _, out var place, out var heroTeam, out var heroHealth))
+            {
+                if (heroTeam.Index == team || heroHealth.IsDead)
+                    continue;
+                var distance = Photon.Deterministic.FPVector2.DistanceSquared(from, place.Position);
+                if (distance > nearest || (distance == nearest && found))
+                    continue;
+                nearest = distance;
+                at = place.Position.ToUnityVector3();
+                found = true;
+            }
+            return found;
         }
 
         // The parts of a 3D structure drawn with the heroes' material turn that white (0: their colours).
