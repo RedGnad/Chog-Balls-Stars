@@ -502,6 +502,21 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**17 October 2026, morning (the owner sells #1287 this afternoon and tests what needs it this morning; the domain
+is bought later).**
+- **Read on the chain that morning:** the Ledger holds token 1795, 39.03 $CHOG and 79.4 MON; #1287 is not offered
+  for rent; its career on Render is empty (0 matches).
+- **How a Genesis stays playable after the sale, without faking ownership:** a rental paid before the sale runs to
+  its end (`ChogRental.sol`, at most 30 days from the payment); an offer from a former holder no longer stands; a
+  free loan pass stops with the holding. A test wallet was made on this Mac for that
+  (`0xa69B8e6Bc63426868e7eF1FE0272E80A6de73AbB`, key in `.artifacts/test-renter/key`, never printed);
+  `tools/contracts/rent_as_test_wallet.sh 1795 30` rents with it (run by the owner, since it pays). The scripted
+  browser plays as that renter with `CHOG_BROWSER_WALLET_KEY`.
+- **Known limits for judging:** careers and records on Render's free plan are lost at each restart of the service
+  (each deploy among them); after the sale RENT A HERO is empty unless another holder offers a Genesis.
+**Next action:** the owner's session with #1287 (sign-in, a match in SECOND FORM, RENT IT OUT at 1 $CHOG, LEND IT),
+the test wallet funded and renting #1287 for 30 days, the holder's shots for the video; then where careers are kept.
+
 **16 October 2026, 21:40 (the game is Chog Arena, at https://chogarena.vercel.app).**
 - **Name:** the owner named the game Chog Arena (menu title, page name, manifest, share text, sign-in message);
   Chog Genesis stays the collection's name.
