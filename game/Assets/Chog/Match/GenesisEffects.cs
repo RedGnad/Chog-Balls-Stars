@@ -328,6 +328,12 @@ namespace Chog.Match
                 cfxr.clearBehavior = CFXR_Effect.ClearBehavior.None;
             foreach (var light in GetComponentsInChildren<Light>(true))
                 light.enabled = false;
+            // Sparks and smoke cast no shadow worth the computer's shadow pass (13 of the pack's renderers did).
+            foreach (var drawn in GetComponentsInChildren<ParticleSystemRenderer>(true))
+            {
+                drawn.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                drawn.receiveShadows = false;
+            }
             for (var i = 0; i < _systems.Length; i++)
             {
                 var main = _systems[i].main;
@@ -440,6 +446,24 @@ namespace Chog.Match
                 End();
         }
 
+        /// <summary>
+        /// Shows the effect frozen a quarter of a second in, every system at once (those that start late too),
+        /// so that it is drawn on the next frame: the warm-up of its shaders (ChogFxRunner).
+        /// </summary>
+        internal void ShowFrozen()
+        {
+            if (_root != null)
+                _root.Simulate(0.25f, true, true);
+        }
+
+        /// <summary>Ends the effect at once, its particles cleared, and keeps it for the next one of its kind.</summary>
+        internal void EndNow()
+        {
+            if (_root != null)
+                _root.Clear(true);
+            End();
+        }
+
         private void End()
         {
             if (_playing)
@@ -518,11 +542,17 @@ namespace Chog.Match
     /// Runs the effects asked for later (a structure that falls in several blasts), and makes a copy of every
     /// effect, one a frame, while a match loads (Warm), on one object of the game.
     /// </summary>
-    internal sealed class ChogFxRunner : MonoBehaviour
+    public sealed class ChogFxRunner : MonoBehaviour
     {
         private static ChogFxRunner s_runner;
         private readonly List<(float At, System.Action Action)> _waiting = new List<(float, System.Action)>();
         private readonly Queue<ChogFx> _warming = new Queue<ChogFx>();
+        // The effect drawn out of sight to compile its shaders, and the frame it was shown on.
+        private ChogFxPlayback _warmShown;
+        private int _warmShownAt;
+        private bool _lightsToWarm;
+        // How far under the floor the warm-up is drawn: in the camera's view, hidden by the floor.
+        private const float WarmDepth = 3f;
 
         public static void After(float seconds, System.Action action)
         {
@@ -538,6 +568,21 @@ namespace Chog.Match
             runner._warming.Clear();
             foreach (ChogFx effect in System.Enum.GetValues(typeof(ChogFx)))
                 runner._warming.Enqueue(effect);
+            runner._lightsToWarm = true;
+        }
+
+        /// <summary>
+        /// A point in the camera's view, "WarmDepth" under the floor: what is drawn there is sent to the graphics
+        /// card, so its shaders are compiled, and hidden by the floor. False without a camera looking down.
+        /// </summary>
+        public static bool WarmPoint(Vector3 camera, Vector3 forward, out Vector3 at)
+        {
+            at = default;
+            if (forward.y > -0.2f)
+                return false;
+            var along = (camera.y + WarmDepth) / -forward.y;
+            at = camera + forward * along;
+            return true;
         }
 
         private static ChogFxRunner Runner()
@@ -553,8 +598,41 @@ namespace Chog.Match
 
         private void Update()
         {
-            if (_warming.Count > 0)
-                GenesisEffects.MakeSpare(_warming.Dequeue());
+            // Each effect is made, then drawn once out of sight under the floor while the match loads: a browser
+            // compiles a shader the first time it is drawn, which stalled the frame of a fight (the phone's worst
+            // frames, 158 to 1,552 ms, docs/PERF-AUDIT.md, Q3). One at a time, two frames each.
+            if (_warmShown != null && Time.frameCount >= _warmShownAt + 2)
+            {
+                _warmShown.EndNow();
+                _warmShown = null;
+            }
+            if (_warmShown == null && _warming.Count > 0)
+            {
+                var effect = _warming.Dequeue();
+                GenesisEffects.MakeSpare(effect);
+                var view = Camera.main;
+                if (view != null && WarmPoint(view.transform.position, view.transform.forward, out var at))
+                {
+                    _warmShown = GenesisEffects.Play(effect, at, 1f);
+                    if (_warmShown != null)
+                    {
+                        _warmShown.ShowFrozen();
+                        _warmShownAt = Time.frameCount;
+                    }
+                }
+            }
+            else if (_warmShown == null && _lightsToWarm)
+            {
+                _lightsToWarm = false;
+                var view = Camera.main;
+                if (view != null && WarmPoint(view.transform.position, view.transform.forward, out var at))
+                {
+                    // The rings, columns and pools of light lie on the floor, where they would show: they share the
+                    // flare's material, so the flare alone (without its pool) warms them.
+                    ChogLight.Flash(at, Color.white, 1f, 0.05f, 4, false);
+                    ChogLightning.Strike(at + Vector3.up, at, Color.white, 0.05f);
+                }
+            }
 
             for (var i = _waiting.Count - 1; i >= 0; i--)
             {

@@ -101,6 +101,11 @@ namespace Chog.Screens
 
         private void OnDestroy() => StructureViews.ClockDrawnElsewhere = false;
 
+        private static readonly Color ShortColour = ChogTheme.Hex("FF7A7F");
+        private int _oursShown = int.MinValue;
+        private int _theirsShown = int.MinValue;
+        private int _clockShown = int.MinValue;
+
         private unsafe void Update()
         {
             var game = QuantumRunner.Default != null ? QuantumRunner.Default.Game : null;
@@ -108,9 +113,12 @@ namespace Chog.Screens
             var playing = frame != null && frame.Global->State == GameState.Playing;
             // Nothing to count during the team preparation, nor once the end screen is up.
             var shown = playing && !ChogResultScreen.IsShown;
-            foreach (Transform child in transform)
-                if (child.gameObject != _clockPlate && child.gameObject.activeSelf != shown)
-                    child.gameObject.SetActive(shown);
+            for (var i = 0; i < transform.childCount; i++)
+            {
+                var child = transform.GetChild(i).gameObject;
+                if (child != _clockPlate && child.activeSelf != shown)
+                    child.SetActive(shown);
+            }
             if (!shown)
                 _clockPlate.SetActive(false);
             if (!shown)
@@ -127,10 +135,19 @@ namespace Chog.Screens
 
             var teams = frame.ResolveList(frame.Global->TeamsData);
             var mine = LocalTeam(game, frame) == 1 ? 1 : 0;
+            // A text only when its number changes: a string a frame each otherwise.
             if (teams.Count >= 2)
             {
-                _ours.text = teams[mine].Score.ToString();
-                _theirs.text = teams[1 - mine].Score.ToString();
+                if (teams[mine].Score != _oursShown)
+                {
+                    _oursShown = teams[mine].Score;
+                    _ours.text = _oursShown.ToString();
+                }
+                if (teams[1 - mine].Score != _theirsShown)
+                {
+                    _theirsShown = teams[1 - mine].Score;
+                    _theirs.text = _theirsShown.ToString();
+                }
             }
 
             // A siege has a clock from its start; coins only while a team holds the countdown.
@@ -138,8 +155,13 @@ namespace Chog.Screens
             if (_clockPlate.activeSelf != running)
                 _clockPlate.SetActive(running);
             var left = siege ? MatchModes.SiegeTimeLeft(frame).AsFloat : frame.Global->MatchTimer.AsFloat;
-            _clock.text = StructureViews.ClockText(left);
-            _clock.color = left <= ShortSeconds ? ChogTheme.Hex("FF7A7F") : ChogTheme.Cream;
+            var whole = Mathf.Max(0, Mathf.CeilToInt(left));
+            if (whole != _clockShown)
+            {
+                _clockShown = whole;
+                _clock.text = StructureViews.ClockText(left);
+                _clock.color = left <= ShortSeconds ? ShortColour : ChogTheme.Cream;
+            }
             _caption.text = siege ? "DAMAGE TO TOWERS" : running ? "COINS, THE CLOCK RUNS" : "COINS";
         }
 

@@ -41,9 +41,12 @@ namespace Chog.Screens
         /// <summary>Seconds before the question is asked again after its "failures"-th failure (from 1).</summary>
         public static float RetryDelay(int failures) => Mathf.Min(15f, 2f * Mathf.Pow(2f, Mathf.Max(0, failures - 1)));
 
-        private const string NotAsked = "";
-        // What the menu was last given: null until then, so that the first frame applies it.
-        private string _given;
+        // What the menu was last given: whether asked, then the parameter and its value, compared each
+        // frame without building a text (the session token is long); not given until the first frame.
+        private bool _givenOnce;
+        private bool _givenAsked;
+        private string _givenName;
+        private string _givenValue;
 
         [System.Serializable]
         private sealed class Answer
@@ -70,7 +73,7 @@ namespace Chog.Screens
             DontDestroyOnLoad(host);
             var identity = host.AddComponent<PhotonIdentity>();
             // A menu scene loaded again has new connection settings: they are given again.
-            SceneManager.sceneLoaded += (scene, mode) => identity._given = null;
+            SceneManager.sceneLoaded += (scene, mode) => identity._givenOnce = false;
             // Asked on this object: the wallet's own may not exist yet at this point of the start.
             identity.StartCoroutine(identity.Ask());
         }
@@ -116,8 +119,7 @@ namespace Chog.Screens
         {
             var asked = SignInNeededToPlay;
             var (name, value) = asked ? Credential(PlayerWallet.Session, GuestPass.Pass) : (null, null);
-            var wanted = asked ? name + "=" + value : NotAsked;
-            if (wanted == _given)
+            if (_givenOnce && asked == _givenAsked && string.Equals(name, _givenName) && string.Equals(value, _givenValue))
                 return;
 
             var menu = FindAnyObjectByType<QuantumMenuUIController>(FindObjectsInactive.Include);
@@ -131,12 +133,15 @@ namespace Chog.Screens
                     values.AddAuthParameter(name, value);
                 menu.ConnectArgs.AuthValues = values;
             }
-            else if (_given != null)
+            else if (_givenOnce)
             {
                 // Assumed before the services said they do not ask: the menu connects as it always did.
                 menu.ConnectArgs.AuthValues = null;
             }
-            _given = wanted;
+            _givenOnce = true;
+            _givenAsked = asked;
+            _givenName = name;
+            _givenValue = value;
         }
     }
 }

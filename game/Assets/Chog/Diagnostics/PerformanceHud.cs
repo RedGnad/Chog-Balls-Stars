@@ -96,6 +96,8 @@ namespace Chog.Diagnostics
         private Vector2 _size;
         private bool _layoutDirty = true;
 
+        private const string CombatLogFlag = "combatlog";
+
         [Preserve]
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -109,7 +111,10 @@ namespace Chog.Diagnostics
             var host = new GameObject("Chog Performance HUD");
             DontDestroyOnLoad(host);
             host.AddComponent<PerformanceHud>();
-            host.AddComponent<CombatLog>();
+            // The log of every cast and hit writes about ten lines a second with their stack traces: a
+            // measured run paid for it (docs/PERF-AUDIT.md, 2.3). Asked for apart, with "combatlog=1".
+            if (PerformanceSampling.HasQueryFlag(url, CombatLogFlag))
+                host.AddComponent<CombatLog>();
             host.AddComponent<InputProbe>();
         }
 

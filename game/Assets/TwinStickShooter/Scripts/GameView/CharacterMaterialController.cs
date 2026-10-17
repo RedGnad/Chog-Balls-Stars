@@ -33,15 +33,24 @@ namespace TwinStickShooter
       }
     }
 
+    // Which set the renderer wears, so that the view's call of every frame swaps it only on a change
+    // (it assigned the materials of each hidden sample mesh every frame).
+    private bool? _wearsInvisible;
+
     public void SetInvisibleMaterial()
     {
+      if (_meshRenderer == null || _wearsInvisible == true)
+        return;
       _meshRenderer.materials = _invisibleMaterial;
+      _wearsInvisible = true;
     }
 
     public void SetVisible()
     {
-      if (_meshRenderer != null)
-        _meshRenderer.materials = _originalMaterials;
+      if (_meshRenderer == null || _wearsInvisible == false)
+        return;
+      _meshRenderer.materials = _originalMaterials;
+      _wearsInvisible = false;
     }
   }
 }
