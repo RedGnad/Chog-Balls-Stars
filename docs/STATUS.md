@@ -523,7 +523,7 @@ is bought later).**
   and whose unused days are paid back (payment held by the contract), and a staging setup on Monad testnet (a test
   collection, test $CHOG, the three contracts, services on this Mac with a second Photon application), the code
   the same and the addresses set by configuration (today `server/src/chain.js` fixes the collection and chain 143).
-- **Seen at 10:00:** #1287's career on Render still reads 0 matches although the owner says they played it.
+- **Seen at 08:30:** #1287's career on Render still reads 0 matches although the owner says they played it.
 **Next action:** the owner's answer on the rental rule and on the staging setup; the holder's shots for the video
 before the sale; why the owner's match left no career.
 
