@@ -1,59 +1,28 @@
-using System;
 using System.Collections.Generic;
-using System.Globalization;
+using Chog.Match;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Chog.Screens
 {
     /// <summary>
-    /// Paints the arena in the colours of the game. The sample's dungeon (planks, stone walls, crates,
-    /// the plants heroes hide in, a chest) is made of a few shared materials of one flat colour each,
-    /// named by the pack they come from; each takes a colour of the Chog night here. Only colours
-    /// change: the shapes, the colliders and the simulation are the sample's, and the heroes, lit by
-    /// their own shader, are not touched.
-    /// A private option tries other colours on a page without a build:
-    /// "arena=floor:2b2257,plant:34c38f" (a role or a material name, then a colour in hex).
+    /// Paints and lights the arena in the colours of the game. The sample's dungeon (planks, stone
+    /// walls, crates, the plants heroes hide in, a chest) is made of a few shared materials of one
+    /// flat colour each, named by the pack they come from; each takes a colour of a palette of
+    /// Chog.Match.ArenaPalettes ("Chog night" by default, "Chog day" to compare) and, since
+    /// 17 October 2026, the shader Chog/Arena (a diffuse matcap, a soft violet shadow), with the
+    /// light of the match set by Chog.Match.ChogMatchLook. The shapes, the colliders and the
+    /// simulation are the sample's.
+    /// A page option tries other colours without a build: "arena=day", or
+    /// "arena=floor:2b2257,plant:34c38f" (a role or a material name, then a colour in hex) laid over
+    /// the palette named first ("arena=day,floor:6fa03c"). "?matchlook=0" shows the look of before.
     /// </summary>
     public static class ChogArenaSkin
     {
         /// <summary>The scene of the arena; the menu has none of these materials, but is left alone anyway.</summary>
         public const string ArenaScene = "Gameplay";
 
-        /// <summary>The colour each material of the arena takes, by its name in the pack.</summary>
-        internal static readonly Dictionary<string, Color> Colours = new Dictionary<string, Color>
-        {
-            // The planks of the floor: a deep indigo, darker than every hero so they stand out.
-            { "WoodDark", ChogTheme.Hex("262052") },
-            // The walls around the arena: the night, a little lighter on their faces.
-            { "Stone", ChogTheme.Hex("2C2358") },
-            { "StoneDark", ChogTheme.Hex("16112E") },
-            // The crates: lavender frames around deep purple planks, lighter than the floor and darker
-            // than the heroes (brighter crates were tried and drew the eye away from the fight).
-            { "Metal", ChogTheme.Hex("A194F0") },
-            { "BrownDark", ChogTheme.Hex("3F3192") },
-            // The plants heroes hide in: a mint that no Chog wears.
-            { "Green", ChogTheme.Hex("2BC48F") },
-            // The chest: gold and cheek pink.
-            { "Gold", ChogTheme.Gold },
-            { "Red", ChogTheme.Cheek },
-        };
-
-        /// <summary>Short names of the option for the materials, by what they are in the arena.</summary>
-        internal static readonly Dictionary<string, string> Roles = new Dictionary<string, string>
-        {
-            { "floor", "WoodDark" },
-            { "wall", "Stone" },
-            { "walldark", "StoneDark" },
-            { "frame", "Metal" },
-            { "crate", "BrownDark" },
-            { "plant", "Green" },
-            { "gold", "Gold" },
-            { "red", "Red" },
-        };
-
-        /// <summary>The flat light of the arena, a violet in place of the sample's blue grey.</summary>
-        internal static readonly Color Ambient = ChogTheme.Hex("6A62A0");
+        public const string ArenaShaderResource = "ChogArena";
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Watch()
@@ -64,25 +33,66 @@ namespace Chog.Screens
 
         private static void Paint(Scene scene)
         {
-            if (!scene.IsValid() || scene.name != ArenaScene)
+            if (!scene.IsValid())
                 return;
+            if (scene.name != ArenaScene)
+            {
+                ChogMatchLook.LeaveArena();
+                return;
+            }
 
-            var colours = WithOption(Colours, Application.absoluteURL);
+            // The rings under the heroes take the colours of the screens' roles.
+            ChogTeamRing.Self = ChogTheme.Confirm;
+            ChogTeamRing.Ally = ChogTheme.Ally;
+            ChogTeamRing.Enemy = ChogTheme.Enemy;
+
+            var option = ArenaPalettes.OptionOf(Application.absoluteURL);
+            var colours = ArenaPalettes.Resolve(option, out var ambientGiven);
+            ChogMatchLook.TuneArena(ArenaPalettes.TuningOf(ArenaPalettes.NameOf(option)));
+            var shader = ChogMatchLook.Has(MatchLookParts.Part.Shade) ? ArenaShader() : null;
+            var roots = scene.GetRootGameObjects();
             var painted = new HashSet<Material>();
-            foreach (var root in scene.GetRootGameObjects())
+            foreach (var root in roots)
             foreach (var drawn in root.GetComponentsInChildren<Renderer>(true))
             foreach (var material in drawn.sharedMaterials)
             {
                 if (material == null || !painted.Add(material) || !material.HasProperty("_Color"))
                     continue;
-                if (colours.TryGetValue(NameOf(material), out var colour))
-                    material.color = colour;
+                var named = colours.TryGetValue(NameOf(material), out var hex);
+                if (named)
+                    material.color = ColourOf(hex);
+                // Every opaque material of the arena's own shapes drawn with Unity's standard shader takes
+                // the matcap, painted or not, so that nothing in the arena keeps the light of before.
+                if (shader != null && material.shader != null && material.shader.name == "Standard" && drawn is MeshRenderer
+                    && material.renderQueue <= (int)UnityEngine.Rendering.RenderQueue.GeometryLast)
+                    material.shader = shader;
             }
 
-            if (colours.TryGetValue("ambient", out var ambient))
-                RenderSettings.ambientLight = ambient;
-            else
-                RenderSettings.ambientLight = Ambient;
+            var paletteAmbient = ColourOf(colours[ArenaPalettes.Ambient]);
+            ChogMatchLook.LightArena(roots, paletteAmbient, ambientGiven ? paletteAmbient : (Color?)null);
+            ChogMatchPost.Attach(roots);
+        }
+
+        private static Shader s_arenaShader;
+
+        private static Shader ArenaShader()
+        {
+            if (s_arenaShader != null)
+                return s_arenaShader;
+            var shader = Resources.Load<Shader>(ArenaShaderResource);
+            if (shader == null || !shader.isSupported)
+            {
+                Debug.LogWarning("CHOG_ARENA the shader Chog/Arena is missing or not supported: the arena keeps Unity's standard shader");
+                return null;
+            }
+            s_arenaShader = shader;
+            return shader;
+        }
+
+        private static Color ColourOf(string hex)
+        {
+            var (r, g, b) = ArenaPalettes.Rgb(hex);
+            return new Color(r, g, b);
         }
 
         /// <summary>The name a material has in the pack: a copy made at run time ends in " (Instance)".</summary>
@@ -90,55 +100,9 @@ namespace Chog.Screens
         {
             var name = material.name;
             const string copy = " (Instance)";
-            while (name.EndsWith(copy, StringComparison.Ordinal))
+            while (name.EndsWith(copy, System.StringComparison.Ordinal))
                 name = name.Substring(0, name.Length - copy.Length);
             return name;
-        }
-
-        /// <summary>
-        /// The colours with those of the page's "arena=" option laid over them: "role:hex" pairs
-        /// separated by commas, a role being a short name of Roles, a material name, or "ambient".
-        /// Anything not understood is left out.
-        /// </summary>
-        internal static Dictionary<string, Color> WithOption(Dictionary<string, Color> colours, string url)
-        {
-            var result = new Dictionary<string, Color>(colours);
-            var option = OptionOf(url);
-            if (option.Length == 0)
-                return result;
-
-            foreach (var pair in option.Split(','))
-            {
-                var parts = pair.Split(':');
-                if (parts.Length != 2 || !TryHex(parts[1], out var colour))
-                    continue;
-                var role = parts[0].Trim();
-                result[Roles.TryGetValue(role.ToLowerInvariant(), out var material) ? material : role] = colour;
-            }
-            return result;
-        }
-
-        private static string OptionOf(string url)
-        {
-            if (string.IsNullOrEmpty(url))
-                return "";
-            var query = url.IndexOf('?');
-            if (query < 0)
-                return "";
-            foreach (var field in url.Substring(query + 1).Split('&', '#'))
-                if (field.StartsWith("arena=", StringComparison.Ordinal))
-                    return Uri.UnescapeDataString(field.Substring("arena=".Length));
-            return "";
-        }
-
-        private static bool TryHex(string text, out Color colour)
-        {
-            colour = default;
-            text = text.Trim().TrimStart('#');
-            if (text.Length != 6 || !int.TryParse(text, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var rgb))
-                return false;
-            colour = new Color(((rgb >> 16) & 255) / 255f, ((rgb >> 8) & 255) / 255f, (rgb & 255) / 255f);
-            return true;
         }
     }
 }
