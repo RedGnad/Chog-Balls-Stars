@@ -14,19 +14,34 @@ namespace Chog.Screens
     /// reach, which wallet or which pass it is. From then on the Genesis a player enters a match
     /// with is checked by the services when the player joins, not declared by the page.
     /// While the services do not say so the game connects as it always did.
+    /// Until they answer, a build assumes they do, as the public site's services say (a page that
+    /// connected with nothing was refused by Photon, "Authentication type 'None' not supported");
+    /// the Editor assumes they do not. A question that fails (a server waking or being replaced) is
+    /// asked again, a little later each time, until an answer comes: it used to be asked once, and a
+    /// player who opened the page during a restart could not play before reloading it.
     /// </summary>
     public sealed class PhotonIdentity : MonoBehaviour
     {
         public const string SessionParameter = "session";
         public const string PassParameter = "pass";
 
-        private static bool _asked;
+        // The answer of the game services: null until they gave one.
+        private static bool? _answer;
 
         /// <summary>
         /// Whether the game services check who plays: then a Genesis is only played by a wallet that
         /// signed in (or a guest with a pass), and a wallet that is only connected plays a recruit.
+        /// Before the services answer: what a build of the public site expects.
         /// </summary>
-        public static bool SignInNeededToPlay => _asked;
+        public static bool SignInNeededToPlay => AskedOrAssumed(_answer, Application.isEditor);
+
+        /// <summary>The services' answer, or before it what a build ("inEditor" false) assumes: asked.</summary>
+        public static bool AskedOrAssumed(bool? answer, bool inEditor) => answer ?? !inEditor;
+
+        /// <summary>Seconds before the question is asked again after its "failures"-th failure (from 1).</summary>
+        public static float RetryDelay(int failures) => Mathf.Min(15f, 2f * Mathf.Pow(2f, Mathf.Max(0, failures - 1)));
+
+        private const string NotAsked = "";
         // What the menu was last given: null until then, so that the first frame applies it.
         private string _given;
 
@@ -57,21 +72,51 @@ namespace Chog.Screens
             // A menu scene loaded again has new connection settings: they are given again.
             SceneManager.sceneLoaded += (scene, mode) => identity._given = null;
             // Asked on this object: the wallet's own may not exist yet at this point of the start.
-            identity.StartCoroutine(GameServices.Call("photon", null, null, (status, text) =>
+            identity.StartCoroutine(identity.Ask());
+        }
+
+        private System.Collections.IEnumerator Ask()
+        {
+            var failures = 0;
+            while (_answer == null)
             {
-                var answer = status == 200 && !string.IsNullOrEmpty(text) && text[0] == '{' ? JsonUtility.FromJson<Answer>(text) : null;
-                _asked = answer != null && answer.authentication;
-                Debug.Log("CHOG_PHOTON identity " + (_asked ? "asked by the game server" : "not asked"));
-            }));
+                long status = 0;
+                string text = null;
+                yield return GameServices.Call("photon", null, null, (code, answer) =>
+                {
+                    status = code;
+                    text = answer;
+                });
+                Answer read = null;
+                if (status == 200 && !string.IsNullOrEmpty(text) && text[0] == '{')
+                {
+                    try
+                    {
+                        read = JsonUtility.FromJson<Answer>(text);
+                    }
+                    catch (System.ArgumentException)
+                    {
+                        // Not the answer of the services: asked again below.
+                    }
+                }
+                if (read != null)
+                {
+                    _answer = read.authentication;
+                    Debug.Log("CHOG_PHOTON identity " + (read.authentication ? "asked by the game server" : "not asked"));
+                    yield break;
+                }
+                failures++;
+                var wait = RetryDelay(failures);
+                Debug.LogWarning($"CHOG_PHOTON the game server did not answer ({status}); asked again in {wait:0} s");
+                yield return new WaitForSecondsRealtime(wait);
+            }
         }
 
         private void Update()
         {
-            if (!_asked)
-                return;
-
-            var (name, value) = Credential(PlayerWallet.Session, GuestPass.Pass);
-            var wanted = name + "=" + value;
+            var asked = SignInNeededToPlay;
+            var (name, value) = asked ? Credential(PlayerWallet.Session, GuestPass.Pass) : (null, null);
+            var wanted = asked ? name + "=" + value : NotAsked;
             if (wanted == _given)
                 return;
 
@@ -79,11 +124,18 @@ namespace Chog.Screens
             if (menu == null || menu.ConnectArgs == null)
                 return;
 
-            var values = new AuthenticationValues { AuthType = CustomAuthenticationType.Custom };
-            if (name != null)
-                values.AddAuthParameter(name, value);
-
-            menu.ConnectArgs.AuthValues = values;
+            if (asked)
+            {
+                var values = new AuthenticationValues { AuthType = CustomAuthenticationType.Custom };
+                if (name != null)
+                    values.AddAuthParameter(name, value);
+                menu.ConnectArgs.AuthValues = values;
+            }
+            else if (_given != null)
+            {
+                // Assumed before the services said they do not ask: the menu connects as it always did.
+                menu.ConnectArgs.AuthValues = null;
+            }
             _given = wanted;
         }
     }
