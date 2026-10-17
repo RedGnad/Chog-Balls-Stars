@@ -1,10 +1,11 @@
 {
- "assembledAtUtc": "2026-10-17T16:07:43+00:00",
- "build": "20261017T155745998Z-483d96467ce94c4eacac7331d6d2fec9",
+ "assembledAtUtc": "2026-10-17T17:20:38+00:00",
+ "build": "20261017T165404384Z-0c20e5670d4d42b985c2ae3a24f35125",
  "rulesetVersion": "genesis-0.3.0",
  "catalogHash": "e9d98fbfd883e08a97d8a45da08108777169a56e738f8788ceb355cdef5c191a",
  "portraits": 1969,
  "cuts": 1277,
  "simulationAssets": true,
- "judge": true
+ "judge": true,
+ "simulation": "f4a81f1ddbd919b6"
 }
