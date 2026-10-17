@@ -34,8 +34,17 @@ namespace Chog.Screens
         /// <summary>The build's own stamp (Application.version), as the page and its server compare it.</summary>
         public static string Version => VersionOf(Application.isEditor, Application.version);
 
-        /// <summary>The name given to Photon, before the mode: the simulation's stamp when the build carries one.</summary>
-        public static string PhotonVersion => PhotonVersionOf(Application.isEditor, Application.version, Simulation);
+        /// <summary>
+        /// The name given to Photon, before the mode: the simulation's stamp when the build carries one.
+        /// A page served from this computer or its network (a test, LocalGenesis.TestEntriesAllowed)
+        /// adds "-preview": tests meet tests, never a player of the public game, and the services judge
+        /// their matches void.
+        /// </summary>
+        public static string PhotonVersion => PhotonVersionOf(Application.isEditor, Application.version, Simulation)
+                                              + (!Application.isEditor && Chog.Match.LocalGenesis.TestEntriesAllowed(Application.absoluteURL ?? "", false)
+                                                  ? PreviewSuffix : "");
+
+        public const string PreviewSuffix = "-preview";
 
         private static string s_simulation;
 
