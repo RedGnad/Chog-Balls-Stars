@@ -37,6 +37,11 @@ namespace Chog.Screens
         private static readonly Vector2 CareerMaxBesideRentOut = new Vector2(0.50f, 0.18f);
 
         // The button that signs in: wide, or beside the button that rents out.
+        // A wallet without a Genesis may both rent one and sign in to stake: the two side by side.
+        private static readonly Vector2 MarketBesideSignInMin = new Vector2(0.04f, 0.035f);
+        private static readonly Vector2 MarketBesideSignInMax = new Vector2(0.48f, 0.20f);
+        private static readonly Vector2 SignInBesideMarketMin = new Vector2(0.52f, 0.035f);
+        private static readonly Vector2 SignInBesideMarketMax = new Vector2(0.96f, 0.20f);
         private static readonly Vector2 SignInMin = new Vector2(0.14f, 0.035f);
         private static readonly Vector2 SignInMax = new Vector2(0.86f, 0.175f);
         private static readonly Vector2 SignInMinBesideRentOut = new Vector2(0.04f, 0.035f);
@@ -394,8 +399,14 @@ namespace Chog.Screens
             var signsInToStake = !holds && !guest && !checkingPass && state == WalletState.Ready && GenesisWager.State == WagerState.Open;
             _signIn.gameObject.SetActive((holds || signsInToStake) && !signedIn);
             var signInArea = (RectTransform)_signIn.transform;
-            signInArea.anchorMin = canRentOut ? SignInMinBesideRentOut : SignInMin;
-            signInArea.anchorMax = canRentOut ? SignInMaxBesideRentOut : SignInMax;
+            var besideMarket = large && signsInToStake && !signedIn;
+            signInArea.anchorMin = besideMarket ? SignInBesideMarketMin : canRentOut ? SignInMinBesideRentOut : SignInMin;
+            signInArea.anchorMax = besideMarket ? SignInBesideMarketMax : canRentOut ? SignInMaxBesideRentOut : SignInMax;
+            if (besideMarket)
+            {
+                marketArea.anchorMin = MarketBesideSignInMin;
+                marketArea.anchorMax = MarketBesideSignInMax;
+            }
             _signIn.interactable = PlayerWallet.SignIn != SignInState.Asking;
             _signInLabel.text = PlayerWallet.SignIn == SignInState.Asking ? "ANSWER IN YOUR WALLET..."
                 : PlayerWallet.SignInProblem.Length > 0 ? "SIGN-IN FAILED, TRY AGAIN"
