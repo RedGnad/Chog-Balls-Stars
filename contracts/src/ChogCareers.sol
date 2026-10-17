@@ -56,9 +56,13 @@ contract ChogCareers {
 
     // 0 for a match key never recorded, its winner team plus one otherwise.
     mapping(bytes32 matchKey => uint8) private _resultPlusOne;
+    /// @notice When the holder of a Genesis last stopped lending it, in seconds since 1970; 0 if never.
+    /// A free pass the holder handed out before that moment no longer lets anyone play it.
+    mapping(uint256 tokenId => uint64) public lendingStoppedAt;
 
     event MatchRecorded(bytes32 indexed matchKey, uint8 winnerTeam, uint256 entries);
     event Played(bytes32 indexed matchKey, uint256 indexed tokenId, uint8 team, uint8 playedBy, uint8 outcome);
+    event LendingStopped(uint256 indexed tokenId, uint64 at);
     event RefereeChanged(address indexed referee);
     event OwnerChanged(address indexed previousOwner, address indexed newOwner);
 
@@ -143,6 +147,16 @@ contract ChogCareers {
             emit Played(matchKey, tokenId, entry.team, entry.playedBy, outcome);
         }
         emit MatchRecorded(matchKey, winnerTeam, count);
+    }
+
+    /// @notice Records that the holder of a Genesis stopped lending it, as the referee was asked by
+    /// that holder (the game services check the holder's signed-in wallet against the chain first).
+    function stopLending(uint256 tokenId) external {
+        if (msg.sender != referee) revert NotReferee();
+        if (tokenId == 0 || tokenId > LAST_TOKEN_ID) revert BadToken(tokenId);
+        uint64 at = uint64(block.timestamp);
+        lendingStoppedAt[tokenId] = at;
+        emit LendingStopped(tokenId, at);
     }
 
     /// @notice Whether a match was recorded, and its winner team (0, 1, or 2 for a draw).

@@ -50,6 +50,21 @@ contract ChogCareersTest is Test {
         entries[5] = ChogCareers.Entry(1969, 0, GUEST);
     }
 
+    function test_OnlyTheRefereeRecordsThatAHolderStoppedLending() public {
+        assertEq(careers.lendingStoppedAt(1795), 0);
+        vm.warp(1_790_000_000);
+        vm.expectRevert(ChogCareers.NotReferee.selector);
+        careers.stopLending(1795);
+
+        vm.prank(referee);
+        careers.stopLending(1795);
+        assertEq(careers.lendingStoppedAt(1795), 1_790_000_000);
+
+        vm.prank(referee);
+        vm.expectRevert(abi.encodeWithSelector(ChogCareers.BadToken.selector, uint256(0)));
+        careers.stopLending(0);
+    }
+
     function test_OnlyTheRefereeRecords() public {
         vm.expectRevert(ChogCareers.NotReferee.selector);
         careers.record(MATCH, 0, solo(1795));
