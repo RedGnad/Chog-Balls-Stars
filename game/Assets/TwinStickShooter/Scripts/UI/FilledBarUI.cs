@@ -23,6 +23,9 @@ namespace TwinStickShooter
     // The trail behind a health bar, made from the bar itself, and what it shows.
     private Image _trail;
     private Chog.Match.ChogBarTrail _trailState;
+    // Whether the bar took its colour (or hid itself) from the local hero: a player who joins a match
+    // under way meets the other heroes before its own, so the bar tries again until it can.
+    private bool _handled;
 
     public override void OnActivate(Frame frame)
     {
@@ -34,10 +37,12 @@ namespace TwinStickShooter
 
     public void HandleUI(Frame frame)
     {
-      if (ViewContext.LocalView == null)
+      _handled = false;
+      if (ViewContext.LocalView == null || frame.Exists(ViewContext.LocalView.EntityRef) == false || frame.Exists(EntityRef) == false)
       {
         return;
       }
+      _handled = true;
       switch (AttributeType)
       {
         case EAttributeType.Health:
@@ -79,6 +84,10 @@ namespace TwinStickShooter
       if (FilledBar == null || PredictedFrame.Exists(EntityRef) == false)
       {
         return;
+      }
+      if (_handled == false)
+      {
+        HandleUI(PredictedFrame);
       }
 
       Attributes attributes = PredictedFrame.Get<Attributes>(EntityRef);

@@ -40,7 +40,8 @@ namespace TwinStickShooter
       {
         return Chog.Match.ChogTeamRing.Self;
       }
-      if (!frame.TryGet<TeamInfo>(_ownerEntity, out var owner) || !frame.TryGet<TeamInfo>(ViewContext.LocalView.EntityRef, out var local))
+      if (ViewContext.LocalView == null || !frame.TryGet<TeamInfo>(_ownerEntity, out var owner)
+          || !frame.TryGet<TeamInfo>(ViewContext.LocalView.EntityRef, out var local))
       {
         return Chog.Match.ChogTeamRing.Enemy;
       }
@@ -58,11 +59,14 @@ namespace TwinStickShooter
       }
       else
       {
+        // Before this player's hero exists (joining a match under way) an attack reads as the other team's.
+        var sameTeam = ViewContext.LocalView != null
+                       && PredictedFrame.TryGet<TeamInfo>(_ownerEntity, out var owner)
+                       && PredictedFrame.TryGet<TeamInfo>(ViewContext.LocalView.EntityRef, out var local)
+                       && owner.Index == local.Index;
         for (int i = 0; i < _colorSetters.Length; i++)
         {
-          int ownerTeam = PredictedFrame.Get<TeamInfo>(_ownerEntity).Index;
-          int localPlayerTeam = PredictedFrame.Get<TeamInfo>(ViewContext.LocalView.EntityRef).Index;
-          _colorSetters[i].SetRemote(ownerTeam == localPlayerTeam);
+          _colorSetters[i].SetRemote(sameTeam);
         }
       }
     }

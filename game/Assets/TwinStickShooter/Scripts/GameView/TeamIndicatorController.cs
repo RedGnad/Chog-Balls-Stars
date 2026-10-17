@@ -17,14 +17,27 @@ namespace TwinStickShooter
 			DefineColor();
 		}
 
+		// Whether the colour was set: a player who joins a match under way meets the other heroes before
+		// its own, so the colour is tried again until the local hero exists.
+		private bool _defined;
+
+		public override void OnUpdateView()
+		{
+			if (_defined == false)
+				DefineColor();
+		}
+
 		public void DefineColor()
 		{
-			if (ViewContext.LocalView == null)
+			if (_defined || ViewContext.LocalView == null)
 				return;
 
-			ColorSetter colorSetter = GetComponent<ColorSetter>();
-
 			EntityRef localEntityRef = ViewContext.LocalView.EntityRef;
+			if (PredictedFrame.Exists(localEntityRef) == false || PredictedFrame.Exists(EntityRef) == false)
+				return;
+			_defined = true;
+
+			ColorSetter colorSetter = GetComponent<ColorSetter>();
 
 			TeamInfo teamInfo = PredictedFrame.Get<TeamInfo>(EntityRef);
 			TeamInfo localPlayerteamInfo = PredictedFrame.Get<TeamInfo>(localEntityRef);
