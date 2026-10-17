@@ -528,6 +528,33 @@ rental, shop, a staked match) and the video's shots with it, today; Render; the 
 **Next action:** listen to the sounds and the two loops on a computer and a phone and keep or replace them; measure
 `?perf=1` on the phone with and without `?fx=0`; then directional impacts and the attacker's kick (DESIGN-BRIEF, Juice).
 
+**17 October 2026, 17:35 (the redesign, screens: the owner validated the mockups and said go; on `main`, built,
+seen in headless Chrome at 1280x720, not deployed yet).**
+- **Implemented and seen** (builds `20261017T151852241Z` and `20261017T152751287Z`, captures in
+  `.artifacts/unity/home-1` to `home-4`, `reveal-1`, `hud-2`): the home screen as the mockup (`ChogHome`: the
+  player's chip with the picture and mastery of the Genesis played and the player's name, the logo, the $CHOG held,
+  the wallet, the settings; a rail HEROES, TOP, RENT, FRIENDS, GUIDE; the hero on a gold pedestal, its name on a
+  ribbon, its kit on four chips; the wallet card with the mastery road and the Genesis of the wallet; mode and
+  PLAY); the hero sheet (`ChogHeroSheet`: 3D hero turned by dragging, the NFT, class and kit with the trait behind
+  each part, the career on Monad, PLAY IT, RENT OUT, LEND, RENT IT, the second form); renting, offering and lending
+  in a centred window; settings (`ChogSettings`: music, sounds, camera shake, vibration, MORE for the sample's);
+  the moment a Genesis comes to life the first time a browser plays it (`ChogReveal`, about 4 s, a tap skips);
+  the end of a match in team halves with the mastery road and what the match added once recorded (`+N MASTERY`
+  from the career before and after, with chimes; not seen yet: no match was played to its end that day); the match
+  scoreboard (`ChogScoreboard`: team pills, clock, what is counted); team preparation in team halves, CANCEL in red.
+- **Real data only:** the $CHOG pill is the wallet's `balanceOf` read by the services (`/api/rental/account` now
+  answers `balance`); the mastery road and the chip read the career the services read on chain; the hall reads
+  the top careers. Seen with services started locally with `--pretend-holder` for the Ledger's address
+  (`0x80fb...cd64`) and a careers file holding token 1795's career as Render answered it that day (3 matches,
+  2 wins, mastery 2, 5 of 8): a local test, never shipped.
+- **Pictograms are drawn in code** (`ChogIcons`, 20 of them on a 24 grid with the ink outline and hard shadow);
+  shared builders in `ChogUi`; cards are outlined in ink.
+- **Not checked:** a phone (layout at other ratios, safe areas), the reveal on a real wallet connection, the
+  result screen after a recorded match, the sounds (every run muted).
+**Next action:** deploy a build of `main` once the match-look work is committed (its files are still uncommitted in
+the shared tree, so every build carries them); then the lobby countdown, the desktop key hints, the collection
+grid of 1,969 heroes behind HEROES, the loading screen and the submission banner.
+
 **17 October 2026, 16:30 (the recruit's eyes exported and seen turned around, on `recruit-eyes`; not on `main`, not
 built).**
 - **Exported** after the owner freed the disk (5.4 GB free; swap 11.8 GB of 12.3 GB; one Blender, `-t 4`):
