@@ -233,7 +233,7 @@ namespace Chog.Match
                 if (s_hits + s_structureHits != _hitsLogged)
                 {
                     _hitsLogged = s_hits + s_structureHits;
-                    Debug.Log("CHOG_JUICE " + Status + "  " + ChogEffectPool.Status + "  " + ChogSounds.Status);
+                    Debug.Log("CHOG_JUICE " + Status + "  " + ChogEffectPool.Status + "  " + ChogSounds.Status + "  " + GenesisEffects.Status);
                 }
             }
 

@@ -69,10 +69,19 @@ namespace Chog.Match
             public Vector3 Target;
             /// <summary>The colour of the thrower's side (ChogTeamRing.Self, Ally or Enemy), for a tear's landing ring.</summary>
             public Color Side;
+            /// <summary>Whether this attack is the one that fires (not the zone a tear leaves): the caster lights up (ChogFxKit.SpecialFires).</summary>
+            public bool Fires;
+            /// <summary>Where the caster stands, on the floor.</summary>
+            public Vector3 Caster;
+            /// <summary>The sign of the caster's Aura, which picks its effects.</summary>
+            public GenesisEffectIcon Aura;
+            /// <summary>The delivery its rarity gives ("direct", "echo", "return", "persistent-zone", "inversion").</summary>
+            public string Delivery;
         }
 
         private readonly bool _flat;
         private GenesisVisualKind _kind;
+        private GenesisEyeLook _look;
 
         // 3D.
         private GenesisLaser _laser;
@@ -107,6 +116,9 @@ namespace Chog.Match
                 return null;
             var drawing = new GenesisSpecialDrawing(!ChogEffectMaterials.Available);
             drawing._kind = cast.Kind;
+            drawing._look = cast.Look;
+            if (cast.Fires && cast.Kind != GenesisVisualKind.GroundDisc)
+                ChogFxKit.SpecialFires(cast.Caster, cast.Forward, cast.Look, cast.Aura, cast.Tint, cast.Delivery);
             if (drawing._flat)
             {
                 if (cast.FlatMaterial == null)
@@ -127,8 +139,12 @@ namespace Chog.Match
                     _laser = GenesisLaser.Create(cast.Look, cast.Start, LaserThickness(cast.Radius));
                     break;
                 case GenesisVisualKind.Fan:
-                    _fan = GenesisLightFan.Create(cast.Look, cast.Here - Flat(cast.Forward) * cast.Ahead, cast.Forward, cast.Radius, FanHalfAngle);
+                {
+                    var apex = cast.Here - Flat(cast.Forward) * cast.Ahead;
+                    _fan = GenesisLightFan.Create(cast.Look, apex, cast.Forward, cast.Radius, FanHalfAngle);
+                    ChogFxKit.FlashOpens(apex + Vector3.up * 1.15f, apex + Flat(cast.Forward) * (cast.Radius * 0.75f), cast.Look);
                     break;
+                }
                 case GenesisVisualKind.GroundDisc:
                     _puddle = GenesisPuddle.Create(cast.Look, cast.Here, cast.Radius);
                     break;
@@ -137,9 +153,11 @@ namespace Chog.Match
                     break;
                 case GenesisVisualKind.Stare:
                     _stare = GenesisStare.Create(cast.Look, cast.Skin, area.Outer, area.Core, cast.Here, cast.Forward, cast.Radius);
+                    ChogFxKit.StareStarts(cast.Here, area.Outer);
                     break;
                 case GenesisVisualKind.EyeBurst:
                     _lookBurst = GenesisLookBurst.Create(cast.Look, cast.Skin, area.Outer, area.Core, cast.Here, cast.Radius);
+                    ChogFxKit.NovaOpens(cast.Here, cast.Radius, area.Outer, area.Core);
                     break;
             }
         }
@@ -247,6 +265,7 @@ namespace Chog.Match
             {
                 _tear.Release();
                 _tear = null;
+                ChogFxKit.TearLands(here, _look);
             }
             if (_puddle != null)
             {

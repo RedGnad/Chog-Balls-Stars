@@ -64,7 +64,12 @@ namespace Chog.Match
             // When it was last hit (below 0: not since it settled), and the size of its model at rest.
             public float HitAt = -1f;
             public Vector3 ModelScale = Vector3.one;
+            // When chips last flew off it: a few times a second at most.
+            public float ChipsAt = -1f;
         }
+
+        // Chips fly off a structure that is hit at most this often.
+        private const float ChipsSeconds = 0.25f;
 
         // A hit squashes a structure less than a hero (ChogBodyAnimator.Squash gives the spring): this much
         // lower and this much wider at the moment of the blow; and it flashes this white for this long.
@@ -149,6 +154,23 @@ namespace Chog.Match
             if (!GenesisEffects.Enabled || !_drawings.TryGetValue(hit.target, out var drawing) || drawing.Model == null || drawing.Ruined)
                 return;
             drawing.HitAt = Time.time;
+            if (Time.time - drawing.ChipsAt < ChipsSeconds)
+                return;
+            drawing.ChipsAt = Time.time;
+            // Chips of stone and a little flash at its top (ChogFxKit).
+            ChogFxKit.StructureHit(drawing.Root.transform.position + Vector3.up * (ModelHeight(drawing) * 0.8f), drawing.Side);
+        }
+
+        // How tall a 3D structure stands over its foot.
+        private static float ModelHeight(Drawing drawing)
+        {
+            if (drawing.Model == null)
+                return drawing.Kind == EStructureKind.Core ? 1.1f : 1.9f;
+            var foot = drawing.Root.transform.position.y;
+            var top = foot;
+            foreach (var drawn in drawing.Model.GetComponentsInChildren<Renderer>())
+                top = Mathf.Max(top, drawn.bounds.max.y);
+            return Mathf.Max(0.5f, top - foot);
         }
 
         /// <summary>
@@ -167,15 +189,23 @@ namespace Chog.Match
             if (_drawings.TryGetValue(fell.Structure, out var fallen) && GenesisEffects.Enabled)
             {
                 var at = fallen.Root.transform.position;
-                var top = fallen.Kind == EStructureKind.Core ? 1.1f : 1.9f;
-                ChogImpact.Burst(at + Vector3.up * top, Purple, 2.6f, 1.9f, fallen.Side);
-                ChogImpact.Burst(at + Vector3.up * (top * 0.5f), DeepPurple, 2.2f, 1.5f, Cream);
-                ChogImpact.Burst(at + Vector3.up * 0.3f, fallen.Side, 1.8f, 1.2f, Outline);
+                Bursts(at, fallen.Kind, fallen.Side);
+                // It blows up in several blasts; a core breaks into hearts under a BOOM (ChogFxKit).
+                ChogFxKit.StructureFalls(at, ModelHeight(fallen), fallen.Kind == EStructureKind.Core, fallen.Side);
                 fallen.HitAt = -1f;
             }
             _notice = NoticeFor(fell.Kind, fell.Team, _localTeam);
             _noticeColour = fell.Team == (_localTeam < 0 ? 0 : _localTeam) ? Theirs : Ours;
             _noticeUntil = Time.time + NoticeSeconds;
+        }
+
+        /// <summary>The pieces a structure of that kind and side bursts into where it stood ("at", its foot).</summary>
+        public static void Bursts(Vector3 at, EStructureKind kind, Color side)
+        {
+            var top = kind == EStructureKind.Core ? 1.1f : 1.9f;
+            ChogImpact.Burst(at + Vector3.up * top, Purple, 2.6f, 1.9f, side);
+            ChogImpact.Burst(at + Vector3.up * (top * 0.5f), DeepPurple, 2.2f, 1.5f, Cream);
+            ChogImpact.Burst(at + Vector3.up * 0.3f, side, 1.8f, 1.2f, Outline);
         }
 
         // One line near the top of the screen, sized with it, on a dark band so it reads on

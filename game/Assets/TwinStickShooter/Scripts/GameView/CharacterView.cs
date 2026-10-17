@@ -178,6 +178,12 @@ namespace TwinStickShooter
       SetShown(true);
       SetScale(0f);
       ChogSounds.Respawn(_isLocal);
+      // It comes back in a column of light in the colour of its side (Chog.Match.ChogFxKit), where the
+      // simulation put it back (this view may not have moved there yet).
+      var back = PredictedFrame != null && PredictedFrame.TryGet<Transform2D>(EntityRef, out var place)
+        ? place.Position.ToUnityVector3()
+        : transform.position;
+      ChogFxKit.HeroReturns(back, SideColour());
     }
 
     private void AnimateFallAndReturn()
@@ -230,6 +236,24 @@ namespace TwinStickShooter
         : ChogHeroModel.Recruit;
       ChogHeroPop.Colours(metadataId, out var skin, out var face);
       ChogImpact.Burst(_fellAt + Vector3.up * BurstHeight, skin, ChogHeroPop.BurstScale, ChogHeroPop.BurstSpeed, face);
+      // A poof of smoke in its colours, a cartoon star, a flash and a ring of its side (Chog.Match.ChogFxKit).
+      ChogFxKit.HeroFalls(_fellAt + Vector3.up * BurstHeight, skin, SideColour());
+    }
+
+    // Green for the local hero, blue for its team, red for the other team (Chog.Match.ChogTeamRing).
+    private Color SideColour()
+    {
+      if (_isLocal)
+      {
+        return ChogTeamRing.Self;
+      }
+      var frame = PredictedFrame;
+      if (frame == null || ViewContext == null || ViewContext.LocalView == null
+          || !frame.TryGet<TeamInfo>(EntityRef, out var mine) || !frame.TryGet<TeamInfo>(ViewContext.LocalView.EntityRef, out var local))
+      {
+        return ChogTeamRing.Enemy;
+      }
+      return mine.Index == local.Index ? ChogTeamRing.Ally : ChogTeamRing.Enemy;
     }
 
     private void Detach()

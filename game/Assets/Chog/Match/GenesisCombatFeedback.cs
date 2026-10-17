@@ -6,9 +6,11 @@ namespace Chog.Match
 {
     /// <summary>
     /// Shows what a signature did to the target it touched: the sign of the Aura effect, in its
-    /// colour, pops on the target at the moment of the hit, and, for an effect that lasts (burn,
-    /// chill, hex, toxin), a smaller one stays above it until the effect ends. The signs are
-    /// drawn (GenesisIcons); which sign and which colour is listed on the roster asset.
+    /// colour, pops on the target at the moment of the hit with the Aura's own effect (fire, ice,
+    /// lightning, stars, smoke, bubbles: ChogFxKit.AuraHits), and, for an effect that lasts (burn,
+    /// chill, hex, toxin), a smaller sign stays above it until the effect ends, with flames, runes
+    /// at its feet or a poison cloud on a computer. The signs are drawn (GenesisIcons); which sign
+    /// and which colour is listed on the roster asset.
     /// </summary>
     public sealed class GenesisCombatFeedback : MonoBehaviour
     {
@@ -25,6 +27,8 @@ namespace Chog.Match
             public GenesisShape Mark;
             public Transform Target;
             public float EndsAt;
+            public ChogFxPlayback Lasting;
+            public int LastingRound;
         }
 
         // One lasting mark per target and effect; a new hit renews it instead of stacking another.
@@ -57,13 +61,19 @@ namespace Chog.Match
             GenesisShape.Icon(roster.ShapeMaterial, icon, color, target.position + BodyOffset, HitSize, HitSeconds);
 
             var seconds = hit.Duration.AsFloat;
+            var key = (hit.Target, hit.Effect);
+            Status status = null;
+            var renewed = seconds > 0f && _statuses.TryGetValue(key, out status) && status.Mark != null;
+            // A renewed effect keeps its lasting effect going, and gets no second one.
+            var lasting = ChogFxKit.AuraHits(icon, color, target, target.position + BodyOffset, renewed ? 0f : seconds);
             if (seconds <= 0f)
                 return;
 
-            var key = (hit.Target, hit.Effect);
-            if (_statuses.TryGetValue(key, out var status) && status.Mark != null)
+            if (renewed)
             {
                 status.EndsAt = Time.time + seconds;
+                if (status.Lasting != null)
+                    status.Lasting.KeepUntil(status.LastingRound, seconds);
                 return;
             }
 
@@ -71,7 +81,9 @@ namespace Chog.Match
             {
                 Mark = GenesisShape.Icon(roster.ShapeMaterial, icon, color, target.position + StatusOffset, StatusSize, 0f),
                 Target = target,
-                EndsAt = Time.time + seconds
+                EndsAt = Time.time + seconds,
+                Lasting = lasting,
+                LastingRound = lasting != null ? lasting.Round : 0
             };
         }
 
@@ -94,6 +106,8 @@ namespace Chog.Match
             {
                 if (_statuses[key].Mark != null)
                     _statuses[key].Mark.Release();
+                if (_statuses[key].Lasting != null)
+                    _statuses[key].Lasting.Stop(_statuses[key].LastingRound);
                 _statuses.Remove(key);
             }
 

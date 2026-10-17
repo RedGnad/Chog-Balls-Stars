@@ -36,6 +36,12 @@ namespace Chog.Match
         // Just above the arena's floor, whose planks stand above y = 0 (ChogTeamRing lifts its rings 0.18).
         public const float FloorLift = 0.17f;
 
+        /// <summary>The height of the floor the effects of a fight lie on: 0 in the arena; a test page far from it sets its own.</summary>
+        public static float Ground;
+
+        /// <summary>The point of the floor under "point", just above it (FloorLift), where a light or a ring lies.</summary>
+        public static Vector3 OnFloor(Vector3 point) => new Vector3(point.x, Ground + FloorLift, point.z);
+
         /// <summary>From "point" toward the camera that watches it, of length 1.</summary>
         public static Vector3 TowardViewer(Vector3 point)
         {
@@ -229,6 +235,7 @@ namespace Chog.Match
                 return;
             _fadeStarted = Time.time;
             ChogImpact.Burst(_head + Vector3.up * EyeHeight, _colour, 0.8f, 1f, _core);
+            ChogFxKit.LaserEnds(_head + Vector3.up * EyeHeight, _colour, _core);
         }
 
         private void LateUpdate()

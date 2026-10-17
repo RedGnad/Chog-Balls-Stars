@@ -170,6 +170,8 @@ namespace Chog.Match
             if (_mainCamera != null)
                 _mainCamera.tag = "MainCamera";
 
+            // The effects of a fight lie on this page's floor, far above the arena's.
+            GenesisSpecial3D.Ground = Origin.y;
             // What faces the viewer (eyeballs, glints) turns toward the match camera of its own row.
             GenesisSpecial3D.ViewerUp = Quaternion.Euler(ChogCameraRig.Pitch, 0f, 0f) * Vector3.up;
             GenesisSpecial3D.ViewerAt = point =>
@@ -245,12 +247,17 @@ namespace Chog.Match
                 Forward = row.Forward,
                 Ahead = plan.Ahead,
                 Target = row.Hero + row.Forward * plan.Reach,
-                Side = enemy ? ChogTeamRing.Enemy : ChogTeamRing.Self
+                Side = enemy ? ChogTeamRing.Enemy : ChogTeamRing.Self,
+                Fires = true,
+                Caster = row.Hero,
+                Aura = roster.EffectIcons != null && entry.Effect < roster.EffectIcons.Length ? roster.EffectIcons[entry.Effect] : GenesisEffectIcon.Burst,
+                Delivery = roster.ExpressionIds != null && entry.Expression < roster.ExpressionIds.Length ? roster.ExpressionIds[entry.Expression] : ""
             };
             if (shape == "puddle")
             {
                 var zoneTint = zone != null ? zone.VisualTint : Color.clear;
                 row.Zone = row.Cast;
+                row.Zone.Fires = false;
                 row.Zone.Kind = GenesisVisualKind.GroundDisc;
                 row.Zone.Look = GenesisSpecialDrawing.LookOf(roster, entry, zoneTint, false, enemy, out _);
                 row.Zone.Tint = zoneTint;
@@ -437,6 +444,7 @@ namespace Chog.Match
         {
             GenesisSpecial3D.ViewerAt = null;
             GenesisSpecial3D.ViewerUp = null;
+            GenesisSpecial3D.Ground = 0f;
             foreach (var picture in _pictures)
                 if (picture != null)
                     picture.Release();

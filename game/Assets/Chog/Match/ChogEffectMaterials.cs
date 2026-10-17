@@ -29,6 +29,7 @@ namespace Chog.Match
         private static Material s_solid;
         private static Material s_glow;
         private static Material s_floor;
+        private static Material s_light;
         private static bool s_tried;
         private static bool? s_off;
         private static MaterialPropertyBlock s_block;
@@ -83,6 +84,19 @@ namespace Chog.Match
         }
 
         /// <summary>
+        /// "Light", added to what is behind it as a light would (the flashes, rings, columns and bolts of
+        /// ChogLight and ChogLightning): drawn after the see-through things, never written to depth, both sides.
+        /// </summary>
+        public static Material Light
+        {
+            get
+            {
+                Make();
+                return s_light;
+            }
+        }
+
+        /// <summary>
         /// How visible a glow drawn by this renderer is, from 0 (gone) to 1, and the picture a ball it draws
         /// wears (an eyeball's eye; null for none).
         /// </summary>
@@ -123,6 +137,13 @@ namespace Chog.Match
             s_glow.SetFloat(DstBlendId, (float)BlendMode.OneMinusSrcAlpha);
             s_glow.SetFloat(ZWriteId, 0f);
             s_glow.SetFloat(CullId, (float)CullMode.Back);
+
+            s_light = new Material(shader) { name = "ChogEffectLight", renderQueue = (int)RenderQueue.Transparent + 20 };
+            s_light.SetOverrideTag("RenderType", "Transparent");
+            s_light.SetFloat(SrcBlendId, (float)BlendMode.SrcAlpha);
+            s_light.SetFloat(DstBlendId, (float)BlendMode.One);
+            s_light.SetFloat(ZWriteId, 0f);
+            s_light.SetFloat(CullId, (float)CullMode.Off);
 
             var ground = Resources.Load<Shader>(ChogTeamRing.ShaderResource);
             if (ground != null && ground.isSupported)

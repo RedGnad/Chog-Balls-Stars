@@ -104,7 +104,12 @@ submitting. Character counts are for the 8,000-character fields.
   sample's page credits; and Photon's sample licence grants its non-code "Assets" for internal
   development only (`research/research_notes/Audit architecture Photon MOBA Genesis/twin_stick_sample_reuse_licences.md`,
   KQ2 and KQ5). Before a public repository or a release: replace those effects with our own, or
-  hold a licence for each pack used.
+  hold a licence for each pack used. **Since 17 October, evening, the fights use more of it:** 23
+  Cartoon FX Remaster prefabs (the CFXR2 and CFXR3 families found in the project, copied under our names
+  into `game/Assets/Chog/Effects/Resources/ChogFx`, with the textures, materials and shaders they
+  reference) play the explosions, fire, ice, electricity, sparks, smoke and splashes of a fight
+  (`game/README.md`, "The effects of a fight"). The owner said that day that the licence is not a problem
+  for a non-profit MVP; which Cartoon FX pack each prefab comes from was not checked.
 - Fonts Lilita One, Nunito and Koulen (SIL Open Font License); Koulen as on chog.xyz.
 - Sounds and music: 18 CC0 files (Kenney, OpenGameArt), each with its source in
   `game/Assets/Chog/Audio/LICENSES.md`. The pictograms of the screens are drawn in code.

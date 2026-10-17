@@ -88,3 +88,12 @@ fan of a visor, the stare of drawn eyes: `GenesisAttackView`). When it fires, th
 also pop up in 3D above it for under a second, turned to the camera, with a burst in their colour
 (`ChogSignatureFlash`, the very part of the library the hero wears). Seen on the viewer page
 (`?heroes=1287,1241,491,46,162&flash=1`); not yet caught in a match picture.
+
+## What hits, built (17 October 2026, evening)
+
+The column "What hits" of the table above is now drawn, object by object (`ChogFxRecipes.ForAttack`,
+`ChogFxKit.AttackEnds`): small copies of the object itself where the table says so (coins, stars, snow,
+curls, bones, leaves, peace signs; a money bag bursts into dollar coins), flakes of cloth in the colours of
+a cap or a bucket hat, sparks, a puff, a ring on the floor, a flash of light, and a bolt of lightning for the
+Thunder Cap, with Cartoon FX particles in the object's colours. What it looks like and costs:
+`game/README.md`, "The effects of a fight".

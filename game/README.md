@@ -585,6 +585,86 @@ CHOG_BROWSER_URL="http://127.0.0.1:<port>/?noguide=1&specials=1&at=4" node
 tools/unity/qualify_webgl.mjs`. Sheets: `research/evidence/specials-3d-*-2026-10-17.jpg`.
 **Not seen:** a phone (cost on its GPU), a real match through Photon.
 
+### The effects of a fight (17 October, evening)
+
+The owner, that evening: the licence is no problem (a non-profit MVP), and "effects come from a Chog" is a
+direction, not a rule: explosions, flashes with light, lightning are welcome as long as they respect the
+traits. So every effect of a fight is now chosen and coloured by a trait (`ChogFxRecipes`, plain data,
+tested), and played by `ChogFxKit`:
+
+- **Where a basic attack ends, the object of the hat bursts in its own way** (the "What hits" column of
+  `docs/ATTACKS-FROM-THE-ART.md`): a cap or a bucket hat into flakes of its cloth in its own colours, a
+  cartoon pop and a puff, with a ring of its colour on the floor; a coin (dollar, bitcoin, buttcoin) into
+  small copies of itself thrown high with gold sparkles; a money bag into dollar coins; a Thunder Cap's bolt
+  calls a bolt of lightning down from the top of the screen with an electric crackle; a snowball into
+  chunks of snow, ice shards and frost; stars into small stars and a sparkle; a cloud into puffs of cloud and
+  rain drops; a rainbow ball into stars of every colour; the crown and the gold hats into gold sparks; a peace
+  sign into a white ring and small peace signs; the rising sun into red rays; a leaf of the crown into small
+  leaves; and so on for every object a hat throws (`ChogFxTests` checks that each has its own). The gesture
+  of the class adds to it: the brute's blow lands in dust and a ring, the controller's lob in dust and a ring
+  in the colour of its side. Small copies are the very mesh of the object (`ChogHeroModel.TryGetAttackParts`).
+- **A special lights up its caster** (`ChogFxKit.SpecialFires`, from `GenesisSpecialDrawing.Begin`): a
+  flash with rays at the eyes in the colours of the Eyes value; the Aura at the eyes (embers for burn, ice
+  for chill, stars for hex, sparks for rally, smoke for veil, bubbles for toxin, and, for haste, bolts of
+  lightning thrown ahead from the eyes); the rarity's delivery adds its touch: an echo two rings of light, a
+  return (Skull) a dark purple flash and smoke, a zone (Radioactive) a green glow and bubbles, an inversion
+  (1:1) golden stars and rays. The shapes add theirs: a laser's head ends in sparks, a fan of light opens
+  with a camera's flash, a tear lands in a liquid splash and a ripple, a nova goes off with a flash, a shock
+  wave of light and dust, a stare leaves in a gust of dust.
+- **The Aura on the target** (`GenesisCombatFeedback`, which still pops the drawn sign): fire, ice shards,
+  purple stars, a soft pink light, a white light with a ring, royal blue sparks, electricity with small
+  bolts, a cloud of smoke, green bubbles; while a burn, a hex or a toxin lasts, flames on the target, a
+  circle of runes at the rooted target's feet, or a poison cloud follow it (a computer only).
+- **Big moments:** a hero that falls goes in a poof of its colours, a cartoon star, a flash and a ring of
+  its side; one that comes back stands in a column of light of its side; a tower or a core that is hit
+  throws chips of stone; one that falls blows up in three blasts, its light on the floor, a shock wave of its
+  side and smoke that stays; the core, a heart, breaks into hearts under a BOOM, with pink lightning.
+
+**How they are made.** The particle effects are 23 Cartoon FX Remaster prefabs (Jean Moreno) copied under
+the names of `ChogFx` into `Assets/Chog/Effects/Resources/ChogFx` and played by `GenesisEffects.Play`: each
+copy is kept and played again (pools per effect), takes the colour asked for from the colours it was made
+with (as made, multiplied, or painted), plays once or as long as asked, follows a hero when asked, and is
+made while a match loads (one effect a frame), not in the middle of a fight. Light is faked
+(`ChogLight`, a new additive material of `Chog/Effect`): a flare turned to the camera, white-hot in its
+middle, with rays, and the pool of light it casts on the floor; a ring of light that runs out on the floor;
+a column of light. No real-time light: it would relight the arena and cost a phone a pass per object, and
+the heroes' matcap does not read lights; on a computer the glow of `ChogMatchPost` makes the flares bloom.
+Bolts of lightning (`ChogLightning`) are jagged bands drawn again twenty times a second, with forks.
+
+**Cost and the phone.** At most 40 particle effects play at once on a computer (the big moments, a special,
+an Aura, a fall, may go half as far again; the many small ones are skipped beyond the cap), 14 on a phone.
+A phone (or any device below the quality level Good) takes the lighter path: at most 30 particles a system
+and every burst halved, no second layer (the puff of a cap), no lasting effects on targets, no dust under
+blows, bolts without forks, half the flares' rays, fewer lights at once, two blasts fewer when a tower falls.
+The second layer of a basic attack also waits when half the cap is playing. Options on a private page:
+`?fxlevel=0` the effects of before (only the pieces), `1` the phone's path, `2` a computer's; `?fx=0` turns
+every effect of a fight off, as before. `?perf=1` and the console line `CHOG_JUICE` say how many play, were
+played, made and skipped.
+
+**Measured on 17 October** (`?perf=1`, a match against the bots #29, #57, #21, #20 and #137 with every special
+charged, the report at 123 s of each, M1 MacBook Pro, muted headless Chrome on Metal, 1280 x 720, quality Good;
+the Mac swapped 11 to 12 GB of 12 to 13 that evening, so only medians compare). Main thread busy, median and
+95th percentile: the build of before (`20261017T180618131Z`) 4.2 / 6.4 ms with its effects, 4.5 / 6.7 with
+`fx=0`; this work (`20261017T185700009Z`) 4.7 / 6.9 and 4.6 / 7.6 with the effects (two matches), 4.6 / 7.1 and
+4.7 / 7.0 with `fx=0`, 4.4 / 7.5 and 4.5 / 6.8 on the phone's path (`fxlevel=1`). The frame is the display's
+17.0 ms in every run (99th percentile 18 to 19 ms); the worst frame was 284 ms once with the effects, 45 to 69
+ms otherwise. No difference stands out of the noise. In a match about ten particle effects start a second
+(1,132 and 1,267 in 123 s), up to the cap of 40 at once, 70 and 76 skipped at the cap; 123 and 127 copies are
+made in all, and the managed heap is up to about 7 MB larger (44 to 50 MB against 42 to 43 with `fx=0`). The
+phone's path started 545 and 583, skipped 249 and 244, and made 71 and 75 copies. The build's data grew from 11.85 to 12.38 MB compressed.
+**Not measured:** a phone, and the GPU anywhere (the frame is held at 60 Hz here): the flares and particles
+are see-through and additive, so their cost on a phone is overdraw, which only `?perf=1` on a phone shows.
+
+**Seeing them without a match:** `?impacts=1` (a Genesis for each object a hat throws, throwing it at a
+recruit with the gesture of its class), `?impacts=aura` (each Aura fired and hitting), `?impacts=big` (a
+tower and a core that fall, a hero that falls and one that comes back, and what each rarity adds),
+`?impacts=1287,39` the Genesis named (`ChogImpactsViewer`, the camera of a match at the scale of a 1280 x 720
+screen; `&t=0.15` stops the page that long after the moment of each cell). Sheets, before and after on the
+same build: `research/evidence/fight-fx-impacts-before-after-2026-10-17.jpg` (with the phone's path),
+`fight-fx-auras-before-after-2026-10-17.jpg`, `fight-fx-big-moments-2026-10-17.jpg`,
+`fight-fx-specials-film-2026-10-17.jpg`, and in matches on Photon's cloud
+`fight-fx-match-before-after-2026-10-17.jpg`.
+
 ### Genesis portraits (9 October)
 
 Each Genesis on the preparation screen shows its real image beside its team slot and on the

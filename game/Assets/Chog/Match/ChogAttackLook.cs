@@ -11,7 +11,8 @@ namespace Chog.Match
     /// It replaces what the sample drew for that attack (its arrow, its slash): the attack itself, where
     /// it goes and what it hits, is the simulation's and does not change. A thrown object turns as its
     /// style says; a strike (the attack of the brute, which does not travel) pops out in front, turns
-    /// and fades; where an attack ends, a few small pieces in its colour fly out (ChogImpact).
+    /// and fades; where an attack ends, the object bursts in its own way (ChogFxKit.AttackEnds: a coin
+    /// into coins and sparkles, a cap into cloth and a puff, a bolt calls lightning).
     /// A lobbed attack (the controller's, which the simulation sends to a point on the ground) flies on
     /// a high arc instead of the straight line of the ranger's: higher the farther it goes, larger at
     /// its top, its shadow running on the floor under it, and a ring in the colour of its side on the
@@ -56,6 +57,7 @@ namespace Chog.Match
         private Transform _shadow;
         private Transform _landing;
         private Color _landingColour;
+        private Color _side;
 
         /// <summary>
         /// Dresses the view of an attack whose data is named "dataName", thrown by the hero of
@@ -76,6 +78,7 @@ namespace Chog.Match
             if (look == null)
                 look = view.gameObject.AddComponent<ChogAttackLook>();
             look.Show(metadataId, dataName == Strike);
+            look._side = side;
             look.Lob(landing, side);
         }
 
@@ -168,8 +171,8 @@ namespace Chog.Match
                 if (_object != null)
                     Destroy(_object.gameObject);
                 _object = ChogHeroModel.BuildAttack(metadataId, transform, out _style, out _impact);
-                _metadataId = metadataId;
-            }
+                }
+            _metadataId = metadataId;
             _shown = _object != null;
             if (!_shown)
                 return;
@@ -254,7 +257,7 @@ namespace Chog.Match
             }
         }
 
-        // Where the attack ends (it hit, or it went as far as it goes), its pieces fly out.
+        // Where the attack ends (it hit, or it went as far as it goes), its object bursts.
         private void OnDisable()
         {
             Hide();
@@ -262,7 +265,9 @@ namespace Chog.Match
                 return;
             _shown = false;
             // A lob bursts on the floor where it landed.
-            ChogImpact.Burst(_lob ? new Vector3(_object.position.x, Height * 0.5f, _object.position.z) : _object.position, _impact);
+            var at = _lob ? new Vector3(_object.position.x, transform.position.y + Height * 0.5f, _object.position.z) : _object.position;
+            var gesture = _strike ? ChogFxKit.Gesture.Strike : _lob ? ChogFxKit.Gesture.Lob : ChogFxKit.Gesture.Thrown;
+            ChogFxKit.AttackEnds(_metadataId, at, gesture, _side, _impact);
         }
 
         private void OnDestroy()

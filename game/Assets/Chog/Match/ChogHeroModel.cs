@@ -42,7 +42,7 @@ namespace Chog.Match
         public const float AttackSize = 0.8f;
 
         // The meshes of the attack objects, made once for each piece and skin: attacks come often.
-        private static readonly Dictionary<long, (Mesh Mesh, Color Impact)> s_attacks = new Dictionary<long, (Mesh, Color)>();
+        private static readonly Dictionary<long, (Mesh Mesh, Color Impact, Color Second)> s_attacks = new Dictionary<long, (Mesh, Color, Color)>();
 
         private static ChogPartsLibrary s_library;
         private static bool s_loaded;
@@ -188,6 +188,47 @@ namespace Chog.Match
             return Alone(library, hero.Attack, hero.Skin, AttackSize, parent, "ChogAttackObject", out impact);
         }
 
+        /// <summary>What the basic attack of a Genesis is made of, for the effects where it ends (ChogFxKit).</summary>
+        public struct AttackParts
+        {
+            /// <summary>The name of its piece in the library ("Attack_Snowball", "Hat_Cap").</summary>
+            public string Piece;
+            /// <summary>The colour most of it is drawn in, and the next one.</summary>
+            public Color Main;
+            public Color Second;
+            /// <summary>Its mesh, centred, AttackSize across.</summary>
+            public Mesh Mesh;
+            /// <summary>The skin it is drawn with (a leaf of the crown is the hero's colour).</summary>
+            public int Skin;
+        }
+
+        /// <summary>What the basic attack of this Genesis throws; false when the library has no object for it.</summary>
+        public static bool TryGetAttackParts(int metadataId, out AttackParts parts)
+        {
+            parts = default;
+            var library = Library;
+            if (Off || library == null || !library.TryGetHero(metadataId, out var hero) || hero.Attack == ChogPartsLibrary.NoAttack)
+                return false;
+            var made = Made(library, hero.Attack, hero.Skin, AttackSize);
+            parts = new AttackParts
+            {
+                Piece = library.Pieces[hero.Attack].Name, Main = made.Impact, Second = made.Second, Mesh = made.Mesh, Skin = hero.Skin
+            };
+            return true;
+        }
+
+        /// <summary>The mesh of the piece of the library of that name (a dollar coin), AttackSize across; null when there is none.</summary>
+        public static Mesh PieceMesh(string pieceName, int skin)
+        {
+            var library = Library;
+            if (Off || library == null || string.IsNullOrEmpty(pieceName))
+                return null;
+            for (var i = 0; i < library.Pieces.Length; i++)
+                if (library.Pieces[i].Name == pieceName)
+                    return Made(library, i, skin, AttackSize).Mesh;
+            return null;
+        }
+
         /// <summary>
         /// The eyes this Genesis wears (its glasses, visor, headset, lasers or drawn eyes), alone, centred,
         /// "size" across, under "parent": what its special attack comes from. Null when it has no eyes in
@@ -210,12 +251,7 @@ namespace Chog.Match
         private static Transform Alone(ChogPartsLibrary library, int piece, int skin, float size, Transform parent,
                                        string name, out Color colour)
         {
-            var key = ((long)piece * 64 + skin) * 1000 + Mathf.RoundToInt(size * 100f);
-            if (!s_attacks.TryGetValue(key, out var made) || made.Mesh == null)
-            {
-                made = AttackMesh(library, library.Pieces[piece], skin, size);
-                s_attacks[key] = made;
-            }
+            var made = Made(library, piece, skin, size);
             colour = made.Impact;
             var thing = new GameObject(name, typeof(MeshFilter), typeof(MeshRenderer));
             thing.transform.SetParent(parent, false);
@@ -227,8 +263,20 @@ namespace Chog.Match
             return thing.transform;
         }
 
-        // One piece alone, centred and brought to "size"; the colour most of its vertices take.
-        private static (Mesh, Color) AttackMesh(ChogPartsLibrary library, ChogPartsLibrary.Piece piece, int skin, float size)
+        // The mesh of one piece alone at that size and skin, made once.
+        private static (Mesh Mesh, Color Impact, Color Second) Made(ChogPartsLibrary library, int piece, int skin, float size)
+        {
+            var key = ((long)piece * 64 + skin) * 1000 + Mathf.RoundToInt(size * 100f);
+            if (!s_attacks.TryGetValue(key, out var made) || made.Mesh == null)
+            {
+                made = AttackMesh(library, library.Pieces[piece], skin, size);
+                s_attacks[key] = made;
+            }
+            return made;
+        }
+
+        // One piece alone, centred and brought to "size"; the colour most of its vertices take, and the next.
+        private static (Mesh, Color, Color) AttackMesh(ChogPartsLibrary library, ChogPartsLibrary.Piece piece, int skin, float size)
         {
             var count = piece.VertexCount;
             var low = Vector3.one * float.MaxValue;
@@ -259,13 +307,28 @@ namespace Chog.Match
 
             var most = (ushort)0;
             var best = -1;
+            var next = (ushort)0;
+            var runnerUp = -1;
             foreach (var vote in votes)
                 if (vote.Value > best)
                 {
+                    next = most;
+                    runnerUp = best;
                     best = vote.Value;
                     most = vote.Key;
                 }
+                else if (vote.Value > runnerUp)
+                {
+                    runnerUp = vote.Value;
+                    next = vote.Key;
+                }
             library.ColourOf(most, skin, out var ir, out var ig, out var ib, out _);
+            var second = new Color(ir, ig, ib, 1f);
+            if (runnerUp > 0)
+            {
+                library.ColourOf(next, skin, out var sr, out var sg, out var sb, out _);
+                second = new Color(sr, sg, sb, 1f);
+            }
 
             var mesh = new Mesh { name = "ChogAttack " + piece.Name };
             mesh.vertices = vertices;
@@ -274,7 +337,7 @@ namespace Chog.Match
             mesh.triangles = piece.Indices;
             mesh.RecalculateBounds();
             mesh.UploadMeshData(true);
-            return (mesh, new Color(ir, ig, ib, 1f));
+            return (mesh, new Color(ir, ig, ib, 1f), second);
         }
 
         /// <summary>The one material every hero is drawn with.</summary>

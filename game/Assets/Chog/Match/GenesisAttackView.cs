@@ -27,9 +27,19 @@ namespace Chog.Match
                 return;
 
             // The moment of the special: the eyes it comes from, large above the hero (ChogSignatureFlash).
+            var fires = false;
+            var casterPlace = transform.position;
+            var delivery = "";
             if (data.IsGenesisSignature && frame.TryGet<GenesisHero>(attack->Source, out var caster)
                 && frame.TryGet<Transform2D>(attack->Source, out var casterAt))
-                ChogSignatureFlash.ShowOnce(attack->Source, casterAt.Position.ToUnityVector3(), caster.MetadataId);
+            {
+                casterPlace = casterAt.Position.ToUnityVector3();
+                ChogSignatureFlash.ShowOnce(attack->Source, casterPlace, caster.MetadataId);
+                fires = true;
+                var roster = GenesisCast.Roster(frame);
+                if (roster != null && roster.ExpressionIds != null && caster.Expression < roster.ExpressionIds.Length)
+                    delivery = roster.ExpressionIds[caster.Expression];
+            }
 
             if (data.VisualKind == GenesisVisualKind.Effect || data.ShapeMaterial == null)
             {
@@ -54,7 +64,11 @@ namespace Chog.Match
                 Forward = frame.TryGet<Transform2D>(EntityRef, out var placed) ? placed.Up.ToUnityVector3() : Vector3.forward,
                 Ahead = data is GenesisSweepAttackData sweep ? sweep.ForwardOffset.AsFloat : 0f,
                 Target = data is BallisticAttackData lob ? lob.GetTargetPosition(frame, attack).ToUnityVector3() : here,
-                Side = SideOf(frame, attack->Source, enemy)
+                Side = SideOf(frame, attack->Source, enemy),
+                Fires = fires,
+                Caster = new Vector3(casterPlace.x, here.y, casterPlace.z),
+                Aura = AuraOf(frame, data.GenesisEffect),
+                Delivery = delivery
             };
             _drawing = GenesisSpecialDrawing.Begin(cast);
         }
@@ -94,6 +108,15 @@ namespace Chog.Match
                 particles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
             Destroy(_visual, FadeSeconds);
             _visual = null;
+        }
+
+        // The sign of the Aura effect this attack carries (a position in the roster's effect table).
+        private static GenesisEffectIcon AuraOf(Frame frame, byte effect)
+        {
+            var roster = GenesisCast.Roster(frame);
+            return roster != null && roster.EffectIcons != null && effect < roster.EffectIcons.Length
+                ? roster.EffectIcons[effect]
+                : GenesisEffectIcon.Burst;
         }
 
         // The roster entry of the caster's Genesis, when it plays one.

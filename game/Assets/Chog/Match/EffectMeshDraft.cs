@@ -355,6 +355,30 @@ namespace Chog.Match
             return new Vector3(Mathf.Sin(angle) * radius, 0f, Mathf.Cos(angle) * radius);
         }
 
+        /// <summary>Empties the draft, to put another shape together in the same lists (a bolt that flickers).</summary>
+        public void Clear()
+        {
+            Vertices.Clear();
+            Normals.Clear();
+            Colours.Clear();
+            Flags.Clear();
+            Cores.Clear();
+            Triangles.Clear();
+        }
+
+        /// <summary>Puts the draft into a mesh that is drawn again and again (its data stays readable, for the next fill).</summary>
+        public void Fill(Mesh mesh)
+        {
+            mesh.Clear();
+            mesh.SetVertices(Vertices);
+            mesh.SetNormals(Normals);
+            mesh.SetColors(Colours);
+            mesh.SetUVs(0, Flags);
+            mesh.SetUVs(1, Cores);
+            mesh.SetTriangles(Triangles, 0);
+            mesh.RecalculateBounds();
+        }
+
         /// <summary>The mesh for the engine.</summary>
         public Mesh ToMesh(string name)
         {
