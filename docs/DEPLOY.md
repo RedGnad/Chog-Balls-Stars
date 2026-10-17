@@ -170,6 +170,26 @@ admission). Flat fields came back as sent (`passTokenId`, `passLender`, `passIss
 carries only flat fields that matter (`server/src/photon.js`, `passOf`); the guests' path had only ever been tested with
 our own requests before, never through Photon's cloud, and every guest played a recruit until then.
 
+### Photon's limit on application versions (found 17 October 2026)
+
+At 16:41 UTC Photon began refusing every client that gave it a version it had not seen:
+`OperationResponse 230: ReturnCode: 32767 (Too many application versions are in use)` on the master
+server, then `DisconnectException: InvalidAuthentication` in the game. The version already in use in
+production kept working. Each build had named itself to Photon by its own stamp, once per mode
+(`-siege`, `-coins`): about forty versions in a day of builds. Photon's glossary only says "There is a
+limit of how many an AppId can have in parallel"
+(https://doc.photonengine.com/realtime/v5/reference/glossary); no number and no expiry are published.
+
+Since then the game gives Photon `sim-<16 hex digits>`, a SHA-256 of what decides how a match plays:
+the simulation's code and schema (`Assets/QuantumUser/Simulation`, `.cs` and `.qtn`), Quantum's
+assemblies and the exported simulation assets (`QualificationBuild.SimulationStamp`, stable across
+two builds of the same code). The build writes it into `Resources/ChogSimulationStamp` and into
+`simulation.txt` beside the build; `assemble_site.py` records it as `simulation` in `RELEASE.json`;
+the services compare rooms and judge matches with it (`servedPhotonVersion`, `node.js`), or with the
+build as before when a release has none. A build that changes only screens or looks keeps the name.
+**Before deploying a build whose stamp is new, check that a local build with that stamp can connect**:
+the console of a capture shows the line above when Photon refuses.
+
 ## A public address from this Mac (a tunnel)
 
 Allowed by the user on 12 October 2026 ("oui je valide"). It makes the game on this Mac
