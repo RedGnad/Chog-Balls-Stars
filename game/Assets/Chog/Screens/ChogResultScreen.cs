@@ -143,7 +143,7 @@ namespace Chog.Screens
         /// Leaves the match as the menu's own leave button does (QuantumMenuUIGameplay), shows the menu
         /// and, for PLAY AGAIN, looks for the next match as QUICK PLAY does.
         /// </summary>
-        private static async Task LeaveMatch(bool playAgain)
+        public static async Task LeaveMatch(bool playAgain)
         {
             var gameplay = Object.FindFirstObjectByType<QuantumMenuUIGameplay>(FindObjectsInactive.Include);
             if (gameplay == null || gameplay.Connection == null || gameplay.Controller == null)

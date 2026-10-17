@@ -74,6 +74,8 @@ namespace TwinStickShooter
       UpdateClassButtons();
       // The stakes of the match, where the game services stake on matches.
       Chog.Screens.WagerPanel.Show(transform, Teams[0].TeamCharacters[0], LocalTeam());
+      // A way back to the menu before the match starts.
+      Chog.Screens.PreparationBack.Show(transform, Teams[0].TeamCharacters[0]);
 
       if (_connection == null)
       {
