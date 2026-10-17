@@ -61,6 +61,15 @@ namespace Chog.Screens
                 image.sprite = ChogSprites.Gradient(ChogTheme.Night, ChogTheme.NightHigh);
                 image.color = Color.white;
                 image.type = Image.Type.Simple;
+                // The two teams: blue at the left, red at the right, a dark seam between (mockup "Lobby").
+                var halves = ChogUi.Area(BackgroundName, backdrop, Vector2.zero, Vector2.one);
+                halves.SetAsFirstSibling();
+                Half(halves, 0f, ChogTheme.Hex("16336B"), ChogTheme.Hex("2A5BB8"));
+                Half(halves, 0.5f, ChogTheme.Hex("4A1430"), ChogTheme.Hex("8E2F4E"));
+                var seam = ChogUi.Area("Seam", halves, new Vector2(0.44f, 0f), new Vector2(0.56f, 1f)).gameObject.AddComponent<Image>();
+                seam.sprite = ChogSprites.Disc(64, 1f);
+                seam.color = new Color(ChogTheme.Night.r, ChogTheme.Night.g, ChogTheme.Night.b, 0.85f);
+                seam.raycastTarget = false;
             }
 
             foreach (var button in selection.GetComponentsInChildren<Button>(true))
@@ -87,7 +96,7 @@ namespace Chog.Screens
                 }
             }
 
-            // The slots of the teams: dark cards.
+            // The slots of the teams: cards in the colour of their team, outlined in ink.
             foreach (var slot in selection.GetComponentsInChildren<Transform>(true))
             {
                 if (!slot.name.StartsWith("PlayerSlot"))
@@ -99,6 +108,10 @@ namespace Chog.Screens
                     card = background != null ? background.GetComponent<Image>() : null;
                 }
                 ChogTheme.AsCard(card);
+                if (card == null)
+                    continue;
+                var right = InRightTeam(slot);
+                card.sprite = ChogSprites.Rounded(24, 3, ChogTheme.Ink, right ? ChogTheme.Hex("6A1F3A") : ChogTheme.Hex("1F4FA6"));
             }
 
             DressTexts(selection);
@@ -116,6 +129,22 @@ namespace Chog.Screens
                 else
                     ChogTheme.AsBody(text);
             }
+        }
+
+        // A slot of the right team: one under the second team's list (TeamSelectionUI-2).
+        private static bool InRightTeam(Transform slot)
+        {
+            for (var at = slot; at != null; at = at.parent)
+                if (at.name.EndsWith("-2"))
+                    return true;
+            return false;
+        }
+
+        private static void Half(Transform parent, float left, Color bottom, Color top)
+        {
+            var half = ChogUi.Area(left < 0.5f ? "Left" : "Right", parent, new Vector2(left, 0f), new Vector2(left + 0.5f, 1f)).gameObject.AddComponent<Image>();
+            half.sprite = ChogSprites.Gradient(bottom, top);
+            half.raycastTarget = false;
         }
 
         private static void Tint(Transform stick, Color colour)

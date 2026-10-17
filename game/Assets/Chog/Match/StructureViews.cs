@@ -213,10 +213,13 @@ namespace Chog.Match
             GUI.Label(band, fell ? _notice : _alarm, _noticeStyle);
         }
 
+        /// <summary>Set by the match's scoreboard (Chog.Screens.ChogScoreboard), which draws the clock itself.</summary>
+        public static bool ClockDrawnElsewhere { get; set; }
+
         // The siege's clock, top middle between the two scores: white, red in its last thirty seconds.
         private void DrawClock()
         {
-            if (_clock.Length == 0)
+            if (_clock.Length == 0 || ClockDrawnElsewhere)
                 return;
             if (_clockStyle == null)
             {
