@@ -96,3 +96,25 @@ declared by the player's page today, not by the replay.
 | ERC-6551 registry | `0x000000006551c19487814612e58FE06813775758` | 571 bytes |
 | Sablier Lockup v4.0 / Flow v3.0 | `0x82723C1ffEc9D43dE5FA80b25Da8df99AfD470ba` / `0x95004df5abe86a246664d8f5fb2683f24df768d1` | present (https://docs.sablier.com/guides/lockup/deployments) |
 | EAS, Superfluid | | not on Monad |
+
+## Fewer wallet windows: permit or batched calls (checked 17 October 2026, 18:10)
+
+The question behind "contracts v3 with EIP-2612 permit": does it take wallet windows away?
+
+- **Today:** the first payment to one of our contracts asks an approval of a 1,000 $CHOG budget, then
+  the payment; every later payment to that contract is one transaction (`ApprovalBudgetWei` in
+  `MonadTransactions.cs`). $CHOG answers `permit` (read on chain that day).
+- **With permit:** the first payment becomes a signature (no gas, no block to wait) and one
+  transaction: still two windows. Later payments are one window as today only if the permit signed a
+  budget; a permit per payment would make every payment two windows. The gain is one gas payment and
+  one block, once per contract, against three contracts to deploy again (rental, shop, wager) and
+  their state to move.
+- **With batched calls (EIP-5792 `wallet_sendCalls`, approve and pay in one window):** MetaMask does
+  it only on the networks it lists, through an EIP-7702 upgrade of the account to its smart account;
+  Monad is not among them (https://docs.metamask.io/wallet/how-to/send-transactions/send-batch-transactions/).
+  On Monad a delegated account cannot spend below 10 MON: "transactions that would reduce its balance
+  to below 10 MON will unconditionally revert" (https://docs.monad.xyz/developer-essentials/eip-7702).
+  Alchemy disables EIP-7702 user operations on Monad by default (support article updated 21 August
+  2026). So batching is not something players' wallets can rely on here.
+- **Reading:** permit is worth little over the budget approval already in place; batching is not
+  available on Monad in MetaMask. The decision is the owner's.
