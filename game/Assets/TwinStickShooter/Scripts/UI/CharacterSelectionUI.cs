@@ -77,6 +77,10 @@ namespace TwinStickShooter
       // A way back to the menu before the match starts.
       Chog.Screens.PreparationBack.Show(transform, Teams[0].TeamCharacters[0]);
 
+      // The host's clock: the match starts by itself when nobody presses START.
+      var hosts = _connection == null || _connection.Client.LocalPlayer.IsMasterClient;
+      Chog.Screens.LobbyCountdown.Show(transform, hosts, PlayersInRoom(), OnStartClicked);
+
       if (_connection == null)
       {
         StartButton.SetActive(true);
@@ -292,6 +296,22 @@ namespace TwinStickShooter
         var startCommand = new SelectCharacterCommands.FinishCharacterSelectionCommand();
         Game.SendCommand(startCommand);
       });
+    }
+
+    // The players in the room with a character, bots left out.
+    private int PlayersInRoom()
+    {
+      var count = 0;
+      var characters = VerifiedFrame.Filter<PlayerLink, TeamInfo>();
+      while (characters.Next(out _, out var playerLink, out _))
+      {
+        if (playerLink.PlayerRef != PlayerRef.None)
+        {
+          count++;
+        }
+      }
+
+      return count;
     }
 
     // The team of the local player's character, or -1 while it has none.

@@ -80,6 +80,9 @@ namespace Chog.Screens
                 {
                     case "StartButton":
                         ChogTheme.Style(button, ChogTheme.ButtonKind.Primary);
+                        // The host's clock starts the match by itself (LobbyCountdown); this starts it now.
+                        foreach (var label in button.GetComponentsInChildren<TMP_Text>(true))
+                            label.text = "START NOW";
                         break;
                     case "ChangeTeamButton":
                         ChogTheme.Style(button, ChogTheme.ButtonKind.Quiet);

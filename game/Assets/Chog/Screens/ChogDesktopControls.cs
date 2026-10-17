@@ -119,17 +119,34 @@ namespace Chog.Screens
             scaler.matchWidthOrHeight = 0.5f;
 
             var root = (RectTransform)_canvas.transform;
-            MakeCard(root, new Vector2(0f, 0f), new Vector2(Margin, Margin), 250f, "MOVE", "W A S D", null);
-            _special = MakeCard(root, new Vector2(1f, 0f), new Vector2(-Margin, Margin), 360f, "SPECIAL",
-                                "RIGHT CLICK <size=60%>OR SPACE</size>", ChogTheme.Gold);
-            _attack = MakeCard(root, new Vector2(1f, 0f), new Vector2(-Margin - 360f - Gap, Margin), 270f, "ATTACK",
-                               "LEFT CLICK", ChogTheme.Cheek);
+            var move = MakeCard(root, new Vector2(0f, 0f), new Vector2(Margin, Margin), 270f, "MOVE", "", null, null);
+            Keycaps(move.Frame.rectTransform, new[] { "W", "A", "S", "D" });
+            _special = MakeCard(root, new Vector2(1f, 0f), new Vector2(-Margin, Margin), 400f, "SPECIAL",
+                                "RIGHT CLICK <size=60%>OR SPACE</size>", ChogTheme.Gold, ChogIcons.Icon.Bolt);
+            _attack = MakeCard(root, new Vector2(1f, 0f), new Vector2(-Margin - 400f - Gap, Margin), 310f, "ATTACK",
+                               "LEFT CLICK", ChogTheme.Cheek, ChogIcons.Icon.Crosshair);
+        }
+
+        // Cream keys outlined in ink, side by side under the card's title.
+        private static void Keycaps(RectTransform card, string[] keys)
+        {
+            const float size = 50f, gap = 10f;
+            for (var i = 0; i < keys.Length; i++)
+            {
+                var key = ChogUi.Pinned("Key " + keys[i], card, new Vector2(0f, 0f), new Vector2(0f, 0f),
+                    new Vector2(16f + i * (size + gap), 12f), new Vector2(size, size));
+                var plate = ChogUi.Plate("Plate", key, Vector2.zero, Vector2.one, ChogTheme.Cream, 10);
+                plate.gameObject.AddComponent<Shadow>().effectDistance = new Vector2(0f, -4f);
+                var letter = ChogUi.Title("Letter", key, new Vector2(0f, 0.08f), Vector2.one, 34f, TextAlignmentOptions.Center, ChogTheme.Ink);
+                letter.fontSharedMaterial = letter.font != null ? letter.font.material : letter.fontSharedMaterial;
+                letter.text = keys[i];
+            }
         }
 
         // A dark card on a corner: the action in small letters over the keys in large ones, and,
         // when given a colour, a bar under them.
         private static Card MakeCard(RectTransform root, Vector2 corner, Vector2 position, float width,
-                                     string action, string keys, Color? bar)
+                                     string action, string keys, Color? bar, ChogIcons.Icon? icon)
         {
             var frame = new GameObject("Card " + action, typeof(RectTransform), typeof(Image));
             var area = (RectTransform)frame.transform;
@@ -142,17 +159,26 @@ namespace Chog.Screens
             image.raycastTarget = false;
 
             var card = new Card { Frame = image };
-            card.Action = Text(area, "Action", new Vector2(0.06f, 0.62f), new Vector2(0.94f, 0.94f), 24f, false);
+            // A pictogram on a tile of the action's colour at the left, the words beside it.
+            var left = 0.06f;
+            if (icon.HasValue && bar.HasValue)
+            {
+                var tile = ChogUi.Pinned("Tile", area, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(14f, 0f), new Vector2(76f, 76f));
+                ChogUi.Plate("Plate", tile, Vector2.zero, Vector2.one, bar.Value, 14);
+                ChogUi.Icon("Icon", tile, icon.Value, new Vector2(0.12f, 0.12f), new Vector2(0.88f, 0.88f));
+                left = 104f / width;
+            }
+            card.Action = Text(area, "Action", new Vector2(left, 0.62f), new Vector2(0.94f, 0.94f), 24f, false);
             card.Action.text = action;
             card.Action.color = Color.white;
-            var big = Text(area, "Keys", new Vector2(0.06f, bar.HasValue ? 0.2f : 0.08f), new Vector2(0.94f, 0.66f), 44f, true);
+            var big = Text(area, "Keys", new Vector2(left, bar.HasValue ? 0.2f : 0.08f), new Vector2(0.94f, 0.66f), 44f, true);
             big.text = keys;
             big.color = ChogTheme.Text;
 
             if (bar.HasValue)
             {
                 var track = Box(area, "Bar", new Color(1f, 1f, 1f, 0.12f));
-                track.anchorMin = new Vector2(0.06f, 0.09f);
+                track.anchorMin = new Vector2(left, 0.09f);
                 track.anchorMax = new Vector2(0.94f, 0.17f);
                 track.offsetMin = track.offsetMax = Vector2.zero;
                 card.Fill = Box(track, "Fill", bar.Value);

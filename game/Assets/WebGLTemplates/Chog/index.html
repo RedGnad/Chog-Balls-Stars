@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, shrink-to-fit=yes, viewport-fit=cover">
     <title>{{{ PRODUCT_NAME }}}</title>
     <meta name="description" content="3v3 arena. Your Chog Genesis is your hero.">
-    <meta name="theme-color" content="#0b1026">
+    <meta name="theme-color" content="#120d2a">
     <!-- Opened from the home screen of a phone, the page has no browser bars. -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -17,38 +17,70 @@
     <link rel="icon" type="image/png" href="TemplateData/icon-192.png">
     <link rel="apple-touch-icon" href="TemplateData/apple-touch-icon.png">
     <style>
+      /* The game's own letters (SIL Open Font License, texts beside them): Koulen for the name,
+         Lilita One for titles, Nunito for sentences, as in the game (docs/DESIGN-BRIEF.md). */
+      @font-face { font-family: "Koulen"; src: url("TemplateData/fonts/Koulen-Regular.ttf") format("truetype"); font-display: swap; }
+      @font-face { font-family: "Lilita One"; src: url("TemplateData/fonts/LilitaOne-Regular.ttf") format("truetype"); font-display: swap; }
+      @font-face { font-family: "Nunito"; src: url("TemplateData/fonts/Nunito-ExtraBold.ttf") format("truetype"); font-weight: 800; font-display: swap; }
       html, body {
         margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
-        background: #0b1026; color: #ffffff;
-        font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: #120d2a; color: #ffffff;
+        font-family: "Nunito", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 800;
         overscroll-behavior: none; touch-action: none;
         -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
         -webkit-tap-highlight-color: transparent;
       }
       #unity-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
-      #unity-canvas { display: block; width: 100%; height: 100%; background: #0b1026; outline: none; }
+      #unity-canvas { display: block; width: 100%; height: 100%; background: #120d2a; outline: none; }
       .cover {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0b1026;
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background:
+          radial-gradient(ellipse 60% 70% at 15% 30%, rgba(131, 110, 249, 0.30), rgba(131, 110, 249, 0) 70%),
+          radial-gradient(ellipse 60% 60% at 85% 95%, rgba(216, 62, 126, 0.22), rgba(216, 62, 126, 0) 70%),
+          linear-gradient(180deg, #1e1640 0%, #120d2a 100%);
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         text-align: center; padding: 24px; box-sizing: border-box;
       }
       #unity-loading-container { z-index: 10; }
-      #chog-title { font-size: 34px; font-weight: 800; letter-spacing: 2px; }
-      #chog-line { margin-top: 6px; font-size: 15px; color: #a9adc2; }
-      #chog-bar { margin-top: 26px; width: 240px; max-width: 70%; height: 8px; border-radius: 4px; background: #232a48; overflow: hidden; }
-      #chog-bar-full { width: 0; height: 100%; background: #54d18f; transition: width 0.2s; }
-      #chog-note { margin-top: 18px; min-height: 20px; max-width: 520px; font-size: 14px; line-height: 1.4; color: #a9adc2; }
+      #chog-hero {
+        width: 132px; height: 132px; border-radius: 50%; border: 5px solid #f7a81b; box-shadow: 0 7px 0 #140f24, 0 0 40px rgba(255, 214, 90, 0.35);
+        background: #140f24 url("TemplateData/icon-512.png") center / 118% no-repeat; animation: bob 1.6s ease-in-out infinite;
+      }
+      @keyframes bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
+      #chog-title {
+        margin-top: 22px; font-family: "Koulen", "Lilita One", sans-serif; font-size: 54px; line-height: 1; letter-spacing: 2px;
+        color: #fdf7d3; -webkit-text-stroke: 2px #140f24; paint-order: stroke fill; text-shadow: 0 4px 0 #140f24;
+      }
+      #chog-line { margin-top: 6px; font-size: 15px; color: #c9beff; }
+      #chog-bar {
+        margin-top: 24px; width: 320px; max-width: 76%; height: 22px; border-radius: 12px; background: #140f24;
+        border: 3px solid #140f24; box-shadow: 0 5px 0 rgba(10, 6, 24, 0.6); overflow: hidden; box-sizing: content-box;
+      }
+      #chog-bar-full {
+        width: 0; height: 100%; border-radius: 10px; transition: width 0.2s;
+        background: linear-gradient(180deg, #ffe58a 0%, #ffd34d 45%, #f5a20b 50%, #e68a00 100%);
+      }
+      #chog-note { margin-top: 14px; min-height: 20px; max-width: 520px; font-size: 14px; line-height: 1.4; color: #c9beff; }
+      #chog-tip {
+        margin-top: 18px; max-width: 520px; min-height: 44px; padding: 10px 18px; border-radius: 14px; box-sizing: border-box;
+        background: rgba(20, 15, 36, 0.6); border: 2px solid rgba(169, 155, 252, 0.35); font-size: 14px; line-height: 1.4; color: #ffffff;
+      }
+      #chog-tip b { font-family: "Lilita One", sans-serif; font-weight: 400; color: #ffe27a; letter-spacing: 0.5px; }
       #unity-warning { margin-top: 10px; max-width: 520px; font-size: 13px; color: #ff9c8a; }
       .action {
-        margin-top: 18px; padding: 12px 26px; border: 0; border-radius: 6px; background: #54d18f;
-        color: #0d1f29; font-size: 16px; font-weight: 800; letter-spacing: 1px; touch-action: manipulation;
+        margin-top: 18px; padding: 12px 28px; border: 3px solid #140f24; border-radius: 14px;
+        background: linear-gradient(180deg, #8ff0ae 0%, #4cd97a 48%, #3fbf68 52%, #33a85a 100%);
+        box-shadow: 0 5px 0 #140f24; color: #ffffff; font-family: "Lilita One", sans-serif; font-size: 20px; letter-spacing: 1px;
+        -webkit-text-stroke: 1.5px #140f24; paint-order: stroke fill; text-shadow: 0 2px 0 #140f24; touch-action: manipulation;
       }
-      .quiet { background: #ede8d9; }
+      .action:active { transform: translateY(3px) scale(0.97); box-shadow: 0 2px 0 #140f24; }
+      .quiet { background: linear-gradient(180deg, #5b4ca8 0%, #4a3c92 48%, #3b2f72 52%, #30265f 100%); }
       /* A phone held upright: the game is drawn for a screen on its side. */
       #chog-turn { display: none; z-index: 20; }
       @media (orientation: portrait) { body.touch.turn #chog-turn { display: flex; } }
-      #chog-phone { width: 46px; height: 82px; border: 4px solid #54d18f; border-radius: 10px; animation: turn 2.4s ease-in-out infinite; }
+      #chog-phone { width: 46px; height: 82px; border: 5px solid #f7a81b; border-radius: 12px; box-shadow: 0 5px 0 #140f24; animation: turn 2.4s ease-in-out infinite; }
       @keyframes turn { 0%, 30% { transform: rotate(0deg); } 60%, 100% { transform: rotate(-90deg); } }
+      @media (max-height: 420px) { #chog-hero { width: 92px; height: 92px; } #chog-title { margin-top: 12px; font-size: 40px; } #chog-tip { display: none; } }
     </style>
   </head>
   <body>
@@ -57,19 +89,44 @@
     </div>
 
     <div id="unity-loading-container" class="cover">
+      <div id="chog-hero"></div>
       <div id="chog-title">CHOG ARENA</div>
       <div id="chog-line">3v3 arena. Your Genesis is your hero.</div>
       <div id="chog-bar"><div id="chog-bar-full"></div></div>
       <div id="chog-note">Loading...</div>
+      <div id="chog-tip"></div>
       <div id="unity-warning"></div>
       <button id="chog-retry" class="action" style="display: none">TRY AGAIN</button>
     </div>
 
     <div id="chog-turn" class="cover">
       <div id="chog-phone"></div>
-      <div id="chog-note-turn" style="margin-top: 26px; font-size: 18px; font-weight: 700;">Turn your phone on its side to play</div>
+      <div id="chog-note-turn" style="margin-top: 26px; font-family: 'Lilita One', sans-serif; font-size: 22px;">Turn your phone on its side to play</div>
       <button id="chog-upright" class="action quiet">CONTINUE UPRIGHT</button>
     </div>
+
+    <script>
+      // While the game loads: what a Genesis does in it, one tip after another.
+      (function () {
+        var tips = [
+          "<b>YOUR HAT</b> gives your basic attack.",
+          "<b>YOUR EYES</b> give your special: it charges as you hit.",
+          "<b>YOUR OUTFIT</b> gives your class: brute, ranger or controller.",
+          "<b>YOUR AURA</b> gives the effect of your special.",
+          "<b>SIEGE:</b> bring their core down, or hit their towers harder than they hit yours for three minutes.",
+          "<b>MASTERY:</b> the matches a signed-in player plays with a Genesis are written on Monad, and its career follows the NFT.",
+          "<b>NO GENESIS?</b> You play a grey recruit, or rent a Genesis from its holder in $CHOG."
+        ];
+        var at = Math.floor(Math.random() * tips.length);
+        var tip = document.getElementById("chog-tip");
+        function show() { tip.innerHTML = tips[at]; at = (at + 1) % tips.length; }
+        show();
+        var turning = setInterval(function () {
+          if (document.getElementById("unity-loading-container").style.display === "none") { clearInterval(turning); return; }
+          show();
+        }, 3500);
+      })();
+    </script>
 
     <!-- The wallet of the page: the browser's own, or a wallet app connected on request. -->
     <script src="TemplateData/wallet-connector.js"></script>

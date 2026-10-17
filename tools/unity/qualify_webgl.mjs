@@ -70,7 +70,9 @@ try {
   };
   const version=await command('Browser.getVersion');
   for(const domain of ['Page','Runtime','Log','Network'])await command(domain+'.enable');
-  await command('Emulation.setDeviceMetricsOverride',{width:touch?960:1280,height:touch?540:720,deviceScaleFactor:1,mobile:touch});
+  // CHOG_BROWSER_WIDTH and CHOG_BROWSER_HEIGHT set another screen, for instance 844x390, a phone held sideways.
+  await command('Emulation.setDeviceMetricsOverride',{width:Number(process.env.CHOG_BROWSER_WIDTH)||(touch?960:1280),
+    height:Number(process.env.CHOG_BROWSER_HEIGHT)||(touch?540:720),deviceScaleFactor:1,mobile:touch});
   if(touch){
     await command('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:2});
     await command('Emulation.setUserAgentOverride',{userAgent:'Mozilla/5.0 (Linux; Android 11; ChogBrowserTest) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36'});
