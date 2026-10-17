@@ -79,7 +79,7 @@ namespace Chog.Screens
         private void BuildOfferView()
         {
             var cover = Child("Offer", transform, Vector2.zero, Vector2.one);
-            ChogTheme.AsCard(cover.gameObject.AddComponent<Image>());
+            ChogTheme.AsCard(cover.gameObject.AddComponent<Image>(), raised: true); // Opaque: nothing of the panel under it shows through.
             _offerView = cover.gameObject;
 
             _offerTitle = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.62f, 0.98f), TextAlignmentOptions.Left, Color.white, 60f, cover);
@@ -128,7 +128,7 @@ namespace Chog.Screens
         private void BuildMarketView()
         {
             var cover = Child("Market", transform, Vector2.zero, Vector2.one);
-            ChogTheme.AsCard(cover.gameObject.AddComponent<Image>());
+            ChogTheme.AsCard(cover.gameObject.AddComponent<Image>(), raised: true); // Opaque: nothing of the panel under it shows through.
             _marketView = cover.gameObject;
 
             var title = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.62f, 0.98f), TextAlignmentOptions.Left, Color.white, 60f, cover);

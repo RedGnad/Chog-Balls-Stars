@@ -260,7 +260,7 @@ namespace Chog.Screens
         private void BuildLoanView()
         {
             var cover = Child("Loan", transform, Vector2.zero, Vector2.one);
-            ChogTheme.AsCard(cover.gameObject.AddComponent<Image>());
+            ChogTheme.AsCard(cover.gameObject.AddComponent<Image>(), raised: true); // Opaque: nothing of the panel under it shows through.
             _loanView = cover.gameObject;
 
             _loanTitle = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.96f, 0.98f), TextAlignmentOptions.Left, Color.white, 60f, cover);
