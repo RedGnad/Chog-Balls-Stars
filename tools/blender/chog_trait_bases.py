@@ -382,12 +382,14 @@ def build_demon_horns(maker):
 def build_third_eye(maker):
     import make_chog_traits as traits_module
     part, surface = maker.part(), maker.surface
-    lift = 0.026
-    traits_module.draw_shape(part, surface, part.named("Dark"), traits_module.oval((0.0, 0.135), 0.040, 0.026, 16), lift)
+    # Three layers on the brow, laid on the head (settled(): 0.026, 0.034 and 0.042 off it until 18 October 2026).
+    lifts = [traits_module.settled(lift) for lift in (0.026, 0.026 * 1.3, 0.026 * 1.6)]
+    traits_module.draw_shape(part, surface, part.named("Dark"), traits_module.oval((0.0, 0.135), 0.040, 0.026, 16),
+                             lifts[0])
     traits_module.draw_shape(part, surface, part.named("White"), traits_module.oval((0.0, 0.135), 0.032, 0.019, 16),
-                             lift * 1.3)
+                             lifts[1])
     traits_module.draw_shape(part, surface, part.named("Dark"), traits_module.oval((0.0, 0.134), 0.011, 0.016, 10),
-                             lift * 1.6)
+                             lifts[2])
 
 
 def build_gem(maker):
@@ -480,7 +482,7 @@ def build_head_laser(maker):
     import make_chog_traits as traits_module
     wide, high = numbers.GLOW
     traits_module.draw_shape(part, surface, part.named("Glow"), traits_module.oval((0.0, numbers.AT), wide, high, 14),
-                             0.026)
+                             traits_module.settled(0.026))
 
 
 POISON_SHROOM = {

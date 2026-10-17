@@ -1980,7 +1980,11 @@ COSTUME = {
     "FIN": (24.0, 96.0, 0.150, 0.016),
     # The bandana over the lower face: in the coordinates of the face, its upper corners (to the side,
     # above), its point below the chin, how far off the head, its dots.
-    "BANDANA": (0.27, -0.040, -0.300, 0.032),
+    # Its lift runs from its top edge to its point: close to the face under the eyes, over the band of the hood
+    # that closes under the chin (CHIN, 1.10 times the head) at its point (0.034 there let that band show through
+    # it from below). It was 0.032 all over until 18 October 2026, 0.020 off the face; the face is now 0.0038 off
+    # the head, and the cloth, a grid 0.13 wide, sags up to 0.008 between its points.
+    "BANDANA": (0.27, -0.040, -0.300, (0.016, 0.056)),
     "BANDANA_DOTS": ((-0.12, -0.085), (0.0, -0.090), (0.12, -0.085), (-0.06, -0.150), (0.06, -0.150),
                      (0.0, -0.210), (-0.17, -0.060), (0.17, -0.060)),
     # 16 October 2026, the owner: a costume covers the whole body. Trousers in the colour of the suit over
@@ -2092,17 +2096,22 @@ def build_costume(maker):
     if entry.get("bandana"):
         # A triangle of cloth over the lower face, from below the eyes to a point under the chin, with
         # white dots: it covers the mouth ("HIDES" in "head").
-        half, top, point, lift = numbers.BANDANA
+        half, top, point, (lift_top, lift_point) = numbers.BANDANA
+
+        def lift_at(height):
+            share = min(1.0, max(0.0, (height - top) / (point - top)))
+            return lift_top + (lift_point - lift_top) * share
+
         rows = []
         for index in range(5):
             share = index / 4
             height = top + (point - top) * share
             wide = half * (1.0 - share) + 0.012
-            rows.append([surface.front(side, height, lift) for side in (-wide, -wide * 0.5, 0.0, wide * 0.5, wide)])
+            rows.append([surface.front(side, height, lift_at(height)) for side in (-wide, -wide * 0.5, 0.0, wide * 0.5, wide)])
         full.add_skin(hood, surface, rows, hood.named("Bandana"), around=False)
         for side, height in numbers.BANDANA_DOTS:
-            full.add_skin(hood, surface, full.patch_loops(surface, (side, height), 0.010, 0.010, 2.0, 0.0, lift + 0.003, 1, 6),
-                          hood.named("Dot"))
+            full.add_skin(hood, surface, full.patch_loops(surface, (side, height), 0.010, 0.010, 2.0, 0.0, lift_at(height) + 0.0015,
+                                                          1, 6), hood.named("Dot"))
 
 
 # ---------------------------------------------------------------------------------------------

@@ -48,9 +48,11 @@ def attach(host):
 
 X, Y, Z = Vector((1.0, 0.0, 0.0)), Vector((0.0, 1.0, 0.0)), Vector((0.0, 0.0, 1.0))
 
-# The lifts of what is drawn here, off the head: above the cheeks and the nose of the base (0.0216),
-# eight layers so that a tear can lie under an eye and a glint over it.
-LIFT = (0.0232, 0.0250, 0.0268, 0.0286, 0.0304, 0.0322, 0.0340, 0.0358)
+# The lifts of what is drawn here, off the head: above the cheeks and the nose of the base, eight layers so
+# that a tear can lie under an eye and a glint over it. (0.0232 to 0.0358, 0.0018 apart, until 18 October
+# 2026: the eyes and mouths stood out of the face like sheets. Now on it: settled() of make_chog_traits.py
+# says the rule, the lowest layer 0.0012 over the cheeks, each next one 0.0011 higher.)
+LIFT = tuple(0.0066 + 0.0011 * layer for layer in range(8))
 
 DARK = (0.05, 0.05, 0.05)
 WHITE = (0.95, 0.95, 0.95)
@@ -260,7 +262,7 @@ PIXEL_SHADES = {
              (-0.024, 0.020, 0.050, 0.020)),
     "BAR": (0.052, 0.018, 0.212),
     "WHITE": ((-0.040, 0.030, 0.0085), (-0.023, 0.012, 0.0085), (-0.006, -0.006, 0.0085)),
-    "LIFTS": (0.018, 0.046),
+    "LIFTS": (0.008, 0.036),     # (0.018 and 0.046 until 18 October 2026, the face then 0.009 higher)
     "OUTLINE_THICKNESS": 0.008,
 }
 

@@ -748,3 +748,48 @@ then the bust and the turns now); every value of every base in `.artifacts/chog-
 checked, none failed, none lacking a part; the view tests pass on it (84); the ten seen in a local preview
 build (`research/evidence/chog-head-objects-in-game-preview-headless-2026-10-16.png`), the game's own library
 put back right after.
+
+## The night of 18 October 2026: what the owner saw in the game
+
+What the owner wrote after looking at every hero in the app on 17 October, in their order, and what was done
+for each. Every change is a rule for all the Genesis it touches, measured or judged from every side, never
+a patch on one picture.
+
+### 1. The face, its eyes and its mouth lie on the head
+
+"The faces are slightly detached from the head, a strange result, like a sheet hanging in the air." Measured
+first with `measure_face_gaps.py` (a ray from fifteen points of every triangle drawn on the head back to the
+faceted head, and out again to see what shows through it; six Genesis of both Sides built before the change):
+the cream face stood 0.015 off the head on average (0.0185 at most), the eyes 0.031 (0.037), the mouths 0.030
+(0.043), up to 0.021 and 0.030 off the face. Seen turned (the hero pages), the face was a plate with a dark
+band under its edge, the teeth of hair on the brow stood in the air, and a wide grin stood out of the profile.
+Two causes: every layer was laid a fixed lift off the egg of the head (face 0.012, line 0.006, cheeks 0.0216,
+eyes and mouths 0.0232 to 0.0397), and the faceted head lies up to 0.007 inside that egg between its points.
+
+- **The face** (`add_settled_face` in `make_chog_traits.py`, in place of `add_face` of `make_chog_full.py`):
+  0.0038 off the egg, in triangles small enough that none sags into the head: its 24 points evenly spaced
+  along its edge (`face_edge_angles`; spaced by angle, the rounded square left chords 0.15 long over the brow
+  that sank 0.006 into the head) and its five rings evenly spaced over the head. Its dark line runs from under
+  the face out to its width, then a skirt goes down into the head (`FACE_EDGE`), so no gap shows at its edge
+  from any side; at the chin the line follows the egg (`along_egg`) where `HeadSurface.front` put it in the air.
+  The teeth of hair on the brow end in the same skirt, in the skin colour, and have a row halfway so the face
+  never shows through them. The cheeks and the nose lie 0.0016 over the face (`FACE_OVER`).
+- **Eyes and mouths** (every Eyes and Mouth part): the layers they are drawn in follow one rule, `settled()`:
+  the lowest just over the cheeks (0.0066 off the egg), each next one 0.0011 to 0.0020 higher, in the order
+  they had (`DRAWN` of `make_chog_traits.py`, `LIFT` of `chog_trait_faces.py`, the third eye and the glow of
+  the head laser of `chog_trait_bases.py`). 0.0011 is about ten times the step of the depth buffer of the
+  game's camera at its distance. The bandana of the gangster suit and the pixel shades came down with the face.
+- **Measured after** (twelve Genesis: #75, #15, #1287, #23, #103, #249, #38, #1149, #26, #45, #591, #70): the face
+  0.0069 off the head on average (0.0100 at most), the eyes 0.0125 (0.018), the mouths 0.011 (0.020), at most
+  0.010 and 0.015 off the face; no point of the head shows through the face, the cheeks, the teeth of hair, an
+  eye or a mouth, and no point of the face through an eye or a mouth (the dark line's skirt goes into the head
+  by design). Sheet: [before and after, turned](../../research/evidence/hero-3d-faces-on-the-head-2026-10-18.jpg)
+  (heroes read from the game's library, the one of `main` before and the new one).
+- **Checks**: library exported with `--check 5000` (1,970 heroes, 507 pieces, 3,570,687 bytes, 123 built and
+  1,846 checked, 0 failed, 0 lacking a part; every hero it builds under 8,000 triangles, the largest 7,983; a first
+  try with 28 points round the face put four heroes over, by 9 to 48); `sh tools/dev/view_tests.sh`: 155 passed.
+
+```sh
+B=/Applications/Blender.app/Contents/MacOS/Blender
+$B --background --factory-startup -t 4 --python tools/blender/measure_face_gaps.py -- --genesis 75,1287,23
+```

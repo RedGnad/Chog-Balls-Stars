@@ -135,7 +135,39 @@ POLISH = {
     "CHEEK": (0.180, -0.062, 0.046, 0.032),
     "FRINGE_WIDTH": 0.088,
     "FRINGE_DROP": 0.050,
+    # The face lies on the head (18 October 2026, see add_settled_face): it stands FACE_LIFT off the egg of
+    # the head (0.012 until then), in five rings evenly spaced over the head and 24 points round its edge
+    # evenly spaced along it, so that each triangle of the face keeps above the head.
+    # FACE_EDGE: how far inside the face the dark line starts, its lift there (under the face),
+    # the lift of its outer edge, then how far beyond that edge and how deep under the head the skirt that
+    # closes it goes. FACE_OVER: how much higher than the face the cheeks and the nose lie, and the teeth of
+    # hair. (A face 0.0030 off the egg let a point of the head show through it at the cheek: the quads by its
+    # edge sag up to 0.0032 between their corners.)
+    "FACE_LIFT": 0.0038,
+    "FACE_OVER": (0.0016, 0.0046),
+    "FACE_RING_SHARES": (0.2, 0.4, 0.6, 0.8, 1.0),
+    "FACE_SEGMENTS": 24,
+    "FACE_EDGE": (0.012, 0.0012, 0.0020, 0.005, 0.012),
 }
+
+# What is drawn on the face, in layers, off the egg of the head (eyes, mouths, tears, glints: DRAWN here,
+# LIFT of chog_trait_faces.py, which come between them). Until 18 October 2026 they stood 0.0245 to
+# 0.0397 off it: measured with a ray from each drawn point back to the head (#75, #1287, #23), an eye stood
+# 0.028 to 0.035 off the head and 0.016 to 0.019 off the face, and from the side a grin, a brow or the
+# teeth of hair stood out of the profile as sheets ("like a sheet hanging in the air", the owner). The
+# rule now: the lowest layer just above the cheeks (FACE_LIFT + FACE_OVER = 0.0054), each next one 0.0011 to
+# 0.0020 higher, in the order the old values had (settled(): each old value v becomes 0.0066 + (v - 0.0232)
+# x 0.611), so nothing that lay over something else changes sides. 0.0011 is about ten times the step of
+# the depth buffer of the game's camera at its distance (26 units, near plane 0.3, 24 bits).
+DRAWN_BEFORE = (0.0245, 0.0277, 0.0307, 0.0337, 0.0367, 0.0397)
+
+
+def settled(lift):
+    """Where a drawn layer that stood "lift" off the head until 18 October 2026 lies now."""
+    return 0.0066 + (lift - 0.0232) * (0.0011 / 0.0018)
+
+
+DRAWN = tuple(settled(lift) for lift in DRAWN_BEFORE)
 
 # The leaves a hat leaves: each hat shape says it in its numbers ("LEAVES"); what an item means is
 # said at leaf() in chog_trait_hats.py (15 October 2026). leaf_crossings() below checks the result.
@@ -167,8 +199,6 @@ def background_colour(value):
         found = json.load(source).get("backgrounds", {}).get(value)
     return tuple(channel / 255.0 for channel in found[0]) if found else None
 
-# The lifts of what is drawn on the face, off the head: above the cheeks of the base (0.0216).
-DRAWN = (0.0245, 0.0277, 0.0307, 0.0337, 0.0367, 0.0397)
 
 # ---------------------------------------------------------------------------------------------
 # Hats. A shape is built once; a hat of the collection is a shape, a colour set, a print or a mark,
@@ -781,6 +811,137 @@ def head_numbers(replaced=None):
 # ---------------------------------------------------------------------------------------------
 # The polished base.
 # ---------------------------------------------------------------------------------------------
+
+def egg_normal(surface, point):
+    """The way out of the egg of the head at a point on it (or near it)."""
+    offset = point - surface.middle
+    return Vector((offset.x / surface.half.x ** 2, offset.y / surface.half.y ** 2,
+                   offset.z / surface.half.z ** 2)).normalized()
+
+
+def along_egg(surface, start, away, distance, lift):
+    """The point "distance" further over the egg of the head from "start" (a point on it), going the way
+    "away" points (laid along the egg), then "lift" off it. Unlike HeadSurface.front, it stays on the head
+    where the face reaches its sides and the bottom of the chin."""
+    normal = egg_normal(surface, start)
+    way = away - normal * away.dot(normal)
+    if way.length < 1e-9:
+        return start + normal * lift
+    point = surface.towards((start + way.normalized() * distance - surface.middle).normalized())
+    return point + egg_normal(surface, point) * lift
+
+
+def face_place(numbers, angle, amount):
+    """A place of the face (to the side, above its middle): on its edge at "angle" when "amount" is 1, as
+    patch_loops of make_chog_full.py lays it (rounded square, wider at the brow)."""
+    width, height = numbers.FACE_HALF_WIDTH, numbers.FACE_HALF_HEIGHT
+    cosine, sine = math.cos(angle), math.sin(angle)
+    x = width * power(cosine, numbers.FACE_SQUARENESS)
+    z = height * power(sine, numbers.FACE_SQUARENESS)
+    x *= 1.0 + numbers.FACE_TAPER * z / height
+    return x * amount, z * amount
+
+
+def face_edge_angles(numbers, surface, segments):
+    """The angles (of face_place) of "segments" points round the edge of the face, evenly spaced along the
+    edge as it lies on the head: the upper half and the lower half each get an even number, so the middle of
+    the brow and of the chin are points and both sides mirror each other. Spaced by angle, the points of the
+    rounded square bunch at its corners and leave chords 0.15 long over the brow, which sank 0.006 into the
+    head between their ends."""
+    def half_lengths(first, last, steps=200):
+        angles = [first + (last - first) * index / steps for index in range(steps + 1)]
+        points = [surface.front(*face_place(numbers, angle, 1.0), 0.0) for angle in angles]
+        lengths = [0.0]
+        for before, after in zip(points, points[1:]):
+            lengths.append(lengths[-1] + (after - before).length)
+        return angles, lengths
+
+    halves = [half_lengths(0.0, math.pi), half_lengths(math.pi, 2.0 * math.pi)]
+    total = halves[0][1][-1] + halves[1][1][-1]
+    upper = max(2, 2 * round(segments * halves[0][1][-1] / total / 2.0))
+    counts = (upper, segments - upper)
+    chosen = []
+    for (angles, lengths), count in zip(halves, counts):
+        for index in range(count):
+            wanted = lengths[-1] * index / count
+            step = next(step for step in range(len(lengths) - 1) if lengths[step + 1] >= wanted)
+            share = (wanted - lengths[step]) / max(lengths[step + 1] - lengths[step], 1e-12)
+            chosen.append(angles[step] + (angles[step + 1] - angles[step]) * share)
+    return chosen
+
+
+def add_settled_face(part, numbers, surface):
+    """The cream face of the base, its dark line, the cheeks, the nose and the teeth of hair on the brow, laid
+    ON the head (18 October 2026). add_face of make_chog_full.py laid them 0.006 to 0.022 off the egg of the
+    head, which is itself 0 to 0.007 outside the faceted head between its points: seen turned (the hero
+    pages, the pick), the face stood off the head like a sheet with a dark line under its edge, and the teeth
+    of hair on the brow stood in the air. Now: the face FACE_LIFT off the egg, in triangles small enough
+    that none sags into the head (its points evenly spaced along its edge, face_edge_angles, and its rings
+    evenly spaced over the head from its middle to that edge, FACE_RING_SHARES); the dark line from under
+    the face out to its width, then a skirt down into the head, so no gap shows at the edge from any side;
+    each tooth of hair the same, its skirt in the skin colour. Where the face reaches the bottom of the chin,
+    the line and the skirt are laid along the egg (along_egg), never in the air."""
+    lift, line = numbers.FACE_LIFT, numbers.FACE_LINE
+    inset, under, outer, beyond, depth = numbers.FACE_EDGE
+    segments, shares = numbers.FACE_SEGMENTS, numbers.FACE_RING_SHARES
+    middle_of_face = surface.front(0.0, 0.0, 0.0)
+    towards_middle = (middle_of_face - surface.middle).normalized()
+    edges = [surface.front(*face_place(numbers, angle, 1.0), 0.0)
+             for angle in face_edge_angles(numbers, surface, segments)]
+
+    def over_the_head(edge, share, height):
+        """The point "share" of the way over the head from the middle of the face to a point of its edge
+        (by the angle seen from the middle of the head), "height" off the egg."""
+        towards_edge = (edge - surface.middle).normalized()
+        point = surface.towards((towards_middle * (1.0 - share) + towards_edge * share).normalized())
+        return point + egg_normal(surface, point) * height
+
+    # The face: its middle, then rings out to its edge.
+    loops = [[surface.front(0.0, 0.0, lift)]]
+    for share in shares:
+        loops.append([over_the_head(edge, share, lift) for edge in edges])
+    full.add_skin(part, surface, loops, full.FACE)
+
+    # The dark line: from under the edge of the face out over the head, then into it.
+    rows = [[], [], []]
+    for edge in edges:
+        away = edge - middle_of_face
+        reach = (edge - middle_of_face).length
+        rows[0].append(over_the_head(edge, 1.0 - inset / reach, under))
+        rows[1].append(along_egg(surface, edge, away, line, outer))
+        rows[2].append(along_egg(surface, edge, away, line + beyond, -depth))
+    full.add_skin(part, surface, rows, OUTLINE)
+
+    drawn = lift + numbers.FACE_OVER[0]
+    cheek_side, cheek_up, cheek_width, cheek_height = numbers.CHEEK
+    for side in (1.0, -1.0):
+        full.add_skin(part, surface, full.patch_loops(surface, (side * cheek_side, cheek_up), cheek_width, cheek_height,
+                                                      2.0, 0.0, drawn, 1, 12), full.BLUSH)
+    nose_side, nose_up, nose_width, nose_height = numbers.NOSE
+    full.add_skin(part, surface, full.patch_loops(surface, (nose_side, nose_up), nose_width, nose_height, 2.0, 0.6,
+                                                  drawn, 1, 8), full.BLUSH)
+
+    # The teeth of hair on the brow, in the skin colour: from a point on the face up over the dark line, then
+    # into the head. A tooth 0.085 long sags 0.004 to 0.006 between its tip and its corners over the corners
+    # of the brow, so it has a row halfway and lies higher than the eyes (FACE_OVER): the face never shows
+    # through it (0.0015 over the face, in one triangle, it did).
+    teeth = numbers.FRINGE_TEETH
+    if teeth:
+        brow = numbers.FACE_HALF_HEIGHT * 0.995
+        hair = lift + numbers.FACE_OVER[1]
+        tip = brow - numbers.FRINGE_DROP
+        for index in range(teeth):
+            middle = (index - (teeth - 1) * 0.5) * numbers.FRINGE_WIDTH
+            half = numbers.FRINGE_WIDTH * 0.5
+            corners = [surface.front(middle + offset, brow, 0.0) for offset in (-half, half)]
+            ups = [corner - middle_of_face for corner in corners]
+            full.add_skin(part, surface, [
+                [surface.front(middle, tip, hair)],
+                [surface.front(middle + offset * 0.55, tip + (brow - tip) * 0.55, hair) for offset in (-half, half)],
+                [along_egg(surface, corner, up, line, hair) for corner, up in zip(corners, ups)],
+                [along_egg(surface, corner, up, line + beyond, -depth) for corner, up in zip(corners, ups)],
+            ], SKIN, around=False)
+
 
 def add_leaf_crown(part, numbers, surface, leaves=FULL_CROWN):
     """The crown of add_crown of make_chog_full.py, blade for blade, each one a leaf, as "leaves" (one
@@ -2500,7 +2661,7 @@ def budget():
             rim_leaves_for(head, traits, None, head_n, body_n, surface)
             if key[1]:
                 hats_and_clothes.add_hair_points(head, surface, key[1], SKIN)
-            full.add_face(head, face_numbers(head_n, hat_numbers), surface, eyes=False, mouth=False)
+            add_settled_face(head, face_numbers(head_n, hat_numbers), surface)
             thing = head.finish("ChogBudgetHead", Vector((0.0, 0.0, 0.0)), None, base_materials)
             heads[key] = without_head + len(thing.data.polygons)
             data = thing.data
@@ -2594,7 +2755,7 @@ def build(traits=None, replaced=None, head_replaced=None):
         # Points of hair that a hat lets out on the brow (the durag), in the skin colour: part of the head.
         if hat_numbers.get("HAIR_POINTS"):
             hats_and_clothes.add_hair_points(head, surface, hat_numbers["HAIR_POINTS"], SKIN)
-        full.add_face(head, face_numbers(head_n, hat_numbers), surface, eyes=False, mouth=False)
+        add_settled_face(head, face_numbers(head_n, hat_numbers), surface)
     full.turn_head_up(head, head_n)
 
     arms = {}
