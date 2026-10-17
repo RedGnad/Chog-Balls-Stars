@@ -98,11 +98,10 @@ the test wallets, and a page that signs in without a Genesis, takes 1,000 tCHOG 
 
 # ChogWager: $CHOG staked on a match
 
-**Not deployed yet; ready for Monad testnet (above).** Written on 10 October 2026 after the user
+**Deployed on Monad mainnet on 16 October 2026 (top of this file); never used with a real wallet yet.** Written on 10 October 2026 after the user
 put staking on a match in scope (decision D33 in `docs/STATUS.md`). The backend that signs
 tickets and results (`server/src/wager.js`, `referee.js`) and the screens that stake and collect
-(`WagerPanel`, `WagerResult`) exist since 11 October. **No transaction was ever sent to Monad
-mainnet.**
+(`WagerPanel`, `WagerResult`) exist since 11 October.
 
 ## What the contract does
 
@@ -207,7 +206,7 @@ copy:
 Monad charges the gas limit of a transaction, not what it uses: the limits the game sends will
 have to sit above these, and a settlement costs more with every winner to pay.
 
-## Deploying on mainnet (not done)
+## Deploying on mainnet (done on 16 October 2026, see the top of this file)
 
 For the testnet, see "On Monad testnet" at the top. Moving the wager from the testnet to mainnet
 changes no code: the same contract, deployed with the real $CHOG token, and the services started
@@ -247,14 +246,18 @@ apart, able to replace it. This command was not run against the real chain.
 - The contract was not reviewed by anyone else and not audited.
 - Never used with a real wallet. From the game only with test wallets in the headless browser,
   on a local copy of mainnet (11 October) and a local chain started as the testnet (15 October).
+- **Probably a regulated wager.** Read on 17 October 2026 (not legal advice): in France, article L. 320-1 of the code
+  de la sécurité intérieure, as rewritten by ordonnance 2019-1015, bans games with a financial sacrifice and a gain due
+  even partly to chance, and adds "Cette interdiction recouvre les jeux dont le fonctionnement repose sur le savoir-faire
+  des joueurs" (https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000039167505); in Great Britain the Gambling Commission
+  finds "no basis in legislation" for saying a bet on oneself is not a bet (2017 position paper, 4.14); in the US it
+  depends on the state. Details and the professional fixes: `docs/PRODUCT-REVIEW.md`.
 
 # ChogRental: a Genesis played for a few days against $CHOG
 
-**Not deployed.** Written on 10 October 2026 after the user asked for a rental where the player
-pays and the holder is paid. Once the contract is deployed and its address given to the game
-services, the menu lets a holder offer the chosen Genesis and lets any connected wallet rent
-one that is offered. Until then nothing is shown. **No transaction was ever sent to the real
-chain and no key of the project was used.**
+**Deployed on Monad mainnet on 16 October 2026 (top of this file); no offer and no rental made on it yet.** Written on
+10 October 2026 after the user asked for a rental where the player pays and the holder is paid. With its address given to
+the game services, the menu lets a holder offer the chosen Genesis and lets any connected wallet rent one that is offered.
 
 ## What the contract does
 
@@ -308,7 +311,7 @@ day from their real holders (impersonated on the copy only), and gives the playe
 a first offer, 62,379 for a new price, 68,365 to take an offer back, 262,740 for a first rental
 and 172,689 for more days. The game sends them with limits of 250,000, 120,000 and 400,000.
 
-## Deploying (not done)
+## Deploying (done on 16 October 2026, see the top of this file)
 
 ```sh
 forge create contracts/src/ChogRental.sol:ChogRental --root contracts --rpc-url https://rpc.monad.xyz \
@@ -343,12 +346,10 @@ for `local.js`). This command was not run against the real chain.
 
 # ChogShop: items bought for a Genesis with $CHOG
 
-**Not deployed.** This folder holds the contract and its tests. Since 10 October 2026 the game
-knows how to use it: once the contract is deployed and its address given to the game services,
-the menu offers the second form of a Genesis's attack for $CHOG (item 1), and the purchase is
-two transactions of the player's wallet. Until then nothing is offered. The whole purchase was
-rehearsed on a local copy of Monad mainnet (below); **no transaction was ever sent to the real
-chain and no key of the project was used.** What is left to decide is at the bottom.
+**Deployed on Monad mainnet on 16 October 2026 (top of this file).** The owner bought the second form of #1287 (token
+1795) with their Ledger that day, for 100 $CHOG: the shop's only use by a real wallet so far. With its address given to the
+game services, the menu offers the second form of a Genesis's attack for $CHOG (item 1), two transactions of the player's
+wallet. What is left to decide is at the bottom.
 
 ## What the contract does
 
@@ -405,7 +406,7 @@ wallet without enough $CHOG was told so before signing anything. Gas used on the
 for the approval of the real token, 205,100 for a first purchase and 188,112 for a later one;
 the game sends them with limits of 100,000 and 300,000.
 
-## Deploying (not done)
+## Deploying (done on 16 October 2026, see the top of this file)
 
 The constructor takes the $CHOG token, the Genesis collection, the treasury, the share burned
 in basis points, and the owner who will set prices:
