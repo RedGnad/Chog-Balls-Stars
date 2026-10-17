@@ -571,6 +571,23 @@ rental, shop, a staked match) and the video's shots with it, today; Render; the 
 **Next action:** the perf quick wins and the phone measurement (the owner opens `?perf=1` on a phone); the trait 3D
 audit and fixes; the owner's eye on the aim, the towers and the core.
 
+**17 October 2026, 23:30 (night, the owner away and following the recommendations; deployed: `20261017T212207675Z`).**
+- **Asked by the owner:** simulation changes are fine when worth it ("on peut changer ce qu'il faut changer"),
+  maps will change. The 3D heroes still have problems seen in the app: faces slightly off the head ("feuille en
+  suspension"), the astronaut not a full costume like the banana and the dragon, Skull and Radioactive heads not
+  faithful nor cute, spikes longer under caps, some eyes and mouths wrong or misplaced.
+- **Deployed:** the audit's quick wins (`20261017T204324452Z`: effect shaders warmed under the floor while a match
+  loads, a phone's pixel ratio capped at 2, Unity physics off, no per-frame texts, combat log only with
+  `combatlog=1`), then `20261017T212207675Z`: the first trait set from the art (cd63001: laser eyes, Side=Left smile
+  and frown, angry skull sockets, the Accessory held in hand by 195 Genesis) and attack views kept for the next
+  attack (`ChogAttackViewPool`, 2585a5a; `viewpool=0` on a private page). Checked: matches against bots in siege
+  and coins, no exception; the public site loads the build (`live-8`, 1,970 heroes, 507 parts).
+- **Not measured:** the pool's gain. With the Mac swapping 11 GB, frames of 1.8 s appeared with and without it.
+- **Under way:** an agent on the owner's five 3D points; an agent studying the siege map (how the arena is built,
+  references, three layouts, a plan grouping the map and the core's collision radius in one simulation change).
+**Next action:** build, check and deploy the 3D fixes as they come; the owner picks a siege layout; the phone
+measurement (`http://<mac-ip>:8096/?perf=1`).
+
 **17 October 2026, 20:10 (the specials in 3D; on `main`, built `20261017T175516922Z`, not deployed).**
 - **Asked by the owner:** some attacks were "not in 3D, just sprites thrown on the attack". **Implemented**
   (`game/README.md`, "The specials in 3D"): the five specials, which come from the Eyes trait, are 3D objects
