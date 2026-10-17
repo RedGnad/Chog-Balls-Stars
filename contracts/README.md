@@ -255,43 +255,104 @@ apart, able to replace it. This command was not run against the real chain.
 
 # ChogRental: a Genesis played for a few days against $CHOG
 
-**Deployed on Monad mainnet on 16 October 2026 (top of this file); no offer and no rental made on it yet.** Written on
-10 October 2026 after the user asked for a rental where the player pays and the holder is paid. With its address given to
-the game services, the menu lets a holder offer the chosen Genesis and lets any connected wallet rent one that is offered.
+**Version 2, on the branch `rental-v2`, not deployed.** The version deployed on Monad mainnet on 16 October 2026 (top of
+this file, `0x7f1271d43b0e41e2eeddd5290f459fdc6196a19a`, no offer and no rental made on it) let a paid rental run to its
+end even when the Genesis was sold, so its buyer inherited a right they could neither see nor stop. On 17 October the
+owner asked to follow current practice instead: version 2 does what the reference implementation of ERC-4907,
+Yuga's ExclusiveDelegateResolver and delegate.xyz's guidance do (the right ends when the holder who was paid no longer
+holds the Genesis), and holds the payment as reNFT's escrow did, so the renter gets back the time not delivered
+(sources and the comparison in [docs/PRODUCT-REVIEW.md](../docs/PRODUCT-REVIEW.md), "The rental"). Written first on
+10 October 2026 after the user asked for a rental where the player pays and the holder is paid.
 
 ## What the contract does
 
-`src/ChogRental.sol`, about 200 lines, no dependency, not upgradeable, **no owner at all**.
+`src/ChogRental.sol`, about 350 lines, no dependency, not upgradeable, **no owner at all**.
 
 - The holder of a Genesis offers it at a price a day in $CHOG (`offer`), changes that price by
   offering again, or takes the offer back (`withdraw`). Only the address that holds the token
-  at that moment can offer it.
-- Anyone rents an offered Genesis for a whole number of days (`rent` after an `approve`). The
-  payment goes **straight from the renter to the holder**, less a share that is burned; the
-  contract keeps nothing. `rent` carries the price the renter saw: if the holder raised it
-  meanwhile the rental is refused, if the holder lowered it the lower price is charged.
+  at that moment can offer it. Taking the offer back never ends a running rental.
+- **One player at a time** rents an offered Genesis for a whole number of days (`rent` after an
+  `approve` of price x days), as ERC-4907, Axie's delegation and reNFT do for one token. `rent`
+  carries the price the renter saw: if the holder raised it meanwhile the rental is refused, if
+  the holder lowered it the lower price is charged. While a rental runs nobody else can rent
+  that Genesis (`AlreadyRented`); its renter adds days after those already paid, nobody is paid
+  up further than 30 days ahead.
+- **The payment is held by the contract** and the holder earns it **by the second** (reNFT's
+  formula, seconds x price / 86400). Days added at another price are spread, with what is left
+  of the first payment, evenly over the time left.
 - **The Genesis never moves and nothing is locked.** A rental is a right the game reads:
-  `isRenting(tokenId, renter)`. The holder keeps playing, and several players can rent the
-  same Genesis at once.
-- More days are added after those already paid; nobody is paid up further than 30 days ahead.
-- A rental that was paid runs to its end even if the offer is taken back or the Genesis sold.
-  An offer made by a former holder cannot be rented any more: `rent` checks that its author
-  still holds the token. The new holder clears it or replaces it with their own.
-- A holder cannot rent their own Genesis.
-- `standingOffers()` lists every offer that stands and `rentalsOf(address)` what an address
-  rents now: one read each, so no indexer is needed (Monad's public endpoints limit log
-  searches to 100 blocks).
+  `isRenting(tokenId, renter)` is true while the paid time runs **and the holder who was paid
+  still holds the Genesis**. The holder keeps playing.
+- **A sale ends the right at once.** The contract cannot see when a Genesis changed hands, so
+  anyone may `close` the rental once its holder no longer holds it (or once its time is over):
+  the holder has earned the time up to that moment, the renter gets the rest back. The game
+  services are meant to close it as soon as they see the transfer; until then the seller earns
+  that time. The renter may also end a rental early (`endRental`) and get the rest back.
+- **Each party takes its own money out** (`claim(tokenIds)`): what it earned as a holder, less
+  the burned share, and what it is owed back as a renter, whole. The rentals listed are settled
+  first, by whoever calls, and those whose holder sold or whose time is over are closed. A
+  transfer the token refuses to one address only fails that address's claim.
+- A holder cannot rent their own Genesis. An offer made by a former holder cannot be rented.
+- `standingOffers()` lists every offer that stands and is not rented now, `rentalsOf(address)`
+  the rentals of an address that still count: one read each, so no indexer is needed (Monad's
+  public endpoints limit log searches to 100 blocks). A burned Genesis does not stop them.
 - The token, the collection and the burned share cannot be changed afterwards.
+
+What changed for the callers (selectors unchanged unless said):
+
+| Function | Selector | Version 2 |
+| --- | --- | --- |
+| `offer(uint256,uint128)` | `0x92f6d20c` | unchanged |
+| `withdraw(uint256)` | `0x2e1a7d4d` | unchanged (takes the offer back, never ends a rental) |
+| `rent(uint256,uint256,uint128)` | `0xcfb0c2ab` | same call; the payment goes to the contract, not to the holder; refused with `AlreadyRented(tokenId, until)` while another player rents it |
+| `isRenting(uint256,address)` | `0xec06af47` | false as soon as the holder who was paid no longer holds the Genesis |
+| `standingOffers()` | `0x96f6c6be` | leaves out a Genesis rented now, so its renter finds its price with `offerOf` to add days |
+| `rentalsOf(address)` | `0xf43163ac` | leaves out a rental whose holder sold the Genesis |
+| `offerOf(uint256)` | `0xa3cb2f44` | unchanged (still true while the Genesis is rented) |
+| `rentedUntil(uint256,address)` | `0x4c3dce8b` | was a public mapping, now a view: the end of that address's rental on record, 0 when none |
+| `claim(uint256[])` | `0x6ba4c138` | new: settles the rentals listed and pays the caller what they earned (less the burned share) and are owed back |
+| `close(uint256)` | `0x0aebeb4e` | new: anyone, once the holder sold or the time is over |
+| `endRental(uint256)` | `0x97491d6f` | new: the renter ends early |
+| `rentalOf(uint256)` | `0xfc6779f9` | new view: renter, holder paid, end, payment still held, part of it earned since the last settlement |
+| `earnings(address)`, `refunds(address)` | `0x543fd313`, `0xbc3da535` | new views: what an address can claim, before the burned share for earnings |
+
+New events: `Earned(tokenId, lender, amount)`, `Ended(tokenId, renter, lender, refunded)`, `Claimed(account, paid,
+burned)`. New errors: `AlreadyRented`, `NotRenting`, `NoRental`, `StillRunning`.
 
 ## Tests
 
-The 18 tests run against stand-ins: the payment split and its events, the end of a rental to
-the second, days added after those paid, the 30-day limit, several renters at once, who may
-offer, a Genesis that is not offered, a raised and a lowered price, a holder renting their own,
-an offer taken back, a Genesis sold while rented and while offered, a former holder clearing
-their offer, no approval and no funds, a token whose transfer answers nothing, the two lists,
-a half-configured deployment, and a fuzz test that every unit paid is either burned or with
-the holder.
+The 27 tests of `ChogRentalTest` run against stand-ins: the payment held and earned by the
+second, the holder's claim less the burned share, the end of a rental to the second and its
+closing, a sale ending the right at once and the closing that refunds the time not delivered,
+a renter whose own claim closes the rental after a sale, no closing while a rental runs, a
+burned Genesis, an early end by the renter and by nobody else, one renter at a time and the
+next one after the end, days added after those paid and at another price, the 30-day limit,
+who may offer, a Genesis that is not offered, a raised and a lowered price, a holder renting
+their own, an offer taken back, a former holder clearing their offer, no approval and no funds,
+a payment refused to the holder that does not block the renter's refund, a claim of nothing,
+a token whose transfers answer nothing, the two lists, a half-configured deployment, and a
+fuzz test that every unit paid in is paid out, refunded or burned, none created or lost,
+whatever the price, the days added, the burned share and when the holder claims and sells.
+
+Gas of each step with every account cold, as a transaction of its own (`ChogRentalGasTest`,
+`forge test --match-contract ChogRentalGasTest -vv`, with the stand-in token, 17 October 2026):
+
+| Step | Gas |
+| --- | --- |
+| first offer | 163,865 |
+| new price | 62,467 |
+| take an offer back | 50,733 |
+| first rental | 232,013 |
+| more days | 126,050 |
+| a rental again after an early end | 167,409 |
+| the holder's claim, one Genesis | 107,737 |
+| the renter ends early | 58,854 |
+| the renter's claim of a refund | 49,957 |
+| close after a sale | 88,808 |
+
+Deployed size 8,611 bytes. Not measured with the real $CHOG token, whose transfers cost more
+than the stand-in's (the copy of mainnet gave 262,740 for a first rental of version 1, which
+made two transfers and a burn where version 2 makes one transfer).
 
 ## Rehearsing a rental on a local copy of the chain
 
@@ -307,9 +368,10 @@ sh tools/unity/checks/browser_check.sh rent http://127.0.0.1:8085 my-rental     
 
 The rehearsal script burns a tenth of each payment, offers the Genesis 3 and 408 at 10 $CHOG a
 day from their real holders (impersonated on the copy only), and gives the player some MON,
-10,000 $CHOG and the Genesis 1795. Gas used on the copy, with the real $CHOG token: 155,365 for
-a first offer, 62,379 for a new price, 68,365 to take an offer back, 262,740 for a first rental
-and 172,689 for more days. The game sends them with limits of 250,000, 120,000 and 400,000.
+10,000 $CHOG and the Genesis 1795. Gas used on the copy by version 1, with the real $CHOG token:
+155,365 for a first offer, 62,379 for a new price, 68,365 to take an offer back, 262,740 for a
+first rental and 172,689 for more days. The game sends them with limits of 250,000, 120,000 and
+400,000. Version 2 was not rehearsed on the copy yet.
 
 ## Deploying (done on 16 October 2026, see the top of this file)
 
@@ -321,7 +383,8 @@ forge create contracts/src/ChogRental.sol:ChogRental --root contracts --rpc-url 
 ```
 
 Then give the address to the services (`RENTAL_ADDRESS` for `server/src/host.js`, `--rental`
-for `local.js`). This command was not run against the real chain.
+for `local.js`). Version 1 was deployed on 16 October 2026 by the owner's script
+(`script/DeployMainnet.s.sol`); version 2 is not deployed.
 
 ## Limits
 
@@ -329,18 +392,27 @@ for `local.js`). This command was not run against the real chain.
 - The match itself does not check a rental: like ownership, it is checked by the game services
   when they credit a career. On a public address the game only lets a wallet pick a Genesis it
   holds or rents, but a modified page could declare any Genesis in a match.
-- A holder cannot end a rental that was paid, and a buyer of the Genesis inherits the rentals
-  that are running (30 days at most).
-- Nothing limits how many players rent one Genesis.
+- Between a sale and the closing of the rental the seller earns the time (the contract cannot
+  see the sale); the right itself stops at the sale. If the seller buys the Genesis back before
+  anyone closes the rental, it counts again as if it had never stopped.
+- A holder cannot end a rental that runs: it ends at its time, by its renter, or by a sale.
 - Never made with a real wallet: the stand-in wallet of the rehearsal accepts every request.
 
-## To decide before any deployment (the user)
+## Before deploying version 2
+
+- The services: `isRenting` and `rentalsOf` already give the new answers; they should also
+  call `close` (or have it called) when they see a rented Genesis change hands.
+- The game: a renter adds days with the price read by `offerOf` (the rented Genesis leaves
+  `standingOffers`); the holder needs a CLAIM button (`claim` with the Genesis they offer), the
+  renter one to end early and one to take a refund out; the text of the offer screen says one
+  player at a time and that a sale ends the rental.
+- The owner deploys it, then the services' `RENTAL_ADDRESS` changes; version 1 has no offer
+  and no rental, so nothing is left behind on it.
 
 | Question | What is built | Other options |
 | --- | --- | --- |
-| Share burned | fixed at deployment; the rehearsal used a tenth | none, or a part to a project treasury (needs a small change) |
+| Share burned | fixed at deployment, taken from what the holder earns; the rehearsal used a tenth | none, or a part to a project treasury (needs a small change) |
 | Who sets the price | each holder, per day, among steps from 1 to 5,000 $CHOG in the menu | a floor or a ceiling |
-| One renter or several | several at once, the holder keeps playing | one at a time (scarcer, needs a queue) |
 | The free link loan | kept beside the rental | removed once the rental is live |
 | Who deploys | whoever has a funded Monad wallet; the contract has no owner afterwards | |
 
