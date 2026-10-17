@@ -502,6 +502,31 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**17 October 2026, 18:45 (the look of a match; on `main`: 54f62ae, faf163f; in main's build `20261017T155010541Z`).**
+- **Implemented** (`game/README.md`, "The look of a match"): heroes and arena drawn with a diffuse matcap
+  (`ChogHero.shader` keeps `_Flash` as it was; `ChogArena.shader` on the pack's materials); each team's key light
+  turned to the upper left of its own camera, #FFE8C2, the same full shadow, shown at 75% toward violet, no fog; a
+  soft shadow and a ring under every hero (green, blue, red) and structure, in place of the sample's circle
+  (`ChogTeamRing`); grading, glow, vignette and FXAA at the quality level Good and up only (`ChogMatchPost`); the
+  palette "Chog day" beside the night, default unchanged (`ArenaPalettes`, `?arena=day`); `?matchlook=0` shows the
+  look of before on the same build, `?looktune=` tries other numbers, `?camera=` another angle (`ChogCameraRig`,
+  read by `LocalPlayerCameraFollow`). 123 view tests pass (16 new in `MatchLookTests`).
+- **Seen in matches on Photon's cloud** (muted headless Chrome on Metal, against bots): every step against the look
+  of before, night against day, four camera angles (`research/evidence/match-look-steps-2026-10-17.jpg`,
+  `match-night-vs-day-2026-10-17.jpg`, `match-camera-angles-2026-10-17.jpg`, `match-camera-faces-2026-10-17.png`).
+- **Measured** (`?perf=1`, a minute each): the median frame is 17.0 ms (60 Hz) in every configuration, Good, Fast and
+  2560 x 1440 with post-processing; main-thread median 3.3 to 3.9 ms at Good and 2.6 to 3.1 at Fast, before and
+  after alike. The Mac swapped 11 to 12 GB of 12 to 13 GB, so one-second frames appear in every run (the look of
+  before too): only the medians compare, and no cost stands out of the noise.
+- **Camera:** 62 to 65 degrees keep the floor seen around the player and show more of the tower's face and the lower
+  half of a hero's face, but the recruit's drawn eyes stay under the fringe; at 55 the near wall hides a hero at its
+  base. Default kept at the sample's 75.
+- **Not checked:** a phone (frame time, look on a small screen); team 1's side (the lights are set for both, only
+  team 0 was played); the menu's hero stage with the new shader (it uses the same material).
+**Waiting on the owner:** night or day; whether to keep the post-processing on computers; a camera angle (or the
+eyes made to show from above, which is the 3D work, not the camera).
+**Next action:** `?perf=1` on the phone with `?matchlook=0` and without; a match played as team 1 to see its shadows.
+
 **17 October 2026, 17:25 (juice and sound, in the view only; on `main`: 73c65d2, fd11ae1, 9740baf, 634985b).**
 - **Implemented** (`game/README.md`, "Juice and sound"): pooled fight effects; a 90 ms white flash, a flinch (0.85 high,
   1.1 wide, back in 0.25 s) and, on blows involving the local hero, a 0.06 s hit stop of the poses; damage numbers that

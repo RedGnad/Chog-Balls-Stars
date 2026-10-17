@@ -745,6 +745,8 @@ in `research/evidence/arena-palettes-headless-2026-10-16.jpg`): bright lavender 
 from the fight, cream ones read best but left the Chog colours; the one kept has lavender frames
 around deep purple planks on an indigo floor. A private option tries others without a build:
 `?arena=floor:262052,frame:a194f0,crate:3f3192,wall:2c2358,walldark:16112e,plant:2bc48f,ambient:6a62a0`.
+Since 17 October the palettes live in `Assets/Chog/Match/ArenaPalettes.cs` and the arena is lit as the
+next section says.
 
 **TOP GENESIS** (`Assets/Chog/Screens/ChogHall.cs`), a button beside HOW TO PLAY, opens the ten Genesis
 with the most wins as the game services keep their careers (`GET /api/career/top`, read through
@@ -763,6 +765,56 @@ crown of nine Chog leaves. The models face the camera; the tower turns its head 
 its beam leaves its eyes; the heart beats, faster while the core is hit; a fallen one becomes a lower
 ruin in greys, without its head or its heart (`ChogStructureModel`, `StructureViews`). About 4,000
 triangles each. Four tests read the file (`ChogStructureModelTests`).
+
+### The look of a match (17 October)
+
+The owner asked for a match that looks like an arena brawler of Supercell's (warm, readable, toy-like);
+the research behind it is in `docs/DESIGN-BRIEF.md` ("Match look", "Lighting plan"). Four parts, each
+of which a page can turn off to compare on the same build (`Assets/Chog/Match/ChogMatchLook.cs`), and a
+second palette:
+`?matchlook=0` is the look of before, `?matchlook=shade,ring` keeps only those, `?matchlook=-post`
+drops one. Without the option every part is on.
+
+| Part | What the player sees | Where |
+| --- | --- | --- |
+| shade | heroes drawn with a diffuse matcap: white where they face the viewer and the key, a lavender crescent (#D4C2E6) toward the lower right of the silhouette, a light rim on the upper left edge, outlines in a dark violet instead of black; the arena with the same light per vertex: tops lit, fronts turned toward a violet, a contact shade at the foot of walls and crates. Both read the normal in view space, so both teams, whose cameras face each other, see the same picture. `_Flash` (the hit flash) is untouched | `Resources/ChogHero.shader`, `Resources/ChogArena.shader` (put on the pack's materials by `ChogArenaSkin`) |
+| light | each team's key light turned to come from the upper left of its own camera, in #FFE8C2, the same full shadow for both (the arena shader turns it into 75% of the colour, toward violet), no fog, a lavender ambient for what still uses Unity's shaders | `ChogMatchLook.LightArena` |
+| ring | a soft shadow and a ring under every hero (green the player, blue allies, red enemies: the roles of `ChogTheme`) and under the tower and the core; the sample's faded circle is hidden and the ring takes its place, so an enemy hidden in a bush loses it too | `Assets/Chog/Match/ChogTeamRing.cs`, `Resources/ChogGround.shader` |
+| post | on a computer only (quality level Good and up; a phone starts at Fast and gets nothing): a glow of what is brightest by luminance, a light grading (violet shadows, warm highlights, a little contrast and colour), a violet vignette, FXAA | `Assets/Chog/Match/ChogMatchPost.cs`, `Resources/ChogMatchPost.shader` |
+| palette | "Chog night" (the default) or "Chog day" (grass floor #79A942, walls #CFC6E4 and #7D6FB0, frames #836EF9, crates #E39A55, bushes #2F8F5E) with `?arena=day`, each with its own light | `Assets/Chog/Match/ArenaPalettes.cs` |
+
+The numbers of the shading are globals the scripts give the shaders (`MatchLookTuning.cs`); a page tries
+others without a build, `?looktune=exposure:1.1,slope:1.2,arenashade:7a72b0,heroshade:c4b0e0,rim:0.4,warmth:0.5`
+(also `ramp`, `rampwidth`, `offset`, `shadow`, `foot`, `bloom`, `threshold`, `contrast`, `saturation`,
+`vignette`). The camera's angle is in `ChogCameraRig.cs` (the sample's 75 degrees unless `?camera=pitch[,fov[,distance]]`
+asks for another; the offset then keeps the same width of floor at the player; `LocalPlayerCameraFollow`
+reads it). Tests: `MatchLookTests.cs` (the options, the palettes, the camera's geometry).
+
+**Seen on 17 October** in matches against bots on Photon's cloud, in a muted headless Chrome drawing with
+the Mac's GPU (preview builds `20261017T151852241Z` and main's `20261017T155010541Z`): each step against the
+look of before (`research/evidence/match-look-steps-2026-10-17.jpg`), night against day
+(`research/evidence/match-night-vs-day-2026-10-17.jpg`). Found on the way: the floor's planks stand above
+y = 0, so a ring laid at 0.03 was hidden under them (it now sits just under the sample's circle, at 0.18);
+a flat matcap on the arena erased the planks and the crates' faces (the arena now takes the key per face,
+saturate(cosine x 1.1 + 0.15)); a glow thresholded on the brightest channel made the lavender crates shine
+(it is now thresholded on luminance).
+
+**Frame times** (perf overlay, one minute of a match each, M1 MacBook Pro, headless Chrome on Metal, 1280 x 720
+unless said; the Mac swapped 11 to 12 GB of 12 that evening, so frames of about one second appear in every run,
+the look of before included, and only the medians and the main thread compare): the median frame is 17.0 ms
+(the display's 60 Hz) in every configuration, at Good and at Fast, and at 2560 x 1440 with the post-processing
+on; the main thread's median busy time is 3.7 ms before, 3.8 with the shading, 3.9 with the light, 3.3 with
+the rings, 3.6 at 2560 x 1440 with everything (3.7 before at that size), 2.6 to 3.1 at Fast before and 3.1
+after. No difference stands out of the run-to-run noise. **Not measured:** a phone (no GPU timing from here;
+on a phone the new cost is a few arithmetic operations per hero pixel, the arena's per vertex, and one draw
+call per hero and structure for its ring; no post-processing).
+
+**The camera angle** (`research/evidence/match-camera-angles-2026-10-17.jpg`, `match-camera-faces-2026-10-17.png`,
+the local recruit facing the camera at the base): at 62 to 65 degrees (`?camera=62,27.5`, `?camera=65,30`)
+the same floor is seen around the player, the tower's face reads better and the hero's face grows from a thin
+crescent under the fringe to its lower half, but the recruit's drawn eyes stay under the fringe; at 55 degrees
+the near wall hides a hero standing at its base. The default is unchanged: faces need the model's help (eyes
+lower or a shorter fringe as seen from above), which the camera alone does not give.
 
 ### Two modes: the siege and the coins (16 October)
 
