@@ -161,17 +161,44 @@ const judge = verifier && (await exists(database))
 // Stakes without a judge would only ever be given back after an hour: say so at the start.
 if (referee && !judge) console.warn('WAGER_ADDRESS is set without VERIFIER_DLL: no match will get a verdict, stakes can only be refunded.');
 
-// A judged match goes on chain once: the careers of the Genesis that played it.
+// A judged match goes on chain once: the careers of the Genesis that played it. What happened to
+// the last matches is kept in memory and shown at /api/careers/recent, since the host's own log
+// is not readable from outside: the verdict, and the transaction or why there is none.
 const recorded = new Set();
+const recent = [];
+function remember(entry) {
+  recent.unshift({ at: new Date().toISOString(), ...entry });
+  recent.length = Math.min(recent.length, 30);
+}
 async function judgeAndRecord(gameId) {
-  const verdict = await judge.judge(gameId);
-  if (verdict && chainCareers && !recorded.has(gameId)) {
-    recorded.add(gameId);
-    const match = await matches.get(gameId);
-    chainCareers.recordMatch(gameId, verdict, match?.admissions ?? [])
-      .then(result => console.log(`Careers of ${gameId}: ${result.recorded ? 'recorded ' + result.hash : 'nothing recorded (' + result.reason + ')'}`))
-      .catch(error => console.warn(`Careers of ${gameId} not recorded: ${error.message}`));
+  let verdict;
+  try {
+    verdict = await judge.judge(gameId);
+  } catch (error) {
+    remember({ gameId, judged: false, why: error.message });
+    throw error;
   }
+  if (!verdict) {
+    remember({ gameId, judged: false, why: 'the record of the match is not whole yet' });
+    return verdict;
+  }
+  const summary = { gameId, judged: true, void: Boolean(verdict.void), why: verdict.why ?? null, winnerTeam: verdict.winnerTeam ?? null, players: verdict.players ?? null };
+  if (!chainCareers || verdict.void || recorded.has(gameId)) {
+    remember({ ...summary, recorded: false, reason: !chainCareers ? 'careers kept in a file' : verdict.void ? 'void' : 'already sent' });
+    return verdict;
+  }
+  recorded.add(gameId);
+  const match = await matches.get(gameId);
+  const admissions = (match?.admissions ?? []).map(({ player, tokenId, right, standIn }) => ({ player, tokenId, right, ...(standIn ? { standIn } : {}) }));
+  chainCareers.recordMatch(gameId, verdict, match?.admissions ?? [])
+    .then(result => {
+      remember({ ...summary, admissions, recorded: result.recorded, reason: result.reason ?? null, hash: result.hash ?? null, entries: result.entries ?? null });
+      console.log(`Careers of ${gameId}: ${result.recorded ? 'recorded ' + result.hash : 'nothing recorded (' + result.reason + ')'}`);
+    })
+    .catch(error => {
+      remember({ ...summary, admissions, recorded: false, reason: error.message });
+      console.warn(`Careers of ${gameId} not recorded: ${error.message}`);
+    });
   return verdict;
 }
 
@@ -190,6 +217,7 @@ const api = createApi({
   rental,
   standIns,
   careers,
+  recentRecords: () => recent,
   sessions,
   photon: createPhoton({
     secret: await photonSecret(dataFolder, environment.PHOTON_SECRET),

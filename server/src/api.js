@@ -60,7 +60,7 @@ async function bodyOf(request) {
  *   beside these services, or a function that reads it; empty when they do not know
  * @returns {(request: Request) => Promise<Response>}
  */
-export function createApi({ chain, sessions, careers, shop, rental, standIns, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
+export function createApi({ chain, sessions, careers, recentRecords, shop, rental, standIns, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
   // The page a wallet is asked to trust: it is written in the message the player signs.
   function pageOf(request, url) {
     const origin = publicOrigin
@@ -133,6 +133,9 @@ export function createApi({ chain, sessions, careers, shop, rental, standIns, ph
     },
 
     // The Genesis that won the most.
+    // What happened to the last judged matches: verdict, and the career transaction or why none.
+    'GET /api/careers/recent': async () => json(200, { matches: recentRecords ? recentRecords() : [] }),
+
     'GET /api/career/top': async (request, url) => {
       const limit = Number(url.searchParams.get('limit') ?? 10);
       if (!Number.isInteger(limit) || limit < 1 || limit > MAX_TOKENS_PER_READ) {
