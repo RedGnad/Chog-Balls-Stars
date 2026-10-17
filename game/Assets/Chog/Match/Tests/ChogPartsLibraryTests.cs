@@ -45,7 +45,15 @@ namespace Chog.Match.Tests
             Assert.AreEqual(OriginGenesis + SkullAndRadioactiveGenesis + OneOfOneGenesis + 1, Library.Heroes.Count);
             Assert.IsTrue(Library.TryGetHero(ChogHeroModel.Recruit, out var recruit));
             Assert.AreEqual("Recruit", Library.Skins[recruit.Skin].Name);
-            Assert.AreEqual(4, recruit.Pieces.Length, "the recruit is the bare Chog: body, head, two arms");
+            Assert.AreEqual(5, recruit.Pieces.Length, "the recruit is the bare Chog with plain eyes: body, head, two arms, eyes");
+
+            // Its eyes are the very part a Genesis of "Side Eye" wears: CHOG #112, a bare head on Side=Right.
+            var eyes = recruit.Pieces.Where(index => Library.Pieces[index].Name.StartsWith("Eyes_")).ToList();
+            Assert.AreEqual(1, eyes.Count, "the recruit wears one pair of eyes");
+            Assert.AreEqual("Eyes_SideEye", Library.Pieces[eyes[0]].Name);
+            Assert.AreEqual("Head", Library.Pieces[eyes[0]].On);
+            Assert.IsTrue(Library.TryGetHero(112, out var sideEye));
+            CollectionAssert.Contains(sideEye.Pieces, eyes[0]);
         }
 
         [Test]

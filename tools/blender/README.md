@@ -423,6 +423,29 @@ builds. The 100 Genesis on another base are not exported (no head of their own y
 bare Chog in grey, under the number 0, for the recruits. Summary in `.artifacts/chog-body/parts-export.json`.
 After any change to the 3D, run it again and build the game.
 
+**The recruit's eyes (17 October 2026, branch `recruit-eyes`).** The bare Chog had no eyes (eyes are a trait),
+so its face read as blank. The export now gives it the eyes of "Side Eye" (`RECRUIT_EYES` in
+`export_chog_parts.py`), the very part the Genesis of that value wear, no new mesh: a dark eye half closed under
+a straight lid, glancing aside, the Genesis drawing of the official mascot's half-lidded look
+(`chogathon.chog.xyz/chog1.jpg`, the first eyes of the site's picture maker), and the most worn eye part that is
+neither closed nor an object. CHOG #112 wears it on the bare head. **Not exported yet** (16:15 that day the disk
+had 1.0 GB free, under the 3 GB asked before a Blender run): the game's library still has the recruit without
+eyes, and its view test fails until the export is run. `render_recruit.py` renders any hero of the library as
+the game assembles it, turned around, and `make_recruit_sheet.py` lays the pictures on one sheet:
+
+```sh
+B=/Applications/Blender.app/Contents/MacOS/Blender
+$B --background --factory-startup -t 4 --python tools/blender/export_chog_parts.py -- --check 5000
+sh tools/dev/view_tests.sh
+git show main:game/Assets/Chog/Resources/ChogParts.bytes > .artifacts/chog-body/recruit-eyes/ChogParts-main.bytes
+$B --background --factory-startup -t 4 --python tools/blender/render_recruit.py -- \
+    --library .artifacts/chog-body/recruit-eyes/ChogParts-main.bytes --name recruit_before
+$B --background --factory-startup -t 4 --python tools/blender/render_recruit.py
+.artifacts/tools-venv/bin/python tools/blender/make_recruit_sheet.py \
+    --out .artifacts/chog-body/recruit-eyes/recruit_turnaround.png \
+    --row "before=.artifacts/chog-body/recruit-eyes/recruit_before" --row "after=.artifacts/chog-body/recruit-eyes/recruit"
+```
+
 ## The tower and the core (16 October 2026, a proposal behind `?structures3d=1`)
 
 `make_chog_structures.py` builds what each team defends in the style of the heroes and writes

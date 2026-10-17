@@ -34,7 +34,8 @@ The file (written to game/Assets/Chog/Resources/ChogParts.bytes by default), lit
     pieces:    count, then name, the rest part it sits on, vertex count, positions (3 floats each),
                normals (3 signed bytes each), material of each vertex (2 bytes), index count, indices
                (2 bytes, or 4 when the piece has more than 65,535 vertices)
-    genesis:   count, then the number shown in the name (2 bytes; 0 is the grey Chog of a recruit), skin
+    genesis:   count, then the number shown in the name (2 bytes; 0 is the grey Chog of a recruit, bare but
+               for the eyes of "Side Eye"), skin
                (1 byte), piece count (1 byte), pieces (2 bytes each), the piece its basic attack throws
                (2 bytes, 65535 for none) and how that piece moves (1 byte, chog_attack_objects.SPIN...)
     lines:     count, then each line a player reads about a basic attack (string), and for every Genesis
@@ -94,6 +95,12 @@ ROLE_FIXED, ROLE_SKIN, ROLE_FACE = 0, 1, 2
 # Skin of the collection has: what a Genesis adds shows by what the recruit lacks.
 RECRUIT = 0
 RECRUIT_SKIN = {"skin": (0.62, 0.62, 0.66), "face": traits.GENESIS_FACE}
+# A face without eyes read as blank (17 October 2026), so the recruit wears the eyes of "Side Eye", the very
+# part the Genesis of that value wear: a dark eye half closed under a straight lid, glancing aside, the
+# Genesis drawing of the official mascot's half-lidded look (chogathon.chog.xyz/chog1.jpg, the first eyes
+# of the site's picture maker), and the most worn eye part that is neither closed nor an object. CHOG #112
+# wears it on the bare head too.
+RECRUIT_EYES = ("trait", "Eyes", "Side Eye", "Right")
 SKINS = {**traits.SKINS, "Recruit": RECRUIT_SKIN}
 # The Skull base (batch 7): its own bone colours, by "Skin", under names that do not meet those of Origin.
 SKINS.update({"Skull " + name: {"skin": colour, "face": colour} for name, colour in bases.SKULL_SKINS.items()})
@@ -493,12 +500,15 @@ def main():
             incomplete[number] = lacking
         heroes[number] = (skin_key(found), worn, *attack_for(found, worn))
 
-    # The recruit: the body, the arms and the head of a Genesis without hat or hood.
+    # The recruit: the body, the arms and the head of a Genesis without hat or hood, and plain eyes.
     bare = ("head", None, None, None)
     if bare not in by_key:
         raise SystemExit("CHOG_PARTS no Genesis without hat or hood was built: the recruit has no head")
-    heroes[RECRUIT] = ("Recruit", [index for key in (("rest", "Body"), bare, ("rest", "armLeft"), ("rest", "armRight"))
-                                   for index in by_key[key]], attack_pieces["Leaf"], attacks.TUMBLE)
+    if RECRUIT_EYES not in by_key:
+        raise SystemExit(f"CHOG_PARTS no Genesis wearing {RECRUIT_EYES} was built: the recruit has no eyes")
+    recruit_keys = (("rest", "Body"), bare, ("rest", "armLeft"), ("rest", "armRight"), RECRUIT_EYES)
+    heroes[RECRUIT] = ("Recruit", [index for key in recruit_keys for index in by_key[key]],
+                       attack_pieces["Leaf"], attacks.TUMBLE)
 
     labels = {number: attacks.label_of(everyone[number].get("Head"), bases.is_skull(everyone[number])) if number in everyone else
               "THROWS THE SPIKES OF ITS CROWN" for number in heroes}

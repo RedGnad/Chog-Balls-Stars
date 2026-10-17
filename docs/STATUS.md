@@ -502,6 +502,26 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**17 October 2026, 16:15 (the owner: the recruit has no eyes; branch `recruit-eyes`, not in the game).**
+- **Found:** the recruit (number 0 of the library) wears only the body, the bare head and the arms
+  (`export_chog_parts.py`); eyes are a trait, so its face shows the fringe and the cheeks and nothing else.
+- **Changed (implemented, not exported):** it now also takes the eyes of "Side Eye" (`RECRUIT_EYES`), the very piece
+  `Eyes_SideEye` the Genesis of that value wear (CHOG #112 wears it on the same bare head): a dark eye half closed
+  under a straight lid, glancing aside, the Genesis drawing of the official mascot's half-lidded look, and the most
+  worn eye piece that is neither closed nor an object (106 heroes). No new mesh. The view test now expects 5 pieces
+  for the recruit, `Eyes_SideEye` among them, the same piece as #112's. `render_recruit.py` renders any hero of the
+  library as the game assembles it, turned around; `make_recruit_sheet.py` lays the pictures on one sheet.
+- **Not done: the export, the pictures, the tests on the new library.** The disk had 1.0 GB free (swap 11.4 GB of
+  12.3 GB), under the 3 GB the owner asks before any Blender run, so no Blender was started. With the library of
+  `main` the view tests give 89 passed, 1 failed: that recruit test (4 pieces where 5 are expected), as planned.
+  Library of `main` (the "before"): 1,970 heroes, 495 pieces, 749 materials, 30 skins.
+**Next action:** free disk to 3 GB or more, then on `recruit-eyes`: `export_chog_parts.py -- --check 5000` (expect
+1,970 heroes and 495 pieces, none failed, none lacking a part), `sh tools/dev/view_tests.sh`, `render_recruit.py`
+(and with `--library` set to `main`'s file and `--name recruit_before`), `make_recruit_sheet.py` into
+`.artifacts/chog-body/recruit-eyes/` (the commands are in `tools/blender/README.md`, "The recruit's eyes"); once
+exported, say it in `game/README.md` ("The 3D heroes") and the summary of `ChogHeroModel`; the owner's eye on the
+sheet, then merge and build.
+
 **17 October 2026, morning (the owner sells #1287 this afternoon and tests what needs it this morning; the domain
 is bought later).**
 - **Read on the chain that morning:** the Ledger holds token 1795, 39.03 $CHOG and 79.4 MON; #1287 is not offered
