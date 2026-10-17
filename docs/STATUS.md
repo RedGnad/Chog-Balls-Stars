@@ -524,8 +524,18 @@ is bought later).**
   collection, test $CHOG, the three contracts, services on this Mac with a second Photon application), the code
   the same and the addresses set by configuration (today `server/src/chain.js` fixes the collection and chain 143).
 - **Seen at 08:30:** #1287's career on Render still reads 0 matches although the owner says they played it.
-**Next action:** the owner's answer on the rental rule and on the staging setup; the holder's shots for the video
-before the sale; why the owner's match left no career.
+- **Decided by the owner that morning** (after `docs/PRODUCT-REVIEW.md`): the rental follows current practice (payment
+  held and earned by the second, the right ends with the holding, unused time paid back, one renter at a time; branch
+  `rental-v2`); the stakes stay ("un mvp crypto worldwide ... expérimental"), the legal reading is recorded in the
+  review; careers go on chain, and as much as can go on chain or through an indexer does (branch `careers-onchain`);
+  no testnet, full mainnet; the video shows the features in action, no wallet scenes, filmed late with a real match
+  where an NFT the owner keeps stands in for #1287 (to build: a stand-in setting of the services, off by default,
+  that writes no career for the Genesis it stands in for).
+- **The owner's match of 16 October evening left no career:** the report path answers through Vercel (`POST
+  /api/career/result` gives 401 `not_signed_in` unsigned); a restart of the free service overnight is the likely cause,
+  not proven (no logs). A match signed in on 17 October settles it.
+**Next action:** the owner's match signed in with #1287 and the career read right after; LEND IT tested; the rental v2
+and the career registry built, deployed by the owner and wired; the stand-in for the video.
 
 **16 October 2026, 21:40 (the game is Chog Arena, at https://chogarena.vercel.app).**
 - **Name:** the owner named the game Chog Arena (menu title, page name, manifest, share text, sign-in message);
