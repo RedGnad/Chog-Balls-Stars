@@ -33,6 +33,9 @@
 //   STAND_INS       optional, "0xCollection:tokenId=genesisTokenId[,...]": the holder of that NFT
 //                   plays that Genesis without holding it, to film or test it (standin.js); it
 //                   writes no career. Empty in the public game
+//   PREVIEW_BUILDS  optional, "any" or builds separated by commas that may open rooms although they
+//                   are not the build served: a local build is then played on Photon's cloud to be
+//                   looked at; the judge calls its matches void (no career, no stake settled)
 //   CAREERS_ADDRESS optional, the careers register on Monad mainnet (contracts/src/ChogCareers.sol);
 //                   needs REFEREE_KEY, whose address writes it and pays its gas. Without it the
 //                   careers are kept in a file of DATA_DIR, lost when a free host restarts
@@ -222,6 +225,7 @@ const api = createApi({
   photon: createPhoton({
     secret: await photonSecret(dataFolder, environment.PHOTON_SECRET),
     sessions, careers, chain, shop, rental, standIns, matches, build,
+    previewBuilds: (environment.PREVIEW_BUILDS ?? '').trim(),
     onReplayEnded: judge ? gameId => judgeAndRecord(gameId) : undefined,
   }),
   build,

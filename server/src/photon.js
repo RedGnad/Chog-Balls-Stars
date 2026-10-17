@@ -59,7 +59,7 @@ const refused = (error, message) => ({ status: 400, body: { Status: 400, Error: 
  *   room of another build is refused. Empty when the services do not know what they serve:
  *   every room is then accepted
  */
-export function createPhoton({ secret, sessions, careers, chain, shop, rental, standIns, matches, onReplayEnded, build = '' }) {
+export function createPhoton({ secret, sessions, careers, chain, shop, rental, standIns, matches, onReplayEnded, build = '', previewBuilds = '' }) {
   if (typeof secret !== 'string' || secret.length < 32) throw new Error('The Photon secret must be at least 32 characters');
   const servedNow = typeof build === 'function' ? build : async () => build;
 
@@ -181,7 +181,11 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, s
       // A page that kept an older build would play a match nobody here can judge: the judge
       // only replays right what was played with its own simulation.
       const served = await servedNow();
-      if (served && buildOf(request.AppVersion) !== served) {
+      // A build being previewed (PREVIEW_BUILDS) may open rooms of its own: its pages only meet each
+      // other (a room is named after its build), and the judge calls its matches void, so they write
+      // no career and settle no stake.
+      const previewed = previewBuilds === 'any' || String(previewBuilds).split(',').map(one => one.trim()).includes(buildOf(request.AppVersion));
+      if (served && buildOf(request.AppVersion) !== served && !previewed) {
         return refused('AnotherBuild', 'this page runs another version of the game than the one served here: load it again');
       }
       const gameId = `${request.GameId}~${randomName('')}`;

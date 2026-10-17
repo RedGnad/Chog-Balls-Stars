@@ -65,6 +65,10 @@ services:
         value: "0x90c26090aea05a3dc18d6ba8fd80afe8f933bf86"
       # The careers register on Monad mainnet (contracts/src/ChogCareers.sol), written by the referee
       # after each judged match; deployed on 17 October 2026 with the rental above.
+      # Builds made on the development Mac may open rooms of their own to be looked at in a match;
+      # the judge calls their matches void (server/src/photon.js, game/create).
+      - key: PREVIEW_BUILDS
+        value: "any"
       - key: CAREERS_ADDRESS
         value: "0x335bf7bc610645546e2b00de6a9fd0c4709d6111"
       # The deployed wager contract and the key of its referee (contracts/README.md): both or

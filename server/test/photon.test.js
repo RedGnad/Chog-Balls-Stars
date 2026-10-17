@@ -18,7 +18,7 @@ const AVATAR = '2430278665492933905';
 const LOADOUT = '440543562436170603';
 
 // Services where HOLDER holds the Genesis 1795 and rents 8, and the Genesis 1795 has its second form.
-function services({ replay, onReplayEnded, build } = {}) {
+function services({ replay, onReplayEnded, build, previewBuilds } = {}) {
   const state = { holders: new Map([[1795, HOLDER.address], [408, '0x' + 'c3'.repeat(20)]]), rented: new Set([`8:${HOLDER.address}`]), bought: new Set([1795]) };
   const chain = {
     holds: async (address, tokenId) => ({ holds: state.holders.get(tokenId) === address.toLowerCase() }),
@@ -32,7 +32,7 @@ function services({ replay, onReplayEnded, build } = {}) {
   const matches = createMatches({ store: createMemoryStore() });
   const judge = replay ? createJudge({ matches, replay, build }) : null;
   const photon = createPhoton({
-    secret: PHOTON_SECRET, sessions, careers, chain, shop, rental, matches, build,
+    secret: PHOTON_SECRET, sessions, careers, chain, shop, rental, matches, build, previewBuilds,
     onReplayEnded: onReplayEnded ?? (judge ? gameId => judge.judge(gameId) : undefined),
   });
   const api = createApi({ chain, sessions, careers, shop, rental, photon, photonAuthentication: true, publicOrigin: ORIGIN, build });
@@ -231,6 +231,17 @@ async function playedMatch(api, gameId = 'g5') {
 const report = changes => ({
   winnerTeam: 1, scores: [3, 11], endedAtTick: 3235, selectionEndedAtTick: 387, firstTick: 60, lastTick: 3239, updateRate: 30,
   players: [{ player: 0, team: 0, tokenId: 1795 }, { player: 1, team: 1, tokenId: 0 }], simulation: 'abc', ...changes,
+});
+
+test('a build being previewed opens rooms of its own, and its matches are void', async () => {
+  const served = '20261012T035911141Z';
+  const { api, matches } = services({ build: async () => served, replay: async () => report(), previewBuilds: 'any' });
+  const created = await hook(api, 'game/create',
+    `{"AppId":"app","AppVersion":"20261017T120000000Z","Region":"eu","Cloud":"0","UserId":"u","RoomName":"party","GameId":"0:eu:party"}`);
+  assert.equal(created.status, 200, 'a previewed build opens a room');
+  const gameId = JSON.parse(created.text).GameId;
+  await playedMatch(api, gameId);
+  assert.equal((await matches.get(gameId)).verdict.void, true, 'judged with another simulation, its match counts for nothing');
 });
 
 test('a page that runs another build opens no room here, and a match played with another build is void', async () => {
