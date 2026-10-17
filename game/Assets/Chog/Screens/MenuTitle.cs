@@ -79,8 +79,9 @@ namespace Chog.Screens
             title.enableAutoSizing = true;
             title.fontSizeMin = 14f;
             title.fontSizeMax = 120f;
-            title.color = Color.white;
-            ChogTheme.AsTitle(title);
+            title.color = ChogTheme.Cream;
+            // The game's name in the logo's letters (Koulen, outlined), as on chog.xyz.
+            ChogTheme.AsLogo(title);
             title.text = Title + "\n<size=40%><color=#A99BFC>" + Tagline + "</color></size>";
         }
     }

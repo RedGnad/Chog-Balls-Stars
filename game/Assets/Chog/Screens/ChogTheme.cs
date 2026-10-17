@@ -6,11 +6,13 @@ using UnityEngine.UI;
 namespace Chog.Screens
 {
     /// <summary>
-    /// The look of the game's screens, after the official Chog identity read on 15 October 2026
-    /// (research/chog-visual-identity-2026-10-15.md): the night purple of chogathon.chog.xyz, the cheek
-    /// pink and the cream of the mascot, Koulen in capitals for titles, buttons and numbers, Convergence
-    /// for sentences, pill buttons with a hard dark shadow under them. Every screen asks here for its
-    /// colours, fonts and shapes, so the whole game changes in one place.
+    /// The look of the game's screens. Since 17 October 2026 it follows the Supercell-inspired direction
+    /// the owner chose (docs/DESIGN-BRIEF.md): Lilita One with a thick dark outline and a hard shadow for
+    /// titles and buttons, Nunito for sentences and numbers, Koulen kept for the logo; chunky buttons with
+    /// a near-black outline, a light band on top and a darker lip below, that sink when pressed; the
+    /// colour roles of Supercell with the Chog colours (gold for the main action, green to confirm,
+    /// purple for the rest, red to close, pink kept for $CHOG). Every screen asks here for its colours,
+    /// fonts and shapes, so the whole game changes in one place.
     /// </summary>
     public static class ChogTheme
     {
@@ -28,25 +30,49 @@ namespace Chog.Screens
         public static readonly Color Ok = Hex("5CE68A");
         public static readonly Color Gold = Hex("F59E0B");
         public static readonly Color Shadow = new Color(0f, 0f, 0f, 0.55f);
+        /// <summary>The near-black of every outline and hard shadow.</summary>
+        public static readonly Color Ink = Hex("140F24");
+        /// <summary>The main action (PLAY, PLAY AGAIN).</summary>
+        public static readonly Color Action = Hex("F7A81B");
+        /// <summary>To confirm, buy, claim.</summary>
+        public static readonly Color Confirm = Hex("4CD97A");
+        /// <summary>To close, cancel, leave.</summary>
+        public static readonly Color Danger = Hex("E5484D");
+        /// <summary>Your team, and the way home.</summary>
+        public static readonly Color Ally = Hex("3E86E8");
+        /// <summary>The other team.</summary>
+        public static readonly Color Enemy = Hex("C9375D");
 
-        /// <summary>The kinds of buttons: the one thing to do, another thing, a quiet way back.</summary>
-        public enum ButtonKind { Primary, Secondary, Quiet }
+        /// <summary>
+        /// The kinds of buttons: the one thing to do (gold), another thing (purple), a quiet way back,
+        /// confirming (green), closing (red), and anything paid in $CHOG (pink).
+        /// </summary>
+        public enum ButtonKind { Primary, Secondary, Quiet, Confirm, Danger, Chog }
 
-        private const string TitleFontResource = "Fonts/Koulen SDF";
-        private const string BodyFontResource = "Fonts/Convergence SDF";
-        private const string TitleFileResource = "Fonts/Koulen-Regular";
-        private const string BodyFileResource = "Fonts/Convergence-Regular";
-        private static TMP_FontAsset s_title, s_body;
+        private const string TitleFontResource = "Fonts/Lilita One SDF";
+        private const string TitleMaterialResource = "Fonts/Lilita One SDF Outlined";
+        private const string BodyFontResource = "Fonts/Nunito ExtraBold SDF";
+        private const string NumberFontResource = "Fonts/Nunito Black SDF";
+        private const string NumberMaterialResource = "Fonts/Nunito Black SDF Outlined";
+        private const string LogoFontResource = "Fonts/Koulen SDF";
+        private const string LogoMaterialResource = "Fonts/Koulen SDF Outlined";
+        // Before the build has made the new fonts, the earlier ones.
+        private const string OldTitleFontResource = "Fonts/Koulen SDF";
+        private const string OldBodyFontResource = "Fonts/Convergence SDF";
+        private const string TitleFileResource = "Fonts/LilitaOne-Regular";
+        private const string BodyFileResource = "Fonts/Nunito-ExtraBold";
+        private static TMP_FontAsset s_title, s_body, s_number, s_logo;
+        private static Material s_titleOutlined, s_numberOutlined, s_logoOutlined;
         private static Font s_legacyTitle, s_legacyBody;
         private static bool s_loaded;
 
-        /// <summary>Koulen: titles, buttons, numbers. Null when the project has not made it.</summary>
+        /// <summary>Lilita One: titles and buttons. Null when the project has made none of the fonts.</summary>
         public static TMP_FontAsset TitleFont
         {
             get { Load(); return s_title; }
         }
 
-        /// <summary>Convergence: sentences. Null when the project has not made it.</summary>
+        /// <summary>Nunito ExtraBold: sentences. Null when the project has made none of the fonts.</summary>
         public static TMP_FontAsset BodyFont
         {
             get { Load(); return s_body; }
@@ -57,8 +83,13 @@ namespace Chog.Screens
             if (s_loaded)
                 return;
             s_loaded = true;
-            s_title = Resources.Load<TMP_FontAsset>(TitleFontResource);
-            s_body = Resources.Load<TMP_FontAsset>(BodyFontResource);
+            s_title = Resources.Load<TMP_FontAsset>(TitleFontResource) ?? Resources.Load<TMP_FontAsset>(OldTitleFontResource);
+            s_body = Resources.Load<TMP_FontAsset>(BodyFontResource) ?? Resources.Load<TMP_FontAsset>(OldBodyFontResource);
+            s_number = Resources.Load<TMP_FontAsset>(NumberFontResource) ?? s_body;
+            s_logo = Resources.Load<TMP_FontAsset>(LogoFontResource) ?? s_title;
+            s_titleOutlined = Resources.Load<Material>(TitleMaterialResource);
+            s_numberOutlined = Resources.Load<Material>(NumberMaterialResource);
+            s_logoOutlined = Resources.Load<Material>(LogoMaterialResource);
             // The sample's menu writes some labels with the older text component, which takes the font file.
             s_legacyTitle = Resources.Load<Font>(TitleFileResource);
             s_legacyBody = Resources.Load<Font>(BodyFileResource);
@@ -66,13 +97,45 @@ namespace Chog.Screens
                 Debug.LogWarning("CHOG_THEME the fonts of the theme are missing: the sample's font stays");
         }
 
-        /// <summary>Writes a title, a button or a number in Koulen, in capitals.</summary>
-        public static void AsTitle(TMP_Text text)
+        /// <summary>
+        /// Writes a title, a button or a banner in Lilita One, in capitals, with the thick dark outline and
+        /// the hard shadow ("outlined" false: plain, for small labels on a light ground).
+        /// </summary>
+        public static void AsTitle(TMP_Text text, bool outlined = true)
         {
             if (text == null)
                 return;
             if (TitleFont != null)
                 text.font = TitleFont;
+            if (outlined && s_titleOutlined != null && text.font == s_title)
+                text.fontSharedMaterial = s_titleOutlined;
+            text.fontStyle &= ~FontStyles.Bold;
+            text.fontStyle |= FontStyles.UpperCase;
+            text.characterSpacing = 1f;
+        }
+
+        /// <summary>Writes a number (a score, a balance, a count) in Nunito Black, outlined.</summary>
+        public static void AsNumber(TMP_Text text, bool outlined = true)
+        {
+            Load();
+            if (text == null || s_number == null)
+                return;
+            text.font = s_number;
+            if (outlined && s_numberOutlined != null)
+                text.fontSharedMaterial = s_numberOutlined;
+            text.fontStyle &= ~(FontStyles.Bold | FontStyles.UpperCase);
+            text.characterSpacing = 0f;
+        }
+
+        /// <summary>Writes the game's name in Koulen, outlined, as on chog.xyz.</summary>
+        public static void AsLogo(TMP_Text text)
+        {
+            Load();
+            if (text == null || s_logo == null)
+                return;
+            text.font = s_logo;
+            if (s_logoOutlined != null)
+                text.fontSharedMaterial = s_logoOutlined;
             text.fontStyle &= ~FontStyles.Bold;
             text.fontStyle |= FontStyles.UpperCase;
             text.characterSpacing = 2f;
@@ -90,7 +153,7 @@ namespace Chog.Screens
                 text.text = text.text.ToUpperInvariant();
         }
 
-        /// <summary>Writes a sentence in Convergence.</summary>
+        /// <summary>Writes a sentence in Nunito ExtraBold.</summary>
         public static void AsBody(TMP_Text text)
         {
             if (text == null)
@@ -103,7 +166,7 @@ namespace Chog.Screens
         /// <summary>The fill of a quiet button: a muted purple that white letters read on.</summary>
         public static readonly Color Quiet = Hex("3B2F72");
 
-        /// <summary>A pill button of that kind: its fill, a hard shadow under it, its label in Koulen.</summary>
+        /// <summary>A chunky button of that kind: its colour, its outline and lip, its label outlined in Lilita One.</summary>
         public static void Style(Button button, ButtonKind kind)
         {
             if (button == null)
@@ -116,9 +179,16 @@ namespace Chog.Screens
                 label.color = Color.white;
         }
 
+        // The sprite of a chunky button is drawn white (a grey lip) and tinted by the Image's colour, so
+        // every screen that sets a button's colour keeps doing so. Below 1, its outline and lip are drawn
+        // thicker than the sprite's pixels.
+        private const float ChunkyScale = 0.62f;
+        private const string ShineName = "ChogShine";
+
         /// <summary>
-        /// The shape of a pill button, its colour left as it is: the rounded fill, a hard shadow under
-        /// it, the way it darkens when pressed, its label in Koulen.
+        /// The shape of a chunky button, its colour left as it is: the rounded fill with its near-black
+        /// outline and darker lip, a light band on its top half, a hard dark shadow under it, the way it
+        /// sinks when pressed (ChogPress), its label outlined in Lilita One.
         /// </summary>
         public static void Shape(Button button)
         {
@@ -127,16 +197,36 @@ namespace Chog.Screens
             var image = ImageOf(button);
             if (image != null)
             {
-                image.sprite = ChogSprites.Rounded(28, 0, Color.clear, Color.white);
+                image.sprite = ChogSprites.Chunky(Color.white, new Color(0.70f, 0.70f, 0.74f, 1f));
                 image.type = Image.Type.Sliced;
-                image.pixelsPerUnitMultiplier = 1f;
+                image.pixelsPerUnitMultiplier = ChunkyScale;
                 var shadow = image.GetComponent<Shadow>();
                 if (shadow == null)
                     shadow = image.gameObject.AddComponent<Shadow>();
-                shadow.effectColor = Shadow;
-                shadow.effectDistance = new Vector2(5f, -6f);
+                shadow.effectColor = Ink;
+                shadow.effectDistance = new Vector2(0f, -6f);
                 shadow.useGraphicAlpha = true;
+
+                if (image.transform.Find(ShineName) == null)
+                {
+                    var shine = new GameObject(ShineName, typeof(RectTransform)).AddComponent<Image>();
+                    var area = shine.rectTransform;
+                    area.SetParent(image.transform, false);
+                    area.SetSiblingIndex(0);
+                    area.anchorMin = new Vector2(0f, 0.56f);
+                    area.anchorMax = new Vector2(1f, 1f);
+                    area.offsetMin = new Vector2(6f, 0f);
+                    area.offsetMax = new Vector2(-6f, -6f);
+                    shine.sprite = ChogSprites.TopRounded(14);
+                    shine.type = Image.Type.Sliced;
+                    shine.pixelsPerUnitMultiplier = ChunkyScale;
+                    shine.color = new Color(1f, 1f, 1f, 0.26f);
+                    shine.raycastTarget = false;
+                }
             }
+
+            if (button.GetComponent<ChogPress>() == null)
+                button.gameObject.AddComponent<ChogPress>();
 
             var colours = button.colors;
             colours.normalColor = Color.white;
@@ -185,8 +275,11 @@ namespace Chog.Screens
         {
             switch (kind)
             {
-                case ButtonKind.Primary: return Cheek;
+                case ButtonKind.Primary: return Action;
                 case ButtonKind.Secondary: return Purple;
+                case ButtonKind.Confirm: return Confirm;
+                case ButtonKind.Danger: return Danger;
+                case ButtonKind.Chog: return Cheek;
                 default: return Quiet;
             }
         }

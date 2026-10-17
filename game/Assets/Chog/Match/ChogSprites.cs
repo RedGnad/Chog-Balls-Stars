@@ -57,6 +57,88 @@ namespace Chog.Match
             return sprite;
         }
 
+        /// <summary>
+        /// A chunky button in the Supercell way (docs/DESIGN-BRIEF.md): a rounded rectangle with a near-black
+        /// outline, its colour, and a darker lip along the bottom that gives it thickness. Sliced: the corners,
+        /// the outline and the lip keep their size whatever the button's.
+        /// </summary>
+        public static Sprite Chunky(Color fill, Color lip, int radius = 14, int outline = 3, int lipHeight = 7)
+        {
+            var key = $"chunky {ColorUtility.ToHtmlStringRGBA(fill)} {ColorUtility.ToHtmlStringRGBA(lip)} {radius} {outline} {lipHeight}";
+            if (s_made.TryGetValue(key, out var kept) && kept != null)
+                return kept;
+
+            var ink = new Color(0.078f, 0.059f, 0.141f, 1f);
+            var width = radius * 2 + 8;
+            var height = radius * 2 + lipHeight + 8;
+            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false)
+            {
+                name = key, wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear
+            };
+            var pixels = new Color32[width * height];
+            var halfW = width * 0.5f;
+            var halfH = height * 0.5f;
+            for (var y = 0; y < height; y++)
+            {
+                for (var x = 0; x < width; x++)
+                {
+                    var dx = Mathf.Max(Mathf.Abs(x + 0.5f - halfW) - (halfW - radius), 0f);
+                    var dy = Mathf.Max(Mathf.Abs(y + 0.5f - halfH) - (halfH - radius), 0f);
+                    var edge = Mathf.Sqrt(dx * dx + dy * dy) - radius;
+                    var cover = Mathf.Clamp01(0.5f - edge);
+                    var inner = Mathf.Clamp01(0.5f - (edge + outline));
+                    // The lip: the lowest rows inside the outline (y counts from the bottom).
+                    var body = y < outline + lipHeight ? lip : fill;
+                    var colour = Color.Lerp(ink, body, inner);
+                    colour.a *= cover;
+                    pixels[y * width + x] = colour;
+                }
+            }
+            texture.SetPixels32(pixels);
+            texture.Apply(false, true);
+            var side = radius + 3;
+            var sprite = Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f), 100f, 0,
+                SpriteMeshType.FullRect, new Vector4(side, side + lipHeight, side, side));
+            sprite.name = key;
+            s_made[key] = sprite;
+            return sprite;
+        }
+
+        /// <summary>A white shape rounded at its two top corners only, square below: the light band of a chunky button.</summary>
+        public static Sprite TopRounded(int radius)
+        {
+            var key = $"toprounded {radius}";
+            if (s_made.TryGetValue(key, out var kept) && kept != null)
+                return kept;
+
+            var size = radius * 2 + 4;
+            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false)
+            {
+                name = key, wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear
+            };
+            var pixels = new Color32[size * size];
+            var half = size * 0.5f;
+            for (var y = 0; y < size; y++)
+            {
+                for (var x = 0; x < size; x++)
+                {
+                    var dx = Mathf.Max(Mathf.Abs(x + 0.5f - half) - (half - radius), 0f);
+                    // Only the top half is rounded.
+                    var dy = Mathf.Max(y + 0.5f - half - (half - radius), 0f);
+                    var edge = Mathf.Sqrt(dx * dx + dy * dy) - radius;
+                    pixels[y * size + x] = new Color(1f, 1f, 1f, Mathf.Clamp01(0.5f - edge));
+                }
+            }
+            texture.SetPixels32(pixels);
+            texture.Apply(false, true);
+            var border = radius + 2;
+            var sprite = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f, 0,
+                SpriteMeshType.FullRect, new Vector4(border, border, border, border));
+            sprite.name = key;
+            s_made[key] = sprite;
+            return sprite;
+        }
+
         /// <summary>A white disc with a soft edge, for rings, pedestals and shadows.</summary>
         public static Sprite Disc(int radius, float softness)
         {
