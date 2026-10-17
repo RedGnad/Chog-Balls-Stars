@@ -82,7 +82,11 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, s
       const loan = await sessions.loanOf(pass);
       if (!loan || loan.expired) return { status: 200, body: { ResultCode: 2, Message: 'this link does not lend a Genesis any more' } };
       const { tokenId, lender, issuedAt } = loan;
-      return { status: 200, body: { ResultCode: 1, UserId: randomName('guest-'), AuthCookie: { pass: { tokenId, lender, issuedAt } } } };
+      // Flat as well as nested: what Photon hands back of a cookie inside an object was never seen.
+      return {
+        status: 200,
+        body: { ResultCode: 1, UserId: randomName('guest-'), AuthCookie: { pass: { tokenId, lender, issuedAt }, passTokenId: tokenId, passLender: lender, passIssuedAt: issuedAt } },
+      };
     }
     return { status: 200, body: { ResultCode: 1, UserId: randomName('visitor-'), AuthCookie: { visitor: true } } };
   }
@@ -96,13 +100,30 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, s
       if (rental && await rental.isRenting(tokenId, cookie.address)) return 'renter';
       return standIns && await standIns.standsIn(cookie.address, tokenId) ? 'stand-in' : null;
     }
-    const pass = cookie?.pass;
+    const pass = passOf(cookie);
     if (pass && pass.tokenId === tokenId && isAddress(pass.lender)) {
       // A pass counts while its holder has not taken the Genesis back and still holds it.
       const stopped = pass.issuedAt <= await careers.lendingStoppedAt(tokenId);
       return !stopped && (await chain.holds(pass.lender, tokenId)).holds ? 'guest' : null;
     }
     return null;
+  }
+
+  // The pass in a cookie as Photon handed it back, nested or flat, its numbers maybe as text.
+  function passOf(cookie) {
+    const nested = cookie?.pass && typeof cookie.pass === 'object' ? cookie.pass : null;
+    const tokenId = Number(nested?.tokenId ?? cookie?.passTokenId);
+    const lender = String(nested?.lender ?? cookie?.passLender ?? '');
+    const issuedAt = Number(nested?.issuedAt ?? cookie?.passIssuedAt);
+    return Number.isInteger(tokenId) && tokenId > 0 && Number.isFinite(issuedAt) ? { tokenId, lender, issuedAt } : null;
+  }
+
+  // The last admissions, shown at /api/admissions/recent: Photon's cookie as it came back and what
+  // was decided, since the host's log cannot be read from outside. Nothing secret is in a cookie.
+  const admissionsSeen = [];
+  function rememberAdmission(entry) {
+    admissionsSeen.unshift({ at: new Date().toISOString(), ...entry });
+    admissionsSeen.length = Math.min(admissionsSeen.length, 30);
   }
 
   async function secondFormOf(tokenId) {
@@ -123,7 +144,19 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, s
     const asked = request.RuntimePlayer;
     const askedToken = numberOf(asked?.GenesisTokenId) ?? 0;
     const askedForm = numberOf(asked?.GenesisForm) ?? 0;
-    const right = askedToken > 0 ? await rightTo(askedToken, cookie) : null;
+    const seen = {
+      gameId: request.GameId, userId: request.UserId, askedToken,
+      cookie: { kind: isAddress(cookie.address) ? 'wallet' : cookie.pass || cookie.passTokenId ? 'pass' : cookie.visitor ? 'visitor' : 'none', fields: cookie },
+    };
+    let right;
+    try {
+      right = askedToken > 0 ? await rightTo(askedToken, cookie) : null;
+    } catch (error) {
+      // The chain could not be read: Photon is told to ask again (the hook fails), and it is shown.
+      rememberAdmission({ ...seen, right: null, why: error.message });
+      throw error;
+    }
+    rememberAdmission({ ...seen, right });
     const tokenId = right ? askedToken : 0;
     const form = tokenId > 0 && askedForm === 1 && await secondFormOf(tokenId) ? 1 : 0;
 
@@ -230,5 +263,5 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, s
     }
   }
 
-  return { authenticate, hook, hookNames: Object.keys(hooks) };
+  return { authenticate, hook, hookNames: Object.keys(hooks), recentAdmissions: () => admissionsSeen };
 }

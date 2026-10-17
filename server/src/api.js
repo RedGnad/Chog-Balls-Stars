@@ -133,6 +133,9 @@ export function createApi({ chain, sessions, careers, recentRecords, shop, renta
     },
 
     // The Genesis that won the most.
+    // The last players Photon asked to add: the cookie it handed back and the right decided.
+    'GET /api/admissions/recent': async () => json(200, { admissions: photon?.recentAdmissions ? photon.recentAdmissions() : [] }),
+
     // What happened to the last judged matches: verdict, and the career transaction or why none.
     'GET /api/careers/recent': async () => json(200, { matches: recentRecords ? recentRecords() : [] }),
 

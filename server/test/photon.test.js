@@ -142,6 +142,10 @@ test('a renter and a guest enter with the Genesis they have a right to, and lose
   const other = runtimePlayer().replace('"GenesisTokenId":0', '"GenesisTokenId":408');
   assert.equal(parseExact((await addPlayer(api, 'g2', cookie, other, 'guest-1')).text).RuntimePlayer.GenesisTokenId, 0, 'and no other');
 
+  // However Photon hands the cookie back: flat, its numbers as text.
+  const flat = { passTokenId: '1795', passLender: HOLDER.address, passIssuedAt: String(Date.now() - 1000) };
+  assert.equal((await addPlayer(api, 'g2', flat, lent, 'guest-2')).text, '{}', 'a flat cookie lends the same');
+
   await careers.stopLending(1795);
   assert.equal(parseExact((await addPlayer(api, 'g2', cookie, lent, 'guest-1')).text).RuntimePlayer.GenesisTokenId, 0, 'not after the holder took it back');
 });
