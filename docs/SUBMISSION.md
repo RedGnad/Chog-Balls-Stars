@@ -63,7 +63,7 @@ submitting. Character counts are for the 8,000-character fields.
 
 ## 04 Why Chog matters (the "NFT gate")
 
-> Take the NFT out and there is no hero: without a Genesis you are a grey recruit with 15% less
+> Take the NFT out and there is no hero: without a Genesis you are a grey recruit with 10% less
 > health and no Genesis attack. With one, everything you see and do comes from its traits: the 3D
 > character is built from them, the basic attack throws what its hat shows, the special comes from
 > its eyes and its aura, the class from its outfit. Ownership is read on Monad mainnet at sign-in and

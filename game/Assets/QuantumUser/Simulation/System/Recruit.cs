@@ -5,8 +5,9 @@ namespace Quantum
     // always Genesis, so a recruit is always a human player.
     public static unsafe class Recruit
     {
-        // Percentage of the class's health a recruit gets. A first number, not balanced.
-        public const int HealthPercent = 85;
+        // Percentage of the class's health a recruit gets: 10% less, as the owner set on 17 October 2026
+        // (it was 15%; 5% less if 10% proves too harsh in play).
+        public const int HealthPercent = 90;
 
         // Call before the first spawn: a spawn fills the health from these two values.
         public static void Apply(Frame frame, EntityRef character)

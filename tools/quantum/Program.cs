@@ -155,7 +155,7 @@ internal static unsafe class Program
                 frame.Add<PlayerLink>(recruit);
                 Recruit.Apply(frame, recruit);
                 var health = AttributesHelper.GetAttributeData(frame, recruit, EAttributeType.Health);
-                Require(health.MaxValue == 8500 && health.InitialValue == 8500, "A recruit should have 85% of the health");
+                Require(health.MaxValue == 100 * Recruit.HealthPercent && health.InitialValue == 100 * Recruit.HealthPercent, "A recruit should have " + Recruit.HealthPercent + "% of the health");
                 Require(Recruit.Is(frame, recruit), "A player without a Genesis is a recruit");
 
                 var hero = WithHealth(frame, 10000);

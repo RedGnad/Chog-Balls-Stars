@@ -249,7 +249,7 @@ namespace Chog.Screens
         private void OnAsideButton()
         {
             GenesisRental.Dismiss();
-            if (GenesisRental.OwedBackWei != "0")
+            if (GenesisRental.HasMoneyToClaim)
                 GenesisRental.Claim();
             else if (_marketPick > 0)
                 GenesisRental.EndRental(_marketPick);
@@ -415,19 +415,22 @@ namespace Chog.Screens
             ShowAside(busy, until > 0 ? _marketPick : 0);
         }
 
-        // TAKE BACK the $CHOG the wallet is owed (a rental it stopped, or whose Genesis was sold),
-        // else END NOW for the Genesis it rents; nothing otherwise.
+        // The $CHOG this wallet may take out (owed back as a renter, or earned as a holder, which a
+        // holder who sold every Genesis can only reach here), else END NOW for the Genesis it rents.
         private void ShowAside(bool busy, int rentedPick)
         {
             var owed = GenesisRental.OwedBackWei;
-            var show = owed != "0" || rentedPick > 0;
+            var earned = GenesisRental.EarnedWei;
+            var show = GenesisRental.HasMoneyToClaim || rentedPick > 0;
             _marketAside.gameObject.SetActive(show);
             if (!show)
                 return;
             _marketAside.interactable = !busy;
             _marketAsideLabel.text = owed != "0"
                 ? "<size=70%>GET YOUR REFUND</size>\n" + MonadTransactions.PriceText(owed) + " $CHOG"
-                : "END NOW";
+                : earned != "0"
+                    ? "<size=70%>CLAIM</size>\n" + MonadTransactions.PriceText(GenesisRental.HolderShare(earned, GenesisRental.BurnedShare)) + " $CHOG"
+                    : "END NOW";
         }
 
         // What the wallet is being asked, in the order of a payment.

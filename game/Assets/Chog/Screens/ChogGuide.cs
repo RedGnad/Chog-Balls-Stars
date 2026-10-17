@@ -24,7 +24,7 @@ namespace Chog.Screens
             ("YOUR GENESIS IS YOUR HERO",
              "Connect the wallet that holds your Chog Genesis: its traits build its hero in 3D and decide how it " +
              "fights. Its hat gives its basic attack, its eyes its special, its outfit its class, its aura the " +
-             "effect of its special.\n\nNo Genesis? You play a grey recruit: 15% less health and no Genesis attack."),
+             "effect of its special.\n\nNo Genesis? You play a grey recruit: " + (100 - Quantum.Recruit.HealthPercent) + "% less health and no Genesis attack."),
             ("HOW TO FIGHT",
              "On a phone: the left stick moves, the pink stick throws your basic attack, the gold stick fires your " +
              "special once it is charged.\n\nOn a computer: W A S D to move, the mouse to aim, left click to " +
