@@ -161,6 +161,15 @@ that this refuses the creation of the match is expected and **not yet seen**. To
 clear `WebHookBaseUrl` in the dashboard, and tick "Allow anonymous clients" or keep
 `--photon-auth`.
 
+### What Photon hands back of the cookie (seen 17 October 2026)
+
+The `AuthCookie` our custom authentication answers comes back in the webhooks, but an object nested in it does not
+come back as an object: `{"pass": {"tokenId": 1795, "lender": "0x80fb...", "issuedAt": 1792227857183}}` was handed back
+as `"pass": [[1795], ["0x80fb..."], [1792227857183]]`, its keys lost (seen at `/api/admissions/recent` on Render, a guest's
+admission). Flat fields came back as sent (`passTokenId`, `passLender`, `passIssuedAt`, numbers as numbers). So the cookie
+carries only flat fields that matter (`server/src/photon.js`, `passOf`); the guests' path had only ever been tested with
+our own requests before, never through Photon's cloud, and every guest played a recruit until then.
+
 ## A public address from this Mac (a tunnel)
 
 Allowed by the user on 12 October 2026 ("oui je valide"). It makes the game on this Mac
