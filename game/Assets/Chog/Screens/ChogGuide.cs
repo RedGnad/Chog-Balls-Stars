@@ -65,8 +65,8 @@ namespace Chog.Screens
             var area = new GameObject(ButtonName, typeof(RectTransform), typeof(Image), typeof(Button));
             var rect = (RectTransform)area.transform;
             rect.SetParent(main.transform, false);
-            rect.anchorMin = new Vector2(0.06f, 0.035f);
-            rect.anchorMax = new Vector2(0.20f, 0.105f);
+            rect.anchorMin = new Vector2(0.04f, 0.04f);
+            rect.anchorMax = new Vector2(0.18f, 0.11f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
             var button = area.GetComponent<Button>();

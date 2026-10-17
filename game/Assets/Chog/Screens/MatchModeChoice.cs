@@ -114,12 +114,12 @@ namespace Chog.Screens
             if (main == null || main.transform.Find(ButtonName) != null)
                 return;
 
-            // Beside QUICK PLAY, before the panel of the wallet.
+            // Beside PLAY, at the bottom right of the home screen.
             var area = new GameObject(ButtonName, typeof(RectTransform), typeof(Image), typeof(Button));
             var rect = (RectTransform)area.transform;
             rect.SetParent(main.transform, false);
-            rect.anchorMin = new Vector2(0.226f, 0.262f);
-            rect.anchorMax = new Vector2(0.334f, 0.348f);
+            rect.anchorMin = new Vector2(0.44f, 0.12f);
+            rect.anchorMax = new Vector2(0.60f, 0.25f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
             var button = area.GetComponent<Button>();

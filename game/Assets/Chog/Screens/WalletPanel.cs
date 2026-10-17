@@ -26,9 +26,9 @@ namespace Chog.Screens
         private const string RosterResource = "GenesisRoster";
         private const int SlotsPerPage = 6;
 
-        // Share of the main screen the panel takes: right of the menu buttons, under the player name.
-        private static readonly Vector2 PanelMin = new Vector2(0.34f, 0.10f);
-        private static readonly Vector2 PanelMax = new Vector2(0.97f, 0.72f);
+        // Share of the main screen the panel takes: right of the hero, under the player name, over the mode and PLAY.
+        private static readonly Vector2 PanelMin = new Vector2(0.44f, 0.31f);
+        private static readonly Vector2 PanelMax = new Vector2(0.97f, 0.80f);
 
         // The career line: the whole width, or the room left by the buttons that lend and rent out.
         private static readonly Vector2 CareerMin = new Vector2(0.04f, 0.03f);
@@ -67,8 +67,7 @@ namespace Chog.Screens
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         private static readonly string RecruitNote =
-            "Without one you play a recruit: " + (100 - Recruit.HealthPercent) + "% less health and no Genesis attack. " +
-            "A holder can also lend you a Genesis with a link.";
+            "No Genesis? You play a grey recruit, with " + (100 - Recruit.HealthPercent) + "% less health and no Genesis attack.";
 
         private GenesisRoster _roster;
         private TextMeshProUGUI _title;
@@ -557,8 +556,7 @@ namespace Chog.Screens
                     return "No wallet in this browser. To play a Chog Genesis you hold, open this page in the browser of your " +
                            "wallet (MetaMask, Rabby, Backpack) or install its extension.\n\n" + RecruitNote;
                 case WalletState.Disconnected:
-                    return "Connect the wallet that holds your Chog Genesis: each one is a hero, with the class, the attack " +
-                           "and the effect its traits give it." +
+                    return "Your Chog Genesis is your hero: its traits build it in 3D and decide how it fights." +
                            (PlayerWallet.CanOpenInWalletBrowser
                                ? " OPEN IN METAMASK plays inside the MetaMask app, where your wallet answers without leaving the game." +
                                  (PlayerWallet.ThroughApp ? " OTHER WALLET: pick your app, approve there, then come back here." : "")

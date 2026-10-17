@@ -23,10 +23,12 @@ namespace Chog.Screens
 
         // The left column of the main screen: the hero, its name, then the play buttons.
         // Between the tagline of the title and the play buttons, as the sample lays them out.
-        private static readonly Vector2 StageMin = new Vector2(0.02f, 0.37f);
-        private static readonly Vector2 StageMax = new Vector2(0.33f, 0.735f);
-        private static readonly Vector2 ButtonsMin = new Vector2(0.03f, 0.04f);
-        private static readonly Vector2 ButtonsMax = new Vector2(0.32f, 0.24f);
+        // The home screen of an arena game: the hero large at the left, the wallet at the top right,
+        // the mode and a large PLAY at the bottom right, the other buttons small at the bottom left.
+        private static readonly Vector2 StageMin = new Vector2(0.03f, 0.19f);
+        private static readonly Vector2 StageMax = new Vector2(0.41f, 0.71f);
+        private static readonly Vector2 ButtonsMin = new Vector2(0.62f, 0.04f);
+        private static readonly Vector2 ButtonsMax = new Vector2(0.97f, 0.28f);
 
         private ChogHeroStage _stage;
         private TextMeshProUGUI _name;
@@ -187,9 +189,15 @@ namespace Chog.Screens
                 column.pivot = new Vector2(0f, 0f);
             }
             if (play != null)
+            {
                 ChogTheme.Style(play, ChogTheme.ButtonKind.Primary);
+                Relabel(play, "PLAY", 72f);
+            }
             if (party != null)
-                ChogTheme.Style(party, ChogTheme.ButtonKind.Secondary);
+            {
+                ChogTheme.Style(party, ChogTheme.ButtonKind.Quiet);
+                Relabel(party, "PLAY WITH FRIENDS", 34f);
+            }
 
             if (main.transform.Find(StageName) != null)
                 return;
@@ -228,6 +236,24 @@ namespace Chog.Screens
                 _name.text = played > 0 ? "CHOG #" + played : "RECRUIT";
                 _line.text = ChogHeroModel.AttackLine(played > 0 ? played : ChogHeroModel.Recruit);
             }
+        }
+
+        // The sample's labels sit to the right of an icon this game does not show: centred over the whole button.
+        private static void Relabel(Button button, string text, float largest)
+        {
+            var label = button.GetComponentInChildren<TMP_Text>(true);
+            if (label == null)
+                return;
+            label.text = text;
+            label.alignment = TextAlignmentOptions.Center;
+            label.enableAutoSizing = true;
+            label.fontSizeMin = 14f;
+            label.fontSizeMax = largest;
+            var area = label.rectTransform;
+            area.anchorMin = Vector2.zero;
+            area.anchorMax = Vector2.one;
+            area.offsetMin = new Vector2(12f, 4f);
+            area.offsetMax = new Vector2(-12f, -4f);
         }
 
         private static TextMeshProUGUI Label(Transform parent, Vector2 min, Vector2 max, float largest, Color colour)
