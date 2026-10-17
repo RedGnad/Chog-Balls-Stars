@@ -168,21 +168,23 @@ export function createRental({ chain, address, now = Date.now }) {
     const owedBack = rented
       .filter(record => !record.counting)
       .reduce((sum, record) => sum + BigInt(record.escrow) - BigInt(record.earned), BigInt(refunds ?? '0x0'));
-    const prices = await Promise.all(rented.map(record => chain.call(rental, '0x' + OFFER_OF + word(record.tokenId))));
+    // The price a day of each, as offerOf answers it (three words: whether the offer stands, its
+    // price, its author): what a renter adds days at, what a holder offers it at.
+    const tokenIds = [...new Set([...lent, ...rented].map(record => record.tokenId))].sort((a, b) => a - b);
+    const answers = await Promise.all(tokenIds.map(tokenId => chain.call(rental, '0x' + OFFER_OF + word(tokenId))));
+    const priceOf = new Map(tokenIds.map((tokenId, index) => {
+      const answer = answers[index];
+      return [tokenId, typeof answer === 'string' && answer.length >= 2 + 64 * 3 ? BigInt('0x' + answer.slice(66, 130)).toString() : '0'];
+    }));
     return {
       enabled: true,
       address: who,
       earned: claimable.toString(),
       owedBack: owedBack.toString(),
       // The token ids a claim must name so that their rentals are settled or closed first.
-      toSettle: [...new Set([...lent, ...rented].map(record => record.tokenId))].sort((a, b) => a - b),
-      lent: lent.map(({ tokenId, renter, until, counting }) => ({ tokenId, renter, until, counting })),
-      rented: rented.map(({ tokenId, lender, until, counting }, index) => {
-        // offerOf answers three words: whether the offer stands, its price a day, its author.
-        const answer = prices[index];
-        const price = typeof answer === 'string' && answer.length >= 2 + 64 * 3 ? BigInt('0x' + answer.slice(66, 130)).toString() : '0';
-        return { tokenId, lender, until, counting, pricePerDay: price };
-      }),
+      toSettle: tokenIds,
+      lent: lent.map(({ tokenId, renter, until, counting }) => ({ tokenId, renter, until, counting, pricePerDay: priceOf.get(tokenId) })),
+      rented: rented.map(({ tokenId, lender, until, counting }) => ({ tokenId, lender, until, counting, pricePerDay: priceOf.get(tokenId) })),
     };
   }
 

@@ -242,7 +242,48 @@ namespace Chog.Match
                       " token " + tokenId + " : " + answer.career.matches + " matches, " + answer.career.wins + " wins");
             Known[tokenId] = answer.career;
             Changed?.Invoke();
+            if (answer.reason == RecordedAfterTheReplay)
+            {
+                // The careers are on Monad: the referee writes this match once the services played it
+                // again. The career is read until it has one match more, then announced.
+                yield return WaitForTheRecord(tokenId, answer.career.matches);
+                yield break;
+            }
+
             Recorded?.Invoke(answer.career, answer.credited);
+        }
+
+        // The answer of services that keep the careers on chain (server/src/careers-onchain.js).
+        private const string RecordedAfterTheReplay = "recorded_after_the_replay";
+        // The replay takes seconds, the transaction one more: about two minutes at most are waited for.
+        private const int RecordReads = 16;
+        private const float RecordReadSeconds = 8f;
+
+        private static IEnumerator WaitForTheRecord(int tokenId, int matchesBefore)
+        {
+            for (var attempt = 0; attempt < RecordReads; attempt++)
+            {
+                yield return new WaitForSecondsRealtime(RecordReadSeconds);
+                GenesisCareer read = null;
+                var answered = false;
+                yield return GameServices.Call("career?tokens=" + tokenId, null, null, (status, text) =>
+                {
+                    answered = true;
+                    var list = status == 200 ? JsonUtility.FromJson<CareerList>(text) : null;
+                    if (list != null && list.careers != null && list.careers.Length > 0)
+                        read = list.careers[0];
+                });
+                if (!answered || read == null || read.matches <= matchesBefore)
+                    continue;
+
+                Debug.Log("CHOG_CAREER recorded on chain token " + tokenId + " : " + read.matches + " matches, " + read.wins + " wins");
+                Known[tokenId] = read;
+                Changed?.Invoke();
+                Recorded?.Invoke(read, true);
+                yield break;
+            }
+
+            Debug.LogWarning("CHOG_CAREER not on chain yet for token " + tokenId + " after " + RecordReads * RecordReadSeconds + " s");
         }
 
         /// <summary>

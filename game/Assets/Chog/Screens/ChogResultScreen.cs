@@ -1,6 +1,8 @@
 using Chog.Match;
+using Quantum.Menu;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Chog.Screens
@@ -9,7 +11,9 @@ namespace Chog.Screens
     /// The end of a match, in the game's look: the result in large Koulen letters and, beside it, the
     /// player's own hero in 3D (ChogHeroStage), cheering after a win, slumping after a loss, its name under
     /// it. It takes the place of the sample's one line of text (CoinGrabUI). A spectator, who plays no
-    /// hero, reads which team won, without a hero.
+    /// hero, reads which team won, without a hero. BACK TO MENU (or Enter, Space or Escape) leaves the
+    /// match the way the menu's own leave button does (QuantumMenuUIGameplay): the sample left the end of
+    /// a match without a way out.
     /// </summary>
     public static class ChogResultScreen
     {
@@ -75,7 +79,42 @@ namespace Chog.Screens
             ChogTheme.AsBody(line);
             line.color = ChogTheme.Text;
             line.text = !playing ? "" : won ? "Your team won the match." : "Your team lost this one.";
+
+            var back = Child<Image>("Back", card.transform, new Vector2(textLeft + 0.06f, 0.08f), new Vector2(0.90f, 0.24f));
+            var button = back.gameObject.AddComponent<Button>();
+            button.targetGraphic = back;
+            var label = Text("Label", back.transform, new Vector2(0.04f, 0.1f), new Vector2(0.96f, 0.9f), 64f);
+            label.text = "BACK TO MENU";
+            ChogTheme.Style(button, ChogTheme.ButtonKind.Primary);
+            button.onClick.AddListener(() => Leave(host));
+            host.AddComponent<LeaveKeys>().Host = host;
             return true;
+        }
+
+        // Leaves the match as the menu's leave button does, then takes the screen away.
+        private static void Leave(GameObject host)
+        {
+            if (host == null)
+                return;
+            var gameplay = Object.FindFirstObjectByType<QuantumMenuUIGameplay>(FindObjectsInactive.Include);
+            if (gameplay != null)
+                gameplay.SendMessage("OnDisconnectPressed", SendMessageOptions.DontRequireReceiver);
+            else
+                Debug.LogWarning("CHOG_RESULT no menu to go back to");
+            Object.Destroy(host);
+        }
+
+        // On a computer the keys that close a card: Enter, Space or Escape.
+        private sealed class LeaveKeys : MonoBehaviour
+        {
+            public GameObject Host;
+
+            private void Update()
+            {
+                var keys = Keyboard.current;
+                if (keys != null && (keys.enterKey.wasPressedThisFrame || keys.spaceKey.wasPressedThisFrame || keys.escapeKey.wasPressedThisFrame))
+                    Leave(Host);
+            }
         }
 
         private static T Child<T>(string name, Transform parent, Vector2 min, Vector2 max) where T : Component

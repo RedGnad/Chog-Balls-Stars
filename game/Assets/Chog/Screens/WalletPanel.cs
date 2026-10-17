@@ -405,9 +405,12 @@ namespace Chog.Screens
             _rentOut.gameObject.SetActive(canRentOut);
             if (canRentOut)
             {
-                _rentOutLabel.text = GenesisRental.TryGetOffer(played, out var offered)
-                    ? "<size=55%>RENTED OUT AT</size>\n" + MonadTransactions.PriceText(offered.PricePerDayWei) + " A DAY"
-                    : "RENT IT OUT";
+                var lentUntil = GenesisRental.LentUntilSeconds(played);
+                _rentOutLabel.text = lentUntil > 0
+                    ? "<size=55%>RENTED FOR</size>\n" + GenesisRental.TimeLeft(lentUntil, NowMs() / 1000).ToUpperInvariant()
+                    : GenesisRental.TryGetOffer(played, out var offered)
+                        ? "<size=55%>RENTED OUT AT</size>\n" + MonadTransactions.PriceText(offered.PricePerDayWei) + " A DAY"
+                        : "RENT IT OUT";
             }
 
             _career.rectTransform.anchorMax = canRentOut ? CareerMaxBesideRentOut : canLend ? CareerMaxBesideLend : CareerMax;

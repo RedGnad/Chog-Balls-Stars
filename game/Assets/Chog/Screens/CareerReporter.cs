@@ -105,7 +105,7 @@ namespace Chog.Screens
             text.color = Color.white;
             Names.TryGetValue(career.tokenId, out var name);
             text.text = "<b>" + (string.IsNullOrEmpty(name) ? "YOUR GENESIS" : name.ToUpperInvariant()) + "</b>" +
-                        "  <size=70%>career recorded</size>\n<color=" + CareerColor + ">" + GenesisCareers.DescribeAll(career) + "</color>";
+                        "  <size=70%>career recorded on Monad</size>\n<color=" + CareerColor + ">" + GenesisCareers.DescribeAll(career) + "</color>";
 
             Destroy(host, NoticeSeconds);
         }

@@ -10,9 +10,10 @@ namespace Chog.Screens
     /// <summary>
     /// The two screens of the rental, laid over the wallet panel like the screen that lends: one
     /// where a holder offers the chosen Genesis at a price a day in $CHOG, changes that price or
-    /// takes the offer back, and one where any connected wallet picks a Genesis that is offered,
-    /// a number of days, and pays. They show the state kept by GenesisRental; every payment is
-    /// a transaction the player approves in the wallet.
+    /// takes the offer back, sees who rents it and claims what it earned; and one where any
+    /// connected wallet picks a Genesis that is offered, a number of days, and pays, adds days to
+    /// its rental or stops it, and takes back what it is owed. They show the state kept by
+    /// GenesisRental; every payment is a transaction the player approves in the wallet.
     /// </summary>
     public sealed partial class WalletPanel
     {
@@ -42,6 +43,8 @@ namespace Chog.Screens
         private Button _offerSend;
         private TextMeshProUGUI _offerSendLabel;
         private Button _offerWithdraw;
+        private Button _offerClaim;
+        private TextMeshProUGUI _offerClaimLabel;
         private int _offerFor;
         private int _priceStep = FirstPriceStep;
 
@@ -54,6 +57,9 @@ namespace Chog.Screens
         private Button _marketNext;
         private Button _rent;
         private TextMeshProUGUI _rentLabel;
+        // Beside the rent button: TAKE BACK what the wallet is owed, else END NOW for the Genesis it rents.
+        private Button _marketAside;
+        private TextMeshProUGUI _marketAsideLabel;
         private readonly Slot[] _marketSlots = new Slot[SlotsPerPage];
         private readonly Button[] _dayButtons = new Button[3];
         private bool _marketOpen;
@@ -76,8 +82,15 @@ namespace Chog.Screens
             ChogTheme.AsCard(cover.gameObject.AddComponent<Image>());
             _offerView = cover.gameObject;
 
-            _offerTitle = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.96f, 0.98f), TextAlignmentOptions.Left, Color.white, 60f, cover);
+            _offerTitle = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.62f, 0.98f), TextAlignmentOptions.Left, Color.white, 60f, cover);
             ChogTheme.AsTitle(_offerTitle);
+            _offerClaim = MakeButton("Claim", new Vector2(0.64f, 0.865f), new Vector2(0.96f, 0.975f), out _offerClaimLabel, cover);
+            _offerClaim.GetComponent<Image>().color = ChogTheme.Gold;
+            _offerClaim.onClick.AddListener(() =>
+            {
+                GenesisRental.Dismiss();
+                GenesisRental.Claim();
+            });
             _offerText = Text("Text", new Vector2(0.04f, 0.50f), new Vector2(0.96f, 0.84f), TextAlignmentOptions.TopLeft, Color.white, 40f, cover);
 
             _offerLess = MakeButton("Less", new Vector2(0.04f, 0.30f), new Vector2(0.15f, 0.47f), out var lessLabel, cover);
@@ -149,6 +162,9 @@ namespace Chog.Screens
 
             _rent = MakeButton("Rent", new Vector2(0.04f, 0.05f), new Vector2(0.60f, 0.22f), out _rentLabel, cover);
             _rent.onClick.AddListener(OnRentButton);
+            _marketAside = MakeButton("Aside", new Vector2(0.62f, 0.05f), new Vector2(0.78f, 0.22f), out _marketAsideLabel, cover);
+            _marketAside.GetComponent<Image>().color = QuietColor;
+            _marketAside.onClick.AddListener(OnAsideButton);
             var back = MakeButton("Back", new Vector2(0.80f, 0.05f), new Vector2(0.96f, 0.22f), out var backLabel, cover);
             back.GetComponent<Image>().color = QuietColor;
             backLabel.text = "BACK";
@@ -168,6 +184,7 @@ namespace Chog.Screens
                 _priceStep = ClosestPriceStep(offer.PricePerDayWei);
             GenesisRental.Dismiss();
             GenesisRental.ReadOffers();
+            GenesisRental.ReadAccount();
             Refresh();
         }
 
@@ -182,6 +199,7 @@ namespace Chog.Screens
             _marketPick = 0;
             GenesisRental.Dismiss();
             GenesisRental.ReadOffers();
+            GenesisRental.ReadAccount();
             Refresh();
         }
 
@@ -225,6 +243,16 @@ namespace Chog.Screens
             _rentedUntilBefore = GenesisRental.RentedUntilSeconds(_marketPick);
             GenesisRental.Dismiss();
             GenesisRental.Rent(_marketPick, DayChoices[_dayChoice]);
+        }
+
+        // Takes back what the wallet is owed when there is something, otherwise stops the rental of the picked Genesis.
+        private void OnAsideButton()
+        {
+            GenesisRental.Dismiss();
+            if (GenesisRental.OwedBackWei != "0")
+                GenesisRental.Claim();
+            else if (_marketPick > 0)
+                GenesisRental.EndRental(_marketPick);
         }
 
         /// <summary>The position, among the prices a holder picks from, of the one closest to a price in the smallest unit of $CHOG.</summary>
@@ -281,20 +309,32 @@ namespace Chog.Screens
 
             var hero = NameOf(_offerFor);
             var offered = GenesisRental.TryGetOffer(_offerFor, out var offer);
-            var mine = GenesisRental.ActionTokenId == _offerFor && GenesisRental.Doing != RentalAction.Rent;
+            var claiming = GenesisRental.Doing == RentalAction.Claim;
+            var mine = (GenesisRental.ActionTokenId == _offerFor && GenesisRental.Doing != RentalAction.Rent) || claiming;
             var busy = mine && GenesisRental.IsBusy;
             var failed = mine && GenesisRental.Step == RentalStep.Failed;
             var price = PriceSteps[_priceStep];
             var samePrice = offered && offer.PricePerDayWei == MonadTransactions.WholeToWei(price);
+            var lentUntil = GenesisRental.LentUntilSeconds(_offerFor);
 
             _offerTitle.text = "RENT OUT " + hero.ToUpperInvariant();
-            _offerText.text = "Any player can pay to play " + hero + " for 1 to " + GenesisRental.MaxDays + " days. It never leaves your " +
-                              "wallet, you keep playing it, and their matches count for its career.\n" +
-                              (offered ? "It is offered at " + MonadTransactions.PriceText(offer.PricePerDayWei) + " $CHOG a day. " : "") +
-                              "Days already paid run to their end even if you take the offer back.";
+            _offerText.text = "One player at a time can pay to play " + hero + " for 1 to " + GenesisRental.MaxDays + " days. It never leaves " +
+                              "your wallet, you keep playing it, and their matches count for its career. You earn the payment by the " +
+                              "second and claim it when you like. If you sell " + hero + ", the rental ends and the renter gets the days " +
+                              "not played back.\n" +
+                              (lentUntil > 0
+                                  ? "<color=" + LabelColor + ">Rented by " + PlayerWallet.ShortAddress(GenesisRental.LentToAddress(_offerFor)) + " for " +
+                                    GenesisRental.TimeLeft(lentUntil, NowMs() / 1000) + " more.</color> "
+                                  : offered ? "It is offered at " + MonadTransactions.PriceText(offer.PricePerDayWei) + " $CHOG a day. " : "");
             _offerPrice.text = price + " <size=60%>$CHOG A DAY</size>";
-            _offerShare.text = "you receive " + MonadTransactions.PriceText(GenesisRental.HolderShare(MonadTransactions.WholeToWei(price), GenesisRental.BurnedShare)) +
+            _offerShare.text = "you keep " + MonadTransactions.PriceText(GenesisRental.HolderShare(MonadTransactions.WholeToWei(price), GenesisRental.BurnedShare)) +
                                (GenesisRental.BurnedShare > 0 ? "\n" + BurnedText() + " is burned" : "");
+            var earned = GenesisRental.EarnedWei;
+            _offerClaim.gameObject.SetActive(earned != "0" || (claiming && GenesisRental.IsBusy));
+            _offerClaim.interactable = !GenesisRental.IsBusy;
+            _offerClaimLabel.text = claiming && GenesisRental.IsBusy
+                ? "<size=60%>" + RentalStepText(GenesisRental.Step).ToUpperInvariant() + "</size>"
+                : "CLAIM " + MonadTransactions.PriceText(GenesisRental.HolderShare(earned, GenesisRental.BurnedShare)) + " $CHOG";
             _offerStatus.text = failed ? "<color=" + ProblemColor + ">" + GenesisRental.Problem + "</color>"
                 : busy ? "Answer in your wallet: " + RentalStepText(GenesisRental.Step) : "";
 
@@ -336,7 +376,7 @@ namespace Chog.Screens
             _marketNext.interactable = _marketPage < pages - 1;
             _marketCount.text = !GenesisRental.OffersRead ? "reading..." : offers.Count == 1 ? "1 offered" : offers.Count + " offered";
 
-            var mine = GenesisRental.Doing == RentalAction.Rent;
+            var mine = GenesisRental.Doing == RentalAction.Rent || GenesisRental.Doing == RentalAction.EndRental || GenesisRental.Doing == RentalAction.Claim;
             var busy = mine && GenesisRental.IsBusy;
             var failed = mine && GenesisRental.Step == RentalStep.Failed;
             var days = DayChoices[_dayChoice];
@@ -356,6 +396,7 @@ namespace Chog.Screens
                     ? "No Genesis is offered for rent yet. A holder offers one from this menu, with RENT IT OUT."
                     : "Reading the offers on Monad...";
                 _rent.gameObject.SetActive(false);
+                ShowAside(busy, 0);
                 return;
             }
 
@@ -371,6 +412,22 @@ namespace Chog.Screens
             _rent.interactable = !busy;
             _rentLabel.text = busy ? "<size=55%>ANSWER IN YOUR WALLET</size>\n" + RentalStepText(GenesisRental.Step).ToUpperInvariant()
                 : (until > 0 ? "ADD " : "RENT ") + days + (days == 1 ? " DAY FOR " : " DAYS FOR ") + cost + " $CHOG";
+            ShowAside(busy, until > 0 ? _marketPick : 0);
+        }
+
+        // TAKE BACK the $CHOG the wallet is owed (a rental it stopped, or whose Genesis was sold),
+        // else END NOW for the Genesis it rents; nothing otherwise.
+        private void ShowAside(bool busy, int rentedPick)
+        {
+            var owed = GenesisRental.OwedBackWei;
+            var show = owed != "0" || rentedPick > 0;
+            _marketAside.gameObject.SetActive(show);
+            if (!show)
+                return;
+            _marketAside.interactable = !busy;
+            _marketAsideLabel.text = owed != "0"
+                ? "<size=70%>TAKE BACK</size>\n" + MonadTransactions.PriceText(owed) + " $CHOG"
+                : "END NOW";
         }
 
         // What the wallet is being asked, in the order of a payment.
@@ -383,7 +440,7 @@ namespace Chog.Screens
                 case RentalStep.Approving:
                     return "1/2 allow";
                 case RentalStep.Sending:
-                    return GenesisRental.Doing == RentalAction.Rent ? "2/2 rent" : "confirm";
+                    return GenesisRental.Doing == RentalAction.Rent ? "2/2 rent" : GenesisRental.Doing == RentalAction.Claim ? "claim" : "confirm";
                 default:
                     return "confirming";
             }

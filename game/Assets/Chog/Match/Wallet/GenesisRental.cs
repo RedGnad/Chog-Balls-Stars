@@ -39,7 +39,11 @@ namespace Chog.Match
         /// <summary>A holder takes an offer back.</summary>
         Withdraw,
         /// <summary>A player pays to play a Genesis for some days.</summary>
-        Rent
+        Rent,
+        /// <summary>A holder takes out what they earned, a renter what they are owed back.</summary>
+        Claim,
+        /// <summary>A renter stops their rental now and is owed the time left.</summary>
+        EndRental
     }
 
     /// <summary>A Genesis its holder offers for rent.</summary>
@@ -53,12 +57,14 @@ namespace Chog.Match
     }
 
     /// <summary>
-    /// The rental of Genesis for $CHOG. A holder offers a Genesis at a price a day; any player
-    /// with a wallet pays to play it for a number of days, and the payment goes to the holder,
-    /// less a share that is burned. The Genesis never leaves its holder's wallet: a rental is a
-    /// right the game reads on the chain. Several players can rent the same Genesis, and the
-    /// matches of a renter count for its career. The game reads the offers and what the connected
-    /// wallet rents from the game services, which read the contract; while no rental contract is
+    /// The rental of Genesis for $CHOG (contracts/src/ChogRental.sol, version 2). A holder offers a
+    /// Genesis at a price a day; one player at a time pays to play it for a number of days. The
+    /// payment is held by the contract and the holder earns it by the second, then claims it, less a
+    /// share that is burned. The Genesis never leaves its holder's wallet: a rental is a right the
+    /// game reads on the chain, and it ends when the holder no longer holds the Genesis; the renter
+    /// is then owed back the time not delivered, as when they stop early. The matches of a renter
+    /// count for its career. The game reads the offers, what the connected wallet rents and its money
+    /// in the rental from the game services, which read the contract; while no rental contract is
     /// set up there, this class stays closed and nothing is offered.
     /// </summary>
     public static class GenesisRental
@@ -66,16 +72,21 @@ namespace Chog.Match
         private const string OfferSelector = "0x92f6d20c";    // offer(uint256,uint128)
         private const string WithdrawSelector = "0x2e1a7d4d"; // withdraw(uint256)
         private const string RentSelector = "0xcfb0c2ab";     // rent(uint256,uint256,uint128)
+        private const string ClaimSelector = "0x6ba4c138";    // claim(uint256[])
+        private const string EndRentalSelector = "0x97491d6f"; // endRental(uint256)
 
         // Monad charges the gas limit of a transaction, not what it uses: each one is sent with a
-        // limit above its cost. On a copy of mainnet, on 10 October 2026
-        // (tools/contracts/measure_rental_gas.sh): a first offer 155,365 and a new price 62,379;
-        // taking an offer back 68,365; a first rental 262,740 and more days 172,689. The margin
-        // covers what was not measured: the very first offer of the contract, an offer taken
-        // back from the middle of the list, a holder who never held $CHOG.
+        // limit above its cost. Measured on version 2, each as a transaction of its own
+        // (contracts/README.md, ChogRental): a first offer 163,865, a new price 62,467, taking an
+        // offer back 50,733, a first rental 232,013, more days 126,050, a holder's claim for one
+        // Genesis 107,737, a renter's early end 58,854 and refund 49,957, a close after a sale 88,808.
+        // A claim settles each Genesis it names first: its limit grows with them.
         private const int OfferGasLimit = 250000;
-        private const int WithdrawGasLimit = 120000;
-        private const int RentGasLimit = 400000;
+        private const int WithdrawGasLimit = 100000;
+        private const int RentGasLimit = 320000;
+        private const int ClaimGasLimit = 120000;
+        private const int ClaimGasPerGenesis = 100000;
+        private const int EndRentalGasLimit = 100000;
 
         private const int SeenAttempts = 8;
         private const float SeenSeconds = 2f;
@@ -86,6 +97,20 @@ namespace Chog.Match
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         private static readonly int[] NoTokens = new int[0];
         private static string s_rentedBy = "";
+
+        // The connected wallet's money in the rental, as the services last read it.
+        private static string s_accountOf = "";
+        private static readonly List<RentalOffer> MineRented = new List<RentalOffer>();
+        private static readonly List<RentalOffer> MineLent = new List<RentalOffer>();
+        private static readonly Dictionary<int, long> LentUntil = new Dictionary<int, long>();
+        private static readonly Dictionary<int, string> LentTo = new Dictionary<int, string>();
+        private static int[] s_toSettle = new int[0];
+
+        /// <summary>What the connected wallet earned as a holder and may claim, before the burned share, in the smallest unit of $CHOG.</summary>
+        public static string EarnedWei { get; private set; } = "0";
+
+        /// <summary>What the connected wallet is owed back as a renter, in the smallest unit of $CHOG.</summary>
+        public static string OwedBackWei { get; private set; } = "0";
 
         public static RentalState State { get; private set; } = RentalState.Unknown;
 
@@ -151,13 +176,53 @@ namespace Chog.Match
             public RentedEntry[] rentals;
         }
 
+        [Serializable]
+        private sealed class AccountEntry
+        {
+            public int tokenId;
+            public string renter;
+            public string lender;
+            public long until;
+            public bool counting;
+            public string pricePerDay;
+        }
+
+        [Serializable]
+        private sealed class AccountAnswer
+        {
+            public bool enabled;
+            public string address;
+            public string earned;
+            public string owedBack;
+            public int[] toSettle;
+            public AccountEntry[] lent;
+            public AccountEntry[] rented;
+        }
+
         /// <summary>Whether an action is under way.</summary>
         public static bool IsBusy => Step != RentalStep.Idle && Step != RentalStep.Failed;
 
-        /// <summary>Every Genesis offered for rent now, by token id.</summary>
-        public static IReadOnlyList<RentalOffer> Offers => Listed;
+        /// <summary>
+        /// Every Genesis that can be rented now, by token id, and those the connected wallet rents
+        /// (nobody else may rent them meanwhile, so the contract no longer lists them; their renter
+        /// adds days there).
+        /// </summary>
+        public static IReadOnlyList<RentalOffer> Offers
+        {
+            get
+            {
+                if (!AccountRead() || MineRented.Count == 0)
+                    return Listed;
+                var all = new List<RentalOffer>(Listed);
+                foreach (var rented in MineRented)
+                    if (all.FindIndex(listed => listed.TokenId == rented.TokenId) < 0)
+                        all.Add(rented);
+                all.Sort((a, b) => a.TokenId.CompareTo(b.TokenId));
+                return all;
+            }
+        }
 
-        /// <summary>The offer for a Genesis, when its holder offers it.</summary>
+        /// <summary>The offer for a Genesis, when its holder offers it: listed, rented by the connected wallet, or its own rented out.</summary>
         public static bool TryGetOffer(int tokenId, out RentalOffer offer)
         {
             foreach (var listed in Listed)
@@ -169,9 +234,47 @@ namespace Chog.Match
                 }
             }
 
+            if (AccountRead())
+            {
+                foreach (var mine in MineRented)
+                {
+                    if (mine.TokenId == tokenId && mine.PricePerDayWei != "0")
+                    {
+                        offer = mine;
+                        return true;
+                    }
+                }
+
+                foreach (var mine in MineLent)
+                {
+                    if (mine.TokenId == tokenId && mine.PricePerDayWei != "0")
+                    {
+                        offer = mine;
+                        return true;
+                    }
+                }
+            }
+
             offer = default;
             return false;
         }
+
+        /// <summary>The second, since 1970, the rental of the connected holder's Genesis ends; 0 when nobody rents it.</summary>
+        public static long LentUntilSeconds(int tokenId)
+        {
+            return AccountRead() && LentUntil.TryGetValue(tokenId, out var until) && until > NowSeconds() ? until : 0;
+        }
+
+        /// <summary>Who rents the connected holder's Genesis, or empty.</summary>
+        public static string LentToAddress(int tokenId)
+        {
+            return LentUntilSeconds(tokenId) > 0 && LentTo.TryGetValue(tokenId, out var renter) ? renter : "";
+        }
+
+        /// <summary>Whether the connected wallet has $CHOG to take out: earned as a holder or owed back as a renter.</summary>
+        public static bool HasMoneyToClaim => AccountRead() && (EarnedWei != "0" || OwedBackWei != "0");
+
+        private static bool AccountRead() => s_accountOf.Length == 42 && s_accountOf == PlayerWallet.Address;
 
         /// <summary>Whether the connected wallet rents this Genesis at this moment, as far as the game has read.</summary>
         public static bool IsRenting(int tokenId)
@@ -225,6 +328,7 @@ namespace Chog.Match
                 {
                     ReadOffers();
                     ReadRented();
+                    ReadAccount();
                 }
             }));
         }
@@ -277,6 +381,82 @@ namespace Chog.Match
             }));
         }
 
+        /// <summary>Reads again the connected wallet's money and rentals both ways; "Changed" follows.</summary>
+        public static void ReadAccount(Action then = null)
+        {
+            var who = PlayerWallet.Address;
+            if (State != RentalState.Open || who.Length != 42)
+                return;
+
+            PlayerWallet.Run(GameServices.Call("rental/account?address=" + who, null, null, (status, text) =>
+            {
+                var answer = status == 200 && !string.IsNullOrEmpty(text) && text[0] == '{' ? JsonUtility.FromJson<AccountAnswer>(text) : null;
+                if (answer != null && answer.enabled && who == PlayerWallet.Address)
+                {
+                    EarnedWei = MonadTransactions.IsDigits(answer.earned) ? answer.earned : "0";
+                    OwedBackWei = MonadTransactions.IsDigits(answer.owedBack) ? answer.owedBack : "0";
+                    s_toSettle = answer.toSettle ?? NoTokens;
+                    MineRented.Clear();
+                    MineLent.Clear();
+                    LentUntil.Clear();
+                    LentTo.Clear();
+                    foreach (var rented in answer.rented ?? new AccountEntry[0])
+                        if (rented.counting && rented.tokenId > 0)
+                            MineRented.Add(new RentalOffer { TokenId = rented.tokenId, PricePerDayWei = MonadTransactions.IsDigits(rented.pricePerDay) ? rented.pricePerDay : "0", Lender = (rented.lender ?? "").ToLowerInvariant() });
+                    foreach (var lent in answer.lent ?? new AccountEntry[0])
+                    {
+                        if (!lent.counting || lent.tokenId <= 0)
+                            continue;
+                        MineLent.Add(new RentalOffer { TokenId = lent.tokenId, PricePerDayWei = MonadTransactions.IsDigits(lent.pricePerDay) ? lent.pricePerDay : "0", Lender = who });
+                        LentUntil[lent.tokenId] = lent.until;
+                        LentTo[lent.tokenId] = (lent.renter ?? "").ToLowerInvariant();
+                    }
+                    s_accountOf = who;
+                    Debug.Log("CHOG_RENTAL account earned " + EarnedWei + " owed back " + OwedBackWei + " lent " + MineLent.Count + " rented " + MineRented.Count);
+                    Changed?.Invoke();
+                }
+
+                then?.Invoke();
+            }));
+        }
+
+        /// <summary>
+        /// The connected wallet takes out its money: what it earned as a holder (less the burned
+        /// share) and what it is owed back as a renter. The rentals it is part of are settled first,
+        /// and those whose Genesis was sold or whose time ran out are closed.
+        /// </summary>
+        public static void Claim()
+        {
+            if (State != RentalState.Open || IsBusy || PlayerWallet.State != WalletState.Ready || !HasMoneyToClaim)
+                return;
+
+            var who = PlayerWallet.Address;
+            var tokens = s_toSettle;
+            SetStep(RentalStep.Switching, RentalAction.Claim, 0, "");
+            MonadTransactions.SwitchToMonad(() =>
+            {
+                SetStep(RentalStep.Sending, RentalAction.Claim, 0, "");
+                MonadTransactions.Send(who, Address, ClaimData(tokens), ClaimGasLimit + ClaimGasPerGenesis * tokens.Length, "taking the $CHOG out",
+                    () => Confirm(0, () => !HasMoneyToClaim, ReadAccount, "taking the $CHOG out"), Fail);
+            }, Fail);
+        }
+
+        /// <summary>The connected renter stops renting a Genesis now; the time left is owed back to them.</summary>
+        public static void EndRental(int tokenId)
+        {
+            if (!CanStart(tokenId) || !IsRenting(tokenId))
+                return;
+
+            var renter = PlayerWallet.Address;
+            SetStep(RentalStep.Switching, RentalAction.EndRental, tokenId, "");
+            MonadTransactions.SwitchToMonad(() =>
+            {
+                SetStep(RentalStep.Sending, RentalAction.EndRental, tokenId, "");
+                MonadTransactions.Send(renter, Address, EndRentalData(tokenId), EndRentalGasLimit, "the end of the rental",
+                    () => Confirm(tokenId, () => !IsRenting(tokenId), then => ReadRented(() => ReadAccount(then)), "the end of the rental"), Fail);
+            }, Fail);
+        }
+
         /// <summary>The connected holder offers a Genesis for rent at a whole number of $CHOG a day, or changes its price.</summary>
         public static void Offer(int tokenId, int chogPerDay)
         {
@@ -295,7 +475,7 @@ namespace Chog.Match
             }, Fail);
         }
 
-        /// <summary>The connected holder takes the offer for a Genesis back. Rentals already paid run to their end.</summary>
+        /// <summary>The connected holder takes the offer for a Genesis back. A rental that runs goes on to its end.</summary>
         public static void Withdraw(int tokenId)
         {
             if (!CanStart(tokenId))
@@ -334,7 +514,7 @@ namespace Chog.Match
                     {
                         SetStep(RentalStep.Sending, RentalAction.Rent, tokenId, "");
                         MonadTransactions.Send(renter, Address, RentData(tokenId, days, offer.PricePerDayWei), RentGasLimit, "the rental",
-                            () => Confirm(tokenId, () => RentedUntilSeconds(tokenId) > paidUntil, ReadRented, "the rental"), Fail);
+                            () => Confirm(tokenId, () => RentedUntilSeconds(tokenId) > paidUntil, then => ReadRented(() => ReadAccount(then)), "the rental"), Fail);
                     }, Fail);
             }, Fail);
         }
@@ -415,13 +595,30 @@ namespace Chog.Match
             return WithdrawSelector + MonadTransactions.Word(tokenId);
         }
 
+        /// <summary>The call that takes out the caller's money after settling the rentals of these Genesis.</summary>
+        public static string ClaimData(int[] tokenIds)
+        {
+            var data = new System.Text.StringBuilder(ClaimSelector);
+            // abi.encode(uint256[]): the offset of the list, its length, then each token id.
+            data.Append(MonadTransactions.Word(32)).Append(MonadTransactions.Word(tokenIds.Length));
+            foreach (var tokenId in tokenIds)
+                data.Append(MonadTransactions.Word(tokenId));
+            return data.ToString();
+        }
+
+        /// <summary>The call with which a renter stops renting a Genesis now.</summary>
+        public static string EndRentalData(int tokenId)
+        {
+            return EndRentalSelector + MonadTransactions.Word(tokenId);
+        }
+
         /// <summary>The call that rents a Genesis for some days at no more than the price the player saw.</summary>
         public static string RentData(int tokenId, int days, string maxPricePerDayWei)
         {
             return RentSelector + MonadTransactions.Word(tokenId) + MonadTransactions.Word(days) + MonadTransactions.WordOf(maxPricePerDayWei);
         }
 
-        /// <summary>What a holder receives of a payment, in the smallest unit: the payment less the burned share.</summary>
+        /// <summary>What a holder receives of what they earned, in the smallest unit: that amount less the burned share.</summary>
         public static string HolderShare(string paidWei, int burnedShare)
         {
             if (!MonadTransactions.IsDigits(paidWei))
