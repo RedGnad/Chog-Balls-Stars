@@ -398,6 +398,14 @@ namespace Chog.Match
                 var up = _camera != null ? _camera.up : Vector3.up;
                 eyes = tower.Root.transform.position + up * TowerEyes - Vector3.up * BeamLift;
             }
+            // In 3D as the lasers of the heroes' specials (GenesisLaser), else flat.
+            if (ChogEffectMaterials.Available)
+            {
+                var laser = GenesisLaser.Create(Laser, eyes, 0.8f);
+                laser.SetHead(target.Position.ToUnityVector3());
+                laser.Release();
+                return;
+            }
             var beam = GenesisBeam.Create(roster.ShapeMaterial, Laser, eyes, 0.8f);
             beam.SetHead(target.Position.ToUnityVector3());
             beam.Release();

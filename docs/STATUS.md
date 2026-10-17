@@ -502,6 +502,34 @@ a ping from cron-job.org for the host).**
 **Next action:** the user's mainnet deployment, then the tests that need #1287 (sign-in, career, loan,
 rental, shop, a staked match) and the video's shots with it, today; Render; the user's eye on batch 9.
 
+**17 October 2026, 20:10 (the specials in 3D; on `main`, built `20261017T175516922Z`, not deployed).**
+- **Asked by the owner:** some attacks were "not in 3D, just sprites thrown on the attack". **Implemented**
+  (`game/README.md`, "The specials in 3D"): the five specials, which come from the Eyes trait, are 3D objects
+  made in code, in the colours of the caster's Eyes value and with its own eye drawing: the laser as two
+  outlined tubes with a lighter core, glows at the eyes, sparks at the head and a glow on the floor; the flash
+  as a see-through wedge of light with a bright edge and a glint on the glasses; the tear as a 3D drop on the
+  lobbed arc of the basic attacks (same helpers, shadow and landing ring), splashing into a low liquid puddle
+  with ripples; the wave as the hero's two eyeballs rolling forward behind a leaning see-through front; the
+  nova as eight eyeballs bursting out over a shock ring. The towers fire the same 3D laser. The flat look
+  stays as the fallback (and `special3d=0` on a private page). View code only: the simulation stamp of the
+  build is unchanged (`f4a81f1ddbd919b6`), so Photon's version too.
+- **Seen** on a new private test page, `?specials=` (`ChogSpecialsViewer`: each Genesis fires its special in a
+  loop with the numbers of its own attack data, seen by the match camera at 1280 x 720 scale and from the side):
+  [before and after](../research/evidence/specials-3d-before-after-2026-10-17.jpg),
+  [six moments of each](../research/evidence/specials-3d-film-2026-10-17.jpg),
+  [as an enemy's, on the day floor](../research/evidence/specials-3d-enemy-day-2026-10-17.jpg),
+  [six more Genesis](../research/evidence/specials-3d-variety-2026-10-17.jpg). Headless Chrome with the GPU on
+  the Mac, muted. View tests: 138 passed, 0 failed (13 new).
+- **Found on the way:** eye drawings laid on a ball as layered geometry speckled on that page (their small lift
+  is below the depth precision of the picture); the eye is now painted once into a 128-pixel picture per look
+  and laid on the ball by the shader. An eye turned with the world's up leaned on screen under the 75-degree
+  camera: what faces the camera turns with the camera's up.
+- **Not seen:** a real match (Photon's version limit that day), a phone (the cost on its GPU: the effects add a
+  few hundred triangles each, pooled; one see-through pass), the second forms and the echo, return and zone
+  deliveries in play (they draw through the same code).
+**Next action:** the owner's eye on the sheets; a match with specials once Photon accepts the build, and a run
+with `?perf=1` on the phone.
+
 **17 October 2026, 18:45 (the look of a match; on `main`: 54f62ae, faf163f; in main's build `20261017T155010541Z`).**
 - **Implemented** (`game/README.md`, "The look of a match"): heroes and arena drawn with a diffuse matcap
   (`ChogHero.shader` keeps `_Flash` as it was; `ChogArena.shader` on the pack's materials); each team's key light

@@ -68,11 +68,38 @@ namespace Chog.Match
         {
             skin = Backing(skin, look);
 
-            var eye = radius * 0.62f;
             var painter = new ShapePainter();
             painter.Ellipse(Vector2.zero, radius, radius, look.Outline);
             painter.Ellipse(Vector2.zero, radius * 0.88f, radius * 0.88f, skin);
+            PaintSingle(painter, look, skin, radius * 0.62f, second);
+            return painter.ToMesh("GenesisEyeBadge");
+        }
 
+        /// <summary>
+        /// The colour of the ball an eye of this look is drawn on in 3D (GenesisEyeball): a white for an
+        /// open eye, so that it reads as an eyeball from afar; the hero's skin, as its eyelid, for an eye
+        /// the collection draws closed (a smile, a dash, a squeeze).
+        /// </summary>
+        public static Color Sclera(GenesisEyeLook look, Color skin)
+        {
+            return IsClosed(look.Glyph) ? Backing(skin, look) : EyeWhite;
+        }
+
+        /// <summary>Whether the collection draws this eye closed: then there is no white to show.</summary>
+        public static bool IsClosed(GenesisEyeGlyph glyph)
+        {
+            return glyph == GenesisEyeGlyph.Arc || glyph == GenesisEyeGlyph.Dash || glyph == GenesisEyeGlyph.Chevron;
+        }
+
+        private static readonly Color EyeWhite = new Color(0.97f, 0.96f, 0.93f);
+
+        /// <summary>
+        /// One eye of "size" (its radius) centred on the origin, without the disc it sits on: what a
+        /// badge shows inside its rim, and what an eyeball wears on its front. "skin" is what the eyelid
+        /// of a lidded eye is drawn in.
+        /// </summary>
+        internal static void PaintSingle(ShapePainter painter, GenesisEyeLook look, Color skin, float eye, bool second)
+        {
             if (look.Glyph == GenesisEyeGlyph.Band)
             {
                 // One lens of the goggles.
@@ -90,8 +117,6 @@ namespace Chog.Match
             {
                 Eye(painter, look, skin, Vector2.zero, eye, second);
             }
-
-            return painter.ToMesh("GenesisEyeBadge");
         }
 
         private static readonly Color Dark = new Color(0.08f, 0.08f, 0.1f);

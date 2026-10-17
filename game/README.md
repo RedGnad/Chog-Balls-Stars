@@ -533,6 +533,58 @@ With `?perf=1` the console receives one `CHOG_COMBAT skill <asset>` line per ski
 the flash is longer than its area. An enemy's attack is told from an ally's by its red outline
 only; the signs on targets are not marked by team.
 
+### The specials in 3D (17 October)
+
+The owner saw specials that were "not in 3D, just sprites thrown on the attack". The five shapes
+are now drawn as 3D objects made in code (`GenesisSpecialMeshes`, built with `EffectMeshDraft`),
+still in the colours of the caster's Eyes value and with its own eye drawing; the flat shapes
+described above stay as the fallback. What a player sees:
+
+- **beam:** two tubes from the eyes to the head of the attack, in the eye colour with a lighter
+  core along the side that faces the camera and an ink outline, a glow at each eye, a spark
+  turning at each head, the glow of the laser on the floor along the line it hits; it holds a
+  moment, thins out and fades, and the head bursts into pieces of its colours. The towers fire
+  the same laser (`StructureViews`).
+- **flash:** a see-through wedge of light from the caster, low at its feet and as high as a hero
+  at its front, in the visor's colours across it (the two sides of the 3D glasses), with a
+  bright front edge and its footprint outlined on the floor; a glint pops and turns on the
+  glasses.
+- **puddle:** a 3D tear (a drop, its tip trailing, a highlight, an outline) flies the arc of the
+  lobbed basic attacks (`ChogAttackLook.LobHeight` and `LobRise`), larger at its top, its shadow
+  on the floor and the landing ring of the thrower's side from the moment it is thrown, then
+  splashes; the zone is a low see-through blob with a wavy rim and ripples spreading from its
+  middle.
+- **wave:** the hero's two eyes as eyeballs (a white ball, the skin for a closed eye, wearing the
+  eye of its Eyes value on its front: `GenesisEyes.PaintSingle` painted once into a 128-pixel
+  picture per look, `GenesisSpecialMeshes.EyePicture`, and laid on the ball pixel by pixel by the
+  shader, so nothing fights for depth) rolling forward, rocking, turned toward the camera (with
+  the camera's up, so the eye stays upright on screen) while leaning where they go; ahead of them
+  a see-through front leaning forward like a wave, and the area washed on the floor.
+- **nova:** eight such eyeballs burst out to the rim of the area, the ring twisting and each eye
+  spinning once, over a shock ring that runs along the floor; the reach is outlined on the
+  floor.
+
+All of it is a few hundred triangles a piece, pooled (`ChogEffectPool`), drawn with one shader,
+`Resources/ChogEffect.shader` (`ChogEffectMaterials`): a solid material shaded with the heroes'
+matcap and ink outline shells (an enemy's outline is its exact red), and a see-through one that
+gets more opaque where a surface turns away from the camera. Floor marks use `Chog/Ground`. The
+drawing is shared by the match (`GenesisAttackView` reads the frame) and a test page
+(`GenesisSpecialDrawing`); none of it is simulation code, so the simulation stamp and Photon's
+version do not change.
+
+**Seeing them without a match.** On a private address, `?specials=1` shows one Genesis of each
+shape (#16 beam, #1287 flash, #1465 puddle, #112 wave, #1514 nova), `?specials=1533,1537` the ones
+named (numbers shown in their names), each firing its special in a loop with the numbers of its
+own attack data (`ChogSpecialsViewer`): on the left as the match camera sees it, at the size a
+1280 x 720 screen shows it, on the right from the side. `&enemy=1` draws them as an enemy's,
+`&special3d=0` the flat look of before (also honoured in a match on a private address),
+`&floor=day` the daylight floor, `&at=4` stops the page four seconds in with each special at a
+moment that shows it, `&t=0.2` stops each one that long into its turn (one picture a moment). A
+capture at 1280 x 1800: `CHOG_BROWSER_WIDTH=1280 CHOG_BROWSER_HEIGHT=1800
+CHOG_BROWSER_URL="http://127.0.0.1:<port>/?noguide=1&specials=1&at=4" node
+tools/unity/qualify_webgl.mjs`. Sheets: `research/evidence/specials-3d-*-2026-10-17.jpg`.
+**Not seen:** a phone (cost on its GPU), a real match through Photon.
+
 ### Genesis portraits (9 October)
 
 Each Genesis on the preparation screen shows its real image beside its team slot and on the

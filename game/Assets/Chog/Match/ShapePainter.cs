@@ -15,6 +15,14 @@ namespace Chog.Match
         private readonly List<Color> _colors = new List<Color>();
         private readonly List<int> _triangles = new List<int>();
 
+        /// <summary>The painted points, in x and y, in the order they were added.</summary>
+        public IReadOnlyList<Vector3> Vertices => _vertices;
+
+        public IReadOnlyList<Color> Colors => _colors;
+
+        /// <summary>Three indices a triangle, in the order they were painted (later ones cover).</summary>
+        public IReadOnlyList<int> Triangles => _triangles;
+
         public void Ellipse(Vector2 center, float radiusX, float radiusY, Color color)
         {
             var first = Add(center, color);
