@@ -26,3 +26,5 @@ pas des décisions de produit actuelles. Les dernières instructions utilisateur
 
 Ces règles de continuité n'ajoutent pas de demande de permission pour les travaux déjà
 autorisés par l'utilisateur. Elles ne demandent pas de délégation à des sous-agents.
+
+Agents (any assistant) : lire aussi `docs/HANDOFF.md`, qui donne le contexte, le travail ouvert et les règles de travail sur cette machine.
