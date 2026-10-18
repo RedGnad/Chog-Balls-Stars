@@ -105,7 +105,8 @@ SKINS = {**traits.SKINS, "Recruit": RECRUIT_SKIN}
 # The Skull base (batch 7): its own bone colours, by "Skin", under names that do not meet those of Origin.
 SKINS.update({"Skull " + name: {"skin": colour, "face": colour} for name, colour in bases.SKULL_SKINS.items()})
 # The Radioactive base: a skin that runs from its colour at the feet to a lighter one at the top (format 5).
-SKINS.update({"Radioactive " + name: {"skin": bottom, "face": bottom, "top": top}
+# Its "face" is the deeper tone the skull shows in through the skin (bases.RADIOACTIVE_LINES).
+SKINS.update({"Radioactive " + name: {"skin": bottom, "face": bases.RADIOACTIVE_LINES[name], "top": top}
               for name, (bottom, top) in bases.RADIOACTIVE_SKINS.items()})
 BASES = ("Origin", "Skull", "Radioactive")
 
@@ -158,7 +159,9 @@ def shared_keys_of(genesis_traits):
         # A skull: its own head (no leaf, whatever the hat), and the ribs on its body. A radioactive Chog:
         # its head with the crown its head object leaves and the skull's teeth, the ribs on its body.
         base_name = genesis_traits["Base"]
-        head = ("head", "Skull") if base_name == "Skull" else ("head", "Radioactive", genesis_traits.get("Head"))
+        # (A skull's head depends on its Side since 18 October 2026: its jaw and its teeth are drawn otherwise.)
+        head = (("head", "Skull", side) if base_name == "Skull"
+                else ("head", "Radioactive", genesis_traits.get("Head")))
         # A skeleton's hands are bone (bases.bone_hands): its arms are its own.
         arms = ("Skull",) if base_name == "Skull" else ()
         keys = {("rest", "Body", base_name), ("rest", "armLeft") + arms, ("rest", "armRight") + arms, head}

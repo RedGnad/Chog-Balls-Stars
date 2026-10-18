@@ -2932,9 +2932,10 @@ MUMMY_WRAP = {
     # Round the jaw (16 October 2026, the owner: "still badly made on the head"; until then one ring 13 % larger
     # than the head, which stood off it like a flange): tight on the skull over the upper teeth, under the
     # nose, as on #552 and #816. The height of its middle on the face, its half width, how far off the head
-    # at the front (over the teeth, drawn 0.031 off it) and at the back; a second turn over the first,
-    # tilted (degrees), a little narrower.
-    "JAW": (-0.080, 0.032, 0.040, 0.012),
+    # at the front (over the teeth) and at the back; a second turn over the first, tilted (degrees), a little
+    # narrower. (0.040 at the front until 18 October 2026, when the teeth were drawn 0.031 off the head; they
+    # are now 0.009 off it.)
+    "JAW": (-0.080, 0.032, 0.020, 0.012),
     "JAW_TURN": (7.0, 0.80, 0.008),
     "STATIONS": 13,
 }
@@ -2991,7 +2992,7 @@ def build_mummy(maker):
                 here = polar + edge * half_band * wide / surface.half.z
                 rows[row].append(on_head(surface, angle, here, 1.0) + head_normal(surface, angle, here) * off)
         KIT.add_loops(head, rows, head.named("Wrap"), 0.008)
-    bases.narrow_jaw(head, maker.head)
+    bases.narrow_jaw(head, maker.head, "Right")     # the three mummies are skulls of Side=Right
 
 
 CLOTH_KINDS["Mummy"] = build_mummy

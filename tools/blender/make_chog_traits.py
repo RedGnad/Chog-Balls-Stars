@@ -986,7 +986,7 @@ def add_leaf_crown(part, numbers, surface, leaves=FULL_CROWN):
                 rings.append((root + away * length * along + curl * along * along, wide * half_wide * wider,
                               thick * half_thick * thicker))
             rings.append((root + away * length + curl, NOWHERE, NOWHERE))
-            part.shell(rings, numbers.LEAF_SIDES, SKIN, numbers.OUTLINE_THICKNESS, smooth=True)
+            part.shell(rings, numbers.LEAF_SIDES, SKIN, numbers.OUTLINE_THICKNESS)
             where = "" if not mirrored else (" left" if side > 0.0 else " right")
             built.append((f"leaf {line}{where}", rings))
     return built
@@ -2741,12 +2741,15 @@ def build(traits=None, replaced=None, head_replaced=None):
     if skull:
         # A skull: no leaf, no hair, no cream face; the bone is the face (chog_trait_bases.py).
         leaves = []
-        bases.add_skull_face(head, head_n, surface, full, draw_shape, oval, SKIN, full.EYE, full.BLUSH, full.FACE)
-        bases.narrow_jaw(head, head_n)
+        side = traits.get("Side", "Right")
+        bases.add_skull_face(head, head_n, surface, full, draw_shape, oval, SKIN, full.EYE, full.BLUSH, full.FACE,
+                             side=side)
+        bases.narrow_jaw(head, head_n, side)
     elif bases.is_radioactive(traits):
         # A radioactive Chog: the crown its hat leaves (all of it under horns), no cream face, the skull's
         # teeth and nose showing, no cheek.
         leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN))
+        bases.add_radioactive_hairline(head, head_n, surface, full.FACE)
         bases.add_skull_face(head, head_n, surface, full, draw_shape, oval, SKIN, full.EYE, full.BLUSH, full.FACE,
                              cheeks=False)
     else:
