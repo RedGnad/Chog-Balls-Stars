@@ -1,5 +1,19 @@
 # État courant et décisions
 
+**18 October 2026, 20:37 (the home direction made real, deployed `20261018T202454468Z`, same simulation stamp).**
+- **Implemented in the game, not only on boards:** the home now gives the Genesis stage more room, puts the
+  compact icon rail around it, frames it with Chog purple, pink and gold marks, and removes button shine,
+  stacked lips, bounce and duplicate outlines. The wallet card, connection state and player data remain the
+  real values already used by the game.
+- **Built and checked:** `20261018T202454468Z-081da580762d4da0a41dfd534dd4ad8e` opened its new home and then a
+  local touch match against bots. View tests: 155 passed, 0 failed. The judge replayed two recorded matches
+  with the announced winner; the service suite passed 80 of 80 outside the sandbox that forbids its local port.
+  The public address now serves this build and its home was opened without pressing PLAY.
+- **Still not checked:** a physical phone and a real wallet connection. The 3D hero audit remains open after
+  the accepted Skull and Radioactive correction: full astronaut costume, cap spikes, then eyes and mouths.
+**Next action:** the owner's eye on the public home, then the next approved Genesis correction or the phone
+measurement with `?perf=1`.
+
 **Since 12 October 2026, 01:36, the game has a public https address** through a tunnel from
 the development Mac, allowed by the user that night: the same program a host would start
 (`server/src/host.js` on the assembled `site/`, with the judge), reachable while this Mac and
