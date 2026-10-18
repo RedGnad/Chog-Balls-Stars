@@ -45,7 +45,7 @@ namespace Chog.Editor
         [MenuItem("Chog/Qualification/Build WebGL")]
         public static void WebGL()
         {
-            BuildWebGL(EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray());
+            BuildWebGL(EditorBuildSettings.scenes.Where(s => s.enabled && File.Exists(s.path)).Select(s => s.path).ToArray());
         }
 
         [MenuItem("Chog/Qualification/Build Local WebGL (Bots)")]
@@ -58,7 +58,7 @@ namespace Chog.Editor
         // Builds the enabled network scenes and returns the path of the written build report.
         internal static string NetworkWebGL()
         {
-            return BuildWebGL(EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray());
+            return BuildWebGL(EditorBuildSettings.scenes.Where(s => s.enabled && File.Exists(s.path)).Select(s => s.path).ToArray());
         }
 
         private static string BuildWebGL(string[] scenes)
@@ -195,6 +195,10 @@ namespace Chog.Editor
         // in the text, which is what the engine does with them.
         private static void ExportSimulationAssets(string path)
         {
+            // Assets removed from the disk while the Editor stayed open (a branch put aside) leave the
+            // database listing them: read it again first.
+            AssetDatabase.Refresh();
+            Quantum.Editor.QuantumUnityDBUtilities.RefreshGlobalDB(true);
             var assets = new List<Quantum.AssetObject>();
             foreach (var entry in Quantum.QuantumUnityDB.Global.Entries)
             {
