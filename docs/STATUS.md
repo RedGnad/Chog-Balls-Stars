@@ -588,6 +588,18 @@ audit and fixes; the owner's eye on the aim, the towers and the core.
 **Next action:** build, check and deploy the 3D fixes as they come; the owner picks a siege layout; the phone
 measurement (`http://<mac-ip>:8096/?perf=1`).
 
+**18 October 2026, 09:50 (the weekly credits ran out: finalised; deployed `20261018T074507080Z`, stamp unchanged).**
+- **Deployed:** the heroes' faces laid on their heads (38048fa: face, line, cheeks, eyes and mouths no longer float;
+  measured gaps halved; sheet `research/evidence/hero-3d-faces-on-the-head-2026-10-18.jpg`). Checked: a match
+  against bots without exception, the judge agrees, Render serves it.
+- **Put aside on the pushed branch `wip/siege-map-and-heroes` (42dea34), not finished:** the siege map A (three
+  lanes, siege-only scene and map, baked with 381 colliders), core radius 1.5 and towers needing line of sight
+  (simulation, tested headless only), and the start of the heroes' point 2 (Skull and Radioactive heads). To finish:
+  check the baked map, bots on it, one WebGL build connected to Photon, both modes, re-record the judge fixtures.
+- **Still open from the owner:** Skull and Radioactive heads, full costumes (astronaut), longer spikes under caps,
+  misplaced eyes and mouths; the phone measurement. The Mac slept in the night and froze the agents: `caffeinate
+  -dimsu` now keeps it awake while it runs (it does not survive a restart).
+
 **17 October 2026, 20:10 (the specials in 3D; on `main`, built `20261017T175516922Z`, not deployed).**
 - **Asked by the owner:** some attacks were "not in 3D, just sprites thrown on the attack". **Implemented**
   (`game/README.md`, "The specials in 3D"): the five specials, which come from the Eyes trait, are 3D objects
