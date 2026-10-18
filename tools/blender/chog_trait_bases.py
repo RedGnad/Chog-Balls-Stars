@@ -120,6 +120,9 @@ RADIOACTIVE_LINES = {
 RADIOACTIVE_HAIRLINE = ((-0.235, 0.205), (-0.155, 0.180), (-0.075, 0.215), (0.0, 0.185),
                         (0.075, 0.215), (0.155, 0.180), (0.235, 0.205))
 RADIOACTIVE_HAIRLINE_THICK = 0.016
+# Roots of volumetric Radioactive head items are clamped below the hairline. Their tips may rise through the
+# crown as in the portraits, but a horn, mushroom or seal must visibly grow from the forehead, not the top.
+RADIOACTIVE_FOREHEAD_TOP = 0.145
 # The tint the eyes of each colour glow in (the white of an eye of the collection, in that colour).
 RADIOACTIVE_EYE_TINTS = {
     "Green": (0.95, 1.0, 0.50),
@@ -365,6 +368,11 @@ def _out(surface, side, up):
     return (surface.front(side, up, 0.01) - surface.front(side, up, 0.0)).normalized()
 
 
+def radioactive_forehead_up(up):
+    """Keep a Radioactive head item's root on the forehead, below the crown-root line."""
+    return min(up, RADIOACTIVE_FOREHEAD_TOP)
+
+
 RAM_HORN = {
     # Read on CHOG #275, #473, #672, #1067, #1200 (Red Horn) and #31, #1745 (Purple Horn): each horn is
     # about as thick at its root as a sixth of the head, rises well above the crown, then curls out to the
@@ -399,6 +407,7 @@ def build_ram_horns(maker):
     for side in (1.0, -1.0):
         part = maker.part()
         across, up = numbers.ROOT
+        up = radioactive_forehead_up(up)
         root = maker.surface.front(across * side, up, -numbers.SUNK)
         back = (X * side + Y * numbers.BACK).normalized()
         across = back.cross(Z).normalized()     # square to the plane of the curl
@@ -448,6 +457,7 @@ def build_demon_horns(maker):
     numbers = SimpleNamespace(**DEMON_HORNS)
     surface = maker.surface
     for (across, up), out, length, thick, bend in maker.entry.get("horns", numbers.HORNS):
+        up = radioactive_forehead_up(up)
         for side in ((1.0,) if across == 0.0 else (1.0, -1.0)):
             part = maker.part()
             root = surface.front(across * side, up, -numbers.SUNK)
@@ -516,7 +526,8 @@ def build_seal(maker):
     lean = math.radians(numbers.LEAN_BACK_DEG)
     facing = (-Y * math.cos(lean) + Z * math.sin(lean)).normalized()
     upward = (Z * math.cos(lean) + Y * math.sin(lean)).normalized()
-    centre = surface.front(0.0, numbers.UP, 0.0) + Z * numbers.RAISE - Y * numbers.AHEAD
+    up = radioactive_forehead_up(numbers.UP)
+    centre = surface.front(0.0, up, 0.0) + Z * numbers.RAISE - Y * numbers.AHEAD
     gold = part.named("Gold")
     rings = []
     for step in range(numbers.SEGMENTS + 1):
@@ -597,6 +608,7 @@ def build_mushrooms(maker):
     surface = maker.surface
     for (across, up), out, height, stem_radius, cap, orange in numbers.SHROOMS:
         part = maker.part()
+        up = radioactive_forehead_up(up)
         root = surface.front(across, up, -numbers.SUNK)
         stem = (Z * (1.0 - out) + _out(surface, across, up) * out).normalized()
         part.shell(base.tube_rings(root, stem, X, [(0.0, stem_radius * 1.15), (height, stem_radius)]), 8,
