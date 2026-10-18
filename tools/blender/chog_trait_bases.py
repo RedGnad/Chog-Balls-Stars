@@ -54,7 +54,8 @@ SKULL_SKINS = {
 # rise); a tooth is outlined by LINE, GAP apart.
 SKULL_FACE = {
     "Right": {
-        "ROWS": ((-0.096, 0.148, 0.020, 7, 0.014), (-0.132, 0.128, 0.0155, 6, 0.011)),
+        # The two rows are little rounded beads, not a large, square monster grin.
+        "ROWS": ((-0.096, 0.132, 0.0145, 7, 0.010), (-0.123, 0.112, 0.011, 6, 0.009)),
         "MOUTH": None,
         "CRACK": ((0.172, -0.128), (0.190, -0.104), (0.204, -0.078), (0.212, -0.056)),
         "CRACK_THICK": (0.014, 0.011, 0.007, 0.003),
@@ -72,20 +73,23 @@ SKULL_FACE = {
     },
 }
 TEETH = {
-    "LINE": 0.0045,                          # the dark line round a tooth
+    "LINE": 0.0035,                          # the dark line round a skull tooth
     "GAP": 0.004,                            # between two teeth of a row, the line showing there
-    "SQUARENESS": 2.6,
+    "SQUARENESS": 2.15,
+    "SIDES": 8,
     # A radioactive Chog (all of Side=Left) shows the skull through its skin, drawn in a deeper tone of its
     # colour (RADIOACTIVE_LINES), never in black: a row of small teeth along the bottom of the face, the line of
     # the jaw under it, and the cheekbones from under the eyes down to the ends of the row (#31, #343, #598,
     # #1134, #140). Row: middle height, half width, half height, count, how far its ends rise.
-    "GLOW_ROW": (-0.142, 0.122, 0.019, 6, 0.016),
-    "GLOW_LINE": 0.0055,
-    "JAW_LINE": ((-0.190, -0.090), (-0.165, -0.150), (-0.110, -0.180), (0.0, -0.190), (0.110, -0.180),
-                 (0.165, -0.150), (0.190, -0.090)),
-    "JAW_THICK": 0.008,
-    "CHEEKBONE": ((0.205, -0.030), (0.192, -0.075), (0.160, -0.112), (0.128, -0.128)),
-    "CHEEKBONE_THICK": (0.004, 0.008, 0.008, 0.005),
+    # The Genesis art uses six small, almost round teeth, then a short shallow chin curve: it is the skull
+    # seen through the glow, not a rectangular grill across the whole mouth.
+    "GLOW_ROW": (-0.136, 0.112, 0.0145, 6, 0.012),
+    "GLOW_LINE": 0.0038,
+    "JAW_LINE": ((-0.158, -0.104), (-0.140, -0.138), (-0.086, -0.163), (0.0, -0.171), (0.086, -0.163),
+                 (0.140, -0.138), (0.158, -0.104)),
+    "JAW_THICK": 0.006,
+    "CHEEKBONE": ((0.198, -0.028), (0.185, -0.070), (0.153, -0.106), (0.117, -0.122)),
+    "CHEEKBONE_THICK": (0.004, 0.006, 0.006, 0.004),
 }
 NOSE = {"UP": -0.040, "HALF_WIDTH": 0.026, "HALF_HEIGHT": 0.021}
 
@@ -182,8 +186,11 @@ def rounded(middle, half_width, half_height, points=8, squareness=3.0):
 
 
 def tooth_row(part, surface, draw_shape, row, line, fill, outline, lifts):
-    """A row of rounded teeth (a row of SKULL_FACE or GLOW_ROW): a dark shape round the whole row (each tooth's
-    outline, and the line between the teeth where they are GAP apart), then each tooth on it in "fill"."""
+    """A row of small rounded teeth (a row of SKULL_FACE or GLOW_ROW), each with its own thin outline.
+
+    A single dark backing made the teeth look like a large grill. The portraits instead leave the head visible
+    between the teeth, including between the two Skull rows.
+    """
     up, half_row, half_tall, count, rise = row
     gap, square = TEETH["GAP"], TEETH["SQUARENESS"]
     wide = (2.0 * half_row - gap * (count - 1)) / count
@@ -191,18 +198,14 @@ def tooth_row(part, surface, draw_shape, row, line, fill, outline, lifts):
     def height(across):
         return up + rise * (across / half_row) ** 2
 
-    # The outline of the row: its top and bottom edges follow the curve of the row.
-    steps = 2 * count
-    upper = [(-half_row - line + (2.0 * (half_row + line)) * index / steps, 0.0) for index in range(steps + 1)]
-    edge = [(x, height(max(-half_row, min(half_row, x))) + half_tall + line) for x, _ in upper]
-    edge += [(x, height(max(-half_row, min(half_row, x))) - half_tall - line) for x, _ in reversed(upper)]
-    draw_shape(part, surface, outline, edge, lifts[0], middle=(0.0, height(0.0)))
     for index in range(count):
         centre = -half_row + wide * 0.5 + index * (wide + gap)
         # The teeth at the ends are shorter: the row follows the jaw.
         tall = half_tall * (0.80 if index in (0, count - 1) else 1.0)
         middle = (centre, height(centre))
-        draw_shape(part, surface, fill, rounded(middle, wide * 0.5, tall, 10, square), lifts[1], middle=middle)
+        draw_shape(part, surface, outline, rounded(middle, wide * 0.5 + line, tall + line, TEETH["SIDES"], square), lifts[0],
+                   middle=middle)
+        draw_shape(part, surface, fill, rounded(middle, wide * 0.5, tall, TEETH["SIDES"], square), lifts[1], middle=middle)
 
 
 def upside_down_heart(middle, half_width, half_height):
@@ -583,21 +586,26 @@ def build_head_laser(maker):
 
 
 POISON_SHROOM = {
-    # Read on CHOG #1100 (Poison Shroom, the only one): mushrooms growing out of the head among the spikes,
-    # pale green caps spotted orange on pale stems: a tall one at the top (on the right of the character), a
-    # smaller one leaning out at the top on its left, a small orange one spotted green low on its right side.
-    # (Until 16 October 2026: two purple caps on the top of the skull, the upper spikes taken out.) Each:
+    # Read on CHOG #1100 (Poison Shroom, the only one): five mushrooms grow out of the forehead among the
+    # spikes. There are two tall pale green caps, then three small foreground and side caps, each spotted in
+    # orange or green. (Until 16 October 2026: two purple caps on the top of the skull, the upper spikes taken
+    # out.) Each:
     # where its root is on the face (to the side, above its middle), how far it leans out (0 up, 1 as the
     # head faces there), the height of its stem, its radius, the radius of its cap, whether the cap is the
     # orange one.
     "SHROOMS": (
-        ((-0.05, 0.27), 0.20, 0.17, 0.022, 0.110, False),
-        ((0.18, 0.23), 0.55, 0.12, 0.018, 0.085, False),
-        ((-0.27, 0.06), 0.85, 0.07, 0.014, 0.055, True),
+        ((-0.10, 0.145), 0.22, 0.165, 0.020, 0.088, False),
+        ((0.13, 0.135), 0.42, 0.142, 0.018, 0.075, False),
+        ((-0.255, 0.075), 0.78, 0.092, 0.014, 0.052, True),
+        ((0.265, 0.075), 0.75, 0.082, 0.013, 0.046, False),
+        ((0.035, 0.055), 0.93, 0.060, 0.012, 0.038, True),
     ),
     "SUNK": 0.02,
-    "CAP_SIDES": 10,
-    "SPOTS": 5,                      # around each cap, halfway down it
+    # Five foreground mushrooms must still leave the dressed hero below 8,000 triangles.
+    "STEM_SIDES": 6,
+    "CAP_SIDES": 8,
+    "CAP_STACKS": 5,
+    "SPOTS": 3,                      # around each cap, halfway down it
     "SPOT": (0.016, 0.006),          # half width and half thickness of a spot, against a cap of 0.1
 }
 
@@ -611,11 +619,13 @@ def build_mushrooms(maker):
         up = radioactive_forehead_up(up)
         root = surface.front(across, up, -numbers.SUNK)
         stem = (Z * (1.0 - out) + _out(surface, across, up) * out).normalized()
-        part.shell(base.tube_rings(root, stem, X, [(0.0, stem_radius * 1.15), (height, stem_radius)]), 8,
+        part.shell(base.tube_rings(root, stem, X, [(0.0, stem_radius * 1.15), (height, stem_radius)]),
+                   numbers.STEM_SIDES,
                    part.named("Stem"), 0.010)
         top = root + stem * height
         cap_key, spot_key = ("Spot", "Cap") if orange else ("Cap", "Spot")
-        part.shell(base.ball_rings(top + stem * cap * 0.2, stem, X, cap * 0.55, cap, cap, 6), numbers.CAP_SIDES,
+        part.shell(base.ball_rings(top + stem * cap * 0.2, stem, X, cap * 0.55, cap, cap, numbers.CAP_STACKS),
+                   numbers.CAP_SIDES,
                    part.named(cap_key), 0.012)
         first, second = base.frame_across(stem, X)
         wide, thick = numbers.SPOT
