@@ -43,11 +43,12 @@ namespace Chog.Screens
                         ChogMenuSkin.LogTree(found, 0);
                 }
 
-                // The sticks of the touch controls, in the colours of the game: moving in lavender, the
-                // basic attack in cheek pink, the special in gold. Their transparency is kept.
-                Tint(Find(root.transform, "MoveJoystick"), ChogTheme.PurpleSoft);
-                Tint(Find(root.transform, "AimBasicJoystick"), ChogTheme.Cheek);
-                Tint(Find(root.transform, "AimSpecialJoystick"), ChogTheme.Gold);
+                // Touch controls are calm, flat controls: one outline per visible piece, no glow,
+                // splash, concentric effect or chunky-button treatment. The outer move zone and its
+                // movable thumb are separate controls, while attacks are one direct button each.
+                DressMoveStick(Find(root.transform, "MoveJoystick"));
+                DressActionStick(Find(root.transform, "AimBasicJoystick"), ChogTheme.Cheek, ChogIcons.Icon.Crosshair);
+                DressActionStick(Find(root.transform, "AimSpecialJoystick"), ChogTheme.Gold, ChogIcons.Icon.Star);
             }
         }
 
@@ -150,12 +151,56 @@ namespace Chog.Screens
             half.raycastTarget = false;
         }
 
-        private static void Tint(Transform stick, Color colour)
+        private static void DressMoveStick(Transform stick)
         {
             if (stick == null)
                 return;
-            foreach (var image in stick.GetComponentsInChildren<Image>(true))
-                image.color = new Color(colour.r, colour.g, colour.b, image.color.a);
+            var field = stick.Find("JoystickArea") != null ? stick.Find("JoystickArea").GetComponent<Image>() : null;
+            var thumb = stick.Find("Joystick") != null ? stick.Find("Joystick").GetComponent<Image>() : null;
+            if (field != null)
+            {
+                field.enabled = true;
+                field.sprite = ChogSprites.Rounded(48, 2, ChogTheme.Ink,
+                    new Color(ChogTheme.PurpleSoft.r, ChogTheme.PurpleSoft.g, ChogTheme.PurpleSoft.b, 0.24f));
+                field.type = Image.Type.Simple;
+                field.preserveAspect = true;
+                field.color = Color.white;
+            }
+            if (thumb != null)
+            {
+                thumb.enabled = true;
+                thumb.sprite = ChogSprites.Rounded(44, 2, ChogTheme.Ink,
+                    new Color(ChogTheme.Cream.r, ChogTheme.Cream.g, ChogTheme.Cream.b, 0.82f));
+                thumb.type = Image.Type.Simple;
+                thumb.preserveAspect = true;
+                thumb.color = Color.white;
+            }
+        }
+
+        private static void DressActionStick(Transform stick, Color fill, ChogIcons.Icon icon)
+        {
+            if (stick == null)
+                return;
+            var field = stick.Find("JoystickArea") != null ? stick.Find("JoystickArea").GetComponent<Image>() : null;
+            var button = stick.Find("Joystick") != null ? stick.Find("Joystick").GetComponent<Image>() : null;
+            if (field != null)
+                field.enabled = false;
+            if (button == null)
+                return;
+
+            button.enabled = true;
+            button.sprite = ChogSprites.Rounded(52, 3, ChogTheme.Ink, fill);
+            button.type = Image.Type.Simple;
+            button.preserveAspect = true;
+            button.color = Color.white;
+
+            var image = button.transform.Find("Img") != null ? button.transform.Find("Img").GetComponent<Image>() : null;
+            if (image == null)
+                return;
+            image.enabled = true;
+            image.sprite = ChogIcons.Get(icon);
+            image.preserveAspect = true;
+            image.color = icon == ChogIcons.Icon.Star ? ChogTheme.Hex("FFE27A") : ChogTheme.Cream;
         }
 
         private static bool IsOurs(Transform part)
