@@ -22,8 +22,6 @@ namespace Chog.Match
         public const string SwitchParameter = "fx";
         public const string LevelParameter = "fxlevel";
         public const string ResourceFolder = "ChogFx/";
-        // The scene of a match (ChogArenaSkin.ArenaScene): its effects are made while it loads.
-        private const string MatchScene = "Gameplay";
 
         /// <summary>How much a fight shows: the pieces of before only, the phone's path, or everything.</summary>
         public enum FxLevel : byte { Before = 0, Light = 1, Full = 2 }
@@ -121,7 +119,8 @@ namespace Chog.Match
             PerformanceHud.StatusLines.Add(() => Status);
             SceneManager.sceneLoaded += (scene, _) =>
             {
-                if (scene.name == MatchScene && Rich)
+                // The effects are made while the scene of a match (either arena, ArenaScenes) loads.
+                if (ArenaScenes.IsArena(scene.name) && Rich)
                     ChogFxRunner.Warm();
             };
         }

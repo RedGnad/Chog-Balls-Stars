@@ -193,7 +193,7 @@ namespace Chog.Editor
         // 32-bit number, this Unity version writes them on 64 bits, and the export throws. So
         // the assets are written with those references left as they are, then each is blanked
         // in the text, which is what the engine does with them.
-        private static void ExportSimulationAssets(string path)
+        internal static void ExportSimulationAssets(string path)
         {
             var assets = new List<Quantum.AssetObject>();
             foreach (var entry in Quantum.QuantumUnityDB.Global.Entries)

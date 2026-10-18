@@ -36,31 +36,58 @@ SKULL_SKINS = {
     "Yellow": (0.95, 0.84, 0.40),
 }
 
-# The face of a skull, against the middle of the face of H3 (to the side, above), as add_face places
-# its parts: the teeth where the mouth would be, wider; the nose hole between the eyes and the teeth.
-# The teeth, read again on the Skull pictures (CHOG #81, #846, #1079, #1313) and the Radioactive ones (#275,
-# #343, #1134, #1187) on 16 October 2026, when the owner asked for jaws and teeth that read as a skull's
-# (until then six square teeth in a small dark band). A skull grins with two rows of rounded teeth on a
-# dark mouth, the upper row larger, and a dark crack runs from its corner up the cheek on the near side.
-# A radioactive Chog shows one row of teeth drawn in dark lines on its skin, along the line of its jaw.
-# Places in the coordinates of the face (to the side, above its middle), before a skull's jaw is narrowed
-# (narrow_jaw), which brings these rows in by about a third.
-TEETH = {
-    "UPPER": (-0.086, 0.188, 0.031, 7),     # middle height, half width of the row, half height of a tooth, count
-    "LOWER": (-0.139, 0.160, 0.022, 6),
-    "GAP": 0.009,                            # between two teeth of a row
-    "MOUTH": (-0.112, 0.204, 0.064),         # the dark behind them: middle height, half width, half height
-    "CRACK": ((0.198, -0.100), (0.222, -0.076), (0.238, -0.050), (0.244, -0.026)),
-    "CRACK_THICK": (0.011, 0.009, 0.006, 0.003),
-    # The radioactive row: middle height, half width, half height, count, and the dark line around each.
-    "GLOW_ROW": (-0.100, 0.150, 0.024, 6),
-    "GLOW_LINE": 0.005,
-    # The jaw under that row, as a dark line: places, and its thickness.
-    "JAW_LINE": ((-0.205, -0.050), (-0.180, -0.120), (-0.120, -0.162), (0.0, -0.178), (0.120, -0.162),
-                 (0.180, -0.120), (0.205, -0.050)),
-    "JAW_THICK": 0.006,
+# The face of a skull, read again on 18 October 2026 on the 1000-point pictures of #54, #846, #1079, #1313 (Side=Right)
+# and #81, #540, #1207, #1104 (Side=Left), after the owner found the skulls "not cute and not faithful". Until then
+# (16 October) a skull grinned with two rows of tall teeth on a large dark mouth from the nose to the chin, its
+# jaw pinched to two thirds of its width, its cheeks at the corners of the mouth: from the front a monster's
+# grin. The pictures draw instead:
+# - Side=Right: under the nose, a compact grin of two rows of small rounded teeth in the bone colour, each tooth
+#   outlined in dark, a dark line between the rows, the rows curving up a little at their ends; no dark mouth
+#   behind them; the dark crack of the grin at its near end, going up the cheek. The jaw a little narrower than
+#   the skull under the cheekbones, by the teeth.
+# - Side=Left: the skull larger over a smaller jaw that steps in below the cheekbones; one row of small upper
+#   teeth along the front of the jaw, and under it the dark of the open mouth.
+# - Both: a dark nose like an upside-down heart, larger on Side=Right; pink cheeks under the outer corner of each
+#   eye (they were at the corners of the mouth).
+# Places in the coordinates of the face (to the side, above its middle), before the jaw is narrowed (narrow_jaw):
+# each row is (height of its middle, half its width, half the height of a tooth, how many teeth, how far its ends
+# rise); a tooth is outlined by LINE, GAP apart.
+SKULL_FACE = {
+    "Right": {
+        "ROWS": ((-0.098, 0.168, 0.024, 7, 0.016), (-0.141, 0.148, 0.019, 6, 0.012)),
+        "MOUTH": None,
+        "CRACK": ((0.172, -0.128), (0.190, -0.104), (0.204, -0.078), (0.212, -0.056)),
+        "CRACK_THICK": (0.014, 0.011, 0.007, 0.003),
+        "NOSE": (-0.040, 0.030, 0.024),
+        "CHEEK": (0.168, -0.040, 0.040, 0.027),
+    },
+    "Left": {
+        "ROWS": ((-0.118, 0.136, 0.022, 6, 0.014),),
+        # The open mouth under the row: middle height, half width, half height.
+        "MOUTH": (-0.157, 0.082, 0.017),
+        "CRACK": (),
+        "CRACK_THICK": (),
+        "NOSE": (-0.046, 0.022, 0.019),
+        "CHEEK": (0.168, -0.040, 0.040, 0.027),
+    },
 }
-NOSE = {"UP": -0.035, "HALF_WIDTH": 0.020, "HALF_HEIGHT": 0.016}
+TEETH = {
+    "LINE": 0.0052,                          # the dark line round a tooth
+    "GAP": 0.005,                            # between two teeth of a row, the line showing there
+    "SQUARENESS": 2.6,
+    # A radioactive Chog (all of Side=Left) shows the skull through its skin, drawn in a deeper tone of its
+    # colour (RADIOACTIVE_LINES), never in black: a row of small teeth along the bottom of the face, the line of
+    # the jaw under it, and the cheekbones from under the eyes down to the ends of the row (#31, #343, #598,
+    # #1134, #140). Row: middle height, half width, half height, count, how far its ends rise.
+    "GLOW_ROW": (-0.142, 0.122, 0.019, 6, 0.016),
+    "GLOW_LINE": 0.0055,
+    "JAW_LINE": ((-0.190, -0.090), (-0.165, -0.150), (-0.110, -0.180), (0.0, -0.190), (0.110, -0.180),
+                 (0.165, -0.150), (0.190, -0.090)),
+    "JAW_THICK": 0.008,
+    "CHEEKBONE": ((0.205, -0.030), (0.192, -0.075), (0.160, -0.112), (0.128, -0.128)),
+    "CHEEKBONE_THICK": (0.004, 0.008, 0.008, 0.005),
+}
+NOSE = {"UP": -0.040, "HALF_WIDTH": 0.026, "HALF_HEIGHT": 0.021}
 
 # Ribs: how many, from which height of the torso to which (shares of its height), how far around the
 # front they go (degrees either side of straight ahead), their thickness.
@@ -79,6 +106,19 @@ RADIOACTIVE_SKINS = {
     "Multi Colored": ((0.30, 0.82, 0.30), (1.00, 0.62, 0.90)),
     "Red": ((0.80, 0.12, 0.36), (1.00, 0.72, 0.84)),
 }
+# The tone the skull shows in through the skin (its nose, teeth, jaw and cheekbones), read on the pictures (#31,
+# #343, #598, #1134, #140; 18 October 2026): a deeper, saturated tone of the skin, never black (they were black
+# until then). It is the "face" colour of the skin record: the lines are drawn with the face's material.
+RADIOACTIVE_LINES = {
+    "Green": (0.04, 0.52, 0.05),
+    "Blue": (0.02, 0.33, 0.74),
+    "Multi Colored": (0.12, 0.44, 0.10),
+    "Red": (0.76, 0.04, 0.22),
+}
+# The crown of a radioactive Chog: the pictures draw its spikes short, a jagged edge round the top of its head
+# (the leaves of an Origin Chog, 0.70 of H3, read there as a second Chog behind the face). Against the leaves of
+# H3: length and width.
+RADIOACTIVE_LEAVES = {"LEAF_LENGTH": 0.38, "LEAF_WIDTH": 1.0}
 # The tint the eyes of each colour glow in (the white of an eye of the collection, in that colour).
 RADIOACTIVE_EYE_TINTS = {
     "Green": (0.95, 1.0, 0.50),
@@ -119,7 +159,7 @@ def skin_of(traits):
         colours = RADIOACTIVE_SKINS.get(traits.get("Skin"))
         if colours is None:
             raise SystemExit(f"CHOG_TRAITS no colours recorded for a Radioactive of Skin={traits.get('Skin')}")
-        return {"skin": colours[0], "face": colours[0], "top": colours[1]}
+        return {"skin": colours[0], "face": RADIOACTIVE_LINES[traits.get("Skin")], "top": colours[1]}
     colour = SKULL_SKINS.get(traits.get("Skin"))
     if colour is None:
         raise SystemExit(f"CHOG_TRAITS no bone colour recorded for a Skull of Skin={traits.get('Skin')}")
@@ -137,71 +177,109 @@ def rounded(middle, half_width, half_height, points=8, squareness=3.0):
     return edge
 
 
-def add_skull_face(part, numbers, surface, full, draw_shape, oval, SKIN, EYE, BLUSH, FACE, cheeks=True, near=1.0):
-    """The cheeks, the nose hole and the teeth on the skull. The skull has no cream face: the bone of the
-    head is its face. A radioactive head draws no cheek, and its teeth as lines along its jaw (TEETH).
-    "near": the side of the character the picture shows nearer (1 its left), where a skull's grin cracks."""
-    lift = numbers.FACE_LIFT
-    drawn = lift * 1.8
-    cheek_side, cheek_up, cheek_width, cheek_height = numbers.CHEEK
-    for side in ((1.0, -1.0) if cheeks else ()):
-        full.add_skin(part, surface, full.patch_loops(surface, (side * cheek_side, cheek_up), cheek_width, cheek_height,
-                                                      2.0, 0.0, drawn, 1, 12), BLUSH)
+def tooth_row(part, surface, draw_shape, row, line, fill, outline, lifts):
+    """A row of rounded teeth (a row of SKULL_FACE or GLOW_ROW): a dark shape round the whole row (each tooth's
+    outline, and the line between the teeth where they are GAP apart), then each tooth on it in "fill"."""
+    up, half_row, half_tall, count, rise = row
+    gap, square = TEETH["GAP"], TEETH["SQUARENESS"]
+    wide = (2.0 * half_row - gap * (count - 1)) / count
 
-    # The nose hole: an upside-down heart, two lobes and a point.
-    up, half_w, half_h = NOSE["UP"], NOSE["HALF_WIDTH"], NOSE["HALF_HEIGHT"]
-    for side in (1.0, -1.0):
-        draw_shape(part, surface, EYE, oval((side * half_w * 0.5, up + half_h * 0.3), half_w * 0.62, half_h * 0.7, 10),
-                   drawn)
-    draw_shape(part, surface, EYE, [(-half_w, up + half_h * 0.2), (half_w, up + half_h * 0.2), (0.0, up - half_h * 1.3)],
-               drawn)
+    def height(across):
+        return up + rise * (across / half_row) ** 2
 
+    # The outline of the row: its top and bottom edges follow the curve of the row.
+    steps = 2 * count
+    upper = [(-half_row - line + (2.0 * (half_row + line)) * index / steps, 0.0) for index in range(steps + 1)]
+    edge = [(x, height(max(-half_row, min(half_row, x))) + half_tall + line) for x, _ in upper]
+    edge += [(x, height(max(-half_row, min(half_row, x))) - half_tall - line) for x, _ in reversed(upper)]
+    draw_shape(part, surface, outline, edge, lifts[0], middle=(0.0, height(0.0)))
+    for index in range(count):
+        centre = -half_row + wide * 0.5 + index * (wide + gap)
+        # The teeth at the ends are shorter: the row follows the jaw.
+        tall = half_tall * (0.80 if index in (0, count - 1) else 1.0)
+        middle = (centre, height(centre))
+        draw_shape(part, surface, fill, rounded(middle, wide * 0.5, tall, 10, square), lifts[1], middle=middle)
+
+
+def upside_down_heart(middle, half_width, half_height):
+    """The nose of a skull: two lobes on top, a point below, as places (to the side, above)."""
+    x, y = middle
+    edge = []
+    for index in range(7):
+        angle = math.pi * index / 6
+        edge.append((x + half_width * 0.5 + half_width * 0.5 * math.cos(angle), y + half_height * 0.25
+                     + half_height * 0.75 * math.sin(angle)))
+    for index in range(1, 7):
+        angle = math.pi * index / 6
+        edge.append((x - half_width * 0.5 + half_width * 0.5 * math.cos(angle), y + half_height * 0.25
+                     + half_height * 0.75 * math.sin(angle)))
+    edge.append((x - half_width * 0.85, y - half_height * 0.20))
+    edge.append((x, y - half_height * 1.15))
+    edge.append((x + half_width * 0.85, y - half_height * 0.20))
+    return list(reversed(edge))
+
+
+def add_skull_face(part, numbers, surface, full, draw_shape, oval, SKIN, EYE, BLUSH, FACE, cheeks=True, near=1.0,
+                   side="Right"):
+    """The cheeks, the nose and the teeth on the skull (SKULL_FACE, by Side), or on a radioactive head (TEETH:
+    "cheeks" False), laid on the head as the face of an Origin Chog is (18 October 2026): the cheeks just over the
+    head, the dark shapes over them, the teeth over those. The skull has no cream face: the bone of the head is
+    its face. "near": the side of the character the picture shows nearer (1 its left), where a skull's grin
+    cracks."""
     import make_chog_traits as traits_module
+    lift = numbers.FACE_LIFT
+    cheek_lift = lift + numbers.FACE_OVER[0]
+    dark_lift, bone_lift = traits_module.DRAWN[0], traits_module.DRAWN[1]
     if cheeks:
-        # A skull: the dark mouth, two rows of rounded teeth in the bone colour on it, the crack of the grin.
-        middle, half_width, half_height = TEETH["MOUTH"]
-        draw_shape(part, surface, EYE, rounded((0.0, middle), half_width, half_height, 16, 2.6), drawn,
-                   middle=(0.0, middle))
-        for up, half_row, half_tall, count in (TEETH["UPPER"], TEETH["LOWER"]):
-            wide = (2.0 * half_row - TEETH["GAP"] * (count - 1)) / count
-            for index in range(count):
-                centre = -half_row + wide * 0.5 + index * (wide + TEETH["GAP"])
-                # The teeth at the ends are shorter: the rows follow the jaw.
-                tall = half_tall * (0.78 if index in (0, count - 1) else 1.0)
-                draw_shape(part, surface, SKIN, rounded((centre, up), wide * 0.5, tall), lift * 2.6)
-        crack = [(near * side, up) for side, up in TEETH["CRACK"]]
-        traits_module.draw_line(part, surface, EYE, crack, list(TEETH["CRACK_THICK"]), drawn)
+        face = SKULL_FACE[side]
+        cheek_side, cheek_up, cheek_width, cheek_height = face["CHEEK"]
+        for sign in (1.0, -1.0):
+            full.add_skin(part, surface, full.patch_loops(surface, (sign * cheek_side, cheek_up), cheek_width, cheek_height,
+                                                          2.0, 0.0, cheek_lift, 1, 12), BLUSH)
+        up, half_w, half_h = face["NOSE"]
+        draw_shape(part, surface, EYE, upside_down_heart((0.0, up), half_w, half_h), dark_lift, middle=(0.0, up))
+        if face["MOUTH"]:
+            middle, half_width, half_height = face["MOUTH"]
+            draw_shape(part, surface, EYE, rounded((0.0, middle), half_width, half_height, 16, 2.4), dark_lift,
+                       middle=(0.0, middle))
+        for row in face["ROWS"]:
+            tooth_row(part, surface, draw_shape, row, TEETH["LINE"], SKIN, EYE, (dark_lift, bone_lift))
+        if face["CRACK"]:
+            crack = [(near * x, y) for x, y in face["CRACK"]]
+            traits_module.draw_line(part, surface, EYE, crack, list(face["CRACK_THICK"]), dark_lift)
     else:
-        # A radioactive Chog: one row of teeth drawn in dark lines on the skin, and the line of the jaw.
-        up, half_row, half_tall, count = TEETH["GLOW_ROW"]
-        wide = (2.0 * half_row - TEETH["GAP"] * (count - 1)) / count
-        line = TEETH["GLOW_LINE"]
-        for index in range(count):
-            centre = -half_row + wide * 0.5 + index * (wide + TEETH["GAP"])
-            tall = half_tall * (0.75 if index in (0, count - 1) else 1.0)
-            draw_shape(part, surface, EYE, rounded((centre, up), wide * 0.5 + line, tall + line), drawn)
-            draw_shape(part, surface, SKIN, rounded((centre, up), wide * 0.5, tall), lift * 2.6)
+        # A radioactive Chog: the skull seen through the skin, in the deeper tone of the face's material.
+        up, half_w, half_h = NOSE["UP"], NOSE["HALF_WIDTH"], NOSE["HALF_HEIGHT"]
+        draw_shape(part, surface, FACE, upside_down_heart((0.0, up), half_w, half_h), dark_lift, middle=(0.0, up))
+        tooth_row(part, surface, draw_shape, TEETH["GLOW_ROW"], TEETH["GLOW_LINE"], SKIN, FACE, (dark_lift, bone_lift))
         jaw = list(TEETH["JAW_LINE"])
-        traits_module.draw_line(part, surface, EYE, jaw, [TEETH["JAW_THICK"]] * len(jaw), drawn)
+        traits_module.draw_line(part, surface, FACE, jaw, [TEETH["JAW_THICK"]] * len(jaw), dark_lift)
+        for sign in (1.0, -1.0):
+            bone = [(sign * x, y) for x, y in TEETH["CHEEKBONE"]]
+            traits_module.draw_line(part, surface, FACE, bone, list(TEETH["CHEEKBONE_THICK"]), dark_lift)
 
 
 # The skull's jaw, read on the Skull pictures (CHOG #81, #846, #1000, #1104, #1207, #1642): a wide round
-# cranium over a jaw much narrower than it, the outline stepping in at the cheekbones, by the nose; the
-# row of teeth is about as wide as the jaw. Heights in halves of the head's height from its middle (-1 its
-# bottom): the head narrows from FROM down to TO, by NARROW of its width. (First: the round ball of the
-# Chog with teeth drawn on it, a face more than a skull.)
-JAW = {"FROM": -0.30, "TO": -0.45, "NARROW": 0.38}
+# cranium over a jaw narrower than it, the outline stepping in at the cheekbones, by the nose; the row of teeth
+# is about as wide as the jaw. Heights in halves of the head's height from its middle (-1 its bottom): the head
+# narrows from FROM down to TO, by NARROW of its width. (First: the round ball of the Chog with teeth drawn on
+# it, a face more than a skull. Then, until 18 October 2026, 38 % from -0.30 to -0.45 on both Sides: the teeth
+# squeezed into tall thin ones and the chin pinched. The pictures of Side=Right keep the grin half as wide as the
+# skull; those of Side=Left step the jaw in further.)
+JAW = {"Right": {"FROM": -0.40, "TO": -0.72, "NARROW": 0.20},
+       "Left": {"FROM": -0.30, "TO": -0.62, "NARROW": 0.32}}
 
 
-def narrow_jaw(part, numbers):
-    """Narrows the lower head of a skull into its jaw: every point of the part (the head and what is drawn
-    on it), before its outline is made, so the teeth and the nose stay on it. The eyes and anything worn
-    higher are not touched."""
+def narrow_jaw(part, numbers, side="Right"):
+    """Narrows the lower head of a skull into its jaw (JAW, by Side): every point of the part (the head and what
+    is drawn on it), before its outline is made, so the teeth and the nose stay on it. The eyes and anything
+    worn higher are not touched."""
+    jaw = JAW[side]
     for point in part.mesh.verts:
         height = (point.co.z - numbers.HEAD_MIDDLE) / numbers.HEAD_HALF_HEIGHT
-        share = min(1.0, max(0.0, (JAW["FROM"] - height) / (JAW["FROM"] - JAW["TO"])))
+        share = min(1.0, max(0.0, (jaw["FROM"] - height) / (jaw["FROM"] - jaw["TO"])))
         share = share * share * (3.0 - 2.0 * share)
-        point.co.x *= 1.0 - JAW["NARROW"] * share
+        point.co.x *= 1.0 - jaw["NARROW"] * share
 
 
 def bone_hands(parts, materials, skin, glove):

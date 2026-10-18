@@ -85,7 +85,8 @@ namespace Chog.Match
         private readonly List<Renderer> _flashRenderers = new List<Renderer>();
 
         // The core is drawn this much larger than its model: the owner found it too small to notice
-        // (17 October), while it is what a team loses the match with. Its collision circle stays 0.75.
+        // (17 October), while it is what a team loses the match with. Its collision circle follows since
+        // 18 October (Structures.CoreRadius 1.5, the plinth's width at this scale).
         public const float CoreScale = 1.5f;
         // How much the heart of a core swells on each beat.
         private const float HeartBeat = 0.14f;
@@ -543,26 +544,16 @@ namespace Chog.Match
             return toMiddle.sqrMagnitude > 1e-4f ? toMiddle.normalized : Vector3.zero;
         }
 
-        // The hero a tower of "team" at "from" shoots next, as Structures.Shoot in the simulation picks it:
-        // the nearest living hero of another team within "range", the first found at equal distance.
+        // The hero a tower of "team" at "from" shoots next, by the simulation's own rule (Structures.TowerTarget):
+        // the nearest living hero of another team within "range" that no block of the map hides.
         private static bool NextTarget(Frame frame, int team, Photon.Deterministic.FPVector2 from, Photon.Deterministic.FP range, out Vector3 at)
         {
             at = default;
-            var found = false;
-            var nearest = range * range;
-            var heroes = frame.Filter<Character, Transform2D, TeamInfo, Health>();
-            while (heroes.Next(out _, out _, out var place, out var heroTeam, out var heroHealth))
-            {
-                if (heroTeam.Index == team || heroHealth.IsDead)
-                    continue;
-                var distance = Photon.Deterministic.FPVector2.DistanceSquared(from, place.Position);
-                if (distance > nearest || (distance == nearest && found))
-                    continue;
-                nearest = distance;
-                at = place.Position.ToUnityVector3();
-                found = true;
-            }
-            return found;
+            var target = Structures.TowerTarget(frame, team, from, range);
+            if (target == default || !frame.TryGet<Transform2D>(target, out var place))
+                return false;
+            at = place.Position.ToUnityVector3();
+            return true;
         }
 
         // The parts of a 3D structure drawn with the heroes' material turn that white (0: their colours).
