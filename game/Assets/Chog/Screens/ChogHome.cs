@@ -27,21 +27,21 @@ namespace Chog.Screens
 
         // In units of the menu canvas (1920 by 1080 at 16:9), from the corners.
         private const float Margin = 30f;
-        private static readonly Vector2 ChipSize = new Vector2(440f, 114f);
-        private static readonly Vector2 SettingsSize = new Vector2(84f, 84f);
-        private static readonly Vector2 WalletSize = new Vector2(300f, 78f);
-        private static readonly Vector2 ChogSize = new Vector2(220f, 78f);
-        private static readonly Vector2 RailButton = new Vector2(112f, 100f);
-        private const float RailTop = 168f;
-        private const float RailStep = 158f;
+        private static readonly Vector2 ChipSize = new Vector2(340f, 92f);
+        private static readonly Vector2 SettingsSize = new Vector2(76f, 76f);
+        private static readonly Vector2 WalletSize = new Vector2(266f, 68f);
+        private static readonly Vector2 ChogSize = new Vector2(198f, 68f);
+        private static readonly Vector2 RailButton = new Vector2(88f, 82f);
+        private const float RailTop = 154f;
+        private const float RailStep = 122f;
 
         // In shares of the screen: the hero, its ribbon and chips, PLAY and the line under it.
-        private static readonly Vector2 StageMin = new Vector2(0.17f, 0.20f);
-        private static readonly Vector2 StageMax = new Vector2(0.55f, 0.86f);
-        private static readonly Vector2 RibbonMin = new Vector2(0.235f, 0.112f);
-        private static readonly Vector2 RibbonMax = new Vector2(0.485f, 0.188f);
-        private static readonly Vector2 ChipsMin = new Vector2(0.15f, 0.035f);
-        private static readonly Vector2 ChipsMax = new Vector2(0.57f, 0.10f);
+        private static readonly Vector2 StageMin = new Vector2(0.14f, 0.18f);
+        private static readonly Vector2 StageMax = new Vector2(0.59f, 0.88f);
+        private static readonly Vector2 RibbonMin = new Vector2(0.225f, 0.115f);
+        private static readonly Vector2 RibbonMax = new Vector2(0.505f, 0.180f);
+        private static readonly Vector2 ChipsMin = new Vector2(0.13f, 0.035f);
+        private static readonly Vector2 ChipsMax = new Vector2(0.60f, 0.095f);
         private static readonly Vector2 PlayMin = new Vector2(0.77f, 0.115f);
         private static readonly Vector2 PlayMax = new Vector2(0.98f, 0.278f);
         private static readonly Vector2 HintMin = new Vector2(0.77f, 0.06f);
@@ -111,6 +111,7 @@ namespace Chog.Screens
             if (top != null)
                 top.gameObject.SetActive(false);
 
+            BuildBackdrop();
             BuildChip();
             BuildTopRight();
             BuildRail();
@@ -137,6 +138,60 @@ namespace Chog.Screens
             GenesisCareers.Changed -= Refresh;
             GenesisRental.Changed -= Refresh;
             GenesisForms.Changed -= Refresh;
+        }
+
+        // The home needs its own place in the game, not a generic dark gradient. These quiet paint marks
+        // live behind all controls, so they frame the hero without becoming another button treatment.
+        private void BuildBackdrop()
+        {
+            var art = ChogUi.Area("BackdropArt", transform, Vector2.zero, Vector2.one);
+            art.SetAsFirstSibling();
+
+            PaintBlob(art, new Vector2(0.18f, 0.67f), new Vector2(520f, 410f), new Color(0.48f, 0.27f, 0.86f, 0.22f));
+            PaintBlob(art, new Vector2(0.48f, 0.24f), new Vector2(360f, 250f), new Color(0.93f, 0.17f, 0.54f, 0.16f));
+            PaintBlob(art, new Vector2(0.88f, 0.78f), new Vector2(470f, 340f), new Color(0.38f, 0.22f, 0.74f, 0.17f));
+
+            PaintBolt(art, new Vector2(0.10f, 0.60f), 0.85f, new Color(1f, 0.76f, 0.25f, 0.46f));
+            PaintBolt(art, new Vector2(0.58f, 0.74f), 0.65f, new Color(0.95f, 0.29f, 0.63f, 0.42f));
+            PaintBolt(art, new Vector2(0.90f, 0.26f), 0.55f, new Color(0.65f, 0.53f, 1f, 0.44f));
+
+            PaintDot(art, new Vector2(0.62f, 0.82f), 18f, new Color(1f, 0.84f, 0.32f, 0.78f));
+            PaintDot(art, new Vector2(0.65f, 0.76f), 12f, new Color(0.94f, 0.29f, 0.63f, 0.82f));
+            PaintDot(art, new Vector2(0.71f, 0.80f), 10f, new Color(0.66f, 0.56f, 1f, 0.80f));
+            PaintDot(art, new Vector2(0.16f, 0.38f), 12f, new Color(1f, 0.84f, 0.32f, 0.60f));
+        }
+
+        private static void PaintBlob(Transform parent, Vector2 at, Vector2 size, Color colour)
+        {
+            var blob = ChogUi.Pinned("Paint", parent, at, new Vector2(0.5f, 0.5f), Vector2.zero, size).gameObject.AddComponent<Image>();
+            blob.sprite = ChogSprites.Disc(128, 0.80f);
+            blob.color = colour;
+            blob.raycastTarget = false;
+        }
+
+        private static void PaintDot(Transform parent, Vector2 at, float size, Color colour)
+        {
+            var dot = ChogUi.Pinned("Dot", parent, at, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.one * size).gameObject.AddComponent<Image>();
+            dot.sprite = ChogSprites.Disc(32, 0.08f);
+            dot.color = colour;
+            dot.raycastTarget = false;
+        }
+
+        private static void PaintBolt(Transform parent, Vector2 at, float scale, Color colour)
+        {
+            PaintStroke(parent, at + new Vector2(-0.010f, 0.052f) * scale, new Vector2(94f, 12f) * scale, -38f, colour);
+            PaintStroke(parent, at + new Vector2(0.025f, 0.000f) * scale, new Vector2(106f, 12f) * scale, 38f, colour);
+            PaintStroke(parent, at + new Vector2(-0.010f, -0.052f) * scale, new Vector2(92f, 12f) * scale, -38f, colour);
+        }
+
+        private static void PaintStroke(Transform parent, Vector2 at, Vector2 size, float angle, Color colour)
+        {
+            var stroke = ChogUi.Pinned("Stroke", parent, at, new Vector2(0.5f, 0.5f), Vector2.zero, size);
+            stroke.localEulerAngles = new Vector3(0f, 0f, angle);
+            var image = stroke.gameObject.AddComponent<Image>();
+            image.sprite = ChogSprites.Rounded(8, 0, Color.white, Color.white);
+            image.color = colour;
+            image.raycastTarget = false;
         }
 
         // The player's chip: the Genesis played (or the recruit) with its mastery, and the player's name.
@@ -219,12 +274,12 @@ namespace Chog.Screens
         private Button Rail(int position, string label, ChogTheme.ButtonKind kind, ChogIcons.Icon icon, UnityEngine.Events.UnityAction tapped)
         {
             var y = -RailTop - position * RailStep;
-            var button = ChogUi.PinnedButton("Rail" + label, transform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(Margin + 6f, y),
+            var button = ChogUi.PinnedButton("Rail" + label, transform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(Margin + 4f, y),
                 RailButton, kind, "", 30f, icon);
             button.onClick.AddListener(tapped);
             var words = ChogUi.Pinned("Label" + label, transform, new Vector2(0f, 1f), new Vector2(0.5f, 1f),
-                new Vector2(Margin + 6f + RailButton.x * 0.5f, y - RailButton.y - 8f), new Vector2(170f, 36f));
-            ChogUi.Title("Text", words, Vector2.zero, Vector2.one, 28f).text = label;
+                new Vector2(Margin + 4f + RailButton.x * 0.5f, y - RailButton.y - 5f), new Vector2(130f, 30f));
+            ChogUi.Title("Text", words, Vector2.zero, Vector2.one, 21f).text = label;
             return button;
         }
 
@@ -234,8 +289,12 @@ namespace Chog.Screens
             var area = ChogUi.Area("Stage", transform, StageMin, StageMax);
             var glow = ChogUi.Area("Glow", area, new Vector2(-0.05f, 0f), new Vector2(1.05f, 0.75f)).gameObject.AddComponent<Image>();
             glow.sprite = ChogSprites.Disc(128, 1f);
-            glow.color = new Color(1f, 0.84f, 0.55f, 0.30f);
+            glow.color = new Color(1f, 0.73f, 0.28f, 0.36f);
             glow.raycastTarget = false;
+            PaintBlob(area, new Vector2(0.30f, 0.35f), new Vector2(230f, 170f), new Color(0.94f, 0.20f, 0.56f, 0.26f));
+            PaintBlob(area, new Vector2(0.70f, 0.37f), new Vector2(210f, 160f), new Color(0.57f, 0.42f, 0.96f, 0.28f));
+            PaintBolt(area, new Vector2(0.17f, 0.56f), 0.62f, new Color(1f, 0.82f, 0.28f, 0.72f));
+            PaintBolt(area, new Vector2(0.82f, 0.56f), 0.56f, new Color(0.95f, 0.28f, 0.62f, 0.68f));
             _stage = ChogHeroStage.Create(ChogUi.Area("Hero", area, Vector2.zero, Vector2.one));
 
             // The whole stage opens the hero's sheet.

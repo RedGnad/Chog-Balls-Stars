@@ -181,16 +181,14 @@ namespace Chog.Screens
                 label.color = Color.white;
         }
 
-        // The sprite of a chunky button is drawn white (a grey lip) and tinted by the Image's colour, so
-        // every screen that sets a button's colour keeps doing so. Below 1, its outline and lip are drawn
-        // thicker than the sprite's pixels.
-        private const float ChunkyScale = 0.62f;
-        private const string ShineName = "ChogShine";
+        // Buttons stay flat and readable. Their colour, a single outline and their pressed tint are enough:
+        // the home screen should never turn a control into a stack of lips, highlights or splash effects.
+        private const float ButtonScale = 0.82f;
 
         /// <summary>
-        /// The shape of a chunky button, its colour left as it is: the rounded fill with its near-black
-        /// outline and darker lip, a light band on its top half, a hard dark shadow under it, the way it
-        /// sinks when pressed (ChogPress), its label outlined in Lilita One.
+        /// The shape of a button, its colour left as it is: one rounded fill, one near-black outline and
+        /// an outlined Lilita One label. Decorative highlights, duplicate contours and drop shadows are
+        /// deliberately absent from controls.
         /// </summary>
         public static void Shape(Button button)
         {
@@ -199,41 +197,26 @@ namespace Chog.Screens
             var image = ImageOf(button);
             if (image != null)
             {
-                image.sprite = ChogSprites.Chunky(Color.white, new Color(0.70f, 0.70f, 0.74f, 1f));
+                image.sprite = ChogSprites.Rounded(18, 3, Ink);
                 image.type = Image.Type.Sliced;
-                image.pixelsPerUnitMultiplier = ChunkyScale;
+                image.pixelsPerUnitMultiplier = ButtonScale;
                 var shadow = image.GetComponent<Shadow>();
                 if (shadow == null)
                     shadow = image.gameObject.AddComponent<Shadow>();
-                shadow.effectColor = Ink;
-                shadow.effectDistance = new Vector2(0f, -6f);
-                shadow.useGraphicAlpha = true;
-
-                if (image.transform.Find(ShineName) == null)
-                {
-                    var shine = new GameObject(ShineName, typeof(RectTransform)).AddComponent<Image>();
-                    var area = shine.rectTransform;
-                    area.SetParent(image.transform, false);
-                    area.SetSiblingIndex(0);
-                    area.anchorMin = new Vector2(0f, 0.56f);
-                    area.anchorMax = new Vector2(1f, 1f);
-                    area.offsetMin = new Vector2(6f, 0f);
-                    area.offsetMax = new Vector2(-6f, -6f);
-                    shine.sprite = ChogSprites.TopRounded(14);
-                    shine.type = Image.Type.Sliced;
-                    shine.pixelsPerUnitMultiplier = ChunkyScale;
-                    shine.color = new Color(1f, 1f, 1f, 0.26f);
-                    shine.raycastTarget = false;
-                }
+                shadow.enabled = false;
+                var shine = image.transform.Find("ChogShine");
+                if (shine != null)
+                    shine.gameObject.SetActive(false);
             }
 
-            if (button.GetComponent<ChogPress>() == null)
-                button.gameObject.AddComponent<ChogPress>();
+            var press = button.GetComponent<ChogPress>();
+            if (press != null)
+                press.enabled = false;
 
             var colours = button.colors;
             colours.normalColor = Color.white;
-            colours.highlightedColor = new Color(1.08f, 1.08f, 1.08f, 1f);
-            colours.pressedColor = new Color(0.82f, 0.82f, 0.86f, 1f);
+            colours.highlightedColor = new Color(1.04f, 1.04f, 1.04f, 1f);
+            colours.pressedColor = new Color(0.86f, 0.86f, 0.90f, 1f);
             colours.selectedColor = Color.white;
             colours.disabledColor = new Color(0.55f, 0.55f, 0.6f, 0.6f);
             colours.colorMultiplier = 1f;
