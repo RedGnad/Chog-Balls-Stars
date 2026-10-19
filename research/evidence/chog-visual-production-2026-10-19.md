@@ -2,16 +2,16 @@
 
 This is a production translation of the owner's approved direction. It is not a new concept board. The references are actual WebGL captures and the right halves of the 18 October comparison sheets. The right halves are 640 x 360, so positions below are described after scaling them by two. The corrected candidate is intended for public owner review, not asserted as an accepted visual match.
 
-The 19 October correction is captured in the [desktop match](chog-visual-runtime-match-desktop-2026-10-19.png), [touch-emulated match](chog-visual-runtime-match-touch-2026-10-19.png) and [touch-emulated home](chog-visual-runtime-home-touch-2026-10-19.png). Build `20261019T170012093Z-1832effe278c49ac8ea39f8d65e834bb` retains the previous simulation stamp. The owner-approved Chog-head floor motif is still absent; no substitute was invented. The original stage tile was preserved, the duplicate collection CTA removed, the sample brick floor renderers hidden behind one slab surface, pink tops textured, and the near wall rebuilt visually.
+The 19 October correction is captured in the [desktop match](chog-visual-runtime-match-desktop-2026-10-19.png), [touch-emulated match](chog-visual-runtime-match-touch-2026-10-19.png) and [touch-emulated home](chog-visual-runtime-home-touch-2026-10-19.png). Build `20261019T170012093Z-1832effe278c49ac8ea39f8d65e834bb` retains the previous simulation stamp. Its page version and Render Photon build were checked after deployment. The owner-approved Chog-head floor motif is still absent; no substitute was invented. The original stage tile was preserved, the duplicate collection CTA removed, the sample brick floor renderers hidden behind one slab surface, pink tops textured, and the near wall rebuilt visually.
 
-## Evidence and current state
+## Earlier implementation evidence
 
 | View | Approved direction | Actual WebGL evidence | Current implementation |
 | --- | --- | --- | --- |
 | Home | [menu direction](chog-menu-direction-2026-10-18.jpg), right half | [final local desktop capture](chog-visual-local-home-desktop-final-2026-10-19.png), build `20261019T114810487Z` | A painted background, a real Genesis example card and a three-quarter hero on an irregular painted stage are in the game. The card and stage remain much cleaner and more geometric than the board. |
 | Match | [arena direction](chog-arena-direction-2026-10-18-v2.jpg), right half | [final local touch-emulated match](chog-visual-local-match-touch-final-2026-10-19.png), same build | The projected floor albedo and rounded pink visual cover skin are visible in a running match. Bushes and walls still use the sample geometry; the capture contains the tutorial and performance overlays. |
 
-The final build is `20261019T114810487Z-bf9042d09d1743cd84cd33828261f0b2`, with the same simulation stamp as the public build. It was captured locally after the floor override fix, stage treatment and cover treatment. No physical phone or real wallet was used. The public site remains on the earlier build.
+The earlier local build was `20261019T114810487Z-bf9042d09d1743cd84cd33828261f0b2`, with the same simulation stamp. It was captured after the floor override fix, stage treatment and cover treatment. At the time of those captures, the public site still served an older build. No physical phone or real wallet was used.
 
 ## Home: element mapping
 
