@@ -22,21 +22,22 @@ namespace Chog.Match
 
         private static readonly Dictionary<string, string> NightColours = new Dictionary<string, string>
         {
-            // The planks of the floor: a deep indigo, darker than every hero so they stand out.
-            { "WoodDark", "262052" },
-            // The walls around the arena: the night, a little lighter on their faces.
-            { "Stone", "2C2358" },
-            { "StoneDark", "16112E" },
-            // The crates: lavender frames around deep purple planks, lighter than the floor and darker
-            // than the heroes (brighter crates were tried and drew the eye away from the fight).
-            { "Metal", "A194F0" },
-            { "BrownDark", "3F3192" },
-            // The plants heroes hide in: a mint that no Chog wears.
-            { "Green", "2BC48F" },
+            // The floor is a deep berry purple. It keeps the heroes readable while the paths look like
+            // part of a Chog arena rather than the sample's blue dungeon.
+            { "WoodDark", "2A1A46" },
+            // The surrounding stone stays several values darker, so it frames the playable lane.
+            { "Stone", "5B3A6C" },
+            { "StoneDark", "281534" },
+            // The cover blocks are candy pink with violet sides. The two materials preserve the sample's
+            // readable cover volumes while moving their identity toward the approved arena board.
+            { "Metal", "F2A8E7" },
+            { "BrownDark", "A763A8" },
+            // Bushes are blue-green, distinct from each team's red and blue control language.
+            { "Green", "25B6B3" },
             // The chest: gold and cheek pink.
             { "Gold", "F59E0B" },
             { "Red", "D83E7E" },
-            { Ambient, "6A62A0" },
+            { Ambient, "77528B" },
         };
 
         // A daylight arena in the colours of arena brawlers: a grass floor, pale lavender walls with
@@ -57,7 +58,7 @@ namespace Chog.Match
         // The light of each palette (MatchLookTuning, the option "looktune=" laid over it), chosen in
         // matches on 17 October 2026: the night keeps the brightness the owner saw in it, with a
         // little warmth; the day takes more of the key's warmth.
-        private const string NightTuning = "exposure:1,slope:1.1,offset:0.15,arenashade:7A72B0,warmth:0.35";
+        private const string NightTuning = "exposure:1.12,slope:1.12,offset:0.12,arenashade:875D91,warmth:0.42";
         private const string DayTuning = "exposure:1.05,slope:1.1,offset:0.15,arenashade:8A7FB8,warmth:0.6";
 
         /// <summary>The palette an option names: "day" or "night" anywhere in it, the default otherwise.</summary>

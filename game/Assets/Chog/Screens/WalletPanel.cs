@@ -26,26 +26,27 @@ namespace Chog.Screens
     {
         private const string ObjectName = "ChogWalletPanel";
         private const string RosterResource = "GenesisRoster";
+        private const int CollectionExampleMetadataId = 1078;
         private const int SlotsPerPage = 6;
 
-        // Share of the main screen the card takes: the right column of the home screen (ChogHome), under
-        // the wallet and over the mode and PLAY.
+        // The right column is a Genesis poster first, then the wallet action beneath it. It replaces the
+        // old generic text slab while keeping the same wallet, rental and career behaviour.
         private static readonly Vector2 PanelMin = new Vector2(0.60f, 0.30f);
-        private static readonly Vector2 PanelMax = new Vector2(0.98f, 0.855f);
+        private static readonly Vector2 PanelMax = new Vector2(0.98f, 0.88f);
 
         // Without a Genesis to play: the main button wide, or beside the one for any other wallet app.
-        private static readonly Vector2 ConnectMin = new Vector2(0.20f, 0.05f);
-        private static readonly Vector2 ConnectMax = new Vector2(0.80f, 0.22f);
-        private static readonly Vector2 ConnectBesideOtherMax = new Vector2(0.62f, 0.22f);
-        private static readonly Vector2 ConnectBesideOtherMin = new Vector2(0.04f, 0.05f);
+        private static readonly Vector2 ConnectMin = new Vector2(0.05f, 0.035f);
+        private static readonly Vector2 ConnectMax = new Vector2(0.47f, 0.18f);
+        private static readonly Vector2 ConnectBesideOtherMax = new Vector2(0.47f, 0.18f);
+        private static readonly Vector2 ConnectBesideOtherMin = new Vector2(0.05f, 0.035f);
 
         // A wallet without a Genesis may both rent one and sign in to stake: the two side by side.
-        private static readonly Vector2 MarketBesideSignInMin = new Vector2(0.04f, 0.05f);
-        private static readonly Vector2 MarketBesideSignInMax = new Vector2(0.48f, 0.22f);
-        private static readonly Vector2 SignInBesideMarketMin = new Vector2(0.52f, 0.05f);
-        private static readonly Vector2 SignInBesideMarketMax = new Vector2(0.96f, 0.22f);
-        private static readonly Vector2 WideMin = new Vector2(0.20f, 0.05f);
-        private static readonly Vector2 WideMax = new Vector2(0.80f, 0.22f);
+        private static readonly Vector2 MarketBesideSignInMin = new Vector2(0.05f, 0.035f);
+        private static readonly Vector2 MarketBesideSignInMax = new Vector2(0.47f, 0.18f);
+        private static readonly Vector2 SignInBesideMarketMin = new Vector2(0.53f, 0.035f);
+        private static readonly Vector2 SignInBesideMarketMax = new Vector2(0.95f, 0.18f);
+        private static readonly Vector2 WideMin = new Vector2(0.05f, 0.035f);
+        private static readonly Vector2 WideMax = new Vector2(0.95f, 0.18f);
 
         // With a Genesis to play: its mastery road on top, the Genesis of the wallet under it.
         private static readonly Vector2 RoadMin = new Vector2(0.03f, 0.47f);
@@ -86,6 +87,14 @@ namespace Chog.Screens
         private Button _market;
         // The Genesis the panel shows as the one played, 0 for none.
         private int _played;
+
+        // Before wallet selection, the card shows a labelled example from the real Genesis collection.
+        // It never presents the example as a hero the visitor owns.
+        private RectTransform _poster;
+        private RawImage _posterPortrait;
+        private TextMeshProUGUI _posterKicker;
+        private TextMeshProUGUI _posterExampleLabel;
+        private bool _posterPortraitRequested;
 
         // With a Genesis to play: its mastery road, then the Genesis of the wallet.
         private MasteryRoad _road;
@@ -273,17 +282,24 @@ namespace Chog.Screens
             area.anchorMax = PanelMax;
             area.offsetMin = Vector2.zero;
             area.offsetMax = Vector2.zero;
-            ChogTheme.AsCard(GetComponent<Image>());
+            var panelImage = GetComponent<Image>();
+            ChogTheme.AsCard(panelImage);
+            panelImage.color = Color.clear;
+            panelImage.raycastTarget = false;
+
+            BuildPoster();
 
             // Without a Genesis to play: what to do to play one.
-            _title = Text("Title", new Vector2(0.04f, 0.86f), new Vector2(0.60f, 0.97f), TextAlignmentOptions.Left, Color.white, 56f);
-            ChogTheme.AsTitle(_title);
-            _address = Text("Address", new Vector2(0.62f, 0.86f), new Vector2(0.96f, 0.97f), TextAlignmentOptions.Right, MutedColor, 36f);
-            _message = Text("Message", new Vector2(0.04f, 0.40f), new Vector2(0.96f, 0.84f), TextAlignmentOptions.TopLeft, Color.white, 40f);
+            _title = Text("Title", new Vector2(0.075f, 0.61f), new Vector2(0.56f, 0.79f), TextAlignmentOptions.Left, ChogTheme.Ink, 38f);
+            ChogTheme.AsTitle(_title, outlined: false);
+            _address = Text("Address", new Vector2(0.075f, 0.36f), new Vector2(0.56f, 0.43f), TextAlignmentOptions.Left,
+                ChogTheme.Purple, 22f);
+            _message = Text("Message", new Vector2(0.075f, 0.40f), new Vector2(0.56f, 0.60f), TextAlignmentOptions.TopLeft,
+                ChogTheme.Hex("3B2F72"), 25f);
 
             _connect = MakeButton("Connect", ConnectMin, ConnectMax, out _connectLabel, kind: ChogTheme.ButtonKind.Secondary);
             _connect.onClick.AddListener(OnMainButton);
-            _otherApp = MakeButton("OtherApp", new Vector2(0.64f, 0.05f), new Vector2(0.96f, 0.22f), out var otherAppLabel,
+            _otherApp = MakeButton("OtherApp", new Vector2(0.53f, 0.035f), new Vector2(0.95f, 0.18f), out var otherAppLabel,
                 kind: ChogTheme.ButtonKind.Quiet);
             otherAppLabel.text = "OTHER WALLET";
             _otherApp.onClick.AddListener(PlayerWallet.Connect);
@@ -291,7 +307,7 @@ namespace Chog.Screens
             _signIn.onClick.AddListener(PlayerWallet.StartSignIn);
 
             // For a visitor without a Genesis: every Genesis as a hero (ChogCollection).
-            _lookUp = MakeButton("LookUp", new Vector2(0.25f, 0.26f), new Vector2(0.75f, 0.37f), out var lookUpLabel,
+            _lookUp = MakeButton("LookUp", new Vector2(0.53f, 0.035f), new Vector2(0.95f, 0.18f), out var lookUpLabel,
                 kind: ChogTheme.ButtonKind.Quiet);
             lookUpLabel.text = "SEE EVERY HERO";
             _lookUp.onClick.AddListener(() => ChogCollection.Open(transform.parent));
@@ -334,6 +350,25 @@ namespace Chog.Screens
             BuildLoanView();
             BuildRentalViews();
             Refresh();
+        }
+
+        // The card has one outline and functional text. The portrait is real collection art, clearly
+        // labelled as an example until a wallet has chosen its own Genesis.
+        private void BuildPoster()
+        {
+            _poster = Child("GenesisCard", transform, new Vector2(0.01f, 0.22f), new Vector2(0.99f, 0.99f));
+            ChogUi.Plate("Paper", _poster, Vector2.zero, Vector2.one, ChogTheme.Cream, 12);
+
+            _posterPortrait = Child("CollectionExample", _poster, new Vector2(0.60f, 0.25f), new Vector2(0.94f, 0.75f))
+                .gameObject.AddComponent<RawImage>();
+            _posterPortrait.texture = GenesisArt.Disc();
+            _posterPortrait.color = WaitingColor;
+            _posterPortrait.raycastTarget = false;
+
+            _posterKicker = ChogUi.Number("Kicker", _poster, new Vector2(0.065f, 0.82f), new Vector2(0.55f, 0.92f), 22f,
+                TextAlignmentOptions.Left, ChogTheme.Purple, false);
+            _posterExampleLabel = ChogUi.Body("ExampleLabel", _poster, new Vector2(0.59f, 0.10f), new Vector2(0.96f, 0.22f),
+                19f, TextAlignmentOptions.Center, ChogTheme.Purple);
         }
 
         // Laid over the menu while a Genesis is being lent; it takes the taps of what it covers.
@@ -496,6 +531,7 @@ namespace Chog.Screens
             PlayedMetadataId = playedIndex >= 0 ? _roster.Entries[playedIndex].MetadataId : 0;
             if (previouslyPlayed != played)
                 PlayedChanged?.Invoke();
+            RefreshPoster(playing);
 
             // The mastery of the Genesis played, as its career on Monad says.
             if (playing)
@@ -570,6 +606,32 @@ namespace Chog.Screens
             _modal.SetActive(open);
         }
 
+        private void RefreshPoster(bool playing)
+        {
+            if (_poster == null)
+                return;
+
+            GetComponent<Image>().color = playing ? Color.white : Color.clear;
+            // The owned-roster view remains the interaction for changing an equipped Genesis.
+            _poster.gameObject.SetActive(!playing);
+            if (playing)
+                return;
+
+            _posterKicker.text = "1,969 CHOG GENESIS HEROES";
+            _posterExampleLabel.text = "COLLECTION EXAMPLE #1078";
+            if (_posterPortraitRequested)
+                return;
+            _posterPortraitRequested = true;
+            GenesisArt.Request(CollectionExampleMetadataId, texture =>
+            {
+                if (_posterPortrait != null)
+                {
+                    _posterPortrait.texture = texture;
+                    _posterPortrait.color = Color.white;
+                }
+            });
+        }
+
         private void RefreshLoanView()
         {
             // The wallet changed account or signed out while the screen was open: there is nothing to lend any more.
@@ -618,26 +680,18 @@ namespace Chog.Screens
             switch (state)
             {
                 case WalletState.NoProvider:
-                    return "No wallet in this browser. To play a Chog Genesis you hold, open this page in the browser of your " +
-                           "wallet (MetaMask, Rabby, Backpack) or install its extension.\n\n" + RecruitNote;
+                    return "Open this page in MetaMask, Rabby or Backpack to play a Genesis you hold.";
                 case WalletState.Disconnected:
-                    return "Your Chog Genesis is your hero: its traits build it in 3D and decide how it fights." +
-                           (PlayerWallet.CanOpenInWalletBrowser
-                               ? " OPEN IN METAMASK plays inside the MetaMask app, where your wallet answers without leaving the game." +
-                                 (PlayerWallet.ThroughApp ? " OTHER WALLET: pick your app, approve there, then come back here." : "")
-                               : PlayerWallet.ThroughApp ? " You pick your wallet app, approve there, then come back here." : "") +
-                           "\n\n" + RecruitNote;
+                    return "Connect the wallet that owns your Chog Genesis.";
                 case WalletState.Connecting:
                     return PlayerWallet.ThroughApp ? "Pick your wallet app and approve there, then come back here..."
                         : "Answer in your wallet...";
                 case WalletState.Reading:
                     return "Reading your Genesis on Monad...";
                 case WalletState.Failed:
-                    return PlayerWallet.Problem + "\n\n" + RecruitNote;
+                    return PlayerWallet.Problem;
                 default:
-                    return "This wallet holds no Chog Genesis." +
-                           (GenesisRental.State == RentalState.Open ? " You can rent one from its holder for $CHOG." : "") +
-                           "\n\n" + RecruitNote;
+                    return "This wallet holds no Chog Genesis." + (GenesisRental.State == RentalState.Open ? " Rent one to enter." : "");
             }
         }
 

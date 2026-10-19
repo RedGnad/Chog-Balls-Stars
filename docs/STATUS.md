@@ -1,5 +1,29 @@
 # État courant et décisions
 
+**19 October 2026, 11:55 UTC (local visual production slice, not deployed or approved).**
+- The owner rejected the gap between the approved menu/arena comparison sheets and the previous public build.
+  The current task is a measured translation of those sheets into the actual Unity menu and the Photon sample
+  map. [The production map and direct visual comparisons](../research/evidence/chog-visual-production-2026-10-19.md)
+  record which screen component and map material corresponds to each part of the approved images.
+- **Implemented locally:** a candidate large painted Chog-head menu mural; a single cream visitor card using a
+  real Genesis #1078 portrait clearly labelled as a collection example; a 3D gold stage with a hand-cut outline,
+  pink contact paint and a stable three-quarter hero view; a painted berry slab floor projected onto the existing
+  sample floor; and pink/teal/plum arena materials. The 86 sample crate renderers are now hidden at runtime and
+  replaced by three batched visual surfaces with dark outlines, berry sides and rounded pink tops. The unapproved
+  ornate frame and random menu marks were removed. No source map layout, collider, bush trigger, cover point,
+  spawn, Quantum simulation asset or service changed. The connected Genesis card plus sample bush and wall shapes
+  remain to be checked or redesigned; the local captures do not yet match the approved boards.
+- **Verified locally:** build `20261019T114810487Z-bf9042d09d1743cd84cd33828261f0b2` succeeded with the
+  unchanged simulation stamp `f4a81f1ddbd919b6`; its desktop home and touch-emulated bot match were captured.
+  View tests: 155 passed, 0 failed. The screen assembly typecheck reports 0 errors. The match ran through recruit
+  preparation into gameplay; the only browser console error was Chrome's known non-cancelable touchstart warning.
+  There has been no physical-phone test, real wallet check or performance measurement for these new bitmaps and
+  batched cover mesh. The public site still serves the old build.
+**Next action:** get the owner's judgement on the actual local screenshots, then tune the card and stage
+silhouette, floor scale and cover surface before approaching bushes and walls. Capture a connected Genesis state,
+a clean match view and a physical phone before considering release. The Skull/Radioactive corrections accepted
+earlier do not close the astronaut, cap-spike or eyes/mouths hero tasks.
+
 **18 October 2026, 20:37 (the home direction made real, deployed `20261018T202454468Z`, same simulation stamp).**
 - **Implemented in the game, not only on boards:** the home now gives the Genesis stage more room, puts the
   compact icon rail around it, frames it with Chog purple, pink and gold marks, and removes button shine,

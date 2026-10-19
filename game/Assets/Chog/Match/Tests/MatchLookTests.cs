@@ -130,9 +130,9 @@ namespace Chog.Match.Tests
         public void ThePageWithoutTheOptionKeepsTheNight()
         {
             var colours = ArenaPalettes.Resolve(ArenaPalettes.OptionOf("http://127.0.0.1:8091/?perf=1"), out var ambientGiven);
-            Assert.AreEqual("262052", colours["WoodDark"]);
-            Assert.AreEqual("A194F0", colours["Metal"]);
-            Assert.AreEqual("6A62A0", colours[ArenaPalettes.Ambient]);
+            Assert.AreEqual("2A1A46", colours["WoodDark"]);
+            Assert.AreEqual("F2A8E7", colours["Metal"]);
+            Assert.AreEqual("77528B", colours[ArenaPalettes.Ambient]);
             Assert.IsFalse(ambientGiven);
         }
 
@@ -164,8 +164,8 @@ namespace Chog.Match.Tests
             var colours = ArenaPalettes.Resolve("ambient:ABCDEF,floor:zzzzzz,crate:12345", out var ambientGiven);
             Assert.IsTrue(ambientGiven);
             Assert.AreEqual("ABCDEF", colours[ArenaPalettes.Ambient]);
-            Assert.AreEqual("262052", colours["WoodDark"]);
-            Assert.AreEqual("3F3192", colours["BrownDark"]);
+            Assert.AreEqual("2A1A46", colours["WoodDark"]);
+            Assert.AreEqual("A763A8", colours["BrownDark"]);
         }
 
         [Test]

@@ -7,7 +7,7 @@ namespace Chog.Match
 {
     /// <summary>
     /// A 3D hero shown from close inside a screen: the hero of a Genesis (ChogHeroModel) standing on a
-    /// round pedestal, turning slowly, lit as in the match, drawn by its own camera into a picture with
+    /// painted, uneven pedestal, turning slowly, lit as in the match, drawn by its own camera into a picture with
     /// a transparent background that a RawImage lays over the screen. Used by the menu and by the end
     /// of a match. Each stage stands far from the arena and from the other stages, so no camera sees
     /// anything else.
@@ -18,13 +18,34 @@ namespace Chog.Match
         private const float DragDegrees = 300f;
 
         // The hero sways about the three-quarter view, as a showcase does, instead of turning its back.
-        private const float SwayDegrees = 40f;
+        private const float SwayDegrees = 18f;
         private const float SwaySeconds = 7f;
         private const float FieldOfView = 24f;
         private const float Elevation = 10f;
-        private const float StartTurn = 200f;   // three quarter, from the front left, as the pictures
+        private const float StartTurn = 222f;   // a stable three-quarter view, with enough motion to read depth
         private const float PedestalRadius = 0.62f;
         private const float PedestalHeight = 0.08f;
+
+        // A deliberately uneven outline. A perfect 48-sided disc read as a generic UI coin in the home
+        // capture; this still fits the hero's feet but gives the stage the hand-cut silhouette of the
+        // approved direction.
+        private static readonly float[] PedestalOutline =
+        {
+            1.00f, 1.02f, 0.99f, 1.02f, 0.98f, 1.01f, 1.03f, 0.99f,
+            1.01f, 0.98f, 1.03f, 1.00f, 0.98f, 1.02f, 0.99f, 1.01f,
+            1.03f, 0.98f, 1.01f, 0.99f, 1.03f, 0.99f, 1.02f, 1.00f,
+        };
+
+        // The pink contact paint is a real stage mesh under the feet, not a screen-space glow. Its
+        // outline and fill are two simple opaque shapes, so it remains visible in the stage camera.
+        private static readonly Vector2[] PaintOutline =
+        {
+            new Vector2(-0.52f, -0.05f), new Vector2(-0.41f, -0.23f), new Vector2(-0.20f, -0.30f),
+            new Vector2(0.00f, -0.25f), new Vector2(0.17f, -0.34f), new Vector2(0.39f, -0.22f),
+            new Vector2(0.52f, -0.04f), new Vector2(0.42f, 0.13f), new Vector2(0.22f, 0.23f),
+            new Vector2(0.03f, 0.17f), new Vector2(-0.16f, 0.29f), new Vector2(-0.36f, 0.20f),
+            new Vector2(-0.49f, 0.08f),
+        };
 
         // A layer no scene uses: the camera and the light of a stage see only what stands on it, so the
         // light of a stage never lights the arena.
@@ -82,6 +103,19 @@ namespace Chog.Match
             pedestal.GetComponent<MeshFilter>().sharedMesh = PedestalMesh();
             pedestal.GetComponent<MeshRenderer>().sharedMaterial = ChogHeroModel.Material;
 
+            var paintOutline = new GameObject("Stage paint outline", typeof(MeshFilter), typeof(MeshRenderer));
+            paintOutline.transform.SetParent(world, false);
+            paintOutline.transform.localPosition = Vector3.up * 0.004f;
+            paintOutline.GetComponent<MeshFilter>().sharedMesh = PaintMesh("ChogHeroStage Paint Outline", new Color(0.07f, 0.04f, 0.10f, 1f));
+            paintOutline.GetComponent<MeshRenderer>().sharedMaterial = ChogHeroModel.Material;
+
+            var paintFill = new GameObject("Stage paint", typeof(MeshFilter), typeof(MeshRenderer));
+            paintFill.transform.SetParent(world, false);
+            paintFill.transform.localPosition = Vector3.up * 0.007f;
+            paintFill.transform.localScale = new Vector3(0.92f, 1f, 0.92f);
+            paintFill.GetComponent<MeshFilter>().sharedMesh = PaintMesh("ChogHeroStage Paint", new Color(0.91f, 0.12f, 0.42f, 1f));
+            paintFill.GetComponent<MeshRenderer>().sharedMaterial = ChogHeroModel.Material;
+
             _camera = new GameObject("ChogHeroStage Camera").AddComponent<Camera>();
             _camera.transform.SetParent(world, false);
             _camera.fieldOfView = FieldOfView;
@@ -100,6 +134,8 @@ namespace Chog.Match
             sun.shadows = LightShadows.None;
             sun.cullingMask = 1 << Layer;
             pedestal.layer = Layer;
+            paintOutline.layer = Layer;
+            paintFill.layer = Layer;
         }
 
         /// <summary>Shows the hero of a Genesis (or the grey Chog); hides the stage when it has none.</summary>
@@ -203,15 +239,13 @@ namespace Chog.Match
 
         private static Mesh s_pedestal;
 
-        // A low round pedestal in the gold of the home screen (docs/DESIGN-BRIEF.md): a light gold top, a
-        // deeper side, the dark outline ring around its top edge, in the vertex colours ChogHero.shader
-        // reads (lit, alpha 1).
+        // A low uneven gold pedestal in the home screen's colours: light top, deeper side, a dark rim and
+        // a pink contact mark behind the hero's feet. Vertex colours work with the same material as heroes.
         private static Mesh PedestalMesh()
         {
             if (s_pedestal != null)
                 return s_pedestal;
 
-            const int sides = 48;
             var top = new Color(0.98f, 0.72f, 0.22f, 1f);
             var side = new Color(0.72f, 0.40f, 0.02f, 1f);
             var line = new Color(0.07f, 0.04f, 0.10f, 0.6f);   // unlit
@@ -223,20 +257,19 @@ namespace Chog.Match
             vertices.Add(new Vector3(0f, 0f, 0f));
             normals.Add(Vector3.up);
             colours.Add(top);
-            for (var i = 0; i <= sides; i++)
+            for (var i = 0; i <= PedestalOutline.Length; i++)
             {
-                var angle = i * Mathf.PI * 2f / sides;
-                var at = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
-                vertices.Add(at * (PedestalRadius - 0.03f));
+                var point = RingPoint(i, PedestalRadius - 0.03f, 0f);
+                vertices.Add(point);
                 normals.Add(Vector3.up);
-                colours.Add(top);
+                colours.Add(Color.Lerp(top, new Color(1f, 0.81f, 0.40f, 1f), i % 3 == 0 ? 0.18f : 0f));
             }
-            for (var i = 0; i < sides; i++)
+            for (var i = 0; i < PedestalOutline.Length; i++)
                 triangles.AddRange(new[] { 0, i + 2, i + 1 });
 
             // The line around the top, then the side down to the floor.
-            AddBand(vertices, normals, colours, triangles, sides, PedestalRadius - 0.03f, 0f, PedestalRadius, 0f, line, true);
-            AddBand(vertices, normals, colours, triangles, sides, PedestalRadius, 0f, PedestalRadius, -PedestalHeight, side, false);
+            AddBand(vertices, normals, colours, triangles, PedestalRadius - 0.03f, 0f, PedestalRadius, 0f, line, true);
+            AddBand(vertices, normals, colours, triangles, PedestalRadius, 0f, PedestalRadius, -PedestalHeight, side, false);
 
             s_pedestal = new Mesh { name = "ChogHeroStage Pedestal" };
             s_pedestal.SetVertices(vertices);
@@ -247,23 +280,55 @@ namespace Chog.Match
             return s_pedestal;
         }
 
+        private static Mesh PaintMesh(string name, Color colour)
+        {
+            var vertices = new List<Vector3> { Vector3.zero };
+            var normals = new List<Vector3> { Vector3.up };
+            var colours = new List<Color> { colour };
+            var triangles = new List<int>();
+            for (var i = 0; i <= PaintOutline.Length; i++)
+            {
+                var point = PaintOutline[i % PaintOutline.Length];
+                vertices.Add(new Vector3(point.x, 0f, point.y));
+                normals.Add(Vector3.up);
+                colours.Add(colour);
+            }
+            for (var i = 0; i < PaintOutline.Length; i++)
+                triangles.AddRange(new[] { 0, i + 1, i + 2 });
+            var mesh = new Mesh { name = name };
+            mesh.SetVertices(vertices);
+            mesh.SetNormals(normals);
+            mesh.SetColors(colours);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        private static Vector3 RingPoint(int index, float radius, float y)
+        {
+            var count = PedestalOutline.Length;
+            var angle = index % count * Mathf.PI * 2f / count;
+            var outline = PedestalOutline[index % count];
+            return new Vector3(Mathf.Cos(angle) * radius * outline, y, Mathf.Sin(angle) * radius * outline);
+        }
+
         private static void AddBand(List<Vector3> vertices, List<Vector3> normals, List<Color> colours, List<int> triangles,
-                                    int sides, float innerRadius, float innerY, float outerRadius, float outerY, Color colour, bool flat)
+                                    float innerRadius, float innerY, float outerRadius, float outerY, Color colour, bool flat)
         {
             var start = vertices.Count;
-            for (var i = 0; i <= sides; i++)
+            for (var i = 0; i <= PedestalOutline.Length; i++)
             {
-                var angle = i * Mathf.PI * 2f / sides;
-                var at = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
-                var normal = flat ? Vector3.up : at;
-                vertices.Add(at * innerRadius + Vector3.up * innerY);
-                vertices.Add(at * outerRadius + Vector3.up * outerY);
+                var inner = RingPoint(i, innerRadius, innerY);
+                var outer = RingPoint(i, outerRadius, outerY);
+                var normal = flat ? Vector3.up : new Vector3(outer.x, 0f, outer.z).normalized;
+                vertices.Add(inner);
+                vertices.Add(outer);
                 normals.Add(normal);
                 normals.Add(normal);
                 colours.Add(colour);
                 colours.Add(colour);
             }
-            for (var i = 0; i < sides; i++)
+            for (var i = 0; i < PedestalOutline.Length; i++)
             {
                 var a = start + i * 2;
                 triangles.AddRange(new[] { a, a + 2, a + 1, a + 1, a + 2, a + 3 });

@@ -17,6 +17,8 @@ Shader "Chog/Arena"
     {
         _Color ("Colour", Color) = (1, 1, 1, 1)
         _MainTex ("Albedo", 2D) = "white" {}
+        _ChogFloorTex ("Floor slabs", 2D) = "white" {}
+        _ChogFloorPattern ("Floor pattern weight", Range(0, 1)) = 0
     }
 
     SubShader
@@ -38,6 +40,8 @@ Shader "Chog/Arena"
             fixed4 _Color;
             sampler2D _MainTex;
             float4 _MainTex_ST;
+            sampler2D _ChogFloorTex;
+            half _ChogFloorPattern;
             half4 _ChogLightView;
             half4 _ChogArenaShade;
             half4 _ChogArenaRamp;
@@ -52,7 +56,8 @@ Shader "Chog/Arena"
                 half3 light : TEXCOORD1;
                 // x: height in the world, y: how much the surface stands upright (0 on a floor).
                 float2 foot : TEXCOORD2;
-                SHADOW_COORDS(3)
+                float2 groundUv : TEXCOORD3;
+                SHADOW_COORDS(4)
             };
 
             v2f vert(appdata_base v)
@@ -66,7 +71,9 @@ Shader "Chog/Arena"
                 // phone nothing per pixel.
                 half light = saturate(dot(viewNormal, _ChogLightView.xyz) * _ChogArenaRamp.x + _ChogArenaRamp.y);
                 o.light = lerp(_ChogArenaShade.rgb, half3(1, 1, 1), light) * _ChogArenaRamp.z;
-                o.foot = float2(mul(unity_ObjectToWorld, v.vertex).y, 1 - abs(normal.y));
+                float3 world = mul(unity_ObjectToWorld, v.vertex).xyz;
+                o.foot = float2(world.y, 1 - abs(normal.y));
+                o.groundUv = world.xz * 0.1;
                 TRANSFER_SHADOW(o);
                 return o;
             }
@@ -74,6 +81,7 @@ Shader "Chog/Arena"
             fixed4 frag(v2f i) : SV_Target
             {
                 fixed3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;
+                albedo *= lerp(fixed3(1, 1, 1), tex2D(_ChogFloorTex, i.groundUv).rgb, _ChogFloorPattern);
                 half shadow = SHADOW_ATTENUATION(i);
                 half3 key = _ChogKey.a > 0.5 ? _ChogKey.rgb : half3(1, 1, 1);
                 half3 light = i.light * lerp(_ChogArenaShadow.rgb, key, shadow);
