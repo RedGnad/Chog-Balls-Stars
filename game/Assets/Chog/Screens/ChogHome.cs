@@ -35,13 +35,13 @@ namespace Chog.Screens
         private const float RailTop = 154f;
         private const float RailStep = 122f;
 
-        // In shares of the screen: the hero, its ribbon and chips, PLAY and the line under it.
-        private static readonly Vector2 StageMin = new Vector2(0.25f, 0.18f);
-        private static readonly Vector2 StageMax = new Vector2(0.63f, 0.86f);
-        private static readonly Vector2 RibbonMin = new Vector2(0.325f, 0.115f);
-        private static readonly Vector2 RibbonMax = new Vector2(0.565f, 0.180f);
-        private static readonly Vector2 ChipsMin = new Vector2(0.24f, 0.035f);
-        private static readonly Vector2 ChipsMax = new Vector2(0.65f, 0.095f);
+        // In shares of the screen: the hero owns the left focal column, the Genesis card owns the right.
+        private static readonly Vector2 StageMin = new Vector2(0.10f, 0.18f);
+        private static readonly Vector2 StageMax = new Vector2(0.51f, 0.86f);
+        private static readonly Vector2 RibbonMin = new Vector2(0.17f, 0.115f);
+        private static readonly Vector2 RibbonMax = new Vector2(0.46f, 0.180f);
+        private static readonly Vector2 ChipsMin = new Vector2(0.10f, 0.035f);
+        private static readonly Vector2 ChipsMax = new Vector2(0.53f, 0.095f);
         private static readonly Vector2 PlayMin = new Vector2(0.77f, 0.115f);
         private static readonly Vector2 PlayMax = new Vector2(0.98f, 0.278f);
         private static readonly Vector2 HintMin = new Vector2(0.77f, 0.06f);

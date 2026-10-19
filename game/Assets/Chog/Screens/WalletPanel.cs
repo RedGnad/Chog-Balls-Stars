@@ -29,10 +29,10 @@ namespace Chog.Screens
         private const int CollectionExampleMetadataId = 1078;
         private const int SlotsPerPage = 6;
 
-        // The right column is a Genesis poster first, then the wallet action beneath it. It replaces the
-        // old generic text slab while keeping the same wallet, rental and career behaviour.
-        private static readonly Vector2 PanelMin = new Vector2(0.60f, 0.30f);
-        private static readonly Vector2 PanelMax = new Vector2(0.98f, 0.88f);
+        // The right column is one Genesis card and its wallet action. It replaces the old generic text slab
+        // while keeping the same wallet, rental and career behaviour.
+        private static readonly Vector2 PanelMin = new Vector2(0.56f, 0.27f);
+        private static readonly Vector2 PanelMax = new Vector2(0.98f, 0.89f);
 
         // Without a Genesis to play: the main button wide, or beside the one for any other wallet app.
         private static readonly Vector2 ConnectMin = new Vector2(0.05f, 0.035f);
@@ -83,7 +83,6 @@ namespace Chog.Screens
         private Button _otherApp;
         private Button _signIn;
         private TextMeshProUGUI _signInLabel;
-        private Button _lookUp;
         private Button _market;
         // The Genesis the panel shows as the one played, 0 for none.
         private int _played;
@@ -306,12 +305,6 @@ namespace Chog.Screens
             _signIn = MakeButton("SignIn", WideMin, WideMax, out _signInLabel, kind: ChogTheme.ButtonKind.Confirm);
             _signIn.onClick.AddListener(PlayerWallet.StartSignIn);
 
-            // For a visitor without a Genesis: every Genesis as a hero (ChogCollection).
-            _lookUp = MakeButton("LookUp", new Vector2(0.53f, 0.035f), new Vector2(0.95f, 0.18f), out var lookUpLabel,
-                kind: ChogTheme.ButtonKind.Quiet);
-            lookUpLabel.text = "SEE EVERY HERO";
-            _lookUp.onClick.AddListener(() => ChogCollection.Open(transform.parent));
-
             // For a connected wallet without a Genesis: the Genesis that holders offer for rent.
             _market = MakeButton("Market", WideMin, WideMax, out var marketLabel, kind: ChogTheme.ButtonKind.Chog);
             marketLabel.text = "RENT A HERO";
@@ -356,7 +349,7 @@ namespace Chog.Screens
         // labelled as an example until a wallet has chosen its own Genesis.
         private void BuildPoster()
         {
-            _poster = Child("GenesisCard", transform, new Vector2(0.01f, 0.22f), new Vector2(0.99f, 0.99f));
+            _poster = Child("GenesisCard", transform, new Vector2(0.01f, 0.18f), new Vector2(0.99f, 0.99f));
             ChogUi.Plate("Paper", _poster, Vector2.zero, Vector2.one, ChogTheme.Cream, 12);
 
             _posterPortrait = Child("CollectionExample", _poster, new Vector2(0.60f, 0.25f), new Vector2(0.94f, 0.75f))
@@ -487,8 +480,6 @@ namespace Chog.Screens
             var connectArea = (RectTransform)_connect.transform;
             connectArea.anchorMin = other ? ConnectBesideOtherMin : ConnectMin;
             connectArea.anchorMax = other ? ConnectBesideOtherMax : ConnectMax;
-            _lookUp.gameObject.SetActive(!holds && !guest && !checkingPass && state != WalletState.Connecting && state != WalletState.Reading);
-
             // A connected wallet without a Genesis to play can rent one that is offered.
             var canRent = state == WalletState.Ready && GenesisRental.State == RentalState.Open && !checkingPass;
             var large = canRent && !holds && !guest;

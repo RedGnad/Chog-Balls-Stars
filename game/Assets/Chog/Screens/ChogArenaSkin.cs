@@ -70,17 +70,17 @@ namespace Chog.Screens
                 if (shader != null && material.shader != null && material.shader.name == "Standard" && drawn is MeshRenderer
                     && material.renderQueue <= (int)UnityEngine.Rendering.RenderQueue.GeometryLast)
                     material.shader = shader;
-                if (materialName == "WoodDark" && material.HasProperty("_ChogFloorPattern"))
-                {
-                    var floorTile = palette == ArenaPalettes.Night && !floorOverride ? FloorTile() : null;
-                    material.SetFloat("_ChogFloorPattern", floorTile != null ? 1f : 0f);
-                    if (floorTile != null)
-                    {
-                        material.SetTexture("_ChogFloorTex", floorTile);
-                        material.color = Color.white;
-                    }
-                }
+                if (material.HasProperty("_ChogFloorPattern"))
+                    material.SetFloat("_ChogFloorPattern", 0f);
             }
+
+            ChogArenaRendererReport.WriteIfAsked(scene, roots);
+
+            // The sample floor and wall geometry remain the source of every collider and baked map entry.
+            // Their renderers are replaced as complete visual systems, so a floor treatment never leaks onto
+            // the boundary and a wall treatment never turns a ground mesh into a dark strip.
+            ChogArenaFloorSkin.Apply(roots, shader, palette == ArenaPalettes.Night && !floorOverride ? FloorTile() : null);
+            ChogArenaBoundarySkin.Apply(roots);
 
             // The Photon sample's cover collision stays exactly where it is. Its repeated cage mesh is
             // replaced only at runtime by three batched candy-block surfaces, built from the original
@@ -135,6 +135,365 @@ namespace Chog.Screens
     }
 
     /// <summary>
+    /// Visual-only ground treatment. The source floor still owns its map and collision. A single textured
+    /// surface covers its repeated brick renderers so the painted slab albedo remains continuous at game scale.
+    /// </summary>
+    internal static class ChogArenaFloorSkin
+    {
+        private const string ObjectName = "ChogArenaFloorSkin";
+        private static Material s_ground;
+
+        public static void Apply(GameObject[] roots, Shader arenaShader, Texture2D floorTile)
+        {
+            if (roots == null || HasObject(roots, ObjectName))
+                return;
+
+            var floor = FindChild(roots, "Level_1", "Floor", "InteriorFloor");
+            if (floor == null)
+                return;
+
+            var renderers = floor.GetComponentsInChildren<Renderer>(true);
+            if (renderers.Length == 0)
+                return;
+
+            var bounds = renderers[0].bounds;
+            for (var i = 1; i < renderers.Length; i++)
+                bounds.Encapsulate(renderers[i].bounds);
+            foreach (var renderer in renderers)
+                renderer.enabled = false;
+
+            var skin = new GameObject(ObjectName, typeof(MeshFilter), typeof(MeshRenderer));
+            skin.GetComponent<MeshFilter>().sharedMesh = FloorMesh(bounds);
+            var shader = arenaShader != null && arenaShader.isSupported ? arenaShader : Shader.Find("Standard");
+            if (s_ground == null)
+                s_ground = new Material(shader) { name = "ChogPaintedFloor", color = Color.white };
+            if (s_ground.HasProperty("_ChogFloorPattern"))
+            {
+                s_ground.SetFloat("_ChogFloorPattern", floorTile != null ? 1f : 0f);
+                if (floorTile != null)
+                    s_ground.SetTexture("_ChogFloorTex", floorTile);
+            }
+            else if (floorTile != null)
+            {
+                s_ground.mainTexture = floorTile;
+                s_ground.mainTextureScale = new Vector2(0.055f, 0.055f);
+            }
+            skin.GetComponent<MeshRenderer>().sharedMaterial = s_ground;
+        }
+
+        private static Mesh FloorMesh(Bounds bounds)
+        {
+            var vertices = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var triangles = new List<int>();
+            var y = bounds.max.y + 0.012f;
+            AddQuad(vertices, normals, triangles, bounds.min.x, bounds.min.z, bounds.max.x, bounds.max.z, y);
+
+            var mesh = new Mesh { name = "ChogArenaPaintedFloor" };
+            mesh.SetVertices(vertices);
+            mesh.SetNormals(normals);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        private static void AddQuad(List<Vector3> vertices, List<Vector3> normals, List<int> triangles,
+                                    float x0, float z0, float x1, float z1, float y)
+        {
+            var start = vertices.Count;
+            vertices.Add(new Vector3(x0, y, z0));
+            vertices.Add(new Vector3(x1, y, z0));
+            vertices.Add(new Vector3(x1, y, z1));
+            vertices.Add(new Vector3(x0, y, z1));
+            for (var i = 0; i < 4; i++)
+                normals.Add(Vector3.up);
+            triangles.AddRange(new[] { start, start + 2, start + 1, start, start + 3, start + 2 });
+        }
+
+        private static Transform FindChild(GameObject[] roots, params string[] path)
+        {
+            foreach (var root in roots)
+            {
+                if (root.name != path[0])
+                    continue;
+                var cursor = root.transform;
+                for (var i = 1; cursor != null && i < path.Length; i++)
+                    cursor = cursor.Find(path[i]);
+                if (cursor != null)
+                    return cursor;
+            }
+            return null;
+        }
+
+        private static bool HasObject(GameObject[] roots, string name)
+        {
+            foreach (var root in roots)
+                if (root.name == name || root.transform.Find(name) != null)
+                    return true;
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Visual-only boundary treatment. The sample's wall mesh and its collider layout stay intact, while two
+    /// dedicated materials separate the dark face from its lighter top. It deliberately avoids the arena-wide
+    /// contact shade that turned the near wall into a broken horizontal band.
+    /// </summary>
+    internal static class ChogArenaBoundarySkin
+    {
+        private const string DetailName = "ChogArenaNearWallStones";
+        private static Material s_face;
+        private static Material s_top;
+        private static Material s_grout;
+        private static Material s_stone;
+
+        public static void Apply(GameObject[] roots)
+        {
+            if (roots == null)
+                return;
+            var nearBounds = new Bounds();
+            var hasNearBounds = false;
+            foreach (var root in roots)
+            foreach (var renderer in root.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                if (!UnderWalls(renderer.transform))
+                    continue;
+                if (renderer.bounds.size.y > 1f && IsNearCenterWall(renderer.transform))
+                {
+                    if (hasNearBounds)
+                        nearBounds.Encapsulate(renderer.bounds);
+                    else
+                    {
+                        nearBounds = renderer.bounds;
+                        hasNearBounds = true;
+                    }
+                }
+                var materials = renderer.sharedMaterials;
+                if (materials == null || materials.Length == 0)
+                    continue;
+                if (s_face == null)
+                    s_face = WallMaterial("ChogBoundaryWallFace", materials[0], new Color(0.20f, 0.11f, 0.29f, 1f));
+                if (s_top == null)
+                    s_top = WallMaterial("ChogBoundaryWallTop", materials.Length > 1 ? materials[1] : materials[0],
+                        new Color(0.36f, 0.23f, 0.47f, 1f));
+                var replacement = new Material[materials.Length];
+                for (var i = 0; i < replacement.Length; i++)
+                    replacement[i] = i == 0 ? s_face : s_top;
+                renderer.sharedMaterials = replacement;
+            }
+            if (hasNearBounds)
+                DetailNearWall(roots, nearBounds);
+        }
+
+        private static void DetailNearWall(GameObject[] roots, Bounds bounds)
+        {
+            foreach (var root in roots)
+                if (root.name == DetailName)
+                    return;
+
+            var vertices = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var uvs = new List<Vector2>();
+            var grout = new List<int>();
+            var stones = new List<int>();
+            var topY = bounds.max.y + 0.014f;
+            var faceZ = bounds.min.z - 0.014f;
+            AddWallTop(vertices, normals, uvs, grout, bounds.min.x, bounds.max.x,
+                bounds.min.z, bounds.max.z, topY, 0f);
+            AddWallFront(vertices, normals, uvs, grout, bounds.min.x, bounds.max.x,
+                bounds.min.y, bounds.max.y, faceZ, 0f);
+
+            const int columns = 14;
+            const int courses = 2;
+            var width = bounds.size.x / columns;
+            var height = bounds.size.y / courses;
+            for (var column = 0; column < columns; column++)
+            {
+                var x0 = bounds.min.x + column * width + 0.065f;
+                var x1 = bounds.min.x + (column + 1) * width - 0.065f;
+                var shift = column % 3 * 0.13f;
+                AddWallTop(vertices, normals, uvs, stones, x0, x1, bounds.min.z + 0.065f,
+                    bounds.max.z - 0.065f, topY + 0.006f, shift);
+                for (var course = 0; course < courses; course++)
+                {
+                    var y0 = bounds.min.y + course * height + 0.065f;
+                    var y1 = bounds.min.y + (course + 1) * height - 0.065f;
+                    AddWallFront(vertices, normals, uvs, stones, x0, x1, y0, y1,
+                        faceZ - 0.006f, shift + course * 0.17f);
+                }
+            }
+
+            var mesh = new Mesh { name = "ChogArenaNearWallStoneMesh", subMeshCount = 2 };
+            mesh.SetVertices(vertices);
+            mesh.SetNormals(normals);
+            mesh.SetUVs(0, uvs);
+            mesh.SetTriangles(grout, 0);
+            mesh.SetTriangles(stones, 1);
+            mesh.RecalculateBounds();
+            var detail = new GameObject(DetailName, typeof(MeshFilter), typeof(MeshRenderer));
+            detail.GetComponent<MeshFilter>().sharedMesh = mesh;
+            if (s_grout == null)
+            {
+                s_grout = WallMaterial("ChogBoundaryGrout", s_face, new Color(0.11f, 0.055f, 0.18f, 1f));
+                s_grout.mainTexture = null;
+            }
+            if (s_stone == null)
+            {
+                s_stone = WallMaterial("ChogBoundaryStone", s_top, new Color(0.73f, 0.58f, 0.79f, 1f));
+                s_stone.mainTexture = Resources.Load<Texture2D>("ArenaFloorSlabs");
+            }
+            detail.GetComponent<MeshRenderer>().sharedMaterials = new[] { s_grout, s_stone };
+        }
+
+        private static void AddWallTop(List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs,
+                                       List<int> triangles, float x0, float x1, float z0, float z1, float y, float shift)
+        {
+            var start = vertices.Count;
+            vertices.Add(new Vector3(x0, y, z0));
+            vertices.Add(new Vector3(x1, y, z0));
+            vertices.Add(new Vector3(x1, y, z1));
+            vertices.Add(new Vector3(x0, y, z1));
+            for (var i = 0; i < 4; i++)
+                normals.Add(Vector3.up);
+            uvs.Add(new Vector2(0.06f + shift, 0.08f));
+            uvs.Add(new Vector2(0.86f + shift, 0.08f));
+            uvs.Add(new Vector2(0.86f + shift, 0.88f));
+            uvs.Add(new Vector2(0.06f + shift, 0.88f));
+            triangles.AddRange(new[] { start, start + 2, start + 1, start, start + 3, start + 2 });
+        }
+
+        private static void AddWallFront(List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs,
+                                         List<int> triangles, float x0, float x1, float y0, float y1, float z, float shift)
+        {
+            var start = vertices.Count;
+            vertices.Add(new Vector3(x0, y0, z));
+            vertices.Add(new Vector3(x1, y0, z));
+            vertices.Add(new Vector3(x1, y1, z));
+            vertices.Add(new Vector3(x0, y1, z));
+            for (var i = 0; i < 4; i++)
+                normals.Add(Vector3.back);
+            uvs.Add(new Vector2(0.06f + shift, 0.08f));
+            uvs.Add(new Vector2(0.86f + shift, 0.08f));
+            uvs.Add(new Vector2(0.86f + shift, 0.88f));
+            uvs.Add(new Vector2(0.06f + shift, 0.88f));
+            triangles.AddRange(new[] { start, start + 2, start + 1, start, start + 3, start + 2 });
+        }
+
+        private static Material WallMaterial(string name, Material source, Color colour)
+        {
+            var material = new Material(source) { name = name, color = colour, enableInstancing = true };
+            material.shader = Shader.Find("Standard");
+            if (material.HasProperty("_Glossiness"))
+                material.SetFloat("_Glossiness", 0.03f);
+            return material;
+        }
+
+        private static bool UnderWalls(Transform transform)
+        {
+            for (var cursor = transform.parent; cursor != null; cursor = cursor.parent)
+                if (cursor.name == "Walls")
+                    return true;
+            return false;
+        }
+
+        private static bool IsNearCenterWall(Transform transform)
+        {
+            for (var cursor = transform.parent; cursor != null; cursor = cursor.parent)
+                if (cursor.name == "CenterWall")
+                    return cursor.position.z < 0f;
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// A development-only scene report, enabled by `?arenadiag=1`, that groups the source sample renderers by
+    /// hierarchy branch, mesh and material. It is captured before visual cover replacement so the presentation
+    /// layer can be mapped to the actual Photon sample without touching its geometry or simulation.
+    /// </summary>
+    internal static class ChogArenaRendererReport
+    {
+        private sealed class Group
+        {
+            public int Count;
+            public Bounds Bounds;
+            public bool HasBounds;
+        }
+
+        private static bool s_written;
+
+        public static void WriteIfAsked(Scene scene, GameObject[] roots)
+        {
+            if (s_written || Application.absoluteURL.IndexOf("arenadiag=1", System.StringComparison.OrdinalIgnoreCase) < 0)
+                return;
+            s_written = true;
+            var groups = new Dictionary<string, Group>();
+            foreach (var root in roots)
+            foreach (var renderer in root.GetComponentsInChildren<Renderer>(true))
+            {
+                if (!renderer.enabled || !renderer.gameObject.activeInHierarchy)
+                    continue;
+                var filter = renderer.GetComponent<MeshFilter>();
+                var mesh = filter != null && filter.sharedMesh != null ? filter.sharedMesh.name : renderer.GetType().Name;
+                var key = BranchOf(renderer.transform) + " | " + mesh + " | " + MaterialsOf(renderer);
+                if (!groups.TryGetValue(key, out var group))
+                {
+                    group = new Group();
+                    groups.Add(key, group);
+                }
+                group.Count++;
+                if (group.HasBounds)
+                    group.Bounds.Encapsulate(renderer.bounds);
+                else
+                {
+                    group.Bounds = renderer.bounds;
+                    group.HasBounds = true;
+                }
+            }
+
+            var keys = new List<string>(groups.Keys);
+            keys.Sort(System.StringComparer.Ordinal);
+            Debug.Log("CHOG_ARENA_RENDERERS scene=" + scene.name + " groups=" + keys.Count);
+            foreach (var key in keys)
+            {
+                var group = groups[key];
+                var bounds = group.Bounds;
+                Debug.Log("CHOG_ARENA_RENDERER " + key + " | count=" + group.Count + " | centre=" + Vector(bounds.center) +
+                    " | size=" + Vector(bounds.size));
+            }
+        }
+
+        private static string BranchOf(Transform transform)
+        {
+            var cursor = transform;
+            while (cursor.parent != null)
+            {
+                if (cursor.parent.name == "Level_1")
+                    return "Level_1/" + cursor.name;
+                cursor = cursor.parent;
+            }
+            return transform.root.name;
+        }
+
+        private static string MaterialsOf(Renderer renderer)
+        {
+            var names = renderer.sharedMaterials;
+            var text = "";
+            for (var i = 0; i < names.Length; i++)
+            {
+                if (i > 0)
+                    text += ";";
+                text += names[i] == null ? "None" : ChogArenaSkin.NameOf(names[i]);
+            }
+            return text;
+        }
+
+        private static string Vector(Vector3 value) =>
+            value.x.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) + "," +
+            value.y.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) + "," +
+            value.z.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
     /// Visual-only cover treatment for the sample Crate prefabs. The 86 Quantum blockers remain the
     /// source of position and collision. One batched mesh replaces their visible dungeon cages with a
     /// dark outline, berry sides and a pink inset top, following the map direction without changing play.
@@ -145,6 +504,7 @@ namespace Chog.Screens
         private static Material s_outline;
         private static Material s_side;
         private static Material s_top;
+        private static Texture2D s_paint;
 
         public static void Apply(GameObject[] roots, Shader arenaShader)
         {
@@ -183,8 +543,12 @@ namespace Chog.Screens
             {
                 MaterialOf("ChogCandyCoverOutline", arenaShader, new Color(0.15f, 0.05f, 0.24f, 1f), ref s_outline),
                 MaterialOf("ChogCandyCoverSide", arenaShader, new Color(0.64f, 0.20f, 0.58f, 1f), ref s_side),
-                MaterialOf("ChogCandyCoverTop", arenaShader, new Color(0.96f, 0.54f, 0.85f, 1f), ref s_top),
+                MaterialOf("ChogCandyCoverTop", arenaShader, Color.white, ref s_top),
             };
+            if (s_paint == null)
+                s_paint = Resources.Load<Texture2D>("ArenaCoverPaint");
+            if (s_paint != null)
+                s_top.mainTexture = s_paint;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             renderer.receiveShadows = true;
         }
@@ -202,9 +566,11 @@ namespace Chog.Screens
             if (saved != null)
                 return saved;
             var shader = arenaShader != null && arenaShader.isSupported ? arenaShader : Shader.Find("Standard");
-            saved = new Material(shader) { name = name, color = colour };
+            saved = new Material(shader) { name = name, color = colour, enableInstancing = true };
             if (saved.HasProperty("_ChogFloorPattern"))
                 saved.SetFloat("_ChogFloorPattern", 0f);
+            if (saved.HasProperty("_Glossiness"))
+                saved.SetFloat("_Glossiness", 0.03f);
             return saved;
         }
 
@@ -212,6 +578,7 @@ namespace Chog.Screens
         {
             var vertices = new List<Vector3>();
             var normals = new List<Vector3>();
+            var uvs = new List<Vector2>();
             var outline = new List<int>();
             var side = new List<int>();
             var top = new List<int>();
@@ -219,19 +586,20 @@ namespace Chog.Screens
             {
                 // The dark layer is a low outline and a small frame beneath the top. It cannot be a full
                 // outer cube: that would occlude the pink surfaces behind it from the match camera.
-                AddBox(vertices, normals, outline, cover.center - Vector3.up * (cover.size.y * 0.46f),
+                AddBox(vertices, normals, uvs, outline, cover.center - Vector3.up * (cover.size.y * 0.46f),
                     new Vector3(cover.size.x * 1.07f, cover.size.y * 0.12f, cover.size.z * 1.07f));
-                AddBox(vertices, normals, outline, cover.center + Vector3.up * (cover.size.y * 0.39f),
+                AddBox(vertices, normals, uvs, outline, cover.center + Vector3.up * (cover.size.y * 0.39f),
                     new Vector3(cover.size.x * 0.90f, cover.size.y * 0.12f, cover.size.z * 0.90f));
-                AddBox(vertices, normals, side, cover.center,
+                AddBox(vertices, normals, uvs, side, cover.center,
                     new Vector3(cover.size.x * 0.94f, cover.size.y * 0.94f, cover.size.z * 0.94f));
-                AddBox(vertices, normals, top, cover.center + Vector3.up * (cover.size.y * 0.46f),
+                AddBox(vertices, normals, uvs, top, cover.center + Vector3.up * (cover.size.y * 0.46f),
                     new Vector3(cover.size.x * 0.78f, cover.size.y * 0.12f, cover.size.z * 0.78f));
             }
 
             var mesh = new Mesh { name = "ChogArenaCandyCoverMesh", subMeshCount = 3 };
             mesh.SetVertices(vertices);
             mesh.SetNormals(normals);
+            mesh.SetUVs(0, uvs);
             mesh.SetTriangles(outline, 0);
             mesh.SetTriangles(side, 1);
             mesh.SetTriangles(top, 2);
@@ -241,7 +609,8 @@ namespace Chog.Screens
 
         // A low-poly rounded rectangle: the chamfered corners remove the source pack's rigid cage read,
         // while flat faces keep the arena material's top and side lighting clean at phone scale.
-        private static void AddBox(List<Vector3> vertices, List<Vector3> normals, List<int> triangles, Vector3 center, Vector3 size)
+        private static void AddBox(List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs,
+                                   List<int> triangles, Vector3 center, Vector3 size)
         {
             var half = size * 0.5f;
             var corner = Mathf.Min(half.x, half.z) * 0.22f;
@@ -257,11 +626,13 @@ namespace Chog.Screens
             var topCenter = vertices.Count;
             vertices.Add(new Vector3(center.x, high, center.z));
             normals.Add(Vector3.up);
+            uvs.Add(new Vector2(0.5f, 0.5f));
             var topStart = vertices.Count;
             for (var i = 0; i < outline.Length; i++)
             {
                 vertices.Add(new Vector3(center.x + outline[i].x, high, center.z + outline[i].y));
                 normals.Add(Vector3.up);
+                uvs.Add(new Vector2(0.5f + outline[i].x / size.x, 0.5f + outline[i].y / size.z));
             }
             for (var i = 0; i < outline.Length; i++)
             {
@@ -275,13 +646,13 @@ namespace Chog.Screens
                 var a = outline[i];
                 var b = outline[next];
                 var normal = new Vector3(a.x + b.x, 0f, a.y + b.y).normalized;
-                AddFace(vertices, normals, triangles, new Vector3(center.x + a.x, low, center.z + a.y),
+                AddFace(vertices, normals, uvs, triangles, new Vector3(center.x + a.x, low, center.z + a.y),
                     new Vector3(center.x + b.x, low, center.z + b.y), new Vector3(center.x + b.x, high, center.z + b.y),
                     new Vector3(center.x + a.x, high, center.z + a.y), normal);
             }
         }
 
-        private static void AddFace(List<Vector3> vertices, List<Vector3> normals, List<int> triangles,
+        private static void AddFace(List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs, List<int> triangles,
                                     Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 normal)
         {
             var first = vertices.Count;
@@ -293,6 +664,10 @@ namespace Chog.Screens
             normals.Add(normal);
             normals.Add(normal);
             normals.Add(normal);
+            uvs.Add(new Vector2(0f, 0f));
+            uvs.Add(new Vector2(1f, 0f));
+            uvs.Add(new Vector2(1f, 1f));
+            uvs.Add(new Vector2(0f, 1f));
             triangles.Add(first);
             triangles.Add(first + 1);
             triangles.Add(first + 2);

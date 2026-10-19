@@ -73,7 +73,7 @@ Shader "Chog/Arena"
                 o.light = lerp(_ChogArenaShade.rgb, half3(1, 1, 1), light) * _ChogArenaRamp.z;
                 float3 world = mul(unity_ObjectToWorld, v.vertex).xyz;
                 o.foot = float2(world.y, 1 - abs(normal.y));
-                o.groundUv = world.xz * 0.1;
+                o.groundUv = world.xz * 0.055;
                 TRANSFER_SHADOW(o);
                 return o;
             }
@@ -81,7 +81,8 @@ Shader "Chog/Arena"
             fixed4 frag(v2f i) : SV_Target
             {
                 fixed3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;
-                albedo *= lerp(fixed3(1, 1, 1), tex2D(_ChogFloorTex, i.groundUv).rgb, _ChogFloorPattern);
+                fixed3 floor = tex2D(_ChogFloorTex, i.groundUv).rgb;
+                albedo = lerp(albedo, floor, _ChogFloorPattern);
                 half shadow = SHADOW_ATTENUATION(i);
                 half3 key = _ChogKey.a > 0.5 ? _ChogKey.rgb : half3(1, 1, 1);
                 half3 light = i.light * lerp(_ChogArenaShadow.rgb, key, shadow);

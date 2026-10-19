@@ -1,6 +1,12 @@
 # État courant et décisions
 
-**19 October 2026, 11:55 UTC (local visual production slice, not deployed or approved).**
+**19 October 2026, 17:00 UTC (corrected visual build, pending public review).**
+- **Implemented locally after the owner's correction:** the home hero moved into the left focal column, the original stage tile was kept, and the duplicate `SEE EVERY HERO` action was removed. In the arena, the 198 visible sample interior-floor renderers are replaced by one painted berry-slab surface, so the old brick pattern no longer shows through. The 86 sample crates retain their gameplay geometry and now have painted pink visual tops. The near `CenterWall` has a two-course stone face and separate caps instead of a flat dark band. These changes are cosmetic; no Photon map, collision, trigger, cover point, spawn or simulation asset changed.
+- **Verified locally:** WebGL build `20261019T170012093Z-1832effe278c49ac8ea39f8d65e834bb` succeeded with 0 errors and the unchanged simulation stamp `f4a81f1ddbd919b6`. A desktop and a touch-emulated bot match both reached gameplay without a JavaScript exception; the corrected floor, blocks and near wall were visible in the running matches. View tests: 155 passed, 0 failed. Screen typecheck: 0 errors. Service tests: 80 passed outside the sandbox, which blocks their temporary localhost listener. No physical-phone, real-wallet or performance check was made.
+- **Still open:** the exact approved Chog-head marks are absent from the arena floor; no substitute contour was invented. The connected Genesis card, far-end wall, bushes and physical phone still need visual review. This is a candidate for owner review on the live site, not a claim that every element matches the board. The earlier accepted Skull and Radioactive work does not close the astronaut, cap-spike or eyes/mouths hero tasks.
+**Next action:** assemble and deploy this checked WebGL build with its judge, verify the public build identity, then wait for the owner's live visual review before changing the composition again.
+
+**19 October 2026, 11:55 UTC (earlier local visual production slice).**
 - The owner rejected the gap between the approved menu/arena comparison sheets and the previous public build.
   The current task is a measured translation of those sheets into the actual Unity menu and the Photon sample
   map. [The production map and direct visual comparisons](../research/evidence/chog-visual-production-2026-10-19.md)
@@ -19,10 +25,19 @@
   preparation into gameplay; the only browser console error was Chrome's known non-cancelable touchstart warning.
   There has been no physical-phone test, real wallet check or performance measurement for these new bitmaps and
   batched cover mesh. The public site still serves the old build.
-**Next action:** get the owner's judgement on the actual local screenshots, then tune the card and stage
-silhouette, floor scale and cover surface before approaching bushes and walls. Capture a connected Genesis state,
-a clean match view and a physical phone before considering release. The Skull/Radioactive corrections accepted
-earlier do not close the astronaut, cap-spike or eyes/mouths hero tasks.
+- **Owner feedback received:** the home hero is too far right; the existing stage tile is already sufficient and
+  must not receive further platform or stamp work; `SEE EVERY HERO` duplicates the rail. In the arena, the floor
+  visibly combines the sample brick language with the new slab language, the exact Chog marks are absent, and the
+  lower boundary wall reads as broken.
+  The renderer and composition diagnosis is recorded in
+  [the visual runtime contract](../research/evidence/chog-visual-runtime-contract-2026-10-19.md). The floor issue
+  is specifically a shader multiplying the original `WoodDark` albedo by the slab texture. The lower band is the
+  sample's lower `CenterWall`, painted through shared material roles and global foot shading.
+**Next action at that point:** map the live renderers to ground, wall-top, wall-face, edge, cover, bush, objective and HUD
+roles. Then replace the home and arena presentation as complete systems against the approved boards, beginning with
+the home composition and the single ground material family, not isolated UI or palette changes. Capture each
+result beside the matching board before review. The Skull/Radioactive corrections accepted earlier do not close the
+astronaut, cap-spike or eyes/mouths hero tasks.
 
 **18 October 2026, 20:37 (the home direction made real, deployed `20261018T202454468Z`, same simulation stamp).**
 - **Implemented in the game, not only on boards:** the home now gives the Genesis stage more room, puts the
