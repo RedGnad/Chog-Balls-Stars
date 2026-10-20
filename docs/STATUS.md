@@ -1,5 +1,12 @@
 # État courant et décisions
 
+**20 October 2026, 13:04 UTC (shared button hover feedback deployed).**
+- **Implemented:** every screen button styled by `ChogTheme` now responds to a desktop hover. It brightens slightly, rises 3 canvas units, grows by 2.5 percent and enables its existing hard shadow. Leaving restores the exact original position and scale. The feedback is one shared component, so landing, lobby, hero, result and settings buttons use the same interaction language without new decorative stripes. No map or simulation files changed.
+- **Verified locally:** WebGL build `20261020T125246678Z-c7f2c120e4544dc6a95a8aa3fa1ff278` succeeded with unchanged simulation stamp `f4a81f1ddbd919b6`. [The PLAY hover capture](../research/evidence/chog-button-hover-2026-10-20.png) shows the raised surface. The local client entered a bot match without exception. Screen typecheck: 0 errors. View tests: 155 passed, 0 failed. The assembled judge replayed two recorded matches and agreed with both announced winners.
+- **Deployed and checked:** commit `bed1070` is pushed to `main`. Vercel reports the production alias ready and the public page serves version `20261020T125246678Z`. Render's Photon endpoint reports the same build. No public `PLAY` was pressed.
+- **Still open:** this was verified with a desktop pointer. Touch controls retain their current press state and were not physically tested.
+**Next action:** owner reviews the live hover feel before another UI change.
+
 **20 October 2026, 12:41 UTC (Chog head mark safe area deployed).**
 - **Implemented:** the supplied Chog head mark is now scaled into a fixed safe area before its ink contour is added. Its full silhouette and outline fit inside both the player portrait and the HEROES rail tile, instead of being clipped at their edges. No map or simulation files changed.
 - **Verified locally:** WebGL build `20261020T123019054Z-d41546da025947e9aec68fa06e0d7b70` succeeded with unchanged simulation stamp `f4a81f1ddbd919b6`. The profile and rail both show the complete mark in this [desktop capture](../research/evidence/chog-head-mark-safe-area-2026-10-20.png). The local client entered a bot match without exception. Screen typecheck: 0 errors. View tests: 155 passed, 0 failed. The assembled judge replayed two recorded matches and agreed with both announced winners.
