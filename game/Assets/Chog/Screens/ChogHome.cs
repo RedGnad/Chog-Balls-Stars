@@ -70,8 +70,8 @@ namespace Chog.Screens
         private GameObject _levelBadge;
         private TextMeshProUGUI _level;
         private TextMeshProUGUI _playerName;
-        private RectTransform _masteryBar;
-        private TextMeshProUGUI _masteryText;
+        private Image _roleBadge;
+        private TextMeshProUGUI _roleText;
 
         private Button _wallet;
         private Image _walletDot;
@@ -167,7 +167,7 @@ namespace Chog.Screens
             }
         }
 
-        // The player's chip: the Genesis played (or the recruit) with its mastery, and the player's name.
+        // The player's chip: the Genesis played (or the recruit), its level, role and player's name.
         private void BuildChip()
         {
             var chip = ChogUi.PinnedButton("Chip", transform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(Margin, -24f), ChipSize,
@@ -192,9 +192,9 @@ namespace Chog.Screens
 
             _playerName = ChogUi.Title("Name", chip.transform, new Vector2(0.285f, 0.50f), new Vector2(0.96f, 0.92f), 34f, TextAlignmentOptions.Left);
             _playerName.textWrappingMode = TextWrappingModes.NoWrap;
-            _masteryBar = ChogUi.Bar("Mastery", chip.transform, new Vector2(0.285f, 0.18f), new Vector2(0.74f, 0.38f), ChogTheme.Confirm);
-            _masteryText = ChogUi.Number("Points", chip.transform, new Vector2(0.75f, 0.10f), new Vector2(0.97f, 0.46f), 24f,
-                TextAlignmentOptions.Left, Color.white, false);
+            _roleBadge = ChogUi.Plate("Role", chip.transform, new Vector2(0.285f, 0.10f), new Vector2(0.80f, 0.43f), ChogTheme.Action, 10);
+            _roleText = ChogUi.Title("Words", _roleBadge.transform, new Vector2(0.06f, 0.04f), new Vector2(0.94f, 0.92f), 22f);
+            _roleText.textWrappingMode = TextWrappingModes.NoWrap;
         }
 
         // The $CHOG held, the wallet, the settings, from the top right corner.
@@ -375,26 +375,18 @@ namespace Chog.Screens
                     ChogReveal.ShowOnce(_main.transform, token);
             }
 
-            // The chip: the picture of the Genesis played and its mastery; the recruit has neither.
+            // The chip: the Genesis picture and level, with the role readable in a gold badge.
             ShowPortrait(metadata);
             _levelBadge.SetActive(token > 0);
-            _masteryBar.gameObject.SetActive(token > 0);
             if (token > 0 && GenesisCareers.TryGet(token, out var career) && career.mastery != null)
             {
                 var mastery = career.mastery;
                 _level.text = mastery.level.ToString(CultureInfo.InvariantCulture);
-                var previous = mastery.level >= 2 && mastery.level - 2 < MasteryRoad.Steps.Length ? MasteryRoad.Steps[mastery.level - 2] : 0;
-                ChogUi.SetBar(_masteryBar, mastery.next > previous ? (mastery.points - previous) / (float)(mastery.next - previous) : 1f);
-                _masteryText.text = mastery.next > 0 ? mastery.points + "/" + mastery.next : "MAX";
             }
             else
             {
                 _level.text = "1";
-                ChogUi.SetBar(_masteryBar, 0f);
-                _masteryText.text = token > 0 ? "" : "RECRUIT";
             }
-            var masteryArea = _masteryText.rectTransform;
-            masteryArea.anchorMin = new Vector2(token > 0 ? 0.75f : 0.285f, 0.10f);
 
             // The wallet: its address once connected, otherwise what a tap does.
             var ready = PlayerWallet.State == WalletState.Ready;
@@ -417,11 +409,13 @@ namespace Chog.Screens
                 _ribbonName.text = GenesisHeroCard.DisplayName(hero).ToUpperInvariant();
                 // The kit in four words: the class, the special, the effect, the delivery (the sheet says more).
                 var lines = _roster.CardLines(hero, GenesisForms.PlayedBy(token));
+                _roleText.text = (lines[0].Gives ?? "GENESIS").ToUpperInvariant();
                 ShowChips(lines[0].Gives, lines[1].Gives, lines[2].Gives, lines[3].Gives);
             }
             else
             {
                 _ribbonName.text = "RECRUIT";
+                _roleText.text = "RECRUIT";
                 ShowChips("NO GENESIS", (100 - Quantum.Recruit.HealthPercent) + "% LESS HEALTH", "NO GENESIS ATTACK");
             }
         }
