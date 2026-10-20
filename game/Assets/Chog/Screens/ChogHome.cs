@@ -291,8 +291,8 @@ namespace Chog.Screens
             tap.color = Color.clear;
             area.gameObject.AddComponent<Button>().onClick.AddListener(OpenHeroes);
 
-            // A passive nameplate identifies the selected hero without competing with the gold PLAY action.
-            var ribbon = ChogUi.Plate("Ribbon", transform, RibbonMin, RibbonMax, ChogTheme.Quiet, 12);
+            // The selected hero or recruit gets the same gold role badge language as the player chip.
+            var ribbon = ChogUi.Plate("Ribbon", transform, RibbonMin, RibbonMax, ChogTheme.Action, 12);
             _ribbonName = ChogUi.Title("Name", ribbon.transform, new Vector2(0.05f, 0.1f), new Vector2(0.95f, 0.94f), 36f);
             _ribbonName.textWrappingMode = TextWrappingModes.NoWrap;
 
