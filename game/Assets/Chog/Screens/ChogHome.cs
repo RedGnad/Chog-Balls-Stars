@@ -31,10 +31,11 @@ namespace Chog.Screens
         private static readonly Vector2 SettingsSize = new Vector2(92f, 92f);
         private static readonly Vector2 WalletSize = new Vector2(286f, 78f);
         private static readonly Vector2 ChogSize = new Vector2(198f, 68f);
-        private static readonly Vector2 RailGridSize = new Vector2(164f, 684f);
+        // The rail uses the otherwise empty column down to the kit chips, not only the top third.
+        private static readonly Vector2 RailGridSize = new Vector2(164f, 832f);
         private const float RailTop = 152f;
-        private const float RailItemHeight = 132f;
-        private const float RailSpacing = 6f;
+        private const float RailItemHeight = 160f;
+        private const float RailSpacing = 8f;
 
         // In shares of the screen: the hero owns the left focal column, the Genesis card owns the right.
         private static readonly Vector2 StageMin = new Vector2(0.10f, 0.18f);

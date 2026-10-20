@@ -69,11 +69,13 @@ namespace Chog.Match
             {
                 var u = Mathf.Lerp(inset, 1f - inset, (x + 0.5f) / size);
                 var v = Mathf.Lerp(inset, 1f - inset, (y + 0.5f) / size);
-                mask[y * size + x] = source.GetPixelBilinear(u, v).a;
+                // A hard source mask lets the final bilinear sprite carry the same clean ink edge as the
+                // procedural icons. Keeping the source antialiasing here made a fuzzy, unmatched contour.
+                mask[y * size + x] = source.GetPixelBilinear(u, v).a >= 0.5f ? 1f : 0f;
             }
 
             var pixels = new Color32[size * size];
-            const int outline = 4;
+            const int outline = 7;
             for (var y = 0; y < size; y++)
             for (var x = 0; x < size; x++)
             {
@@ -90,9 +92,9 @@ namespace Chog.Match
                     if (nx >= 0 && nx < size && ny >= 0 && ny < size)
                         outer = Mathf.Max(outer, mask[ny * size + nx]);
                 }
-                pixels[at] = inner > 0.08f
-                    ? new Color32(255, 255, 255, (byte)Mathf.RoundToInt(inner * 255f))
-                    : new Color32(Ink.r, Ink.g, Ink.b, (byte)Mathf.RoundToInt(outer * 255f));
+                pixels[at] = inner > 0.5f
+                    ? new Color32(255, 255, 255, 255)
+                    : new Color32(Ink.r, Ink.g, Ink.b, outer > 0.5f ? (byte)255 : (byte)0);
             }
 
             var texture = new Texture2D(size, size, TextureFormat.RGBA32, false)

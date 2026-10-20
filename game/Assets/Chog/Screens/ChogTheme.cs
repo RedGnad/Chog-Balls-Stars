@@ -204,10 +204,37 @@ namespace Chog.Screens
             if (image == null)
                 return;
             var fill = Fill(kind);
-            image.sprite = ChogSprites.Chunky(fill, Color.Lerp(fill, Ink, 0.28f), 18, 3, 8);
+            var face = image.rectTransform;
+            var baseName = button.name + "ReliefBase";
+            var baseTransform = face.parent.Find(baseName) as RectTransform;
+            if (baseTransform == null)
+            {
+                baseTransform = new GameObject(baseName, typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
+                baseTransform.SetParent(face.parent, false);
+            }
+            CopyRect(face, baseTransform, 12f);
+            baseTransform.SetSiblingIndex(face.GetSiblingIndex());
+            var baseImage = baseTransform.GetComponent<Image>();
+            baseImage.sprite = ChogSprites.Rounded(18, 3, Ink);
+            baseImage.type = Image.Type.Sliced;
+            baseImage.pixelsPerUnitMultiplier = ButtonScale;
+            baseImage.color = Color.Lerp(fill, Ink, 0.36f);
+            baseImage.raycastTarget = false;
+
+            image.sprite = ChogSprites.Rounded(18, 3, Ink);
             image.type = Image.Type.Sliced;
             image.pixelsPerUnitMultiplier = ButtonScale;
-            image.color = Color.white;
+            image.color = fill;
+        }
+
+        // Copy the face exactly, then put the darker block down far enough for a true ingot silhouette.
+        private static void CopyRect(RectTransform from, RectTransform to, float lowerBy)
+        {
+            to.anchorMin = from.anchorMin;
+            to.anchorMax = from.anchorMax;
+            to.pivot = from.pivot;
+            to.offsetMin = from.offsetMin + Vector2.down * lowerBy;
+            to.offsetMax = from.offsetMax + Vector2.down * lowerBy;
         }
 
         // Standard controls remain flat. Relief is limited to the two home actions so it retains meaning.

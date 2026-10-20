@@ -156,7 +156,8 @@ namespace Chog.Screens
         public static Image Icon(string name, Transform parent, ChogIcons.Icon icon, Vector2 min, Vector2 max)
         {
             var image = Area(name, parent, min, max).gameObject.AddComponent<Image>();
-            image.sprite = ChogIcons.Get(icon);
+            // The Chog mark has a real collection-derived outline and is rasterised at double resolution.
+            image.sprite = ChogIcons.Get(icon, icon == ChogIcons.Icon.Heroes ? 256 : 128);
             image.preserveAspect = true;
             image.raycastTarget = false;
             return image;
