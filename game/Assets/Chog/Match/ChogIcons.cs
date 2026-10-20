@@ -63,15 +63,18 @@ namespace Chog.Match
         private static Texture2D OutlinedHeadMark(Texture2D source, int size)
         {
             var mask = new float[size * size];
-            const float inset = 0.035f;
+            // The 13 px contour is added outside the supplied silhouette. Scale the entire source
+            // into a true safe area, so neither its leaf tips nor the ink can be clipped by a tile.
+            const float inset = 0.12f;
+            const float sourceSpan = 1f - inset * 2f;
             for (var y = 0; y < size; y++)
             for (var x = 0; x < size; x++)
             {
-                var u = Mathf.Lerp(inset, 1f - inset, (x + 0.5f) / size);
-                var v = Mathf.Lerp(inset, 1f - inset, (y + 0.5f) / size);
+                var u = ((x + 0.5f) / size - inset) / sourceSpan;
+                var v = ((y + 0.5f) / size - inset) / sourceSpan;
                 // A hard source mask lets the final bilinear sprite carry the same clean ink edge as the
                 // procedural icons. Keeping the source antialiasing here made a fuzzy, unmatched contour.
-                mask[y * size + x] = source.GetPixelBilinear(u, v).a >= 0.5f ? 1f : 0f;
+                mask[y * size + x] = u >= 0f && u <= 1f && v >= 0f && v <= 1f && source.GetPixelBilinear(u, v).a >= 0.5f ? 1f : 0f;
             }
 
             var pixels = new Color32[size * size];
