@@ -195,8 +195,9 @@ namespace Chog.Screens
         }
 
         /// <summary>
-        /// The two primary home actions are raised like small ingots: a lit face, a darker lower edge and
-        /// one contour in the same sprite. It is deliberately reserved for the mode picker and PLAY.
+        /// The two primary home actions are raised like the approved menu buttons: one continuous silhouette,
+        /// with its coloured face and lower side painted inside the same outer contour. It is deliberately
+        /// reserved for the mode picker and PLAY.
         /// </summary>
         public static void PaintRelief(Button button, ButtonKind kind)
         {
@@ -204,37 +205,15 @@ namespace Chog.Screens
             if (image == null)
                 return;
             var fill = Fill(kind);
-            var face = image.rectTransform;
             var baseName = button.name + "ReliefBase";
-            var baseTransform = face.parent.Find(baseName) as RectTransform;
-            if (baseTransform == null)
-            {
-                baseTransform = new GameObject(baseName, typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
-                baseTransform.SetParent(face.parent, false);
-            }
-            CopyRect(face, baseTransform, 12f);
-            baseTransform.SetSiblingIndex(face.GetSiblingIndex());
-            var baseImage = baseTransform.GetComponent<Image>();
-            baseImage.sprite = ChogSprites.Rounded(18, 3, Ink);
-            baseImage.type = Image.Type.Sliced;
-            baseImage.pixelsPerUnitMultiplier = ButtonScale;
-            baseImage.color = Color.Lerp(fill, Ink, 0.36f);
-            baseImage.raycastTarget = false;
+            var oldBase = image.rectTransform.parent.Find(baseName);
+            if (oldBase != null)
+                Object.Destroy(oldBase.gameObject);
 
-            image.sprite = ChogSprites.Rounded(18, 3, Ink);
+            image.sprite = ChogSprites.Chunky(fill, Color.Lerp(fill, Ink, 0.28f), 18, 3, 10);
             image.type = Image.Type.Sliced;
             image.pixelsPerUnitMultiplier = ButtonScale;
-            image.color = fill;
-        }
-
-        // Copy the face exactly, then put the darker block down far enough for a true ingot silhouette.
-        private static void CopyRect(RectTransform from, RectTransform to, float lowerBy)
-        {
-            to.anchorMin = from.anchorMin;
-            to.anchorMax = from.anchorMax;
-            to.pivot = from.pivot;
-            to.offsetMin = from.offsetMin + Vector2.down * lowerBy;
-            to.offsetMax = from.offsetMax + Vector2.down * lowerBy;
+            image.color = Color.white;
         }
 
         // Standard controls remain flat. Relief is limited to the two home actions so it retains meaning.
