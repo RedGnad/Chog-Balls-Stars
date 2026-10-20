@@ -27,22 +27,22 @@ namespace Chog.Screens
 
         // In units of the menu canvas (1920 by 1080 at 16:9), from the corners.
         private const float Margin = 30f;
-        private static readonly Vector2 ChipSize = new Vector2(340f, 92f);
-        private static readonly Vector2 SettingsSize = new Vector2(76f, 76f);
-        private static readonly Vector2 WalletSize = new Vector2(266f, 68f);
+        private static readonly Vector2 ChipSize = new Vector2(390f, 104f);
+        private static readonly Vector2 SettingsSize = new Vector2(92f, 92f);
+        private static readonly Vector2 WalletSize = new Vector2(286f, 78f);
         private static readonly Vector2 ChogSize = new Vector2(198f, 68f);
-        private static readonly Vector2 RailButton = new Vector2(88f, 82f);
-        private const float RailTop = 154f;
-        private const float RailStep = 122f;
+        private static readonly Vector2 RailButton = new Vector2(114f, 100f);
+        private const float RailTop = 156f;
+        private const float RailStep = 136f;
 
         // In shares of the screen: the hero owns the left focal column, the Genesis card owns the right.
         private static readonly Vector2 StageMin = new Vector2(0.10f, 0.18f);
         private static readonly Vector2 StageMax = new Vector2(0.51f, 0.86f);
-        private static readonly Vector2 RibbonMin = new Vector2(0.17f, 0.115f);
-        private static readonly Vector2 RibbonMax = new Vector2(0.46f, 0.180f);
+        private static readonly Vector2 RibbonMin = new Vector2(0.20f, 0.122f);
+        private static readonly Vector2 RibbonMax = new Vector2(0.42f, 0.168f);
         private static readonly Vector2 ChipsMin = new Vector2(0.10f, 0.035f);
         private static readonly Vector2 ChipsMax = new Vector2(0.53f, 0.095f);
-        private static readonly Vector2 PlayMin = new Vector2(0.77f, 0.115f);
+        private static readonly Vector2 PlayMin = new Vector2(0.75f, 0.115f);
         private static readonly Vector2 PlayMax = new Vector2(0.98f, 0.278f);
         private static readonly Vector2 HintMin = new Vector2(0.77f, 0.06f);
         private static readonly Vector2 HintMax = new Vector2(0.98f, 0.105f);
@@ -197,11 +197,13 @@ namespace Chog.Screens
         {
             var settings = ChogUi.PinnedButton("Settings", transform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-Margin, -26f),
                 SettingsSize, ChogTheme.ButtonKind.Quiet, "", 30f, ChogIcons.Icon.Gear);
+            ChogTheme.Paint(settings, ChogTheme.ButtonKind.Quiet);
             settings.onClick.AddListener(() => ChogSettings.Open(_main.transform));
 
             var walletRight = -Margin - SettingsSize.x - 14f;
             _wallet = ChogUi.PinnedButton("Wallet", transform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(walletRight, -29f),
                 WalletSize, ChogTheme.ButtonKind.Quiet, "", 30f);
+            ChogTheme.Paint(_wallet, ChogTheme.ButtonKind.Quiet);
             _wallet.onClick.AddListener(() =>
             {
                 if (PlayerWallet.State != WalletState.Ready)
@@ -219,6 +221,7 @@ namespace Chog.Screens
             var chogRight = walletRight - WalletSize.x - 14f;
             var chog = ChogUi.PinnedButton("Chog", transform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(chogRight, -29f), ChogSize,
                 ChogTheme.ButtonKind.Quiet, "", 30f);
+            ChogTheme.Paint(chog, ChogTheme.ButtonKind.Quiet);
             chog.onClick.AddListener(WalletPanel.OpenRentals);
             var coin = ChogUi.Pinned("Coin", chog.transform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(10f, 2f), new Vector2(52f, 52f));
             ChogUi.Plate("Plate", coin, Vector2.zero, Vector2.one, ChogTheme.Cheek, 26);
@@ -234,8 +237,7 @@ namespace Chog.Screens
             Rail(0, "HEROES", ChogTheme.ButtonKind.Secondary, ChogIcons.Icon.Heroes, () => ChogCollection.Open(_main.transform));
             Rail(1, "TOP", ChogTheme.ButtonKind.Primary, ChogIcons.Icon.Trophy, () => ChogHall.Open(_main.transform));
             Rail(2, "RENT", ChogTheme.ButtonKind.Chog, ChogIcons.Icon.Key, WalletPanel.OpenRentals);
-            var friends = Rail(3, "FRIENDS", ChogTheme.ButtonKind.Secondary, ChogIcons.Icon.Friends, () => Call("OnPartyButtonPressed"));
-            ChogTheme.ImageOf(friends).color = ChogTheme.Ally;
+            Rail(3, "FRIENDS", ChogTheme.ButtonKind.Secondary, ChogIcons.Icon.Friends, () => Call("OnPartyButtonPressed"));
             Rail(4, "GUIDE", ChogTheme.ButtonKind.Quiet, ChogIcons.Icon.Question, () => ChogGuide.Open(_main.transform));
         }
 
@@ -244,10 +246,11 @@ namespace Chog.Screens
             var y = -RailTop - position * RailStep;
             var button = ChogUi.PinnedButton("Rail" + label, transform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(Margin + 4f, y),
                 RailButton, kind, "", 30f, icon);
+            ChogTheme.Paint(button, kind);
             button.onClick.AddListener(tapped);
             var words = ChogUi.Pinned("Label" + label, transform, new Vector2(0f, 1f), new Vector2(0.5f, 1f),
-                new Vector2(Margin + 4f + RailButton.x * 0.5f, y - RailButton.y - 5f), new Vector2(130f, 30f));
-            ChogUi.Title("Text", words, Vector2.zero, Vector2.one, 21f).text = label;
+                new Vector2(Margin + 4f + RailButton.x * 0.5f, y - RailButton.y - 4f), new Vector2(150f, 34f));
+            ChogUi.Title("Text", words, Vector2.zero, Vector2.one, 24f).text = label;
             return button;
         }
 
@@ -271,8 +274,9 @@ namespace Chog.Screens
             tap.color = Color.clear;
             area.gameObject.AddComponent<Button>().onClick.AddListener(OpenHeroes);
 
-            var ribbon = ChogUi.Plate("Ribbon", transform, RibbonMin, RibbonMax, ChogTheme.Action, 12);
-            _ribbonName = ChogUi.Title("Name", ribbon.transform, new Vector2(0.05f, 0.1f), new Vector2(0.95f, 0.94f), 54f);
+            // A passive nameplate identifies the selected hero without competing with the gold PLAY action.
+            var ribbon = ChogUi.Plate("Ribbon", transform, RibbonMin, RibbonMax, ChogTheme.Quiet, 12);
+            _ribbonName = ChogUi.Title("Name", ribbon.transform, new Vector2(0.05f, 0.1f), new Vector2(0.95f, 0.94f), 36f);
             _ribbonName.textWrappingMode = TextWrappingModes.NoWrap;
 
             var chips = ChogUi.Row("Chips", transform, ChipsMin, ChipsMax, 12f);
@@ -302,6 +306,7 @@ namespace Chog.Screens
                     element.ignoreLayout = true;
                 ChogUi.Stretch((RectTransform)play.transform, PlayMin, PlayMax);
                 ChogTheme.Style(play, ChogTheme.ButtonKind.Primary);
+                ChogTheme.Paint(play, ChogTheme.ButtonKind.Primary);
                 var label = play.GetComponentInChildren<TMP_Text>(true);
                 if (label != null)
                 {

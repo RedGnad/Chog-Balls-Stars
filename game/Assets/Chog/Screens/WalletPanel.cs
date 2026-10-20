@@ -40,11 +40,6 @@ namespace Chog.Screens
         private static readonly Vector2 ConnectBesideOtherMax = new Vector2(0.47f, 0.18f);
         private static readonly Vector2 ConnectBesideOtherMin = new Vector2(0.05f, 0.035f);
 
-        // A wallet without a Genesis may both rent one and sign in to stake: the two side by side.
-        private static readonly Vector2 MarketBesideSignInMin = new Vector2(0.05f, 0.035f);
-        private static readonly Vector2 MarketBesideSignInMax = new Vector2(0.47f, 0.18f);
-        private static readonly Vector2 SignInBesideMarketMin = new Vector2(0.53f, 0.035f);
-        private static readonly Vector2 SignInBesideMarketMax = new Vector2(0.95f, 0.18f);
         private static readonly Vector2 WideMin = new Vector2(0.05f, 0.035f);
         private static readonly Vector2 WideMax = new Vector2(0.95f, 0.18f);
 
@@ -480,10 +475,9 @@ namespace Chog.Screens
             var connectArea = (RectTransform)_connect.transform;
             connectArea.anchorMin = other ? ConnectBesideOtherMin : ConnectMin;
             connectArea.anchorMax = other ? ConnectBesideOtherMax : ConnectMax;
-            // A connected wallet without a Genesis to play can rent one that is offered.
-            var canRent = state == WalletState.Ready && GenesisRental.State == RentalState.Open && !checkingPass;
-            var large = canRent && !holds && !guest;
-            _market.gameObject.SetActive(large);
+            // The RENT rail is the one collection route. The home card reports the account state;
+            // it never duplicates that route with another large rental call to action.
+            _market.gameObject.SetActive(false);
             var marketArea = (RectTransform)_market.transform;
 
             // A new choice opens its page; turning pages by hand is otherwise left alone.
@@ -537,11 +531,10 @@ namespace Chog.Screens
                 : tokens.Length > 1 ? (pages > 1 ? (_page + 1) + " / " + pages + "   " : "") + "tap one to play it"
                 : "";
 
-            // Signed in, the career of the Genesis is recorded; a wallet without a Genesis signs in
-            // where matches are staked on, to stake as a recruit.
+            // A signature records the career of a Genesis. It is not presented to a recruit as a
+            // second primary task and staking stays an opt-in match feature.
             var signedIn = PlayerWallet.SignIn == SignInState.SignedIn;
-            var signsInToStake = !holds && !guest && !checkingPass && state == WalletState.Ready && GenesisWager.State == WagerState.Open;
-            _signIn.gameObject.SetActive((holds || signsInToStake) && !signedIn);
+            _signIn.gameObject.SetActive(holds && !signedIn);
             var signInArea = (RectTransform)_signIn.transform;
             if (holds)
             {
@@ -554,11 +547,10 @@ namespace Chog.Screens
             else
             {
                 _signIn.transform.SetParent(transform, false);
-                var besideMarket = large && signsInToStake && !signedIn;
-                signInArea.anchorMin = besideMarket ? SignInBesideMarketMin : WideMin;
-                signInArea.anchorMax = besideMarket ? SignInBesideMarketMax : WideMax;
-                marketArea.anchorMin = besideMarket ? MarketBesideSignInMin : WideMin;
-                marketArea.anchorMax = besideMarket ? MarketBesideSignInMax : WideMax;
+                signInArea.anchorMin = WideMin;
+                signInArea.anchorMax = WideMax;
+                marketArea.anchorMin = WideMin;
+                marketArea.anchorMax = WideMax;
                 _rosterInfo.gameObject.SetActive(true);
             }
             signInArea.offsetMin = Vector2.zero;
@@ -567,7 +559,15 @@ namespace Chog.Screens
             _signInLabel.text = PlayerWallet.SignIn == SignInState.Asking ? "ANSWER IN YOUR WALLET..."
                 : PlayerWallet.SignInProblem.Length > 0 ? "SIGN-IN FAILED, TRY AGAIN"
                 : holds ? (PhotonIdentity.SignInNeededToPlay ? "SIGN IN TO PLAY IT" : "SIGN IN TO RECORD ITS CAREER")
-                : "SIGN IN TO STAKE " + GenesisWager.Currency;
+                : "";
+            if (_poster != null && _poster.gameObject.activeSelf)
+            {
+                // When no wallet action is available, the poster fills the reserved footer instead of
+                // leaving a floating card above the mode and PLAY group.
+                var footer = _connect.gameObject.activeSelf || _otherApp.gameObject.activeSelf ||
+                    _market.gameObject.activeSelf || _signIn.gameObject.activeSelf;
+                _poster.anchorMin = new Vector2(0.01f, footer ? 0.18f : 0.01f);
+            }
             // The signature is asked by itself whenever this wallet has a Genesis to play (held or
             // rented) and no session: right after connecting, after a rental, after a switch of
             // account. Once per address in a visit, so a player who closes the wallet is not asked again.
@@ -682,7 +682,7 @@ namespace Chog.Screens
                 case WalletState.Failed:
                     return PlayerWallet.Problem;
                 default:
-                    return "This wallet holds no Chog Genesis." + (GenesisRental.State == RentalState.Open ? " Rent one to enter." : "");
+                    return "This wallet holds no Chog Genesis." + (GenesisRental.State == RentalState.Open ? " Browse RENT in the left menu to play one." : "");
             }
         }
 
@@ -796,6 +796,8 @@ namespace Chog.Screens
             button.targetGraphic = background;
             label = Text("Label", new Vector2(0.04f, 0.1f), new Vector2(0.96f, 0.9f), TextAlignmentOptions.Center, ButtonTextColor, 52f, area);
             ChogTheme.Style(button, kind);
+            if (parent == null)
+                ChogTheme.Paint(button, kind);
             return button;
         }
 

@@ -55,6 +55,13 @@ namespace Chog.Screens
             if (GenesisWager.State != WagerState.Open || screen.Find(ObjectName) != null)
                 return;
 
+            // Wagering is opt-in. A player who has not signed in and is not in a wager should see a
+            // clean preparation screen, rather than a second unexplained task beside starting a match.
+            var involved = PlayerWallet.SignIn == SignInState.SignedIn || GenesisWager.Stakers.Count > 0 ||
+                GenesisWager.StakeWei.Length > 0 || GenesisWager.IsBusy;
+            if (!involved)
+                return;
+
             var panel = new GameObject(ObjectName, typeof(RectTransform), typeof(Image));
             panel.transform.SetParent(screen, false);
             panel.AddComponent<WagerPanel>().Build(template);

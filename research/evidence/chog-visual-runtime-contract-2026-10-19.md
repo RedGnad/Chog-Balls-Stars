@@ -39,6 +39,14 @@ The arena board has a single ground language: painted berry slabs. It does not c
 
 The missing Chog marks have a direct cause: `ArenaFloorSlabs.png` was created without a logo and there is no decal or floor-mark placement system. No substitute mark should be invented. The marks will be implemented only after extracting the exact supplied Chog head contour into a source asset. They will be placed at named, mirrored gameplay-safe ground coordinates, not scattered decoratively.
 
+## 20 October priority update
+
+The owner deferred further arena and ground work. In particular, the new monochrome Chog head mark is a menu and profile mark only, not an arena-floor decal. The current slice therefore makes no terrain, wall, platform or floor-material change.
+
+The active home and preparation rules for the `20261020T052754932Z` candidate are visible in [the connected empty-wallet capture](chog-home-connected-empty-runtime-2026-10-20.png) and [the recruit preparation capture](chog-recruit-lobby-runtime-2026-10-20.png). A connected wallet with no Genesis is told to use the `RENT` rail. It does not receive a duplicate rent call to action or a generic staking task. The profile and HEROES rail use the supplied Chog head's outer silhouette as one monochrome mark. Buttons use one face, one contour and one darker lower lip. The preparation view hides the Photon sample classes and shows the local player as `RECRUIT`.
+
+This is a running WebGL check using a throwaway empty address. It is not a real-wallet or physical-phone result. The match music playlist also now contains the Chog loop and retained Photon sample loop; one clip is selected for a whole match, but headless capture does not audition sound.
+
 ## Remaining implementation sequence after owner review
 
 1. Build a renderer and material role map in the running `Gameplay` scene. It will list ground, wall top, wall face, edge, cover, bush, objectives and HUD separately. This verifies the source hierarchy against the board and prevents one shared material from painting unrelated surfaces.

@@ -9,8 +9,8 @@ namespace Chog.Screens
     /// <summary>
     /// Dresses the screens of the arena scene in the game's look (ChogTheme), as ChogMenuSkin does the
     /// menu: the team preparation (its background, title, team names, slots and buttons) and the texts
-    /// of the match. Buttons keep their colours where a colour means something (the colour of each
-    /// class); they become pills with a hard shadow and Koulen letters. Behaviour is not touched.
+    /// of the match. Each action has one coloured face, one contour and one lower lip. The sample
+    /// class picker is hidden because Genesis or the single recruit resolves the role. Behaviour is not touched.
     /// </summary>
     public static class ChogGameSkin
     {
@@ -81,24 +81,34 @@ namespace Chog.Screens
                 {
                     case "StartButton":
                         ChogTheme.Style(button, ChogTheme.ButtonKind.Primary);
+                        ChogTheme.Paint(button, ChogTheme.ButtonKind.Primary);
                         // The host's clock starts the match by itself (LobbyCountdown); this starts it now.
                         foreach (var label in button.GetComponentsInChildren<TMP_Text>(true))
                             label.text = "START NOW";
                         break;
                     case "ChangeTeamButton":
                         ChogTheme.Style(button, ChogTheme.ButtonKind.Quiet);
+                        ChogTheme.Paint(button, ChogTheme.ButtonKind.Quiet);
                         break;
                     default:
-                        // A class: its own colour, dark letters on it, the name this game gives it.
-                        ChogTheme.Shape(button);
-                        foreach (var label in button.GetComponentsInChildren<TMP_Text>(true))
+                        // The Photon sample exposes its three prototype classes while the player is
+                        // joining. Chog Arena does not ask a player to choose one: it resolves the
+                        // Genesis or the single recruit automatically.
+                        if (button.GetComponent<TwinStickShooter.CharacterSelectionButtonDelegate>() != null)
+                            button.gameObject.SetActive(false);
+                        else
                         {
-                            label.color = ChogTheme.Night;
-                            label.text = ChogTheme.ClassName(label.text);
+                            var kind = button.name.IndexOf("Cancel", System.StringComparison.OrdinalIgnoreCase) >= 0
+                                ? ChogTheme.ButtonKind.Danger : ChogTheme.ButtonKind.Quiet;
+                            ChogTheme.Style(button, kind);
+                            ChogTheme.Paint(button, kind);
                         }
                         break;
                 }
             }
+
+            if (selection.GetComponent<ChogPreparationCopy>() == null)
+                selection.gameObject.AddComponent<ChogPreparationCopy>();
 
             // The slots of the teams: cards in the colour of their team, outlined in ink.
             foreach (var slot in selection.GetComponentsInChildren<Transform>(true))
@@ -119,6 +129,31 @@ namespace Chog.Screens
             }
 
             DressTexts(selection);
+        }
+
+        /// <summary>
+        /// Owns only the presentation copy of the Photon preparation screen. The sample refreshes
+        /// player cards every view frame, so this runs after it and keeps prototype names out of
+        /// Chog Arena without touching selection commands or deterministic game data.
+        /// </summary>
+        private sealed class ChogPreparationCopy : MonoBehaviour
+        {
+            private void LateUpdate()
+            {
+                foreach (var choice in GetComponentsInChildren<TwinStickShooter.CharacterSelectionButtonDelegate>(true))
+                    choice.gameObject.SetActive(false);
+
+                foreach (var label in GetComponentsInChildren<TMP_Text>(true))
+                {
+                    var name = (label.text ?? "").Trim().ToUpperInvariant();
+                    if (name == "KNIGHT" || name == "ARCHER" || name == "SPELLCASTER" ||
+                        name == "BRUTE" || name == "RANGER" || name == "CONTROLLER")
+                    {
+                        label.text = "RECRUIT";
+                        label.color = ChogTheme.Text;
+                    }
+                }
+            }
         }
 
         // Large letters in Koulen, the rest in Convergence; our own panels are already dressed.

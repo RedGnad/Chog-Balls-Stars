@@ -181,8 +181,24 @@ namespace Chog.Screens
                 label.color = Color.white;
         }
 
-        // Buttons stay flat and readable. Their colour, a single outline and their pressed tint are enough:
-        // the home screen should never turn a control into a stack of lips, highlights or splash effects.
+        /// <summary>
+        /// A quiet amount of physical depth for a home button: one contour, one coloured face and
+        /// one darker lower lip. It is not a highlight stack, splash or duplicate-border effect.
+        /// </summary>
+        public static void Paint(Button button, ButtonKind kind)
+        {
+            var image = ImageOf(button);
+            if (image == null)
+                return;
+            var fill = Fill(kind);
+            image.sprite = ChogSprites.Chunky(fill, Color.Lerp(fill, Ink, 0.48f), 16, 3, 10);
+            image.type = Image.Type.Sliced;
+            image.pixelsPerUnitMultiplier = ButtonScale;
+            image.color = Color.white;
+        }
+
+        // Buttons remain readable: one face, one contour and one lower lip are enough. The home screen
+        // should never turn a control into a stack of highlights, splashes or duplicate borders.
         private const float ButtonScale = 0.82f;
 
         /// <summary>

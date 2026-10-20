@@ -33,6 +33,19 @@ namespace Chog.Match
             if (s_made.TryGetValue(key, out var kept) && kept != null)
                 return kept;
 
+            if (icon == Icon.Heroes)
+            {
+                var source = Resources.Load<Texture2D>("ChogHeadMark");
+                if (source != null)
+                {
+                    var head = Sprite.Create(source, new Rect(0f, 0f, source.width, source.height),
+                        new Vector2(0.5f, 0.5f), 100f);
+                    head.name = "Chog head mark";
+                    s_made[key] = head;
+                    return head;
+                }
+            }
+
             var texture = new Texture2D(size, size, TextureFormat.RGBA32, false)
             {
                 name = "icon " + key, wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear
@@ -46,7 +59,92 @@ namespace Chog.Match
         }
 
         /// <summary>The pixels of a pictogram, rows from the bottom, as a texture takes them.</summary>
-        public static Color32[] Pixels(Icon icon, int size) => Draw(Describe(icon), size);
+        public static Color32[] Pixels(Icon icon, int size) => icon == Icon.Heroes ? DrawChogHead(size, true) : Draw(Describe(icon), size);
+
+        private static Color32[] DrawChogHead(int size, bool stencil)
+        {
+            // This code-only fallback keeps an asymmetric Chog head if the reference cutout is unavailable.
+            var head = new Shape().Fill(
+                1.0f, 7.8f, 3.3f, 6.8f, 6.1f, 6.0f, 8.0f, 6.2f,
+                7.4f, 4.1f, 7.6f, 2.0f, 8.2f, 0.6f, 10.2f, 0.9f,
+                12.3f, 1.8f, 14.2f, 3.6f, 15.2f, 5.8f,
+                16.8f, 4.8f, 17.9f, 7.0f, 18.4f, 9.0f,
+                20.8f, 9.4f, 22.1f, 10.4f, 21.7f, 12.4f,
+                20.5f, 15.1f, 18.6f, 17.1f, 15.7f, 18.5f,
+                12.1f, 19.3f, 8.6f, 18.9f, 5.4f, 17.7f,
+                2.5f, 15.9f, 4.7f, 14.3f, 2.1f, 12.8f,
+                1.3f, 10.6f);
+            var face = new Shape().Fill(
+                9.0f, 10.1f, 10.5f, 8.7f, 12.5f, 8.4f, 13.5f, 9.2f,
+                15.4f, 8.8f, 17.3f, 9.9f, 18.1f, 11.5f,
+                18.0f, 14.6f, 16.8f, 17.1f, 14.7f, 18.1f,
+                11.3f, 18.0f, 9.2f, 16.7f, 8.4f, 14.5f, 8.5f, 11.7f);
+            var leftEye = new Shape().FillPath(Ellipse(11.8f, 13.3f, 1.18f, 1.75f));
+            var rightEye = new Shape().FillPath(Ellipse(16.0f, 12.9f, 1.05f, 1.65f));
+            var leftShine = new Shape().FillPath(Ellipse(11.4f, 12.6f, 0.38f, 0.48f));
+            var rightShine = new Shape().FillPath(Ellipse(15.7f, 12.2f, 0.34f, 0.43f));
+            var nose = new Shape().FillPath(Ellipse(14.2f, 15.2f, 0.72f, 0.45f));
+            var smile = new Shape().Path(0.33f, new[]
+            {
+                new Vector2(12.8f, 16.6f), new Vector2(14.0f, 16.9f), new Vector2(15.2f, 16.5f)
+            });
+
+            var pixels = new Color32[size * size];
+            var unitsPerPixel = (Grid + Padding * 2f) / size;
+            var scale = 1f / unitsPerPixel;
+            var purple = new Color(0.28f, 0.17f, 0.57f, 1f);
+            var cream = new Color(0.99f, 0.97f, 0.84f, 1f);
+            var pink = new Color(0.86f, 0.23f, 0.52f, 1f);
+            for (var y = 0; y < size; y++)
+            for (var x = 0; x < size; x++)
+            {
+                var p = new Vector2((x + 0.5f) * unitsPerPixel - Padding, (size - 1 - y + 0.5f) * unitsPerPixel - Padding);
+                var outer = Distance(head, p);
+                var inner = Distance(face, p);
+                var headCover = Cover(outer - 0.48f, scale);
+                var faceCover = Cover(inner - 0.35f, scale);
+                if (stencil)
+                {
+                    pixels[y * size + x] = new Color(1f, 1f, 1f, headCover);
+                    continue;
+                }
+
+                var result = Color.clear;
+                Stamp(ref result, Ink, headCover);
+                Stamp(ref result, purple, Cover(outer + 0.35f, scale));
+                Stamp(ref result, Ink, faceCover);
+                Stamp(ref result, cream, Cover(inner + 0.15f, scale));
+                Stamp(ref result, Ink, Cover(Distance(leftEye, p), scale));
+                Stamp(ref result, Ink, Cover(Distance(rightEye, p), scale));
+                Stamp(ref result, Color.white, Cover(Distance(leftShine, p), scale));
+                Stamp(ref result, Color.white, Cover(Distance(rightShine, p), scale));
+                Stamp(ref result, pink, Cover(Distance(nose, p), scale));
+                Stamp(ref result, Ink, Cover(Distance(smile, p), scale));
+                pixels[y * size + x] = result;
+            }
+            return pixels;
+        }
+
+        private static Vector2[] Ellipse(float cx, float cy, float rx, float ry)
+        {
+            var points = Circle(cx, cy, 1f);
+            for (var i = 0; i < points.Length; i++)
+                points[i] = new Vector2(cx + (points[i].x - cx) * rx, cy + (points[i].y - cy) * ry);
+            return points;
+        }
+
+        private static float Cover(float distance, float scale) => Mathf.Clamp01(0.5f - distance * scale);
+
+        private static void Stamp(ref Color baseColour, Color paint, float alpha)
+        {
+            if (alpha <= 0f)
+                return;
+            var combined = alpha + baseColour.a * (1f - alpha);
+            var kept = baseColour.a * (1f - alpha);
+            baseColour = new Color((paint.r * alpha + baseColour.r * kept) / combined,
+                (paint.g * alpha + baseColour.g * kept) / combined,
+                (paint.b * alpha + baseColour.b * kept) / combined, combined);
+        }
 
         /// <summary>
         /// What a pictogram is made of, in units of a 24 grid with y going down (as in SVG): lines of a
@@ -136,11 +234,7 @@ namespace Chog.Match
             switch (icon)
             {
                 case Icon.Heroes:
-                    // A Chog: a round head under the spikes of its crown, its two eyes cut out.
-                    s.FillPath(Circle(12f, 14.6f, 7f));
-                    s.Fill(6.4f, 11.5f, 6.6f, 3.6f, 9.6f, 7.4f, 12f, 2.2f, 14.4f, 7.4f, 17.4f, 3.6f, 17.6f, 11.5f);
-                    s.Cut(Circle(9.3f, 15f, 1.7f));
-                    s.Cut(Circle(14.7f, 15f, 1.7f));
+                    // DrawChogHead gives the mascot its own colours and recognisable asymmetric outline.
                     break;
                 case Icon.Trophy:
                     s.FillPath(Join(new[] { new Vector2(6.5f, 3.5f), new Vector2(17.5f, 3.5f) }, Arc(12f, 9f, 5.5f, 0f, 180f)));

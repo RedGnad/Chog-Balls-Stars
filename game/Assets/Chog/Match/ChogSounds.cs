@@ -17,7 +17,7 @@ namespace Chog.Match
         Reward
     }
 
-    /// <summary>The two music loops: one for the menus, one for a match.</summary>
+    /// <summary>The two music contexts: one loop for the menus and one selected loop for each match.</summary>
     public enum ChogMusic
     {
         None,
@@ -127,7 +127,11 @@ namespace Chog.Match
         private AudioSource _musicBefore;
         private AudioListener _listener;
         private ChogMusic _music = ChogMusic.None;
+        // A sample scene can still offer its clip when no Resources match playlist is installed.
         private AudioClip _matchClip;
+        private AudioClip _selectedMatchMusic;
+        private int _previousMatchMusic = -1;
+        private bool _wasInMatch;
         private float _fade = 1f;
         private float _nextListenerCheck;
 
@@ -302,10 +306,16 @@ namespace Chog.Match
             return source;
         }
 
-        // The menu's music in the menus, a match's music while the arena is loaded; one listener only.
+        // The menu's music plays in menus. Entering a Gameplay scene picks one playlist entry and
+        // keeps it for that whole match. The next match chooses another entry when one is available.
         private void OnScenes()
         {
             var inMatch = SceneManager.GetSceneByName(MatchScene).isLoaded;
+            if (inMatch && !_wasInMatch)
+                _selectedMatchMusic = PickMatchMusic();
+            else if (!inMatch && _wasInMatch)
+                _selectedMatchMusic = null;
+            _wasInMatch = inMatch;
             Switch(inMatch ? ChogMusic.Match : ChogMusic.Menu, false);
             KeepOneListener();
         }
@@ -396,9 +406,29 @@ namespace Chog.Match
             if (music == ChogMusic.None)
                 return null;
             var clips = Resources.LoadAll<AudioClip>(Folder + (music == ChogMusic.Menu ? "MusicMenu" : "MusicMatch"));
-            if (clips.Length > 0)
+            if (music == ChogMusic.Menu && clips.Length > 0)
                 return clips[0];
-            return music == ChogMusic.Match ? _matchClip : null;
+            if (music != ChogMusic.Match)
+                return null;
+            if (_selectedMatchMusic == null)
+                _selectedMatchMusic = PickMatchMusic(clips);
+            return _selectedMatchMusic != null ? _selectedMatchMusic : _matchClip;
+        }
+
+        private AudioClip PickMatchMusic()
+        {
+            return PickMatchMusic(Resources.LoadAll<AudioClip>(Folder + "MusicMatch"));
+        }
+
+        private AudioClip PickMatchMusic(AudioClip[] clips)
+        {
+            if (clips == null || clips.Length == 0)
+                return _matchClip;
+            var index = Random.Range(0, clips.Length);
+            if (clips.Length > 1 && index == _previousMatchMusic)
+                index = (index + 1) % clips.Length;
+            _previousMatchMusic = index;
+            return clips[index];
         }
 
         private void Update()

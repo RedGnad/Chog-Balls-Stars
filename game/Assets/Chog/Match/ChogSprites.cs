@@ -87,8 +87,11 @@ namespace Chog.Match
                     var edge = Mathf.Sqrt(dx * dx + dy * dy) - radius;
                     var cover = Mathf.Clamp01(0.5f - edge);
                     var inner = Mathf.Clamp01(0.5f - (edge + outline));
-                    // The lip: the lowest rows inside the outline (y counts from the bottom).
-                    var body = y < outline + lipHeight ? lip : fill;
+                    // A single painted surface, slightly brighter toward its upper edge, ends in one
+                    // darker lower lip. It reads as a physical button without an added band or decoration.
+                    var faceAmount = Mathf.InverseLerp(outline + lipHeight, height - outline, y);
+                    var face = Color.Lerp(fill, Color.white, 0.18f * faceAmount);
+                    var body = y < outline + lipHeight ? lip : face;
                     var colour = Color.Lerp(ink, body, inner);
                     colour.a *= cover;
                     pixels[y * width + x] = colour;
