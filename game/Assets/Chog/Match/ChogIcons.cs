@@ -36,10 +36,10 @@ namespace Chog.Match
             if (icon == Icon.Heroes)
             {
                 var source = Resources.Load<Texture2D>("ChogHeadMark");
-                if (source != null)
+                if (source != null && source.isReadable)
                 {
-                    var head = Sprite.Create(source, new Rect(0f, 0f, source.width, source.height),
-                        new Vector2(0.5f, 0.5f), 100f);
+                    var outlined = OutlinedHeadMark(source, size);
+                    var head = Sprite.Create(outlined, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), 100f);
                     head.name = "Chog head mark";
                     s_made[key] = head;
                     return head;
@@ -56,6 +56,52 @@ namespace Chog.Match
             sprite.name = texture.name;
             s_made[key] = sprite;
             return sprite;
+        }
+
+        // The supplied mark is a white alpha cutout. Rasterise its own silhouette with the same ink
+        // contour as every other menu pictogram instead of substituting a generic monster head.
+        private static Texture2D OutlinedHeadMark(Texture2D source, int size)
+        {
+            var mask = new float[size * size];
+            const float inset = 0.035f;
+            for (var y = 0; y < size; y++)
+            for (var x = 0; x < size; x++)
+            {
+                var u = Mathf.Lerp(inset, 1f - inset, (x + 0.5f) / size);
+                var v = Mathf.Lerp(inset, 1f - inset, (y + 0.5f) / size);
+                mask[y * size + x] = source.GetPixelBilinear(u, v).a;
+            }
+
+            var pixels = new Color32[size * size];
+            const int outline = 4;
+            for (var y = 0; y < size; y++)
+            for (var x = 0; x < size; x++)
+            {
+                var at = y * size + x;
+                var inner = mask[at];
+                var outer = inner;
+                for (var oy = -outline; oy <= outline; oy++)
+                for (var ox = -outline; ox <= outline; ox++)
+                {
+                    if (ox * ox + oy * oy > outline * outline)
+                        continue;
+                    var nx = x + ox;
+                    var ny = y + oy;
+                    if (nx >= 0 && nx < size && ny >= 0 && ny < size)
+                        outer = Mathf.Max(outer, mask[ny * size + nx]);
+                }
+                pixels[at] = inner > 0.08f
+                    ? new Color32(255, 255, 255, (byte)Mathf.RoundToInt(inner * 255f))
+                    : new Color32(Ink.r, Ink.g, Ink.b, (byte)Mathf.RoundToInt(outer * 255f));
+            }
+
+            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false)
+            {
+                name = "outlined Chog head mark", wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear
+            };
+            texture.SetPixels32(pixels);
+            texture.Apply(false, true);
+            return texture;
         }
 
         /// <summary>The pixels of a pictogram, rows from the bottom, as a texture takes them.</summary>

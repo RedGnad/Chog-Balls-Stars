@@ -181,10 +181,7 @@ namespace Chog.Screens
                 label.color = Color.white;
         }
 
-        /// <summary>
-        /// The approved button treatment is deliberately simple: one saturated face and one thick outer
-        /// contour. It avoids fake depth strips, extra lines, shadows and decorative splashes.
-        /// </summary>
+        /// <summary>One saturated face and one thick outer contour for standard controls.</summary>
         public static void Paint(Button button, ButtonKind kind)
         {
             var image = ImageOf(button);
@@ -197,8 +194,23 @@ namespace Chog.Screens
             image.color = fill;
         }
 
-        // Buttons remain readable: one face and one contour are enough. The home screen should never turn
-        // a control into a stack of highlights, splashes or duplicate borders.
+        /// <summary>
+        /// The two primary home actions are raised like small ingots: a lit face, a darker lower edge and
+        /// one contour in the same sprite. It is deliberately reserved for the mode picker and PLAY.
+        /// </summary>
+        public static void PaintRelief(Button button, ButtonKind kind)
+        {
+            var image = ImageOf(button);
+            if (image == null)
+                return;
+            var fill = Fill(kind);
+            image.sprite = ChogSprites.Chunky(fill, Color.Lerp(fill, Ink, 0.28f), 18, 3, 8);
+            image.type = Image.Type.Sliced;
+            image.pixelsPerUnitMultiplier = ButtonScale;
+            image.color = Color.white;
+        }
+
+        // Standard controls remain flat. Relief is limited to the two home actions so it retains meaning.
         private const float ButtonScale = 0.82f;
 
         /// <summary>

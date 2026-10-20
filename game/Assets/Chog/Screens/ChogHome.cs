@@ -31,9 +31,10 @@ namespace Chog.Screens
         private static readonly Vector2 SettingsSize = new Vector2(92f, 92f);
         private static readonly Vector2 WalletSize = new Vector2(286f, 78f);
         private static readonly Vector2 ChogSize = new Vector2(198f, 68f);
-        private static readonly Vector2 RailButton = new Vector2(114f, 100f);
-        private const float RailTop = 156f;
-        private const float RailStep = 136f;
+        private static readonly Vector2 RailGridSize = new Vector2(164f, 684f);
+        private const float RailTop = 152f;
+        private const float RailItemHeight = 132f;
+        private const float RailSpacing = 6f;
 
         // In shares of the screen: the hero owns the left focal column, the Genesis card owns the right.
         private static readonly Vector2 StageMin = new Vector2(0.10f, 0.18f);
@@ -42,10 +43,13 @@ namespace Chog.Screens
         private static readonly Vector2 RibbonMax = new Vector2(0.42f, 0.168f);
         private static readonly Vector2 ChipsMin = new Vector2(0.10f, 0.035f);
         private static readonly Vector2 ChipsMax = new Vector2(0.53f, 0.095f);
-        private static readonly Vector2 PlayMin = new Vector2(0.75f, 0.115f);
-        private static readonly Vector2 PlayMax = new Vector2(0.98f, 0.278f);
-        private static readonly Vector2 HintMin = new Vector2(0.77f, 0.06f);
-        private static readonly Vector2 HintMax = new Vector2(0.98f, 0.105f);
+        // The action row shares the exact left and right edges of WalletPanel's card.
+        public static readonly Vector2 ModeMin = new Vector2(0.56f, 0.105f);
+        public static readonly Vector2 ModeMax = new Vector2(0.72f, 0.278f);
+        public static readonly Vector2 PlayMin = new Vector2(0.735f, 0.105f);
+        public static readonly Vector2 PlayMax = new Vector2(0.98f, 0.278f);
+        private static readonly Vector2 HintMin = new Vector2(0.735f, 0.052f);
+        private static readonly Vector2 HintMax = new Vector2(0.98f, 0.092f);
 
         private static readonly Color Lilac = ChogTheme.Hex("E9E4FF");
 
@@ -234,23 +238,35 @@ namespace Chog.Screens
         // The rail down the left: the collection, the leaderboard, the rentals, friends, the guide.
         private void BuildRail()
         {
-            Rail(0, "HEROES", ChogTheme.ButtonKind.Secondary, ChogIcons.Icon.Heroes, () => ChogCollection.Open(_main.transform));
-            Rail(1, "TOP", ChogTheme.ButtonKind.Primary, ChogIcons.Icon.Trophy, () => ChogHall.Open(_main.transform));
-            Rail(2, "RENT", ChogTheme.ButtonKind.Chog, ChogIcons.Icon.Key, WalletPanel.OpenRentals);
-            Rail(3, "FRIENDS", ChogTheme.ButtonKind.Secondary, ChogIcons.Icon.Friends, () => Call("OnPartyButtonPressed"));
-            Rail(4, "GUIDE", ChogTheme.ButtonKind.Quiet, ChogIcons.Icon.Question, () => ChogGuide.Open(_main.transform));
+            var rail = ChogUi.Pinned("RailGrid", transform, new Vector2(0f, 1f), new Vector2(0f, 1f),
+                new Vector2(Margin, -RailTop), RailGridSize);
+            var layout = rail.gameObject.AddComponent<VerticalLayoutGroup>();
+            layout.padding = new RectOffset(0, 0, 0, 0);
+            layout.spacing = RailSpacing;
+            layout.childAlignment = TextAnchor.UpperCenter;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+
+            Rail(rail, "HEROES", ChogTheme.ButtonKind.Secondary, ChogIcons.Icon.Heroes, () => ChogCollection.Open(_main.transform));
+            Rail(rail, "TOP", ChogTheme.ButtonKind.Primary, ChogIcons.Icon.Trophy, () => ChogHall.Open(_main.transform));
+            Rail(rail, "RENT", ChogTheme.ButtonKind.Chog, ChogIcons.Icon.Key, WalletPanel.OpenRentals);
+            Rail(rail, "FRIENDS", ChogTheme.ButtonKind.Secondary, ChogIcons.Icon.Friends, () => Call("OnPartyButtonPressed"));
+            Rail(rail, "GUIDE", ChogTheme.ButtonKind.Quiet, ChogIcons.Icon.Question, () => ChogGuide.Open(_main.transform));
         }
 
-        private Button Rail(int position, string label, ChogTheme.ButtonKind kind, ChogIcons.Icon icon, UnityEngine.Events.UnityAction tapped)
+        private Button Rail(Transform rail, string label, ChogTheme.ButtonKind kind, ChogIcons.Icon icon, UnityEngine.Events.UnityAction tapped)
         {
-            var y = -RailTop - position * RailStep;
-            var button = ChogUi.PinnedButton("Rail" + label, transform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(Margin + 4f, y),
-                RailButton, kind, "", 30f, icon);
+            var item = new GameObject("Rail" + label, typeof(RectTransform)).GetComponent<RectTransform>();
+            item.SetParent(rail, false);
+            var size = item.gameObject.AddComponent<LayoutElement>();
+            size.preferredHeight = RailItemHeight;
+            size.minHeight = RailItemHeight;
+            var button = ChogUi.Button("Button", item, new Vector2(0.025f, 0.235f), new Vector2(0.975f, 1f), kind, "", 30f, icon);
             ChogTheme.Paint(button, kind);
             button.onClick.AddListener(tapped);
-            var words = ChogUi.Pinned("Label" + label, transform, new Vector2(0f, 1f), new Vector2(0.5f, 1f),
-                new Vector2(Margin + 4f + RailButton.x * 0.5f, y - RailButton.y - 4f), new Vector2(150f, 34f));
-            ChogUi.Title("Text", words, Vector2.zero, Vector2.one, 24f).text = label;
+            ChogUi.Title("Label", item, new Vector2(0f, 0f), new Vector2(1f, 0.21f), 24f).text = label;
             return button;
         }
 
@@ -306,7 +322,7 @@ namespace Chog.Screens
                     element.ignoreLayout = true;
                 ChogUi.Stretch((RectTransform)play.transform, PlayMin, PlayMax);
                 ChogTheme.Style(play, ChogTheme.ButtonKind.Primary);
-                ChogTheme.Paint(play, ChogTheme.ButtonKind.Primary);
+                ChogTheme.PaintRelief(play, ChogTheme.ButtonKind.Primary);
                 var label = play.GetComponentInChildren<TMP_Text>(true);
                 if (label != null)
                 {

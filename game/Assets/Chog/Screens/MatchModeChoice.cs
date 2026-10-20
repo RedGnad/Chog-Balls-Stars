@@ -116,9 +116,9 @@ namespace Chog.Screens
                 return;
 
             // Beside PLAY, at the bottom right of the home screen: the mode's pictogram, its name, and what a tap does.
-            var button = ChogUi.Button(ButtonName, main.transform, new Vector2(0.60f, 0.115f), new Vector2(0.738f, 0.278f),
+            var button = ChogUi.Button(ButtonName, main.transform, ChogHome.ModeMin, ChogHome.ModeMax,
                 ChogTheme.ButtonKind.Quiet, "", 44f);
-            ChogTheme.Paint(button, ChogTheme.ButtonKind.Quiet);
+            ChogTheme.PaintRelief(button, ChogTheme.ButtonKind.Quiet);
             var icon = ChogUi.Icon("Icon", button.transform, IconOf(Chosen), new Vector2(0.3f, 0.56f), new Vector2(0.7f, 0.92f));
             var name = ChogUi.Title("Label", button.transform, new Vector2(0.06f, 0.24f), new Vector2(0.94f, 0.58f), 50f);
             var hint = ChogUi.Number("Hint", button.transform, new Vector2(0.06f, 0.08f), new Vector2(0.94f, 0.25f), 20f,
