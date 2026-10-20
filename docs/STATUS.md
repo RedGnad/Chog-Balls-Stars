@@ -1,5 +1,12 @@
 # État courant et décisions
 
+**20 October 2026, 12:41 UTC (Chog head mark safe area deployed).**
+- **Implemented:** the supplied Chog head mark is now scaled into a fixed safe area before its ink contour is added. Its full silhouette and outline fit inside both the player portrait and the HEROES rail tile, instead of being clipped at their edges. No map or simulation files changed.
+- **Verified locally:** WebGL build `20261020T123019054Z-d41546da025947e9aec68fa06e0d7b70` succeeded with unchanged simulation stamp `f4a81f1ddbd919b6`. The profile and rail both show the complete mark in this [desktop capture](../research/evidence/chog-head-mark-safe-area-2026-10-20.png). The local client entered a bot match without exception. Screen typecheck: 0 errors. View tests: 155 passed, 0 failed. The assembled judge replayed two recorded matches and agreed with both announced winners.
+- **Deployed and checked:** commit `429b4e3` is pushed to `main`. Vercel reports the production alias ready and the public page serves version `20261020T123019054Z`. Render's Photon endpoint reports the same build. No public `PLAY` was pressed.
+- **Still open:** connected-wallet landing text and physical-phone behaviour were not exercised in this slice.
+**Next action:** owner reviews the live Chog icon sizing before another UI change.
+
 **20 October 2026, 12:09 UTC (gold stage label and Chog loading mark deployed).**
 - **Implemented:** the label below the selected home hero now uses the same gold badge language as the player chip. It reads `RECRUIT` for the recruit and the selected Genesis name for a holder. The former specific Genesis portrait in the WebGL template has been replaced by the supplied monochrome Chog head mark on dark violet, used by the loading screen, favicon and PWA icons. No map or simulation files changed.
 - **Verified locally:** WebGL build `20261020T115502664Z-aa297c841b2f47c39f1715c75e63c2f6` succeeded with unchanged simulation stamp `f4a81f1ddbd919b6`. The desktop landing showed the gold lower badge, [capture](../research/evidence/chog-home-gold-stage-badge-2026-10-20.png), and its built loader asset is [recorded here](../research/evidence/chog-loading-chog-mark-2026-10-20.png). The local client entered team preparation and a bot match without exception. Screen typecheck: 0 errors. View tests: 155 passed, 0 failed. The assembled judge replayed two recorded matches and agreed with both announced winners.
