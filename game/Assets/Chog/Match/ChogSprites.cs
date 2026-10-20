@@ -58,11 +58,10 @@ namespace Chog.Match
         }
 
         /// <summary>
-        /// A chunky button in the Supercell way (docs/DESIGN-BRIEF.md): a rounded rectangle with a near-black
-        /// outline, its colour, and a darker lip along the bottom that gives it thickness. Sliced: the corners,
-        /// the outline and the lip keep their size whatever the button's.
+        /// One button surface with a broad upper face and a lower side inside the same ink contour.
+        /// The vertical slice keeps the upper face close to 40 percent at both short and tall UI sizes.
         /// </summary>
-        public static Sprite Chunky(Color fill, Color lip, int radius = 14, int outline = 3, int lipHeight = 7)
+        public static Sprite Chunky(Color fill, Color lip, int radius = 18, int outline = 5, int lipHeight = 16)
         {
             var key = $"chunky {ColorUtility.ToHtmlStringRGBA(fill)} {ColorUtility.ToHtmlStringRGBA(lip)} {radius} {outline} {lipHeight}";
             if (s_made.TryGetValue(key, out var kept) && kept != null)
@@ -70,7 +69,7 @@ namespace Chog.Match
 
             var ink = new Color(0.078f, 0.059f, 0.141f, 1f);
             var width = radius * 2 + 8;
-            var height = radius * 2 + lipHeight + 8;
+            const int height = 120;
             var texture = new Texture2D(width, height, TextureFormat.RGBA32, false)
             {
                 name = key, wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear
@@ -87,11 +86,8 @@ namespace Chog.Match
                     var edge = Mathf.Sqrt(dx * dx + dy * dy) - radius;
                     var cover = Mathf.Clamp01(0.5f - edge);
                     var inner = Mathf.Clamp01(0.5f - (edge + outline));
-                    // A single painted surface, slightly brighter toward its upper edge, ends in one
-                    // darker lower lip. It reads as a physical button without an added band or decoration.
-                    var faceAmount = Mathf.InverseLerp(outline + lipHeight, height - outline, y);
-                    var face = Color.Lerp(fill, Color.white, 0.18f * faceAmount);
-                    var body = y < outline + lipHeight ? lip : face;
+                    var upperFace = Color.Lerp(fill, Color.white, 0.25f);
+                    var body = y < outline + lipHeight ? lip : y >= height * 0.60f ? upperFace : fill;
                     var colour = Color.Lerp(ink, body, inner);
                     colour.a *= cover;
                     pixels[y * width + x] = colour;

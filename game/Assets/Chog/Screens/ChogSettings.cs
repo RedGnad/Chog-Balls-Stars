@@ -142,7 +142,7 @@ namespace Chog.Screens
 
         private static void ShowSwitch(Button button, bool on)
         {
-            ChogTheme.ImageOf(button).color = on ? ChogTheme.Confirm : ChogTheme.Quiet;
+            ChogTheme.SetButtonFill(button, on ? ChogTheme.Confirm : ChogTheme.Quiet);
             ChogUi.LabelOf(button).text = on ? "ON" : "OFF";
         }
     }

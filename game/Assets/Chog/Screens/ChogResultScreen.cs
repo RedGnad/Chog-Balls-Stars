@@ -126,7 +126,7 @@ namespace Chog.Screens
                 "PLAY AGAIN", 60f);
             var menu = ChogUi.Button("Menu", host.transform, new Vector2(0.815f, 0.09f), new Vector2(0.97f, 0.215f), ChogTheme.ButtonKind.Secondary,
                 "HOME", 52f);
-            ChogTheme.ImageOf(menu).color = ChogTheme.Ally;
+            ChogTheme.SetButtonFill(menu, ChogTheme.Ally);
             if (ControlModeWatcher.Mode == ControlMode.Desktop)
                 ChogUi.Body("Keys", host.transform, new Vector2(0.545f, 0.035f), new Vector2(0.97f, 0.08f), 24f, TextAlignmentOptions.Center,
                     ChogTheme.Hex("E9E4FF")).text = "ENTER plays again, ESCAPE goes home";

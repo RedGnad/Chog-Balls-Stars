@@ -168,61 +168,52 @@ namespace Chog.Screens
         /// <summary>The fill of a quiet button: a muted purple that white letters read on.</summary>
         public static readonly Color Quiet = Hex("3B2F72");
 
-        /// <summary>A chunky button of that kind: its colour, its outline and lip, its label outlined in Lilita One.</summary>
+        /// <summary>A button with the shared face, side, outline and Lilita One label.</summary>
         public static void Style(Button button, ButtonKind kind)
         {
             if (button == null)
                 return;
             Shape(button);
-            var image = ImageOf(button);
-            if (image != null)
-                image.color = Fill(kind);
+            Paint(button, kind);
             foreach (var label in button.GetComponentsInChildren<TMP_Text>(true))
                 label.color = Color.white;
         }
 
-        /// <summary>One saturated face and one thick outer contour for standard controls.</summary>
+        /// <summary>Apply the shared button surface to a named colour role.</summary>
         public static void Paint(Button button, ButtonKind kind)
         {
-            var image = ImageOf(button);
-            if (image == null)
-                return;
-            var fill = Fill(kind);
-            image.sprite = ChogSprites.Rounded(18, 3, Ink);
-            image.type = Image.Type.Sliced;
-            image.pixelsPerUnitMultiplier = ButtonScale;
-            image.color = fill;
+            SetButtonFill(button, Fill(kind));
         }
 
-        /// <summary>
-        /// The two primary home actions are raised like the approved menu buttons: one continuous silhouette,
-        /// with its coloured face and lower side painted inside the same outer contour. It is deliberately
-        /// reserved for the mode picker and PLAY.
-        /// </summary>
+        /// <summary>Keep the home action entry point on the same surface as every other button.</summary>
         public static void PaintRelief(Button button, ButtonKind kind)
         {
             var image = ImageOf(button);
             if (image == null)
                 return;
-            var fill = Fill(kind);
             var baseName = button.name + "ReliefBase";
             var oldBase = image.rectTransform.parent.Find(baseName);
             if (oldBase != null)
                 Object.Destroy(oldBase.gameObject);
+            Paint(button, kind);
+        }
 
-            image.sprite = ChogSprites.Chunky(fill, Color.Lerp(fill, Ink, 0.28f), 18, 3, 10);
+        /// <summary>Change a button's colour without tinting its ink border.</summary>
+        public static void SetButtonFill(Button button, Color fill)
+        {
+            var image = ImageOf(button);
+            if (image == null)
+                return;
+            image.sprite = ChogSprites.Chunky(fill, Color.Lerp(fill, Ink, 0.28f));
             image.type = Image.Type.Sliced;
             image.pixelsPerUnitMultiplier = ButtonScale;
             image.color = Color.white;
         }
 
-        // Standard controls remain flat. Relief is limited to the two home actions so it retains meaning.
         private const float ButtonScale = 0.82f;
 
         /// <summary>
-        /// The shape of a button, its colour left as it is: one rounded fill, one near-black outline and
-        /// an outlined Lilita One label. Decorative highlights, duplicate contours and drop shadows are
-        /// deliberately absent from controls.
+        /// The common button shape keeps the current fill, including buttons supplied by the sample.
         /// </summary>
         public static void Shape(Button button)
         {
@@ -231,9 +222,7 @@ namespace Chog.Screens
             var image = ImageOf(button);
             if (image != null)
             {
-                image.sprite = ChogSprites.Rounded(18, 3, Ink);
-                image.type = Image.Type.Sliced;
-                image.pixelsPerUnitMultiplier = ButtonScale;
+                SetButtonFill(button, image.color);
                 var shadow = image.GetComponent<Shadow>();
                 if (shadow == null)
                     shadow = image.gameObject.AddComponent<Shadow>();

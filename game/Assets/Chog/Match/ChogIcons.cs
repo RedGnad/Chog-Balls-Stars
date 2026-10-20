@@ -75,26 +75,37 @@ namespace Chog.Match
             }
 
             var pixels = new Color32[size * size];
-            const int outline = 7;
+            // The mark is rendered at 256 px and often displayed near 100 canvas units. Thirteen
+            // source pixels give it the same visible ink weight as the 24-grid pictograms.
+            const int outline = 13;
             for (var y = 0; y < size; y++)
             for (var x = 0; x < size; x++)
             {
                 var at = y * size + x;
-                var inner = mask[at];
-                var outer = inner;
-                for (var oy = -outline; oy <= outline; oy++)
-                for (var ox = -outline; ox <= outline; ox++)
+                if (mask[at] > 0.5f)
                 {
-                    if (ox * ox + oy * oy > outline * outline)
-                        continue;
-                    var nx = x + ox;
-                    var ny = y + oy;
-                    if (nx >= 0 && nx < size && ny >= 0 && ny < size)
-                        outer = Mathf.Max(outer, mask[ny * size + nx]);
+                    pixels[at] = new Color32(255, 255, 255, 255);
+                    continue;
                 }
-                pixels[at] = inner > 0.5f
-                    ? new Color32(255, 255, 255, 255)
-                    : new Color32(Ink.r, Ink.g, Ink.b, outer > 0.5f ? (byte)255 : (byte)0);
+                var outer = false;
+                for (var oy = -outline; oy <= outline; oy++)
+                {
+                    for (var ox = -outline; ox <= outline; ox++)
+                    {
+                        if (ox * ox + oy * oy > outline * outline)
+                            continue;
+                        var nx = x + ox;
+                        var ny = y + oy;
+                        if (nx >= 0 && nx < size && ny >= 0 && ny < size && mask[ny * size + nx] > 0.5f)
+                        {
+                            outer = true;
+                            break;
+                        }
+                    }
+                    if (outer)
+                        break;
+                }
+                pixels[at] = new Color32(Ink.r, Ink.g, Ink.b, outer ? (byte)255 : (byte)0);
             }
 
             var texture = new Texture2D(size, size, TextureFormat.RGBA32, false)

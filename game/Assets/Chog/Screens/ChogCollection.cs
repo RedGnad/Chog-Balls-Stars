@@ -243,7 +243,7 @@ namespace Chog.Screens
             if (_pageLabel == null || !isActiveAndEnabled)
                 return;
             for (var i = 0; i < _tabs.Length; i++)
-                ChogTheme.ImageOf(_tabs[i]).color = (int)_list == i ? ChogTheme.Purple : ChogTheme.Quiet;
+                ChogTheme.SetButtonFill(_tabs[i], (int)_list == i ? ChogTheme.Purple : ChogTheme.Quiet);
             ChogUi.LabelOf(_tabs[1]).text = "MINE" + (PlayerWallet.State == WalletState.Ready ? " " + PlayerWallet.Playable.Length : "");
             ChogUi.LabelOf(_tabs[2]).text = "FOR RENT" + (GenesisRental.OffersRead ? " " + GenesisRental.Offers.Count : "");
 

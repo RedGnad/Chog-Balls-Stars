@@ -402,7 +402,7 @@ namespace Chog.Screens
             var words = WalletPanel.ConnectWords();
             _walletWords.text = ready ? PlayerWallet.ShortAddress(PlayerWallet.Address) : words == "CONNECT WALLET" ? "CONNECT" : words;
             _walletWords.rectTransform.anchorMin = new Vector2(ready ? 0.14f : 0.05f, 0.14f);
-            ChogTheme.ImageOf(_wallet).color = ready ? ChogTheme.Quiet : ChogTheme.Purple;
+            ChogTheme.SetButtonFill(_wallet, ready ? ChogTheme.Quiet : ChogTheme.Purple);
             _wallet.interactable = !ready;
 
             var balance = GenesisRental.BalanceWei;

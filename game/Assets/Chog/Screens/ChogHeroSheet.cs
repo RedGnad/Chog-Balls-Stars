@@ -323,7 +323,7 @@ namespace Chog.Screens
 
             _formStatus.text = unlocked ? "SECOND FORM UNLOCKED" : "";
             _form.interactable = unlocked || (canBuy && !GenesisShop.IsBusy);
-            ChogTheme.ImageOf(_form).color = unlocked ? ChogTheme.Purple : canBuy ? ChogTheme.Cheek : ChogTheme.Quiet;
+            ChogTheme.SetButtonFill(_form, unlocked ? ChogTheme.Purple : canBuy ? ChogTheme.Cheek : ChogTheme.Quiet);
             if (unlocked)
             {
                 var picked = GenesisForms.Picked(_tokenId);
