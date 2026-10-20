@@ -45,6 +45,19 @@ namespace Chog.Screens
         /// <summary>The other team.</summary>
         public static readonly Color Enemy = Hex("C9375D");
 
+        private const string ReducedMotionKey = "chog.ui.reduced-motion";
+
+        /// <summary>Replace reward zoom and travel with fades on this device.</summary>
+        public static bool ReducedMotion
+        {
+            get => PlayerPrefs.GetInt(ReducedMotionKey, 0) != 0;
+            set
+            {
+                PlayerPrefs.SetInt(ReducedMotionKey, value ? 1 : 0);
+                PlayerPrefs.Save();
+            }
+        }
+
         /// <summary>
         /// The kinds of buttons: the one thing to do (gold), another thing (purple), a quiet way back,
         /// confirming (green), closing (red), and anything paid in $CHOG (pink).

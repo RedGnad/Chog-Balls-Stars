@@ -12,7 +12,7 @@ namespace Chog.Screens
 {
     /// <summary>
     /// The settings of the game, over the home screen (the wheel at its top right): the music and the
-    /// sounds in steps of a tenth, the camera shake and the vibration on or off. Each is kept on the
+    /// sounds in steps of a tenth, camera shake, vibration and reward animation on or off. Each is kept on the
     /// device by the class that uses it (ChogSounds, ChogCameraShake, ChogHaptics). MORE opens the
     /// sample's own settings (graphics, region).
     /// </summary>
@@ -28,6 +28,7 @@ namespace Chog.Screens
         private TextMeshProUGUI _soundValue;
         private Button _shake;
         private Button _haptics;
+        private Button _motion;
 
         /// <summary>Opens the settings over the main screen of the menu.</summary>
         public static void Open(Transform main)
@@ -65,8 +66,7 @@ namespace Chog.Screens
                 out _soundBar, out _soundValue);
             _shake = Toggle(card, 2, "CAMERA SHAKE", ChogIcons.Icon.Shake, () => ChogCameraShake.Enabled = !ChogCameraShake.Enabled);
             _haptics = Toggle(card, 3, "VIBRATION", ChogIcons.Icon.Shake, () => ChogHaptics.Enabled = !ChogHaptics.Enabled);
-            ChogUi.Body("Phones", card, new Vector2(0.06f, 0.255f), new Vector2(0.94f, 0.30f), 22f, TextAlignmentOptions.Left,
-                ChogTheme.PurpleSoft).text = "Vibration works on Android phones.";
+            _motion = Toggle(card, 4, "REWARD ANIMATION", ChogIcons.Icon.Star, () => ChogTheme.ReducedMotion = !ChogTheme.ReducedMotion);
 
             var more = ChogUi.Button("More", card, new Vector2(0.06f, 0.05f), new Vector2(0.50f, 0.18f), ChogTheme.ButtonKind.Quiet, "MORE", 40f);
             more.onClick.AddListener(() =>
@@ -132,6 +132,7 @@ namespace Chog.Screens
             ShowVolume(_soundBar, _soundValue, ChogSounds.SoundVolume);
             ShowSwitch(_shake, ChogCameraShake.Enabled);
             ShowSwitch(_haptics, ChogHaptics.Enabled);
+            ShowSwitch(_motion, !ChogTheme.ReducedMotion);
         }
 
         private static void ShowVolume(RectTransform bar, TextMeshProUGUI value, float volume)

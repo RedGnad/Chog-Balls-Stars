@@ -1,4 +1,5 @@
 using Chog.Match;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,9 +18,39 @@ namespace Chog.Screens
         /// <summary>The points at which a Genesis reaches levels 2 to 6 (MASTERY_STEPS in server/src/career.js).</summary>
         public static readonly int[] Steps = { 3, 8, 15, 25, 40 };
 
+        /// <summary>The level reached by a confirmed number of mastery points.</summary>
+        public static int LevelForPoints(int points)
+        {
+            var level = 1;
+            foreach (var step in Steps)
+                if (points >= step)
+                    level++;
+            return level;
+        }
+
         // The badges a career can earn, as server/src/career.js names them (BADGES).
         private static readonly string[] BadgeIds = { "first-match", "first-win", "three-in-a-row", "veteran" };
         private static readonly string[] BadgeNames = { "FIRST MATCH", "FIRST WIN", "THREE IN A ROW", "VETERAN" };
+
+        /// <summary>Badge labels newly present in a confirmed career, in their road order.</summary>
+        public static string[] NewBadgeNames(GenesisCareer before, GenesisCareer after)
+        {
+            var names = new List<string>();
+            for (var i = 0; i < BadgeIds.Length; i++)
+                if (!HasBadge(before, BadgeIds[i]) && HasBadge(after, BadgeIds[i]))
+                    names.Add(BadgeNames[i]);
+            return names.ToArray();
+        }
+
+        private static bool HasBadge(GenesisCareer career, string id)
+        {
+            if (career?.badges == null)
+                return false;
+            foreach (var badge in career.badges)
+                if (badge != null && badge.id == id)
+                    return true;
+            return false;
+        }
 
         private const int Levels = 6;
         private const float NodeSize = 74f;
@@ -123,11 +154,14 @@ namespace Chog.Screens
 
         /// <summary>Shows a career; null while it is being read.</summary>
         public void Show(GenesisCareer career, bool hasSecondForm)
+            => ShowAtPoints(career, career?.mastery?.points ?? 0, hasSecondForm);
+
+        /// <summary>Draws a confirmed career at an intermediate point total during the result reveal.</summary>
+        public void ShowAtPoints(GenesisCareer career, int displayedPoints, bool hasSecondForm)
         {
-            var mastery = career?.mastery;
-            var level = mastery != null && mastery.level > 0 ? Mathf.Clamp(mastery.level, 1, Levels) : 1;
-            var points = mastery?.points ?? 0;
-            var next = mastery?.next ?? 0;
+            var points = Mathf.Max(0, displayedPoints);
+            var level = LevelForPoints(points);
+            var next = level < Levels ? Steps[level - 1] : 0;
             var previous = level >= 2 ? Steps[level - 2] : 0;
 
             _points.text = career == null ? "reading its career on Monad..."
@@ -152,10 +186,7 @@ namespace Chog.Screens
 
             for (var i = 0; i < BadgeIds.Length; i++)
             {
-                var earned = false;
-                if (career?.badges != null)
-                    foreach (var badge in career.badges)
-                        earned |= badge != null && badge.id == BadgeIds[i];
+                var earned = HasBadge(career, BadgeIds[i]);
                 _badges[i].color = earned ? ChogTheme.Confirm : new Color(1f, 1f, 1f, 0.28f);
                 _badges[i].GetComponentInChildren<TextMeshProUGUI>().color = earned ? Color.white : new Color(1f, 1f, 1f, 0.45f);
             }
