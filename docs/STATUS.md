@@ -1,5 +1,12 @@
 # État courant et décisions
 
+**20 October 2026, 12:09 UTC (gold stage label and Chog loading mark deployed).**
+- **Implemented:** the label below the selected home hero now uses the same gold badge language as the player chip. It reads `RECRUIT` for the recruit and the selected Genesis name for a holder. The former specific Genesis portrait in the WebGL template has been replaced by the supplied monochrome Chog head mark on dark violet, used by the loading screen, favicon and PWA icons. No map or simulation files changed.
+- **Verified locally:** WebGL build `20261020T115502664Z-aa297c841b2f47c39f1715c75e63c2f6` succeeded with unchanged simulation stamp `f4a81f1ddbd919b6`. The desktop landing showed the gold lower badge, [capture](../research/evidence/chog-home-gold-stage-badge-2026-10-20.png), and its built loader asset is [recorded here](../research/evidence/chog-loading-chog-mark-2026-10-20.png). The local client entered team preparation and a bot match without exception. Screen typecheck: 0 errors. View tests: 155 passed, 0 failed. The assembled judge replayed two recorded matches and agreed with both announced winners.
+- **Deployed and checked:** commit `400fa93` is pushed to `main`. Vercel reports the production alias ready and the public page serves version `20261020T115502664Z`; the public icon hash matches the assembled icon. Render's Photon endpoint reports the same build. No public `PLAY` was pressed.
+- **Still open:** connected-wallet landing text and physical-phone behaviour were not exercised in this slice.
+**Next action:** owner reviews the live gold lower badge and monochrome loading mark before another UI change.
+
 **20 October 2026, 11:47 UTC (landing role badge deployed).**
 - **Implemented:** the landing player chip now gives its second line to a gold role badge with an ink contour. It says `RECRUIT` without a Genesis, or the actual resolved Genesis role (`BRUTE`, `RANGER` or `CONTROLLER`) for a connected holder. The portrait keeps the Genesis level, so the small mastery-progress strip is no longer competing with the role.
 - **Verified locally:** WebGL build `20261020T093437171Z-f5991717215a4361b7c1a35bae9f1782` succeeded with unchanged simulation stamp `f4a81f1ddbd919b6`. The real desktop WebGL loaded after dismissing only the first-run tutorial, and no browser exception occurred. [Landing capture](../research/evidence/chog-home-role-badge-2026-10-20.png). Screen typecheck: 0 errors. View tests: 155 passed, 0 failed. The assembled judge replayed two recorded matches and agreed with both announced winners.
