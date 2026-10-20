@@ -226,6 +226,9 @@ namespace Chog.Screens
                 var shadow = image.GetComponent<Shadow>();
                 if (shadow == null)
                     shadow = image.gameObject.AddComponent<Shadow>();
+                shadow.effectColor = new Color(Ink.r, Ink.g, Ink.b, 0.60f);
+                shadow.effectDistance = new Vector2(0f, -7f);
+                shadow.useGraphicAlpha = true;
                 shadow.enabled = false;
                 var shine = image.transform.Find("ChogShine");
                 if (shine != null)
@@ -236,9 +239,12 @@ namespace Chog.Screens
             if (press != null)
                 press.enabled = false;
 
+            if (button.GetComponent<ChogHover>() == null)
+                button.gameObject.AddComponent<ChogHover>();
+
             var colours = button.colors;
             colours.normalColor = Color.white;
-            colours.highlightedColor = new Color(1.04f, 1.04f, 1.04f, 1f);
+            colours.highlightedColor = new Color(1.08f, 1.08f, 1.08f, 1f);
             colours.pressedColor = new Color(0.86f, 0.86f, 0.90f, 1f);
             colours.selectedColor = Color.white;
             colours.disabledColor = new Color(0.55f, 0.55f, 0.6f, 0.6f);
