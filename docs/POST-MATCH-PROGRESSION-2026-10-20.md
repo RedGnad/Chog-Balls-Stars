@@ -32,23 +32,26 @@ one short chime and a brief scale settle; reduced motion uses a fade. A casual r
 states `NO RANK POINTS`. The rank reveal waits for a Genesis mastery reveal so the two
 never compete for attention. No badge is placed above a fighter's head.
 
-This candidate must not be called a durable public ranked system yet. The free Render
-instance has no disk: local match records are erased on a restart or deploy. The code
-now supports a separate durable Upstash store for immutable player rank events, while
-Render remains the game host. Its public health endpoint confirmed writable rank
-storage on 21 October, but rank credit remains disabled.
-A signed-in bot match and a six-human match still need live end-to-end verification of
-their rank credit. The present matchmaking is room filling, not skill matching. The
-host keeps rank disabled unless `RANK_ENABLED=1` and a startup write probe succeeds;
-the public deployment leaves it off.
+The public player ladder is enabled as of 21 October. The free Render instance has no
+disk: unfinished local match replays can be erased on a restart or deploy. Immutable
+rank events use a separate durable Upstash store while Render remains the game host.
+The host enables rank only when `RANK_ENABLED=1` and a startup write probe succeeds.
+The public health endpoint reports writable storage and enabled rank. A signed Recruit
+wallet completed a real public bot-filled Siege: its non-void defeat created one rank
+event and one match in the signed rank API, with zero points at the Bronze floor. This
+proves the loss path, not a positive award, a tier-up, a six-human match, or durability
+after a restart. Matchmaking is still room filling, not skill matching.
 
 Local runtime evidence from 21 October: [lobby human count](../research/evidence/chog-rank-lobby-runtime-2026-10-21.png),
 [casual bot result](../research/evidence/chog-rank-casual-result-2026-10-21.png), and
 [rank-up visual fixture](../research/evidence/chog-player-rank-preview-2026-10-21.png).
 The last image uses a synthetic 75-to-100 point transition and says so on the screen;
-it is evidence of WebGL layout and animation, not of a server credit. A signed-in bot
-match and durable rank event still need end-to-end proof. The points rule has server tests,
-not a claimed live rank result.
+it is evidence of WebGL layout and animation, not of a server credit. A real public
+[Recruit defeat result](../research/evidence/chog-player-rank-public-result-2026-10-21.png)
+and [signed home](../research/evidence/chog-player-rank-public-home-2026-10-21.png) were
+captured separately. The result remained on `VERIFYING THE MATCH` while the client stayed
+in the Photon room, although the rank event was confirmed after HOME. The intended reveal
+on the result screen is not yet end-to-end verified and needs a lifecycle fix.
 
 ## Current implementation and evidence
 
@@ -65,8 +68,9 @@ The [recruit result](../research/evidence/chog-post-match-recruit-runtime-2026-1
 comes from a completed local bot match in the final build.
 
 The preview is not proof that a signed-in Genesis career was credited on Monad. No
-ranked queue, player rating, skill filter or new in-match rank badge has been shipped
-by this slice. The client was deployed on 21 October with player rank gated off.
+ranked queue, player rating, skill filter or in-match rank badge has been shipped.
+Player rank was gated off in the first 21 October deployment, then enabled in the
+later deployment described above.
 A real signed-in career result,
 including its first match and a refused credit, still needs end-to-end verification.
 

@@ -482,9 +482,13 @@ The existing Render service remains the game host; the cron may keep it awake, b
 protect local files from a restart or deploy. A restart before a match is judged can
 still lose that incomplete replay; no rank is credited without its verdict. Genesis
 careers remain on Monad. On 21 October, the owner added the two Render settings and the
-public health endpoint confirmed `rankStorage: writable` and `rankEnabled: false`.
-No wallet-backed live match or real rank event has been verified, so leave
-`RANK_ENABLED` unset for now.
+public health endpoint confirmed writable storage. `RANK_ENABLED=1` was then deployed;
+the public endpoint reports `rankStorage: writable` and `rankEnabled: true`. A signed
+Recruit wallet completed a public Siege on 21 October. Its non-void defeat produced one
+immutable rank event and one match in `/api/rank/me`; the score stayed at zero because
+of the Bronze floor. A positive award, restart persistence and six-human play are not
+yet live-verified. The result UI stayed on `VERIFYING THE MATCH` until the player left
+the Photon room; do not present its delayed reveal as verified.
 
 ## To decide (the user)
 
