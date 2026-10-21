@@ -120,7 +120,7 @@ if (rankUrl && rankToken) {
     const candidate = createRemoteRankStore({ url: rankUrl, token: rankToken });
     if (!await candidate.ping() || !await candidate.probeWrite()) throw new Error('storage probe failed');
     rankStore = candidate;
-    rankStorageStatus = 'connected';
+    rankStorageStatus = 'writable';
   } catch {
     rankStorageStatus = 'unavailable';
     console.warn('Player rank storage is unavailable; no rank points will be credited.');
