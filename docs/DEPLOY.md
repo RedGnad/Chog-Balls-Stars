@@ -457,7 +457,7 @@ Pages read on 17 October 2026, the providers' own:
 
 | Option | Free limits | Lasts? | Card | From Node |
 | --- | --- | --- | --- | --- |
-| Upstash Redis Free (https://upstash.com/pricing/redis, https://upstash.com/docs/redis/overall/pricing, https://upstash.com/docs/redis/help/faq.md) | 250 MB, 500K commands a month | On disk; archived after 30 days without activity, with emails first, restored from the console | None | Plain `fetch` to its REST API (https://upstash.com/docs/redis/features/restapi) |
+| Upstash Redis Free (https://upstash.com/pricing/redis, https://upstash.com/docs/redis/features/restapi) | 256 MB, 500K commands a month | Persistent; an instant database made without an account is deleted after 3 days unless claimed | None | Plain `fetch` to its REST API |
 | Turso Free (https://turso.tech/pricing) | 5 GB | Archived after 10 days idle, unarchived by hand | None | `fetch` (`/v2/pipeline`) |
 | Neon Free (https://neon.com/docs/introduction/plans) | 1 GB | Kept; compute suspended over a limit | None | Needs its driver |
 | Supabase Free (https://supabase.com/docs/guides/platform/free-project-pausing) | 500 MB | Paused after a week without activity | Not stated | `fetch` (PostgREST) |
@@ -469,13 +469,22 @@ Pages read on 17 October 2026, the providers' own:
 | Render Postgres Free (https://render.com/docs/free.md) | 1 GB | Expires 30 days after creation | | `pg` driver |
 | Render Starter + disk (https://render.com/pricing.md, https://render.com/docs/disks.md) | 7 USD a month (512 MB, half a CPU) + 0.25 USD per GB a month | Durable; one instance, no zero-downtime deploy | Yes | No change |
 
-The smallest change for no monthly cost: Upstash Redis over REST, no new dependency. In `server/src/node.js` a
-REST client (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`), a careers store with the shape of
-`careerFile`, and a match store that writes local files and copies every key but the replay chunks,
-`replay-start` and `configs` to Redis, reading Redis only when the local file is missing; `host.js` picks them
-when both variables are set. About 85 commands for a 10-minute match (about 5,000 matches a month). Still lost
-after it: a match whose container restarts before its verdict (void, or refunded after an hour). Not measured:
-whether the free instance's CPU lets the judge finish a replay within its 330 s.
+The player ladder now has an optional Upstash REST store in `server/src/rank-store.js`.
+It saves only immutable rank events, not replay chunks, and uses `SET NX` so two judge
+callbacks cannot overwrite one match's award. `host.js` uses it only when
+`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` and `RANK_ENABLED=1` are present.
+At startup, the host checks both a Redis ping and a short-lived write. `GET /api/health`
+reports `rankStorage` as `writable`, `unavailable` or `not_configured`, and `rankEnabled`
+separately. A failed storage probe keeps rank off without taking the game server down.
+Neither field reveals the URL or token.
+The URL and token belong only in Render's environment, never in Git or browser code.
+The existing Render service remains the game host; the cron may keep it awake, but cannot
+protect local files from a restart or deploy. A restart before a match is judged can
+still lose that incomplete replay; no rank is credited without its verdict. Genesis
+careers remain on Monad. On 21 October, the owner added the two Render settings and the
+public health endpoint confirmed `rankStorage: writable` and `rankEnabled: false`.
+No wallet-backed live match or real rank event has been verified, so leave
+`RANK_ENABLED` unset for now.
 
 ## To decide (the user)
 

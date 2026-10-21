@@ -32,14 +32,15 @@ one short chime and a brief scale settle; reduced motion uses a fade. A casual r
 states `NO RANK POINTS`. The rank reveal waits for a Genesis mastery reveal so the two
 never compete for attention. No badge is placed above a fighter's head.
 
-This candidate must not be called a durable public ranked system yet. The current free
-Render instance has no disk: `data/matches` is erased on a restart or deploy. Because
-rank events and their wallet mapping live there, a public ladder would reset. A
-persistent store or disk is a launch requirement; no paid hosting change is implied by
-this candidate. A signed-in bot match and a six-human match still need live end-to-end
-verification of their rank credit. The present matchmaking is room filling, not skill matching.
-The host keeps rank disabled unless `RANK_ENABLED=1` is explicitly set after storage
-has been made persistent; the free deployment leaves it off.
+This candidate must not be called a durable public ranked system yet. The free Render
+instance has no disk: local match records are erased on a restart or deploy. The code
+now supports a separate durable Upstash store for immutable player rank events, while
+Render remains the game host. Its public health endpoint confirmed writable rank
+storage on 21 October, but rank credit remains disabled.
+A signed-in bot match and a six-human match still need live end-to-end verification of
+their rank credit. The present matchmaking is room filling, not skill matching. The
+host keeps rank disabled unless `RANK_ENABLED=1` and a startup write probe succeeds;
+the public deployment leaves it off.
 
 Local runtime evidence from 21 October: [lobby human count](../research/evidence/chog-rank-lobby-runtime-2026-10-21.png),
 [casual bot result](../research/evidence/chog-rank-casual-result-2026-10-21.png), and
