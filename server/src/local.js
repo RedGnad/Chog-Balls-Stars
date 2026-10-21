@@ -134,6 +134,7 @@ const handle = createApi({
   rental,
   careers,
   ranks,
+  seasons,
   matches,
   sessions,
   photon,

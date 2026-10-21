@@ -222,3 +222,21 @@ Implemented in the new `server/src/rating.js`, `server/src/ranks.js` (`ratingOf`
   classes (not yet compiled by Unity: plain serializable fields).
 - Not verified: Photon applying the `game/create` room options on the public cloud, a rated
   public match, the lobby filter.
+
+## 21 October, stream E, lot 4: seasons on the API and the reward list (implemented, tests only)
+
+Implemented in `server/src/seasons.js`, `server/src/ranks.js` (`summaryOf`) and `server/src/api.js`;
+verified only by `server/test/ranks-seasons.test.js` (3 tests; 113 server tests pass) and a local
+run of the services with a past season end on the file store.
+
+- `GET /api/season` (public): `{enabled, id, startsAt, endsAt, ended, closed}`, or `{enabled: false}`
+  without a configured season or without the ladder.
+- `GET /api/rank/me` adds `season: {id, startsAt, endsAt, ended, closed, summary}` with
+  `summary: {points, tier, bestTier, matches, wins}` counted in the season's window only, the
+  tier at its start counting for `bestTier`, and the points as played, before the reset.
+- At the close, after the resets, the services write once `seasons/<id>_rewards`: every wallet
+  that played in the season with `address, tier, points, bestTier, matches, wins`, and call the
+  `onClosed` hook with it. `GET /api/season/rewards?season=<id>` (public, addresses and tiers)
+  answers it; 404 before the close. Stream F pays the $CHOG reward from this list; no payment
+  exists here.
+- Not verified: a close on Upstash with real events; the client shows none of this yet.

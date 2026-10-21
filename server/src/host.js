@@ -265,6 +265,7 @@ const api = createApi({
   standIns,
   careers,
   ranks,
+  seasons,
   rankStorageStatus,
   matches,
   recentRecords: () => recent,

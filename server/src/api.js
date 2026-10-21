@@ -52,6 +52,7 @@ async function bodyOf(request) {
  * @param {boolean} [services.photonAuthentication] whether Photon's dashboard is set up to ask
  *   these services who a player is: the game then connects with its session or its pass
  * @param {string} [services.rankStorageStatus] public, credential-free startup probe result
+ * @param {ReturnType<import('./seasons.js').createSeasons>} [services.seasons] the ladder season, when one is configured
  * @param {ReturnType<import('./wager.js').createWager>} [services.wager] absent when no match is staked on
  * @param {string} [services.publicOrigin] origin of the game page, for example "https://game.example";
  *   when absent it is taken from the request, which is only right behind a proxy we control
@@ -61,7 +62,7 @@ async function bodyOf(request) {
  *   beside these services, or a function that reads it; empty when they do not know
  * @returns {(request: Request) => Promise<Response>}
  */
-export function createApi({ chain, sessions, careers, ranks, rankStorageStatus = 'not_configured', matches, recentRecords, shop, rental, standIns, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
+export function createApi({ chain, sessions, careers, ranks, seasons, rankStorageStatus = 'not_configured', matches, recentRecords, shop, rental, standIns, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
   // The page a wallet is asked to trust: it is written in the message the player signs.
   function pageOf(request, url) {
     const origin = publicOrigin
@@ -159,14 +160,30 @@ export function createApi({ chain, sessions, careers, ranks, rankStorageStatus =
       const event = latest && ranks ? await ranks.eventOf(latest.gameId) : null;
       // The hidden rating is answered as a band only, never as a number (rating.js).
       const rated = ranks ? await ranks.ratingOf(address) : null;
+      const season = ranks && seasons ? await seasons.current() : null;
       return json(200, {
         enabled: Boolean(ranks), rank,
         rating: rated ? { band: rated.band, rated: rated.matches > 0, matches: rated.matches } : null,
+        season: season ? { ...season, summary: await seasons.summaryOf(address) } : null,
         latestMatch: latest ? {
           gameId: latest.gameId,
           status: event ? (event.reason ?? 'ranked') : latest.startedAt ? 'verifying' : 'preparing',
         } : null,
       });
+    },
+
+    // The ladder season: its id and times, whether it ended and was closed; {enabled: false} without one.
+    'GET /api/season': async () => {
+      const season = ranks && seasons ? await seasons.current() : null;
+      return json(200, season ? { enabled: true, ...season } : { enabled: false });
+    },
+
+    // The reward list of a closed season: every wallet that played in it with its final tier.
+    // Public like the events behind it; the $CHOG payment is made elsewhere from this list.
+    'GET /api/season/rewards': async (request, url) => {
+      const seasonId = url.searchParams.get('season') ?? '';
+      const rewards = ranks && seasons ? await seasons.rewardsOf(seasonId) : null;
+      return rewards ? json(200, rewards) : failure(404, 'no_such_closed_season', 'no season of that id was closed here');
     },
 
     // One finished match, reported by the game page of a signed-in player for a Genesis that
