@@ -9,13 +9,20 @@ Quick Play already exist. A player rating and a ranked queue do not.
 This candidate adds player ladder points, not a skill rating or a separate ranked queue.
 Photon still fills a compatible Siege room first and starts with bots after the lobby clock;
 the preparation caption now states the human count. No client claims a rank result. The
-server writes one event per replayed match and credits only a full Siege 3v3 with six
-distinct signed-in wallets, the normal simulation options and a non-void verdict. A win
-adds 25 points, a loss takes 15 down to a floor of zero, and a draw changes nothing.
+server writes one event per replayed match and credits authenticated humans in a completed
+Siege 3v3 with normal simulation options and a non-void verdict. The replay counts real
+humans at selection end; bots fill the remaining seats. Only distinct signed-in wallets
+increase the award, so guest tabs cannot inflate it. A win gives 3, 6, 10, 13, 17 or
+20 points for one through six authenticated humans respectively. A loss takes 2, 4, 6, 8, 10 or 12,
+down to a floor of zero; a draw changes nothing. The event freezes its own scoring so
+later balance changes do not alter earlier results.
 Bronze begins at 0, Silver at 100, Gold at 250 and Star at 500. These thresholds are
 initial design values, not tuned against a real player distribution. The rank belongs to
-the signed-in wallet, not its Genesis. Bot, guest, preview, partial and unverified games
-remain casual and award no player points. Genesis mastery remains separate.
+the signed-in wallet, not its Genesis. Guests can occupy a human seat but neither earn
+points nor increase the reward scale. Preview, Coins, unverified and identity-invalid games award no player
+points. A bot-filled Siege now gives slower rank progress, not zero. Genesis mastery remains
+separate. This is a participation-weighted ladder, not a skill rating: repeated solo bot
+wins can still raise it. Measure that behavior before tuning limits or calling it competitive.
 
 The player chip shows a compact rank badge. The result shows `VERIFYING` until the
 server resolves the match. Only after the signed-in player's latest match is matched
@@ -29,8 +36,8 @@ This candidate must not be called a durable public ranked system yet. The curren
 Render instance has no disk: `data/matches` is erased on a restart or deploy. Because
 rank events and their wallet mapping live there, a public ladder would reset. A
 persistent store or disk is a launch requirement; no paid hosting change is implied by
-this candidate. Six signed-in humans and a full replay also still need live end-to-end
-verification. The present matchmaking is room filling, not skill matching.
+this candidate. A signed-in bot match and a six-human match still need live end-to-end
+verification of their rank credit. The present matchmaking is room filling, not skill matching.
 The host keeps rank disabled unless `RANK_ENABLED=1` is explicitly set after storage
 has been made persistent; the free deployment leaves it off.
 
@@ -38,8 +45,9 @@ Local runtime evidence from 21 October: [lobby human count](../research/evidence
 [casual bot result](../research/evidence/chog-rank-casual-result-2026-10-21.png), and
 [rank-up visual fixture](../research/evidence/chog-player-rank-preview-2026-10-21.png).
 The last image uses a synthetic 75-to-100 point transition and says so on the screen;
-it is evidence of WebGL layout and animation, not of a server credit. A signed-in six-human
-match and durable rank event still need end-to-end proof.
+it is evidence of WebGL layout and animation, not of a server credit. A signed-in bot
+match and durable rank event still need end-to-end proof. The points rule has server tests,
+not a claimed live rank result.
 
 ## Current implementation and evidence
 
@@ -133,11 +141,12 @@ the oldest compatible room. A rating filter needs server-issued player identity 
 match history, not a client-chosen room property. Do not split the population into several
 rank buckets before concurrent human play supports it.
 
-For true ranked, use one opt-in Siege queue, six authenticated humans, no bots, a verified
-and idempotent result, and a server-held player rating. Never award or deduct rating from
-a bot match, an incomplete replay or a disconnected game whose outcome cannot be judged.
-Show an honest casual fallback after a bounded wait rather than silently awarding ranked
-points against bots. This is a later implementation gate, not a feature of this slice.
+For a future skill-rated competitive queue, use one opt-in Siege queue, six authenticated
+humans, no bots, a verified and idempotent result, and a server-held rating separate from
+the participation-weighted ladder above. Never adjust that skill rating from a bot match,
+an incomplete replay or a disconnected game whose outcome cannot be judged. Show an
+honest bot fallback after a bounded wait. This is a later implementation gate, not a
+feature of this slice.
 
 ## Acceptance evidence
 
@@ -156,5 +165,6 @@ points against bots. This is a later implementation gate, not a feature of this 
 - [Apple motion guidance](https://developer.apple.com/design/human-interface-guidelines/motion): motion should convey status, stay brief and be cancellable.
 - [Apple accessibility guidance](https://developer.apple.com/design/human-interface-guidelines/accessibility): reduce automatic zoom and travel in a reduced-motion state.
 - [Brawl Stars ranked notes](https://supercell.com/en/games/brawlstars/blog/release-notes/patch-notes-ranked-update/): a rank is visibly distinct from character progression and changes from scored competitive games.
+- [Brawl Stars February 2026 notes](https://supercell.com/en/games/brawlstars/blog/release-notes/release-notes-february-2026/): bot matches remain available at lower trophy levels while matchmaking uses a hidden MMR decoupled from trophies. This is a precedent for separating participation progress from skill, not evidence that this draft point scale is balanced.
 - [Photon Quantum matchmaking](https://doc.photonengine.com/quantum/v3/manual/game-session/async-extensions): existing random rooms and custom lobby properties; these do not themselves establish a trusted skill rating.
 - [Photon result verification](https://doc.photonengine.com/quantum/v3/manual/cheat-protection): replay and game-result validation are the basis for durable competitive progress.

@@ -147,8 +147,8 @@ export function createApi({ chain, sessions, careers, ranks, matches, recentReco
       return json(200, { careers: await careers.top(limit) });
     },
 
-    // A player's ladder is separate from the career of any Genesis they use. Only a replayed,
-    // complete 3v3 Siege with six distinct signed-in wallets can change it.
+    // A player's ladder is separate from the career of any Genesis they use. A replayed,
+    // complete Siege with at least one signed-in human can change it; bots lower the award.
     'GET /api/rank/me': async request => {
       const address = await signedIn(request);
       if (!address) return failure(401, 'not_signed_in', 'sign in with the wallet first');
