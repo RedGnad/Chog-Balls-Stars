@@ -240,6 +240,7 @@ namespace Chog.Screens
             GenesisShop.Changed += Refresh;
             GenesisRental.Changed += Refresh;
             GenesisWager.Changed += Refresh;
+            ChogPrice.Changed += Refresh;
             if (_title != null)
             {
                 // Back on the menu, for instance after a match: the careers and the money may have moved.
@@ -261,6 +262,7 @@ namespace Chog.Screens
             GenesisShop.Changed -= Refresh;
             GenesisRental.Changed -= Refresh;
             GenesisWager.Changed -= Refresh;
+            ChogPrice.Changed -= Refresh;
             // The window of the panel belongs to the main screen: it leaves with it.
             if (_modal != null)
                 _modal.SetActive(false);

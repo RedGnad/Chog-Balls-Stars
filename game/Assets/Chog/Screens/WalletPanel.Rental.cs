@@ -319,16 +319,17 @@ namespace Chog.Screens
                               (lentUntil > 0
                                   ? "<color=" + LabelColor + ">Rented by " + PlayerWallet.ShortAddress(GenesisRental.LentToAddress(_offerFor)) + " for " +
                                     GenesisRental.TimeLeft(lentUntil, NowMs() / 1000) + " more.</color> "
-                                  : offered ? "It is offered at " + MonadTransactions.PriceText(offer.PricePerDayWei) + " $CHOG a day. " : "");
-            _offerPrice.text = price + " <size=60%>$CHOG A DAY</size>";
-            _offerShare.text = "you keep " + MonadTransactions.PriceText(GenesisRental.HolderShare(MonadTransactions.WholeToWei(price), GenesisRental.BurnedShare)) +
+                                  : offered ? "It is offered at " + ChogPrice.WithUsd(offer.PricePerDayWei) + " a day. " : "");
+            var priceUsd = ChogPrice.UsdText(MonadTransactions.WholeToWei(price));
+            _offerPrice.text = price + " <size=60%>$CHOG A DAY" + (priceUsd.Length > 0 ? " (" + priceUsd + ")" : "") + "</size>";
+            _offerShare.text = "you keep " + ChogPrice.WithUsd(GenesisRental.HolderShare(MonadTransactions.WholeToWei(price), GenesisRental.BurnedShare)) +
                                (GenesisRental.BurnedShare > 0 ? "\n" + BurnedText() + " is burned" : "");
             var earned = GenesisRental.EarnedWei;
             _offerClaim.gameObject.SetActive(earned != "0" || (claiming && GenesisRental.IsBusy));
             _offerClaim.interactable = !GenesisRental.IsBusy;
             _offerClaimLabel.text = claiming && GenesisRental.IsBusy
                 ? "<size=60%>" + RentalStepText(GenesisRental.Step).ToUpperInvariant() + "</size>"
-                : "CLAIM " + MonadTransactions.PriceText(GenesisRental.HolderShare(earned, GenesisRental.BurnedShare)) + " $CHOG";
+                : "CLAIM " + ChogPrice.WithUsd(GenesisRental.HolderShare(earned, GenesisRental.BurnedShare));
             _offerStatus.text = failed ? "<color=" + ProblemColor + ">" + GenesisRental.Problem + "</color>"
                 : busy ? "Answer in your wallet: " + RentalStepText(GenesisRental.Step) : "";
 
@@ -361,7 +362,7 @@ namespace Chog.Screens
                 var index = _marketPage * SlotsPerPage + i;
                 var shown = index < offers.Count ? offers[index].TokenId : 0;
                 ShowSlot(_marketSlots[i], shown, _marketPick);
-                TagSlot(_marketSlots[i], shown > 0 ? MonadTransactions.PriceText(offers[index].PricePerDayWei) + " A DAY" : "");
+                TagSlot(_marketSlots[i], shown > 0 ? OfferTag(offers[index].PricePerDayWei, ChogPrice.UsdPerChog) : "");
             }
 
             _marketPrevious.gameObject.SetActive(pages > 1);
@@ -396,7 +397,7 @@ namespace Chog.Screens
 
             var own = Array.IndexOf(PlayerWallet.Tokens, _marketPick) >= 0;
             var until = GenesisRental.RentedUntilSeconds(_marketPick);
-            var cost = MonadTransactions.PriceText(MonadTransactions.Times(picked.PricePerDayWei, days));
+            var cost = ChogPrice.WithUsd(MonadTransactions.Times(picked.PricePerDayWei, days));
             _marketChosen.text = DescribeChoice(_marketPick) + "\n<size=60%><color=" + LabelColor + ">" +
                                  (own ? "THIS ONE IS YOURS"
                                      : until > 0 ? "YOU RENT IT FOR " + GenesisRental.TimeLeft(until, NowMs() / 1000).ToUpperInvariant()
@@ -405,8 +406,15 @@ namespace Chog.Screens
             _rent.gameObject.SetActive(!own);
             _rent.interactable = !busy;
             _rentLabel.text = busy ? "<size=55%>ANSWER IN YOUR WALLET</size>\n" + RentalStepText(GenesisRental.Step).ToUpperInvariant()
-                : (until > 0 ? "ADD " : "RENT ") + days + (days == 1 ? " DAY FOR " : " DAYS FOR ") + cost + " $CHOG";
+                : (until > 0 ? "ADD " : "RENT ") + days + (days == 1 ? " DAY FOR " : " DAYS FOR ") + cost;
             ShowAside(busy, until > 0 ? _marketPick : 0);
+        }
+
+        /// <summary>"10 A DAY ($0.02)": the tag under a Genesis offered for rent; without the dollars while the price is unknown.</summary>
+        public static string OfferTag(string pricePerDayWei, double usdPerChog)
+        {
+            var usd = ChogPrice.UsdText(pricePerDayWei, usdPerChog);
+            return MonadTransactions.PriceText(pricePerDayWei) + " A DAY" + (usd.Length > 0 ? " (" + usd + ")" : "");
         }
 
         // The $CHOG this wallet may take out (owed back as a renter, or earned as a holder, which a
@@ -421,9 +429,9 @@ namespace Chog.Screens
                 return;
             _marketAside.interactable = !busy;
             _marketAsideLabel.text = owed != "0"
-                ? "<size=70%>GET YOUR REFUND</size>\n" + MonadTransactions.PriceText(owed) + " $CHOG"
+                ? "<size=70%>GET YOUR REFUND</size>\n" + ChogPrice.WithUsd(owed)
                 : earned != "0"
-                    ? "<size=70%>CLAIM</size>\n" + MonadTransactions.PriceText(GenesisRental.HolderShare(earned, GenesisRental.BurnedShare)) + " $CHOG"
+                    ? "<size=70%>CLAIM</size>\n" + ChogPrice.WithUsd(GenesisRental.HolderShare(earned, GenesisRental.BurnedShare))
                     : "END NOW";
         }
 

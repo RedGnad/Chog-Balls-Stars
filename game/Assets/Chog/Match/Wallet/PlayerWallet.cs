@@ -215,6 +215,8 @@ namespace Chog.Match
             GenesisRental.Changed += OnRentalsChanged;
             GenesisRental.Begin();
             GenesisWager.Begin();
+            // What a $CHOG is worth in dollars, for every amount shown.
+            ChogPrice.Begin();
 
             s_pageHasWallet = ChogWalletHasProvider() != 0;
             if (!s_pageHasWallet)

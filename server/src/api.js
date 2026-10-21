@@ -5,6 +5,7 @@ import { LAST_TOKEN_ID } from './career.js';
 import { CHAIN_ID, GENESIS, isAddress } from './chain.js';
 import { parseExact } from './matches.js';
 import { MAX_LOAN_DAYS } from './session.js';
+import { CHOG_TOKEN } from './shop.js';
 
 const MAX_BODY_CHARACTERS = 20000;
 const MAX_TOKENS_PER_READ = 64;
@@ -53,6 +54,8 @@ async function bodyOf(request) {
  *   these services who a player is: the game then connects with its session or its pass
  * @param {string} [services.rankStorageStatus] public, credential-free startup probe result
  * @param {ReturnType<import('./wager.js').createWager>} [services.wager] absent when no match is staked on
+ * @param {ReturnType<import('./price.js').createPrice>} [services.price] the price of $CHOG in dollars;
+ *   absent when the game shows amounts in $CHOG only
  * @param {string} [services.publicOrigin] origin of the game page, for example "https://game.example";
  *   when absent it is taken from the request, which is only right behind a proxy we control
  * @param {string} [services.reownProjectId] the Reown project id of this deployment; without it
@@ -61,7 +64,7 @@ async function bodyOf(request) {
  *   beside these services, or a function that reads it; empty when they do not know
  * @returns {(request: Request) => Promise<Response>}
  */
-export function createApi({ chain, sessions, careers, ranks, rankStorageStatus = 'not_configured', matches, recentRecords, shop, rental, standIns, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
+export function createApi({ chain, sessions, careers, ranks, rankStorageStatus = 'not_configured', matches, recentRecords, shop, rental, standIns, photon, photonAuthentication = false, wager, price, publicOrigin, reownProjectId = '', build = '' }) {
   // The page a wallet is asked to trust: it is written in the message the player signs.
   function pageOf(request, url) {
     const origin = publicOrigin
@@ -282,6 +285,12 @@ export function createApi({ chain, sessions, careers, ranks, rankStorageStatus =
       const { status, body } = await photon.authenticate(url.searchParams);
       return json(status, body);
     },
+
+    // The price of $CHOG in US dollars, read from public sources and kept a few minutes (price.js):
+    // usd is null while no source has answered. Public, and never a failure: a page without
+    // a price shows amounts in $CHOG only.
+    'GET /api/price': async () => json(200, price ? await price.describe()
+      : { token: CHOG_TOKEN.toLowerCase(), usd: null, source: null, readAt: null, stale: true }),
 
     // Staking $CHOG on a match: the contract, the token and the terms, or {enabled: false}.
     'GET /api/wager': async () => json(200, wager ? await wager.describe() : { enabled: false }),

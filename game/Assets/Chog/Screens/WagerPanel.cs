@@ -20,7 +20,20 @@ namespace Chog.Screens
 
         // Whole $CHOG a player can stake when the match has no stake yet.
         private static readonly int[] Amounts = { 1, 5, 10, 25, 50, 100, 250, 500, 1000 };
-        private const int FirstAmount = 2;
+
+        /// <summary>
+        /// What the proposed stake is worth, in dollars: the amount of the list closest to it is
+        /// proposed first, so the proposal follows the price of $CHOG. The references bracket a
+        /// low paid entry between about $0.12 and $0.60: Clash Royale's Classic Challenge costs
+        /// 10 gems (support.clashroyale.com, "Classic Challenges"), which the smallest gem pack
+        /// (80 for $0.99) prices at $0.12; Skillz's cash matches start at $0.60 (PocketGamer's
+        /// interview of its CEO, 2015; Naavik on Solitaire Cube, August 2022). $0.15 sits at the
+        /// low end, where a first stake costs about what a Classic Challenge does: on 21 October
+        /// 2026 ($0.0015 a $CHOG) that is 100 $CHOG.
+        /// </summary>
+        public const double DefaultStakeUsd = 0.15;
+        // The amount proposed while the price is unknown: 100 $CHOG, the default of 21 October 2026.
+        private const int FallbackAmount = 5;
 
         private static readonly Color PanelColor = ChogTheme.Card;
         private static readonly Color AccentColor = ChogTheme.Cheek;
@@ -41,7 +54,9 @@ namespace Chog.Screens
         private Button _stake;
         private TextMeshProUGUI _stakeLabel;
         private Button _tap;
-        private int _amount = FirstAmount;
+        private int _amount = FallbackAmount;
+        // Whether the player moved the amount: the proposal then no longer follows the price.
+        private bool _amountPicked;
         private float _readAt;
 
         /// <summary>
@@ -71,22 +86,41 @@ namespace Chog.Screens
         public static void BeforeStart(Action start) => GenesisWager.WhenLocked(start);
 
         /// <summary>
+        /// The place, among the amounts a player picks from, of the one closest to the proposed
+        /// stake in dollars at a price; the fallback amount while the price is unknown.
+        /// </summary>
+        public static int DefaultAmountIndex(double usdPerChog)
+        {
+            if (usdPerChog <= 0)
+                return FallbackAmount;
+            var closest = 0;
+            for (var i = 1; i < Amounts.Length; i++)
+                if (Math.Abs(Amounts[i] * usdPerChog - DefaultStakeUsd) < Math.Abs(Amounts[closest] * usdPerChog - DefaultStakeUsd))
+                    closest = i;
+            return closest;
+        }
+
+        /// <summary>The whole $CHOG proposed as a stake at a price of $CHOG.</summary>
+        public static int DefaultAmount(double usdPerChog) => Amounts[DefaultAmountIndex(usdPerChog)];
+
+        /// <summary>
         /// The line the panel shows, from what is known of the stakes of the match. "currency"
-        /// is what the stakes are called: "TEST $CHOG" when the wager is on the testnet.
+        /// is what the stakes are called: "TEST $CHOG" when the wager is on the testnet;
+        /// "usdPerChog" labels every amount in dollars too, when it is known.
         /// </summary>
         public static string StatusText(bool signedIn, bool inMatch, bool locked, int stakers, string stakeWei, int stakedTeam,
-                                        int winnersIfMine, int losersIfMine, int burnedShare, string currency = "$CHOG")
+                                        int winnersIfMine, int losersIfMine, int burnedShare, string currency = "$CHOG", double usdPerChog = 0)
         {
             if (!signedIn)
                 return "SIGN IN ON THE MENU TO STAKE " + currency + " ON A MATCH";
             if (!inMatch)
                 return "STAKES: WAITING FOR THE GAME SERVER";
 
-            var each = stakeWei.Length > 0 ? MonadTransactions.PriceText(stakeWei) + " " + currency : "";
+            var each = stakeWei.Length > 0 ? ChogPrice.WithUsd(stakeWei, usdPerChog, currency) : "";
             if (stakedTeam >= 0)
             {
                 var gain = GenesisWager.WinnerGain(stakeWei, winnersIfMine, losersIfMine, burnedShare);
-                var toWin = gain == "0" ? "NOBODY ON THE OTHER TEAM YET" : "TO WIN +" + MonadTransactions.PriceText(gain);
+                var toWin = gain == "0" ? "NOBODY ON THE OTHER TEAM YET" : "TO WIN +" + ChogPrice.WithUsd(gain, usdPerChog, currency);
                 return "YOU STAKED " + each + (locked ? "  LOCKED" : "") + "\n" + stakers + " STAKED  " + toWin;
             }
 
@@ -117,9 +151,17 @@ namespace Chog.Screens
             }
         }
 
-        private void OnEnable() => GenesisWager.Changed += Refresh;
+        private void OnEnable()
+        {
+            GenesisWager.Changed += Refresh;
+            ChogPrice.Changed += Refresh;
+        }
 
-        private void OnDisable() => GenesisWager.Changed -= Refresh;
+        private void OnDisable()
+        {
+            GenesisWager.Changed -= Refresh;
+            ChogPrice.Changed -= Refresh;
+        }
 
         private void Build(TextMeshProUGUI template)
         {
@@ -138,19 +180,34 @@ namespace Chog.Screens
             _less = MakeButton(template, "Less", new Vector2(0.03f, 0.06f), new Vector2(0.15f, 0.42f), "-", out _);
             _more = MakeButton(template, "More", new Vector2(0.17f, 0.06f), new Vector2(0.29f, 0.42f), "+", out _);
             _stake = MakeButton(template, "Stake", new Vector2(0.32f, 0.06f), new Vector2(0.97f, 0.42f), "", out _stakeLabel);
+            // The dollars under the amount are smaller: the label reads rich text.
+            _stakeLabel.richText = true;
             // On the testnet only: test tokens from the tap of the test token, beside the line.
             _tap = MakeButton(template, "TestTokens", TapMin, new Vector2(0.97f, 0.95f), "GET 1000\nTEST $CHOG", out _);
             _less.onClick.AddListener(() => Step(-1));
             _more.onClick.AddListener(() => Step(1));
             _stake.onClick.AddListener(() => GenesisWager.Stake(s_team, Amounts[_amount]));
             _tap.onClick.AddListener(GenesisWager.TakeTestTokens);
+            _amount = DefaultAmountIndex(ChogPrice.UsdPerChog);
             Refresh();
         }
 
         private void Step(int by)
         {
             _amount = Mathf.Clamp(_amount + by, 0, Amounts.Length - 1);
+            _amountPicked = true;
             Refresh();
+        }
+
+        /// <summary>
+        /// The words of the stake button: the amount in $CHOG, and under it what it is worth when
+        /// the price is known. "fixedWei" is the stake of the match once someone staked, else empty.
+        /// </summary>
+        public static string StakeButtonText(string fixedWei, int proposedChog, string currency, double usdPerChog)
+        {
+            var wei = fixedWei.Length > 0 ? fixedWei : MonadTransactions.WholeToWei(proposedChog);
+            var usd = ChogPrice.UsdText(wei, usdPerChog);
+            return "STAKE " + MonadTransactions.PriceText(wei) + " " + currency + (usd.Length > 0 ? "\n<size=60%>" + usd + "</size>" : "");
         }
 
         private void Update()
@@ -177,10 +234,15 @@ namespace Chog.Screens
 
             var busy = GenesisWager.Step != WagerStep.Idle;
             var currency = GenesisWager.Currency;
+            // A test token is worth nothing: no dollars beside it.
+            var usdPerChog = GenesisWager.IsTest ? 0 : ChogPrice.UsdPerChog;
+            // The proposal follows the price until the player moves it.
+            if (!_amountPicked)
+                _amount = DefaultAmountIndex(usdPerChog);
             _status.text = busy
                 ? StepText(GenesisWager.Step, GenesisWager.Doing, GenesisWager.LockWaitSeconds, GenesisWager.Problem, GenesisWager.Chain.Name)
                 : StatusText(signedIn, GenesisWager.InMatch, GenesisWager.Locked, stakers.Count, GenesisWager.StakeWei, stakedTeam,
-                    winners, stakers.Count - winners, GenesisWager.BurnedShare, currency);
+                    winners, stakers.Count - winners, GenesisWager.BurnedShare, currency, usdPerChog);
             var tap = signedIn && stakedTeam < 0 && GenesisWager.CanTakeTestTokens;
             _tap.gameObject.SetActive(tap);
             _status.rectTransform.anchorMax = tap ? StatusMaxBesideTap : StatusMax;
@@ -191,8 +253,7 @@ namespace Chog.Screens
             _less.gameObject.SetActive(free);
             _more.gameObject.SetActive(free);
             _stake.gameObject.SetActive(canStake);
-            _stakeLabel.text = "STAKE " + (GenesisWager.StakeWei.Length > 0 ? MonadTransactions.PriceText(GenesisWager.StakeWei) : Amounts[_amount].ToString())
-                + " " + currency;
+            _stakeLabel.text = StakeButtonText(GenesisWager.StakeWei, Amounts[_amount], currency, usdPerChog);
         }
 
         private Button MakeButton(TextMeshProUGUI template, string name, Vector2 min, Vector2 max, string label, out TextMeshProUGUI text)
