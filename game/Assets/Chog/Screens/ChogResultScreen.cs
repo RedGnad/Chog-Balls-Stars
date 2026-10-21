@@ -134,9 +134,11 @@ namespace Chog.Screens
             controls = host.AddComponent<ResultControls>();
             controls.TokenId = tokenId;
             controls.Won = won;
+            controls.GameId = QuantumRunner.Default?.NetworkClient?.CurrentRoom?.Name;
             var game = QuantumRunner.Default != null ? QuantumRunner.Default.Game : null;
             var resultFrame = game != null && game.Frames != null ? game.Frames.Verified : null;
-            controls.RankEligible = playing && resultFrame != null && MatchModes.IsSiege(resultFrame);
+            controls.RankEligible = playing && !string.IsNullOrEmpty(controls.GameId) &&
+                resultFrame != null && MatchModes.IsSiege(resultFrame);
             controls.VictoryTitle = title;
             controls.VictoryGlow = playing && ChogHeroModel.Has(metadataId)
                 ? host.transform.Find("Glow")?.GetComponent<Image>() : null;
@@ -257,6 +259,7 @@ namespace Chog.Screens
             public MasteryRoad Road;
             public GenesisCareer BeforeCareer;
             public int TokenId;
+            public string GameId;
             public int PointsBefore = -1;
             public bool WaitingForRecord;
             public bool Won;
@@ -334,8 +337,8 @@ namespace Chog.Screens
                         yield break;
                     }
                     var match = answer?.latestMatch;
-                    if (match != null && match.status == "ranked" && answer.rank?.last != null &&
-                        answer.rank.last.gameId == match.gameId)
+                    if (match != null && match.gameId == GameId && match.status == "ranked" &&
+                        answer.rank?.last != null && answer.rank.last.gameId == GameId)
                     {
                         var gain = answer.rank.last;
                         _rankStatus.text = "PLAYER RANK  " + answer.rank.tier + "  " + answer.rank.points +
@@ -348,7 +351,8 @@ namespace Chog.Screens
                             yield return RevealRank(gain);
                         yield break;
                     }
-                    if (match != null && match.status != "verifying" && match.status != "preparing")
+                    if (match != null && match.gameId == GameId &&
+                        match.status != "verifying" && match.status != "preparing")
                     {
                         _rankStatus.text = "CASUAL MATCH: NO RANK POINTS  |  " + answer.rank.tier + " " + answer.rank.points + " PTS";
                         yield break;

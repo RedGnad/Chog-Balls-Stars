@@ -1,7 +1,7 @@
 # État courant et décisions
 
 **21 October 2026, 17:55 UTC (result room-close sequencing refined).**
-- **Implemented on `stream/result-home`, not deployed:** the result screen snapshots the final verified match frame before Photon cleanup, then begins `DisconnectAsync` as soon as the persistent result screen starts. The earlier arbitrary 0.8-second wait was removed. The player sees the result immediately; the rank reward appears only after the server confirms it.
+- **Implemented on `stream/result-home`, not deployed:** the result screen snapshots the final verified match frame and its Photon room ID before cleanup, then begins `DisconnectAsync` as soon as the persistent result screen starts. The earlier arbitrary 0.8-second wait was removed. The player sees the result immediately; the rank reward appears only after the server confirms this exact match. An older match can no longer trigger a false reward overlay.
 - **Verified:** screen typecheck has 0 errors; 166 view tests pass. The `rankpreview` fixture shows an existing Genesis Mastery Road, so its late screenshot is not evidence of a Recruit rank reveal. No new Unity build, live signed win, verified reward timing or production deployment was performed for this refinement.
 **Next action:** after the shared heavy-job lock is free, build and capture an actual Recruit result through Photon, check room closure and signed rank credit, then request owner review of the rank overlay before deployment.
 
