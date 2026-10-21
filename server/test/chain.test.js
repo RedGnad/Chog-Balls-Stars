@@ -146,6 +146,10 @@ test('the owned endpoint answers the tokens, refuses a malformed address, and re
 
   const health = await (await api(new Request('http://game.example/api/health'))).json();
   assert.deepEqual([health.ok, health.chainId, health.lastOwnerReadBlock], [true, 143, 100]);
+  assert.equal(health.rankStorage, 'not_configured');
+  assert.equal(health.rankEnabled, false);
+  const connected = createApi({ chain: createChain({ rpcUrls: ['https://first.example'], fetch: fakeChain().fetch }), rankStorageStatus: 'connected' });
+  assert.equal((await (await connected(new Request('http://game.example/api/health'))).json()).rankStorage, 'connected');
 
   assert.equal((await api(new Request('http://game.example/api/genesis/owned?address=0x1234'))).status, 400);
   assert.equal((await api(new Request('http://game.example/api/genesis/owned'))).status, 400);

@@ -51,6 +51,7 @@ async function bodyOf(request) {
  *   cloud is not set up to ask these services anything
  * @param {boolean} [services.photonAuthentication] whether Photon's dashboard is set up to ask
  *   these services who a player is: the game then connects with its session or its pass
+ * @param {string} [services.rankStorageStatus] public, credential-free startup probe result
  * @param {ReturnType<import('./wager.js').createWager>} [services.wager] absent when no match is staked on
  * @param {string} [services.publicOrigin] origin of the game page, for example "https://game.example";
  *   when absent it is taken from the request, which is only right behind a proxy we control
@@ -60,7 +61,7 @@ async function bodyOf(request) {
  *   beside these services, or a function that reads it; empty when they do not know
  * @returns {(request: Request) => Promise<Response>}
  */
-export function createApi({ chain, sessions, careers, ranks, matches, recentRecords, shop, rental, standIns, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
+export function createApi({ chain, sessions, careers, ranks, rankStorageStatus = 'not_configured', matches, recentRecords, shop, rental, standIns, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
   // The page a wallet is asked to trust: it is written in the message the player signs.
   function pageOf(request, url) {
     const origin = publicOrigin
@@ -90,6 +91,7 @@ export function createApi({ chain, sessions, careers, ranks, matches, recentReco
     // Answers without reading the chain, so a host can ask it every few seconds.
     'GET /api/health': async () => json(200, {
       ok: true, chainId: CHAIN_ID, contract: GENESIS, lastOwnerReadBlock: chain.lastBlock?.() ?? null,
+      rankStorage: rankStorageStatus, rankEnabled: Boolean(ranks),
     }),
 
     // The Genesis an address holds. A public read: it proves nothing about who is asking.

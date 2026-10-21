@@ -54,8 +54,10 @@
 //                   on a machine with .NET needs none of these settings.
 //   DOTNET          the .NET 8 runtime that runs the judge; default "dotnet" on the path.
 //                   Without a judge, or without .NET, a match gets no verdict
-//   RANK_ENABLED    1 only after DATA_DIR is on persistent storage. The free Render instance
-//                   loses /var/data on a restart, so its player ladder must stay off.
+//   UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN
+//                   the durable store for immutable player rank events, kept server-side.
+//   RANK_ENABLED    1 only after that store and a real signed-in match have been verified.
+//                   Without both store settings, the player ladder stays disabled.
 
 import { mkdir, stat } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
@@ -71,6 +73,7 @@ import { createPhoton } from './photon.js';
 import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
 import { createRanks } from './ranks.js';
+import { createRemoteRankStore } from './rank-store.js';
 import { createSender } from './sender.js';
 import { createSessions } from './session.js';
 import { createShop } from './shop.js';
@@ -107,7 +110,24 @@ const sessions = createSessions({ secret: await sessionSecret(dataFolder, enviro
 
 const matchStore = matchFiles(join(dataFolder, 'matches'));
 const matches = createMatches({ store: matchStore });
-const ranks = environment.RANK_ENABLED === '1' ? createRanks({ store: matchStore, matches }) : null;
+const rankRequested = environment.RANK_ENABLED === '1';
+const rankUrl = (environment.UPSTASH_REDIS_REST_URL ?? '').trim();
+const rankToken = (environment.UPSTASH_REDIS_REST_TOKEN ?? '').trim();
+let rankStore = null;
+let rankStorageStatus = 'not_configured';
+if (rankUrl && rankToken) {
+  try {
+    const candidate = createRemoteRankStore({ url: rankUrl, token: rankToken });
+    if (!await candidate.ping()) throw new Error('unexpected ping response');
+    rankStore = candidate;
+    rankStorageStatus = 'connected';
+  } catch {
+    rankStorageStatus = 'unavailable';
+    console.warn('Player rank storage is unavailable; no rank points will be credited.');
+  }
+}
+if (rankRequested && !rankStore) console.warn('Player rank is disabled: persistent storage is not connected.');
+const ranks = rankRequested && rankStore ? createRanks({ store: rankStore, matches }) : null;
 const wagerAddress = (environment.WAGER_ADDRESS ?? '').trim();
 const refereeKey = (environment.REFEREE_KEY ?? '').trim();
 if (Boolean(wagerAddress) !== Boolean(refereeKey)) {
@@ -236,6 +256,7 @@ const api = createApi({
   standIns,
   careers,
   ranks,
+  rankStorageStatus,
   matches,
   recentRecords: () => recent,
   sessions,

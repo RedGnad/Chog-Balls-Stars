@@ -65,6 +65,9 @@ export function createRanks({ store, matches, now = Date.now }) {
     const scoring = reason ? null : pointsFor(authenticatedHumans);
     const event = { gameId, at: new Date(now()).toISOString(), reason, winnerTeam: verdict?.winnerTeam ?? null,
       humanCount, authenticatedHumans, scoring, players };
+    if (store.setIfAbsent) {
+      return await store.setIfAbsent(key, JSON.stringify(event)) ? event : JSON.parse(await store.get(key));
+    }
     await store.set(key, JSON.stringify(event));
     return event;
   }
