@@ -74,3 +74,7 @@ technical docs are in English.
 - Answer in French, in plain words, about what the player sees. When the owner asks for an opinion or the next
   steps, answer and wait: build only on an explicit go. Put the answers at the end of a turn, after the work.
 - Judges hold Chogs: never propose loans or trial modes for them.
+
+## Several agents at once
+
+See `docs/TEAM-WORKFLOW.md`: one territory and one branch per stream, one heavy job at a time, the lead integrates.
