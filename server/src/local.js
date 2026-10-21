@@ -11,6 +11,7 @@
 //                            [--verifier <Chog.Quantum.Verifier.dll> --quantum-db <quantum-db.json> [--dotnet <dotnet>]]
 //                            [--photon-auth] [--photon-secret <text>]
 //                            [--reown-project-id <32 hex digits>]
+//                            [--season <id> --season-ends <ISO time> [--season-starts <ISO time>]]
 //
 // --pretend-holder is for tests only: that address is answered as the holder of those tokens,
 // whatever the chain says, so the signed path can be run with a throwaway key. Never use it on
@@ -28,7 +29,8 @@
 // its session. The secret Photon's requests must carry is --photon-secret, else one kept in
 // the data folder (photon-secret). --reown-project-id, else the text of the file
 // reown-project-id in the data folder, lets a page without a wallet connect a wallet app;
-// without either, no such connection is offered.
+// without either, no such connection is offered. --season and --season-ends name the ladder
+// season; once its end has passed it is closed once (seasons.js).
 
 import { mkdir, readFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
@@ -43,6 +45,7 @@ import { createPhoton } from './photon.js';
 import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
 import { createRanks } from './ranks.js';
+import { createSeasons, seasonFrom } from './seasons.js';
 import { createSessions } from './session.js';
 import { createShop } from './shop.js';
 import { createWager, wagerNetwork } from './wager.js';
@@ -90,6 +93,8 @@ const sessions = createSessions({ secret: await sessionSecret(dataFolder) });
 const matchStore = matchFiles(join(dataFolder, 'matches'));
 const matches = createMatches({ store: matchStore });
 const ranks = createRanks({ store: matchStore, matches });
+const seasons = createSeasons({ ranks, store: matchStore, season: seasonFrom({ id: option('--season', ''), endsAt: option('--season-ends', ''), startsAt: option('--season-starts', '') }) });
+seasons.watch();
 const wagerAddress = option('--wager', '');
 const refereeKeyFile = option('--referee-key-file');
 const wagerRpc = option('--wager-rpc');

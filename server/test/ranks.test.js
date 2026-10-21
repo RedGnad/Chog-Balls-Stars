@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createMatches, createMemoryStore } from '../src/matches.js';
-import { createRanks, pointsFor, rankEligibility, tierFor } from '../src/ranks.js';
+import { BANDS, createRanks, pointsFor, rankEligibility, tierFor } from '../src/ranks.js';
 import { createApi } from '../src/api.js';
 import { createSessions } from '../src/session.js';
 import { createWallet } from './wallet.js';
@@ -52,7 +52,7 @@ test('one immutable match event credits only once and survives a service restart
   assert.equal((await createRanks({ store, matches }).of(address(1))).points, 20);
   assert.equal((await ranks.of(address(4))).points, 0);
   assert.equal((await ranks.of(address(1))).last.delta, 20);
-  assert.deepEqual((await ranks.eventOf(id)).scoring, { win: 20, loss: -12 });
+  assert.deepEqual((await ranks.eventOf(id)).scoring, { win: 20, loss: -12, soloCap: null, bands: BANDS });
   assert.equal(tierFor(100), 'SILVER');
 });
 
@@ -66,7 +66,7 @@ test('a solo human earns three points against bots, with no credit for a preview
   const event = await ranks.record(id, { ...verdict, players: players.slice(0, 1) });
   assert.equal(event.reason, null);
   assert.equal(event.humanCount, 1);
-  assert.deepEqual(event.scoring, { win: 3, loss: -2 });
+  assert.deepEqual(event.scoring, { win: 3, loss: -2, soloCap: 100, bands: BANDS });
   assert.equal((await ranks.of(address(1))).points, 3);
   const previewId = 'preview-game';
   await matches.entered(previewId, { how: 'create', userId: address(1), app: match.app });
@@ -90,7 +90,7 @@ test('guest seats cannot inflate a mixed human match reward', async () => {
   assert.equal(event.humanCount, 3);
   assert.equal(event.authenticatedHumans, 2);
   assert.equal(event.players.length, 2);
-  assert.deepEqual(event.scoring, { win: 6, loss: -4 });
+  assert.deepEqual(event.scoring, { win: 6, loss: -4, soloCap: null, bands: BANDS });
   assert.equal((await ranks.of(address(1))).points, 6);
   assert.equal((await ranks.of(address(4))).points, 0);
   assert.equal((await ranks.of(address(2))).matches, 0);

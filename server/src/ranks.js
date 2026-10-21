@@ -1,14 +1,37 @@
 // Player ladder points come only from a complete, server-replayed Siege match. Each match
 // has one immutable event, so duplicate webhooks and restarts cannot credit it twice.
+//
+// The rules (research/evidence/ladder-references-2026-10-21.md, section 5):
+//   - bots are for starting: a match with no other authenticated human raises a wallet up to
+//     Silver and no further, and changes nothing once the wallet is at or above Silver;
+//   - the top is not generous: from Gold a win pays 75% and a loss costs 125% of the base
+//     (Clash Royale, Master I: losses equal gains); from Star 50% and 150% (Brawl Stars above
+//     1100: losing more than winning);
+//   - a season's end brings every wallet above Gold down toward it (seasons.js decides when;
+//     the reset is one immutable event per wallet here).
+// Every event freezes the numbers it was scored with, so a later change alters no past result.
 import { folderOf } from './matches.js';
 import { isAddress } from './chain.js';
 
-const tiers = [
+export const TIERS = [
   { name: 'BRONZE', at: 0 },
   { name: 'SILVER', at: 100 },
   { name: 'GOLD', at: 250 },
   { name: 'STAR', at: 500 },
 ];
+const tiers = TIERS;
+
+/** A solo match (one authenticated human) cannot raise a wallet past this many points. */
+export const SOLO_CAP = 100;
+
+/** From these points a win pays and a loss costs these percentages of the base amounts. */
+export const BANDS = [
+  { from: 250, win: 75, loss: 125 },
+  { from: 500, win: 50, loss: 150 },
+];
+
+/** At a season's end, a wallet above the floor keeps this share of what is above it. */
+export const SEASON_RESET = { floor: 250, keep: 50 };
 
 export function tierFor(points) {
   return [...tiers].reverse().find(tier => points >= tier.at).name;
@@ -21,6 +44,37 @@ export function pointsFor(authenticatedHumans) {
     throw new RangeError('authenticated human count must be 1 to 6');
   }
   return { win: Math.round(3 + (authenticatedHumans - 1) * 17 / 5), loss: -2 * authenticatedHumans };
+}
+
+/** Everything an event freezes to score its players: the base amounts, the solo cap, the bands. */
+export function scoringFor(authenticatedHumans) {
+  return {
+    ...pointsFor(authenticatedHumans),
+    soloCap: authenticatedHumans === 1 ? SOLO_CAP : null,
+    bands: BANDS.map(band => ({ ...band })),
+  };
+}
+
+/**
+ * The change of a wallet's points for one event: from the scoring that event froze, the points
+ * the wallet had before it, and the outcome ('win', 'loss' or 'draw'). An event recorded before
+ * the solo cap and the bands existed has neither, and scores as it did then.
+ */
+export function deltaFor(scoring, before, outcome) {
+  if (outcome === 'draw') return 0;
+  const won = outcome === 'win';
+  const base = Math.abs(won ? (scoring?.win ?? 25) : (scoring?.loss ?? -15));
+  const soloCap = scoring?.soloCap ?? null;
+  if (soloCap !== null && before >= soloCap) return 0;
+  const band = [...(scoring?.bands ?? [])].reverse().find(candidate => before >= candidate.from);
+  const amount = band ? Math.max(1, Math.round(base * (won ? band.win : band.loss) / 100)) : base;
+  if (!won) return -Math.min(amount, before) || 0;
+  return soloCap !== null ? Math.min(amount, soloCap - before) : amount;
+}
+
+/** Where a season's end brings a wallet: unchanged at or below the floor, else toward it. */
+export function resetFor(points, { floor, keep } = SEASON_RESET) {
+  return points > floor ? floor + Math.round((points - floor) * keep / 100) : points;
 }
 
 export function rankEligibility(match, verdict) {
@@ -46,8 +100,35 @@ export function rankEligibility(match, verdict) {
   return addresses.size > 0 ? null : 'no_authenticated_players';
 }
 
+// Season keys are flat ("seasons/<id>_reset_<wallet>"): the match store keeps one folder and one
+// name, so a season id has no underscore.
+export const SEASON_ID = /^[A-Za-z0-9-]{1,40}$/;
+
 export function createRanks({ store, matches, now = Date.now }) {
   const keyOf = gameId => `ranked/${folderOf(gameId)}`;
+  const resetKeyOf = (seasonId, address) => `seasons/${seasonId}_reset_${address}`;
+  // Events are immutable: once read they are kept, and only the key listing is asked again.
+  const cache = new Map();
+
+  async function cached(key) {
+    if (cache.has(key)) return cache.get(key);
+    const text = await store.get(key);
+    if (text === null) return null;
+    const value = JSON.parse(text);
+    cache.set(key, value);
+    return value;
+  }
+
+  async function writeOnce(key, event) {
+    if (store.setIfAbsent) {
+      if (await store.setIfAbsent(key, JSON.stringify(event))) return event;
+      return JSON.parse(await store.get(key));
+    }
+    const existing = await store.get(key);
+    if (existing !== null) return JSON.parse(existing);
+    await store.set(key, JSON.stringify(event));
+    return event;
+  }
 
   async function record(gameId, verdict) {
     const key = keyOf(gameId);
@@ -62,14 +143,10 @@ export function createRanks({ store, matches, now = Date.now }) {
     });
     const humanCount = reason ? null : verdict.players.length;
     const authenticatedHumans = reason ? null : players.length;
-    const scoring = reason ? null : pointsFor(authenticatedHumans);
+    const scoring = reason ? null : scoringFor(authenticatedHumans);
     const event = { gameId, at: new Date(now()).toISOString(), reason, winnerTeam: verdict?.winnerTeam ?? null,
       humanCount, authenticatedHumans, scoring, players };
-    if (store.setIfAbsent) {
-      return await store.setIfAbsent(key, JSON.stringify(event)) ? event : JSON.parse(await store.get(key));
-    }
-    await store.set(key, JSON.stringify(event));
-    return event;
+    return writeOnce(key, event);
   }
 
   async function eventOf(gameId) {
@@ -77,30 +154,109 @@ export function createRanks({ store, matches, now = Date.now }) {
     return text === null ? null : JSON.parse(text);
   }
 
-  async function of(address) {
-    let points = 0;
-    let matchesPlayed = 0;
-    let wins = 0;
+  /** Every match event, oldest first. */
+  async function allEvents() {
     const events = [];
-    for (const key of await store.list('ranked/')) {
-      const event = JSON.parse(await store.get(key));
-      if (event.players.some(player => player.address === address.toLowerCase())) events.push(event);
-    }
+    for (const key of await store.list('ranked/')) events.push(await cached(key));
     events.sort((a, b) => a.at.localeCompare(b.at) || a.gameId.localeCompare(b.gameId));
-    let last = null;
-    for (const event of events) {
-      const player = event.players.find(entry => entry.address === address.toLowerCase());
-      const before = points;
-      const won = event.winnerTeam === player.team;
-      const delta = event.winnerTeam === 2 ? 0 : won ? (event.scoring?.win ?? 25) : (event.scoring?.loss ?? -15);
-      points = Math.max(0, points + delta);
-      matchesPlayed++;
-      if (won) wins++;
-      last = { gameId: event.gameId, delta: points - before, before, after: points, tierBefore: tierFor(before), tierAfter: tierFor(points) };
-    }
-    const next = tiers.find(tier => tier.at > points);
-    return { points, tier: tierFor(points), next: next?.at ?? null, matches: matchesPlayed, wins, last };
+    return events;
   }
 
-  return { record, eventOf, of };
+  /** Every season reset event, oldest first; of one wallet when given. */
+  async function allResets(address = null) {
+    const resets = [];
+    for (const key of await store.list('seasons/')) {
+      const parts = key.slice('seasons/'.length).split('_');
+      if (parts.length !== 3 || parts[1] !== 'reset' || (address && parts[2] !== address)) continue;
+      resets.push(await cached(key));
+    }
+    resets.sort((a, b) => a.at.localeCompare(b.at) || a.seasonId.localeCompare(b.seasonId));
+    return resets;
+  }
+
+  /** Every wallet that has a match event. */
+  async function wallets() {
+    const seen = new Set();
+    for (const event of await allEvents()) for (const player of event.players) seen.add(player.address);
+    return [...seen].sort();
+  }
+
+  /**
+   * What happened to a wallet, in order: its match events and its season resets, each with
+   * the points before and after it. "until" (ISO time) stops the timeline there, inclusive.
+   */
+  async function timelineOf(address, { until = null } = {}) {
+    const wallet = address.toLowerCase();
+    const steps = [];
+    for (const event of await allEvents()) {
+      const player = event.players.find(entry => entry.address === wallet);
+      if (player && (until === null || event.at <= until)) steps.push({ kind: 'match', at: event.at, event, team: player.team });
+    }
+    for (const reset of await allResets(wallet)) {
+      if (until === null || reset.at <= until) steps.push({ kind: 'reset', at: reset.at, event: reset });
+    }
+    // At one instant a match comes before a reset: the reset closes everything up to its time.
+    steps.sort((a, b) => a.at.localeCompare(b.at) || (a.kind === b.kind ? 0 : a.kind === 'match' ? -1 : 1)
+      || (a.event.gameId ?? '').localeCompare(b.event.gameId ?? ''));
+    let points = 0;
+    for (const step of steps) {
+      step.before = points;
+      if (step.kind === 'match') {
+        const outcome = step.event.winnerTeam === 2 ? 'draw' : step.event.winnerTeam === step.team ? 'win' : 'loss';
+        step.outcome = outcome;
+        points = Math.max(0, points + deltaFor(step.event.scoring, points, outcome));
+      } else {
+        points = step.event.after;
+      }
+      step.after = points;
+    }
+    return steps;
+  }
+
+  async function standingOf(address, options = {}) {
+    const steps = await timelineOf(address, options);
+    const points = steps.length > 0 ? steps.at(-1).after : 0;
+    let matchesPlayed = 0;
+    let wins = 0;
+    let last = null;
+    let lastReset = null;
+    for (const step of steps) {
+      if (step.kind === 'reset') {
+        lastReset = { seasonId: step.event.seasonId, at: step.at, before: step.before, after: step.after,
+          tierBefore: tierFor(step.before), tierAfter: tierFor(step.after) };
+        continue;
+      }
+      matchesPlayed++;
+      if (step.outcome === 'win') wins++;
+      last = { gameId: step.event.gameId, delta: step.after - step.before, before: step.before, after: step.after,
+        tierBefore: tierFor(step.before), tierAfter: tierFor(step.after) };
+    }
+    const next = tiers.find(tier => tier.at > points);
+    return { points, tier: tierFor(points), next: next?.at ?? null, matches: matchesPlayed, wins, last, lastReset };
+  }
+
+  const of = address => standingOf(address);
+
+  /**
+   * The end of a season: every wallet above the floor at "at" (ISO time) gets one immutable
+   * reset event that brings it toward the floor. Asking again writes nothing and answers the
+   * same events; a wallet at or below the floor gets none.
+   */
+  async function resetSeason({ seasonId, at, floor = SEASON_RESET.floor, keep = SEASON_RESET.keep }) {
+    if (!SEASON_ID.test(seasonId ?? '')) throw new RangeError('a season id is 1 to 40 letters, digits or -');
+    if (!Number.isFinite(Date.parse(at ?? ''))) throw new RangeError('a season ends at an ISO time');
+    const resets = [];
+    for (const wallet of await wallets()) {
+      const key = resetKeyOf(seasonId, wallet);
+      const existing = await cached(key);
+      if (existing) { resets.push(existing); continue; }
+      const { points } = await standingOf(wallet, { until: at });
+      if (points <= floor) continue;
+      const reset = { kind: 'reset', seasonId, address: wallet, at, before: points, after: resetFor(points, { floor, keep }), floor, keep };
+      resets.push(await writeOnce(key, reset));
+    }
+    return resets;
+  }
+
+  return { record, eventOf, of, standingOf, timelineOf, allEvents, allResets, wallets, resetSeason };
 }

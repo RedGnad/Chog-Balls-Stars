@@ -174,3 +174,26 @@ feature of this slice.
 - [Brawl Stars February 2026 notes](https://supercell.com/en/games/brawlstars/blog/release-notes/release-notes-february-2026/): bot matches remain available at lower trophy levels while matchmaking uses a hidden MMR decoupled from trophies. This is a precedent for separating participation progress from skill, not evidence that this draft point scale is balanced.
 - [Photon Quantum matchmaking](https://doc.photonengine.com/quantum/v3/manual/game-session/async-extensions): existing random rooms and custom lobby properties; these do not themselves establish a trusted skill rating.
 - [Photon result verification](https://doc.photonengine.com/quantum/v3/manual/cheat-protection): replay and game-result validation are the basis for durable competitive progress.
+
+## 21 October, stream E, lot 2: trophies corrected and the season reset (implemented, tests only)
+
+Rules from [the ladder references](../research/evidence/ladder-references-2026-10-21.md), section 5.
+Implemented in `server/src/ranks.js` and the new `server/src/seasons.js`; verified only by
+`server/test/ranks-rules.test.js` (11 tests) and the existing rank tests (104 server tests pass).
+No live match has exercised them yet.
+
+- A solo match (one authenticated wallet, the other seats bots or guests) raises a wallet up to
+  Silver (100) and no further; at or above 100 such a match changes nothing, win or loss. Below
+  100 a loss still costs its frozen amount, to the floor of 0.
+- From Gold (250) a win pays 75% and a loss costs 125% of the base; from Star (500) 50% and 150%.
+  With six humans: 20 and 12 below Gold, 15 and 15 at Gold, 10 and 18 at Star (full table in the
+  note). Rounded to the nearest point, never below 1.
+- Every match event freezes `scoring: {win, loss, soloCap, bands}`; events recorded before
+  21 October have no `soloCap` or `bands` and keep scoring as they did.
+- A season is `SEASON_ID` and `SEASON_ENDS_AT` on the host (`--season`, `--season-ends` locally).
+  Once the end has passed, the host closes it once: every wallet above Gold gets one immutable
+  reset event (`seasons/<id>_reset_<wallet>`: before, after, floor 250, keep 50%), then a marker
+  (`seasons/<id>_closed`). The signed rank answer gains `rank.lastReset` (season, before, after,
+  tiers) beside the unchanged fields. Nothing else of the public API changed.
+- Not verified: a reset on Upstash (the file store ran one locally with zero wallets), a public
+  match scored with the new bands, the client's display of `lastReset`.

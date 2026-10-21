@@ -57,6 +57,9 @@
 //   UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN
 //                   the durable store for immutable player rank events, kept server-side.
 //   RANK_ENABLED    1 only after that store and a real signed-in match have been verified.
+//   SEASON_ID, SEASON_ENDS_AT  optional, together: the ladder season (1 to 40 letters, digits or -)
+//                   and the ISO time it ends; SEASON_STARTS_AT optional. Once the end has passed the
+//                   season is closed once: every wallet above Gold gets its reset event (seasons.js)
 //                   Without both store settings, the player ladder stays disabled.
 
 import { mkdir, stat } from 'node:fs/promises';
@@ -74,6 +77,7 @@ import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
 import { createRanks } from './ranks.js';
 import { createRemoteRankStore } from './rank-store.js';
+import { createSeasons, seasonFrom } from './seasons.js';
 import { createSender } from './sender.js';
 import { createSessions } from './session.js';
 import { createShop } from './shop.js';
@@ -128,6 +132,11 @@ if (rankUrl && rankToken) {
 }
 if (rankRequested && !rankStore) console.warn('Player rank is disabled: persistent storage is not connected.');
 const ranks = rankRequested && rankStore ? createRanks({ store: rankStore, matches }) : null;
+const season = seasonFrom({ id: environment.SEASON_ID, endsAt: environment.SEASON_ENDS_AT, startsAt: environment.SEASON_STARTS_AT });
+const seasons = ranks ? createSeasons({ ranks, store: rankStore, season }) : null;
+if (season) console.log(`Ladder season ${season.id} ends at ${season.endsAt}${ranks ? '' : ' (player rank is disabled: it will not be closed here)'}`);
+// Once a minute: a season whose end has passed is closed, once.
+seasons?.watch();
 const wagerAddress = (environment.WAGER_ADDRESS ?? '').trim();
 const refereeKey = (environment.REFEREE_KEY ?? '').trim();
 if (Boolean(wagerAddress) !== Boolean(refereeKey)) {
