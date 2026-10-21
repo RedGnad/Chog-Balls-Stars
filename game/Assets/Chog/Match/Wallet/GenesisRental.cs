@@ -56,6 +56,15 @@ namespace Chog.Match
         public string Lender;
     }
 
+    /// <summary>What a Genesis earned its holders by being rented, from the rental's events as the services read them.</summary>
+    public struct RentalEarnings
+    {
+        /// <summary>In the smallest unit of $CHOG, before the burned share, as decimal digits.</summary>
+        public string EarnedWei;
+        /// <summary>How many times it was rented.</summary>
+        public int Rentals;
+    }
+
     /// <summary>
     /// The rental of Genesis for $CHOG (contracts/src/ChogRental.sol, version 2). A holder offers a
     /// Genesis at a price a day; one player at a time pays to play it for a number of days. The
@@ -113,6 +122,12 @@ namespace Chog.Match
         public static string OwedBackWei { get; private set; } = "0";
 
         private static string s_balanceWei = "";
+
+        // What each Genesis earned by being rented, as the services' ledger last answered.
+        private static readonly Dictionary<int, RentalEarnings> Earnings = new Dictionary<int, RentalEarnings>();
+
+        /// <summary>Whether the services' read of the rental's events had reached the chain's latest block when last asked.</summary>
+        public static bool EarningsCaughtUp { get; private set; }
 
         /// <summary>The $CHOG the connected wallet holds, in its smallest unit, as last read; empty when not read.</summary>
         public static string BalanceWei => AccountRead() ? s_balanceWei : "";
@@ -193,6 +208,22 @@ namespace Chog.Match
         }
 
         [Serializable]
+        private sealed class EarnedEntry
+        {
+            public int tokenId;
+            public string earned;
+            public int rentals;
+        }
+
+        [Serializable]
+        private sealed class EarnedAnswer
+        {
+            public bool enabled;
+            public bool caughtUp;
+            public EarnedEntry[] tokens;
+        }
+
+        [Serializable]
         private sealed class AccountAnswer
         {
             public bool enabled;
@@ -226,6 +257,58 @@ namespace Chog.Match
                 all.Sort((a, b) => a.TokenId.CompareTo(b.TokenId));
                 return all;
             }
+        }
+
+        /// <summary>The cheapest Genesis for rent now, by price a day then token id, at most "count" of them: what a player without a Genesis is shown first.</summary>
+        public static List<RentalOffer> Cheapest(int count) => CheapestOf(Listed, count);
+
+        /// <summary>The same for any list of offers.</summary>
+        public static List<RentalOffer> CheapestOf(IReadOnlyList<RentalOffer> offers, int count)
+        {
+            var sorted = new List<RentalOffer>(offers);
+            sorted.Sort((a, b) =>
+            {
+                var byPrice = System.Numerics.BigInteger.Parse(a.PricePerDayWei, CultureInfo.InvariantCulture)
+                    .CompareTo(System.Numerics.BigInteger.Parse(b.PricePerDayWei, CultureInfo.InvariantCulture));
+                return byPrice != 0 ? byPrice : a.TokenId.CompareTo(b.TokenId);
+            });
+            if (sorted.Count > count)
+                sorted.RemoveRange(Math.Max(0, count), sorted.Count - Math.Max(0, count));
+            return sorted;
+        }
+
+        /// <summary>What a Genesis earned by being rented, when the services answered for it.</summary>
+        public static bool TryGetEarnings(int tokenId, out RentalEarnings earnings) => Earnings.TryGetValue(tokenId, out earnings);
+
+        /// <summary>Asks the services what these Genesis earned by being rented (their events, read in the background); "Changed" follows.</summary>
+        public static void ReadEarnings(int[] tokenIds)
+        {
+            if (State != RentalState.Open || tokenIds == null || tokenIds.Length == 0)
+                return;
+
+            var list = new System.Text.StringBuilder();
+            for (var i = 0; i < tokenIds.Length && i < GenesisCareers.MaxTokensPerRead; i++)
+                list.Append(i == 0 ? "" : ",").Append(tokenIds[i]);
+
+            PlayerWallet.Run(GameServices.Call("rental/earned?tokens=" + list, null, null, (status, text) =>
+            {
+                var answer = status == 200 && !string.IsNullOrEmpty(text) && text[0] == '{' ? JsonUtility.FromJson<EarnedAnswer>(text) : null;
+                if (answer == null || !answer.enabled || answer.tokens == null)
+                    return;
+
+                EarningsCaughtUp = answer.caughtUp;
+                foreach (var token in answer.tokens)
+                    if (token.tokenId > 0)
+                        Earnings[token.tokenId] = new RentalEarnings { EarnedWei = MonadTransactions.IsDigits(token.earned) ? token.earned : "0", Rentals = token.rentals };
+                Changed?.Invoke();
+            }));
+        }
+
+        /// <summary>Whether a rental ends within twelve hours: the renter is reminded to add days.</summary>
+        public static bool EndsSoon(long untilSeconds, long nowSeconds)
+        {
+            var left = untilSeconds - nowSeconds;
+            return left > 0 && left < 12 * 3600;
         }
 
         /// <summary>The offer for a Genesis, when its holder offers it: listed, rented by the connected wallet, or its own rented out.</summary>

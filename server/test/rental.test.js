@@ -121,6 +121,33 @@ test('the rental says its terms, and lists the offers read on the chain for a sh
   assert.deepEqual(await rental.offers(), [offers[1]], 'a withdrawn offer is gone after the short time');
 });
 
+test('the cheapest offers come first, with the dollars of a day when the price is known', async () => {
+  const { fetch, state } = fakeChain();
+  state.offers.push({ tokenId: 3, pricePerDay: 10n * 10n ** 18n, lender: HOLDER }, { tokenId: 1, pricePerDay: 2n * 10n ** 18n, lender: HOLDER });
+  const price = { usdOfWei: async wei => Number(BigInt(wei) / 10n ** 12n) / 1e6 * 0.0015 };
+  const rental = createRental({ chain: createChain({ rpcUrls: ['https://first.example'], fetch }), address: RENTAL, price });
+  const cheapest = await rental.cheapest(3);
+  assert.equal(cheapest.offered, 4);
+  assert.deepEqual(cheapest.offers.map(offer => [offer.tokenId, offer.pricePerDay, offer.usdPerDay]), [
+    [1, '2000000000000000000', 0.003],
+    [8, '2500000000000000000', 0.00375],
+    [3, '10000000000000000000', 0.015],
+  ], 'by price a day, then token id');
+  assert.equal((await rental.cheapest(1)).offers.length, 1);
+
+  // Without a price the dollars are null; without a rental there is nothing.
+  const plain = createRental({ chain: createChain({ rpcUrls: ['https://first.example'], fetch }), address: RENTAL });
+  assert.equal((await plain.cheapest(3)).offers[0].usdPerDay, null);
+  assert.deepEqual(await createRental({ chain: {} }).cheapest(3), { offers: [], offered: 0 });
+
+  const api = createApi({ chain: {}, rental });
+  const get = path => api(new Request('http://game.example' + path));
+  assert.deepEqual((await (await get('/api/rental/cheapest')).json()).offers.map(offer => offer.tokenId), [1, 8, 3]);
+  assert.deepEqual((await (await get('/api/rental/cheapest?limit=2')).json()).offers.map(offer => offer.tokenId), [1, 8]);
+  assert.equal((await get('/api/rental/cheapest?limit=0')).status, 400);
+  assert.deepEqual(await (await createApi({ chain: {} })(new Request('http://game.example/api/rental/cheapest'))).json(), { offers: [], offered: 0 });
+});
+
 test('what an address rents is read fresh, and a rental that ran out is not one', async () => {
   const { fetch, state } = fakeChain();
   const rental = createRental({ chain: createChain({ rpcUrls: ['https://first.example'], fetch }), address: RENTAL });

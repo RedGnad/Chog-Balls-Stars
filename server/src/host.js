@@ -19,6 +19,11 @@
 //                   nothing is sold and the game shows no purchase
 //   RENTAL_ADDRESS  optional, the deployed rental contract (contracts/src/ChogRental.sol); without
 //                   it nothing is rented and the game shows no rental
+//   RENTAL_LOGS_RPC_URLS  optional, endpoints that serve 10,000-block windows of eth_getLogs,
+//                   separated by commas; default rpc2.monad.xyz (rental-ledger.js). With
+//   RENTAL_FROM_BLOCK  optional, the block the rental contract was deployed at; default the
+//                   block of the mainnet contract. Together they let the game show what each
+//                   Genesis earned by being rented; "none" as the endpoints turns that off
 //   PHOTON_SECRET   optional, at least 32 characters: what Photon's dashboard sends with its
 //                   requests (WebHookSecret, and the "key" parameter of the authentication);
 //                   otherwise one is made once and kept in DATA_DIR (photon-secret)
@@ -73,6 +78,7 @@ import { createPhoton } from './photon.js';
 import { createPrice } from './price.js';
 import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
+import { createRentalLedger, LOGS_RPC_URLS, RENTAL_DEPLOYED_AT_BLOCK } from './rental-ledger.js';
 import { createRanks } from './ranks.js';
 import { createRemoteRankStore } from './rank-store.js';
 import { createSender } from './sender.js';
@@ -108,6 +114,15 @@ const shop = createShop({ chain, address: (environment.SHOP_ADDRESS ?? '').trim(
 // The price of $CHOG in dollars, from public sources (price.js): every amount is labelled in both.
 const price = createPrice();
 const rental = createRental({ chain, address: (environment.RENTAL_ADDRESS ?? '').trim(), price });
+// What each Genesis earned by being rented, from the rental's events, read in the background.
+const logsRpcUrls = (environment.RENTAL_LOGS_RPC_URLS ?? '').split(',').map(url => url.trim()).filter(Boolean);
+const ledger = rental.address && logsRpcUrls[0] !== 'none'
+  ? createRentalLedger({
+    address: rental.address, rpcUrls: logsRpcUrls.length > 0 ? logsRpcUrls : LOGS_RPC_URLS,
+    fromBlock: Number((environment.RENTAL_FROM_BLOCK ?? '').trim() || RENTAL_DEPLOYED_AT_BLOCK),
+  })
+  : undefined;
+ledger?.start();
 const standIns = createStandIns({ chain, setting: environment.STAND_INS ?? '' });
 const sessions = createSessions({ secret: await sessionSecret(dataFolder, environment.SESSION_SECRET) });
 
@@ -273,6 +288,7 @@ const api = createApi({
   photonAuthentication: environment.PHOTON_AUTH === '1',
   wager: createWager({ chain: wagerChain, referee, matches, network: wagerPlace, store: matchStore, price }),
   price,
+  ledger,
   reownProjectId: await reownProjectId(dataFolder, environment.REOWN_PROJECT_ID),
 });
 
