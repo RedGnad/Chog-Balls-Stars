@@ -51,7 +51,7 @@ not a claimed live rank result.
 
 ## Current implementation and evidence
 
-The local candidate adds a confirmed-result reveal to the existing mastery road. It uses
+The deployed client adds a confirmed-result reveal to the existing mastery road. It uses
 the old and new career snapshots, waits for `GenesisCareers.Recorded`, and infers a zero
 baseline only when the confirmed career says this was its first match. A private local
 `?rewardpreview=1` fixture demonstrates the gain, level and badge states without
@@ -65,7 +65,8 @@ comes from a completed local bot match in the final build.
 
 The preview is not proof that a signed-in Genesis career was credited on Monad. No
 ranked queue, player rating, skill filter or new in-match rank badge has been shipped
-by this slice. The candidate has not been deployed. A real signed-in career result,
+by this slice. The client was deployed on 21 October with player rank gated off.
+A real signed-in career result,
 including its first match and a refused credit, still needs end-to-end verification.
 
 ## Product decision
