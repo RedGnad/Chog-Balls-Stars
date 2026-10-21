@@ -61,7 +61,7 @@ namespace Chog.Screens
             plate.gameObject.AddComponent<Shadow>().effectDistance = new Vector2(0f, -6f);
             _number = ChogUi.Title("Number", _disc.transform, new Vector2(0f, 0.08f), Vector2.one, 66f);
             _caption = ChogUi.Number("Caption", transform, Vector2.zero, Vector2.zero, 24f, TextAlignmentOptions.Center, ChogTheme.Hex("FFE27A"));
-            ChogUi.Pin(_caption.rectTransform, Place, new Vector2(0.5f, 1f), new Vector2(0f, -64f), new Vector2(420f, 34f));
+            ChogUi.Pin(_caption.rectTransform, Place, new Vector2(0.5f, 1f), new Vector2(0f, -64f), new Vector2(550f, 34f));
             _startedAt = Time.unscaledTime;
         }
 
@@ -80,7 +80,9 @@ namespace Chog.Screens
 
             var left = Seconds - (Time.unscaledTime - _startedAt - _waited);
             _number.text = Mathf.Max(0, Mathf.CeilToInt(left)).ToString();
-            _caption.text = "STARTS BY ITSELF";
+            _caption.text = players >= 6
+                ? "6/6 HUMANS  |  STARTS BY ITSELF"
+                : Mathf.Max(0, players) + "/6 HUMANS  |  BOTS FILL AT START";
             if (!StartsNow(hosts, left) || _fired)
                 return;
             _fired = true;

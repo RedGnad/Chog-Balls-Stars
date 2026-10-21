@@ -72,6 +72,8 @@ namespace Chog.Screens
         private TextMeshProUGUI _playerName;
         private Image _roleBadge;
         private TextMeshProUGUI _roleText;
+        private Image _rankBadge;
+        private TextMeshProUGUI _rankText;
 
         private Button _wallet;
         private Image _walletDot;
@@ -128,18 +130,21 @@ namespace Chog.Screens
         private void OnEnable()
         {
             WalletPanel.PlayedChanged += Refresh;
-            PlayerWallet.Changed += Refresh;
+            PlayerWallet.Changed += OnWalletChanged;
+            PlayerRanks.Changed += Refresh;
             GenesisCareers.Changed += Refresh;
             GenesisRental.Changed += Refresh;
             GenesisForms.Changed += Refresh;
             if (_ribbonName != null)
                 Refresh();
+            PlayerRanks.Read();
         }
 
         private void OnDisable()
         {
             WalletPanel.PlayedChanged -= Refresh;
-            PlayerWallet.Changed -= Refresh;
+            PlayerWallet.Changed -= OnWalletChanged;
+            PlayerRanks.Changed -= Refresh;
             GenesisCareers.Changed -= Refresh;
             GenesisRental.Changed -= Refresh;
             GenesisForms.Changed -= Refresh;
@@ -192,9 +197,12 @@ namespace Chog.Screens
 
             _playerName = ChogUi.Title("Name", chip.transform, new Vector2(0.285f, 0.50f), new Vector2(0.96f, 0.92f), 34f, TextAlignmentOptions.Left);
             _playerName.textWrappingMode = TextWrappingModes.NoWrap;
-            _roleBadge = ChogUi.Plate("Role", chip.transform, new Vector2(0.285f, 0.10f), new Vector2(0.80f, 0.43f), ChogTheme.Action, 10);
+            _roleBadge = ChogUi.Plate("Role", chip.transform, new Vector2(0.285f, 0.10f), new Vector2(0.59f, 0.43f), ChogTheme.Action, 10);
             _roleText = ChogUi.Title("Words", _roleBadge.transform, new Vector2(0.06f, 0.04f), new Vector2(0.94f, 0.92f), 22f);
             _roleText.textWrappingMode = TextWrappingModes.NoWrap;
+            _rankBadge = ChogUi.Plate("PlayerRank", chip.transform, new Vector2(0.61f, 0.10f), new Vector2(0.97f, 0.43f), ChogTheme.Purple, 10);
+            _rankText = ChogUi.Title("Rank", _rankBadge.transform, new Vector2(0.02f, 0.04f), new Vector2(0.98f, 0.92f), 17f);
+            _rankText.textWrappingMode = TextWrappingModes.NoWrap;
         }
 
         // The $CHOG held, the wallet, the settings, from the top right corner.
@@ -361,6 +369,12 @@ namespace Chog.Screens
             }
         }
 
+        private void OnWalletChanged()
+        {
+            Refresh();
+            PlayerRanks.Read();
+        }
+
         private void Refresh()
         {
             if (_ribbonName == null)
@@ -377,6 +391,13 @@ namespace Chog.Screens
 
             // The chip: the Genesis picture and level, with the role readable in a gold badge.
             ShowPortrait(metadata);
+            var rank = PlayerRanks.Current?.rank;
+            _rankBadge.gameObject.SetActive(rank != null);
+            if (rank != null)
+            {
+                _rankText.text = rank.tier + " " + rank.points.ToString(CultureInfo.InvariantCulture);
+                _rankBadge.color = rank.tier == "STAR" ? ChogTheme.Gold : ChogTheme.Purple;
+            }
             _levelBadge.SetActive(token > 0);
             if (token > 0 && GenesisCareers.TryGet(token, out var career) && career.mastery != null)
             {

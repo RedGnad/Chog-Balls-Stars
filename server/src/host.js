@@ -54,6 +54,8 @@
 //                   on a machine with .NET needs none of these settings.
 //   DOTNET          the .NET 8 runtime that runs the judge; default "dotnet" on the path.
 //                   Without a judge, or without .NET, a match gets no verdict
+//   RANK_ENABLED    1 only after DATA_DIR is on persistent storage. The free Render instance
+//                   loses /var/data on a restart, so its player ladder must stay off.
 
 import { mkdir, stat } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
@@ -68,6 +70,7 @@ import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, r
 import { createPhoton } from './photon.js';
 import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
+import { createRanks } from './ranks.js';
 import { createSender } from './sender.js';
 import { createSessions } from './session.js';
 import { createShop } from './shop.js';
@@ -104,6 +107,7 @@ const sessions = createSessions({ secret: await sessionSecret(dataFolder, enviro
 
 const matchStore = matchFiles(join(dataFolder, 'matches'));
 const matches = createMatches({ store: matchStore });
+const ranks = environment.RANK_ENABLED === '1' ? createRanks({ store: matchStore, matches }) : null;
 const wagerAddress = (environment.WAGER_ADDRESS ?? '').trim();
 const refereeKey = (environment.REFEREE_KEY ?? '').trim();
 if (Boolean(wagerAddress) !== Boolean(refereeKey)) {
@@ -189,6 +193,14 @@ async function judgeAndRecord(gameId) {
     return verdict;
   }
   const summary = { gameId, judged: true, void: Boolean(verdict.void), why: verdict.why ?? null, winnerTeam: verdict.winnerTeam ?? null, players: verdict.players ?? null };
+  if (ranks) {
+    try {
+      const rank = await ranks.record(gameId, verdict);
+      console.log(`Rank of ${gameId}: ${rank.reason ?? 'recorded'}`);
+    } catch (error) {
+      console.warn(`Rank of ${gameId} not recorded: ${error.message}`);
+    }
+  }
   if (!chainCareers || verdict.void || recorded.has(gameId)) {
     remember({ ...summary, recorded: false, reason: !chainCareers ? 'careers kept in a file' : verdict.void ? 'void' : 'already sent' });
     return verdict;
@@ -223,6 +235,8 @@ const api = createApi({
   rental,
   standIns,
   careers,
+  ranks,
+  matches,
   recentRecords: () => recent,
   sessions,
   photon: createPhoton({

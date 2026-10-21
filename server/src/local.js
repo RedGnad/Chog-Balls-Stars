@@ -42,6 +42,7 @@ import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, r
 import { createPhoton } from './photon.js';
 import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
+import { createRanks } from './ranks.js';
 import { createSessions } from './session.js';
 import { createShop } from './shop.js';
 import { createWager, wagerNetwork } from './wager.js';
@@ -88,6 +89,7 @@ const sessions = createSessions({ secret: await sessionSecret(dataFolder) });
 // Photon's part, since this server is not reachable from outside this computer.
 const matchStore = matchFiles(join(dataFolder, 'matches'));
 const matches = createMatches({ store: matchStore });
+const ranks = createRanks({ store: matchStore, matches });
 const wagerAddress = option('--wager', '');
 const refereeKeyFile = option('--referee-key-file');
 const wagerRpc = option('--wager-rpc');
@@ -115,7 +117,10 @@ const judge = verifier
 const photon = createPhoton({
   secret: await photonSecret(dataFolder, option('--photon-secret')),
   sessions, careers, chain, shop, rental, matches,
-  onReplayEnded: judge ? gameId => judge.judge(gameId) : undefined,
+  onReplayEnded: judge ? async gameId => {
+    const verdict = await judge.judge(gameId);
+    if (verdict) await ranks.record(gameId, verdict);
+  } : undefined,
 });
 
 const handle = createApi({
@@ -123,6 +128,8 @@ const handle = createApi({
   shop,
   rental,
   careers,
+  ranks,
+  matches,
   sessions,
   photon,
   photonAuthentication: process.argv.includes('--photon-auth'),

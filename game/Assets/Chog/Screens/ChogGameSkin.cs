@@ -110,6 +110,16 @@ namespace Chog.Screens
             if (selection.GetComponent<ChogPreparationCopy>() == null)
                 selection.gameObject.AddComponent<ChogPreparationCopy>();
 
+            // The player's own rank stays in preparation, away from fighter health and attack cues.
+            var rank = PlayerRanks.Current?.rank;
+            if (rank != null && selection.Find("ChogPlayerRank") == null)
+            {
+                var badge = ChogUi.Plate("ChogPlayerRank", selection, new Vector2(0.77f, 0.86f),
+                    new Vector2(0.93f, 0.93f), rank.tier == "STAR" ? ChogTheme.Gold : ChogTheme.Purple, 12);
+                ChogUi.Title("Words", badge.transform, new Vector2(0.03f, 0.02f), new Vector2(0.97f, 0.98f), 27f).text =
+                    "RANK " + rank.tier + "  " + rank.points;
+            }
+
             // The slots of the teams: cards in the colour of their team, outlined in ink.
             foreach (var slot in selection.GetComponentsInChildren<Transform>(true))
             {

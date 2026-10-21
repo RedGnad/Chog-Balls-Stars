@@ -60,7 +60,7 @@ async function bodyOf(request) {
  *   beside these services, or a function that reads it; empty when they do not know
  * @returns {(request: Request) => Promise<Response>}
  */
-export function createApi({ chain, sessions, careers, recentRecords, shop, rental, standIns, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
+export function createApi({ chain, sessions, careers, ranks, matches, recentRecords, shop, rental, standIns, photon, photonAuthentication = false, wager, publicOrigin, reownProjectId = '', build = '' }) {
   // The page a wallet is asked to trust: it is written in the message the player signs.
   function pageOf(request, url) {
     const origin = publicOrigin
@@ -145,6 +145,23 @@ export function createApi({ chain, sessions, careers, recentRecords, shop, renta
         return failure(400, 'bad_limit', `limit must be 1 to ${MAX_TOKENS_PER_READ}`);
       }
       return json(200, { careers: await careers.top(limit) });
+    },
+
+    // A player's ladder is separate from the career of any Genesis they use. Only a replayed,
+    // complete 3v3 Siege with six distinct signed-in wallets can change it.
+    'GET /api/rank/me': async request => {
+      const address = await signedIn(request);
+      if (!address) return failure(401, 'not_signed_in', 'sign in with the wallet first');
+      const rank = ranks ? await ranks.of(address) : null;
+      const latest = matches?.latestOf ? await matches.latestOf(address) : null;
+      const event = latest && ranks ? await ranks.eventOf(latest.gameId) : null;
+      return json(200, {
+        enabled: Boolean(ranks), rank,
+        latestMatch: latest ? {
+          gameId: latest.gameId,
+          status: event ? (event.reason ?? 'ranked') : latest.startedAt ? 'verifying' : 'preparing',
+        } : null,
+      });
     },
 
     // One finished match, reported by the game page of a signed-in player for a Genesis that

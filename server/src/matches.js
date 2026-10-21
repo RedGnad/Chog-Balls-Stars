@@ -147,6 +147,12 @@ export function createMatches({ store, now = Date.now }) {
     return match && !match.closedAt ? match : null;
   }
 
+  /** The last match this wallet entered, including one Photon has since closed. */
+  async function latestOf(address) {
+    const text = await store.get(`players/${address}`);
+    return text === null ? null : read(parseExact(text).gameId, 'match');
+  }
+
   /**
    * Photon added the player to the simulation. "player" is the number the simulation knows it
    * by: it is written on the admission of that client, which is how a re-simulation learns
@@ -319,6 +325,6 @@ export function createMatches({ store, now = Date.now }) {
 
   return {
     entered, configs, admitted, added, removed, left, closed, started, chunk, claims, ticket, lock, decideOnce,
-    get, currentOf, replayOf, setVerdict, verdictOf, folderOf,
+    get, currentOf, latestOf, replayOf, setVerdict, verdictOf, folderOf,
   };
 }

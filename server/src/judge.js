@@ -52,7 +52,7 @@ export function createJudge({ matches, replay, build = '' }) {
     const facts = {
       mode: report.mode ?? null, scores: report.scores, endedAtTick: report.endedAtTick, selectionEndedAtTick: report.selectionEndedAtTick,
       firstTick: report.firstTick, lastTick: report.lastTick, updateRate: report.updateRate,
-      players: report.players, simulation: report.simulation,
+      players: report.players, simulation: report.simulation, testOptions: report.testOptions,
     };
     if (report.winnerTeam !== 0 && report.winnerTeam !== 1) {
       return matches.setVerdict(gameId, { void: true, why: 'the match did not reach its end', ...facts });

@@ -4,6 +4,43 @@ Design contract, 20 October 2026. This is the intended product behavior, not a c
 every item below has shipped. The result screen, mastery road, on-chain career and Photon
 Quick Play already exist. A player rating and a ranked queue do not.
 
+## 21 October local ranked-points candidate
+
+This candidate adds player ladder points, not a skill rating or a separate ranked queue.
+Photon still fills a compatible Siege room first and starts with bots after the lobby clock;
+the preparation caption now states the human count. No client claims a rank result. The
+server writes one event per replayed match and credits only a full Siege 3v3 with six
+distinct signed-in wallets, the normal simulation options and a non-void verdict. A win
+adds 25 points, a loss takes 15 down to a floor of zero, and a draw changes nothing.
+Bronze begins at 0, Silver at 100, Gold at 250 and Star at 500. These thresholds are
+initial design values, not tuned against a real player distribution. The rank belongs to
+the signed-in wallet, not its Genesis. Bot, guest, preview, partial and unverified games
+remain casual and award no player points. Genesis mastery remains separate.
+
+The player chip shows a compact rank badge. The result shows `VERIFYING` until the
+server resolves the match. Only after the signed-in player's latest match is matched
+to an immutable server event does it display the actual point difference and animate a
+rank card. The card uses one ink-edged surface, a single gold point or tier headline,
+one short chime and a brief scale settle; reduced motion uses a fade. A casual result
+states `NO RANK POINTS`. The rank reveal waits for a Genesis mastery reveal so the two
+never compete for attention. No badge is placed above a fighter's head.
+
+This candidate must not be called a durable public ranked system yet. The current free
+Render instance has no disk: `data/matches` is erased on a restart or deploy. Because
+rank events and their wallet mapping live there, a public ladder would reset. A
+persistent store or disk is a launch requirement; no paid hosting change is implied by
+this candidate. Six signed-in humans and a full replay also still need live end-to-end
+verification. The present matchmaking is room filling, not skill matching.
+The host keeps rank disabled unless `RANK_ENABLED=1` is explicitly set after storage
+has been made persistent; the free deployment leaves it off.
+
+Local runtime evidence from 21 October: [lobby human count](../research/evidence/chog-rank-lobby-runtime-2026-10-21.png),
+[casual bot result](../research/evidence/chog-rank-casual-result-2026-10-21.png), and
+[rank-up visual fixture](../research/evidence/chog-player-rank-preview-2026-10-21.png).
+The last image uses a synthetic 75-to-100 point transition and says so on the screen;
+it is evidence of WebGL layout and animation, not of a server credit. A signed-in six-human
+match and durable rank event still need end-to-end proof.
+
 ## Current implementation and evidence
 
 The local candidate adds a confirmed-result reveal to the existing mastery road. It uses
