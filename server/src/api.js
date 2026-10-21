@@ -302,6 +302,14 @@ export function createApi({ chain, sessions, careers, ranks, rankStorageStatus =
       return json(200, wager ? await wager.mine({ address }) : { enabled: false });
     },
 
+    // What the signed-in wallet won and lost on its stakes of the last seven days, on the
+    // referee's decisions, with the dollars of it when the price is known.
+    'GET /api/wager/week': async request => {
+      const address = await signedIn(request);
+      if (!address) return failure(401, 'not_signed_in', 'sign in with the wallet first');
+      return json(200, wager ? await wager.weekOf({ address }) : { enabled: false });
+    },
+
     // The referee's ticket to stake on the match the signed-in wallet is in.
     'POST /api/wager/ticket': async request => {
       const address = await signedIn(request);

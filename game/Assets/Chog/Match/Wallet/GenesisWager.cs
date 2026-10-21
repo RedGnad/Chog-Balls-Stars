@@ -161,6 +161,19 @@ namespace Chog.Match
         private static string s_lastMatchKey = "";
         private static string s_decisionSignature = "";
 
+        /// <summary>Whether the week of the signed-in wallet was read (ReadWeek), and for which address.</summary>
+        public static bool WeekRead => s_weekOf.Length == 42 && s_weekOf == PlayerWallet.Address;
+        private static string s_weekOf = "";
+
+        /// <summary>What the signed-in wallet won and lost on its stakes of the last seven days, in the smallest unit; "0" until read.</summary>
+        public static string WeekWonWei { get; private set; } = "0";
+        public static string WeekLostWei { get; private set; } = "0";
+
+        /// <summary>How many staked matches the week counts, how many are not judged yet, how many are judged but not paid yet.</summary>
+        public static int WeekMatches { get; private set; }
+        public static int WeekPending { get; private set; }
+        public static int WeekUnpaid { get; private set; }
+
         /// <summary>Raised after any of the values above changed.</summary>
         public static event Action Changed;
 
@@ -225,6 +238,18 @@ namespace Chog.Match
             public int waitSeconds;
             public string error;
             public string message;
+        }
+
+        [Serializable]
+        private sealed class WeekAnswer
+        {
+            public bool enabled;
+            public string address;
+            public int matches;
+            public int pending;
+            public int unpaid;
+            public string won;
+            public string lost;
         }
 
         [Serializable]
@@ -453,6 +478,34 @@ namespace Chog.Match
                         }
                     }
 
+                    Changed?.Invoke();
+                }
+
+                then?.Invoke();
+            }));
+        }
+
+        /// <summary>Reads what the signed-in wallet won and lost on its stakes of the last seven days; "Changed" follows.</summary>
+        public static void ReadWeek(Action then = null)
+        {
+            var who = PlayerWallet.Address;
+            if (State != WagerState.Open || string.IsNullOrEmpty(PlayerWallet.Session) || who.Length != 42)
+            {
+                then?.Invoke();
+                return;
+            }
+
+            PlayerWallet.Run(GameServices.Call("wager/week", null, PlayerWallet.Session, (status, text) =>
+            {
+                var answer = Parsed<WeekAnswer>(status, text);
+                if (answer != null && answer.enabled && who == PlayerWallet.Address)
+                {
+                    WeekWonWei = MonadTransactions.IsDigits(answer.won) ? answer.won : "0";
+                    WeekLostWei = MonadTransactions.IsDigits(answer.lost) ? answer.lost : "0";
+                    WeekMatches = answer.matches;
+                    WeekPending = answer.pending;
+                    WeekUnpaid = answer.unpaid;
+                    s_weekOf = who;
                     Changed?.Invoke();
                 }
 
