@@ -1,5 +1,11 @@
 # État courant et décisions
 
+**21 October 2026 (result-room release deployed for owner review).**
+- **Deployed with explicit owner authorization:** `stream/result-home` was fast-forwarded into `main` at `bba8b5e`, then Vercel deployed `https://chogarena.vercel.app/`. Its public page serves WebGL version `20261021T180233353Z`; the Render Photon endpoint reports the same build. The packaged build is `20261021T180233353Z-10023a260d094a11a4f9bda80ed53acb`, with unchanged simulation stamp `f4a81f1ddbd919b6`.
+- **Verified before deployment:** the full release suite and two judge fixtures passed as recorded below. A local Recruit bot match reached and retained the result screen after Photon room closure. The release page and backend version were checked publicly after deployment.
+- **Not yet verified:** a signed public match, a positive player-rank award, the exact-match rank reveal on the result screen, tier-up timing and the owner's visual acceptance. The local preview match did not qualify for rank points. No production result was fabricated.
+**Next action:** play one signed public Recruit match on the deployed site, stay on the result screen until the server judges it, confirm that the rank delta appears there without HOME, then check the home badge against the same result. If the live reveal fails, inspect its room ID, replay verdict and rank API before changing presentation.
+
 **21 October 2026, 18:27 UTC (result-room release candidate prepared, not deployed).**
 - **Prepared on `stream/result-home`:** WebGL build `20261021T180233353Z-10023a260d094a11a4f9bda80ed53acb` was assembled with its judge into `site/` and committed as `e3f0ab2`. The owner-authorized takeover did not change the live site or `main`: the direct main push was rejected by the repository approval policy because the team workflow assigns integration to the lead. No alternate deployment path was attempted.
 - **Release checks:** all checks in `tools/release/check_all.sh` passed when local loopback permission was granted, including 166 view tests, 109 service tests, 31 catalogue/simulation tests and 86 contract tests. The assembled judge replayed two recorded matches and agreed with both winners. The local preview-room result capture is in the entry below; it does not verify a signed rank award.
