@@ -197,3 +197,28 @@ No live match has exercised them yet.
   tiers) beside the unchanged fields. Nothing else of the public API changed.
 - Not verified: a reset on Upstash (the file store ran one locally with zero wallets), a public
   match scored with the new bands, the client's display of `lastReset`.
+
+## 21 October, stream E, lot 3: hidden rating and the room band (implemented, tests only)
+
+Implemented in the new `server/src/rating.js`, `server/src/ranks.js` (`ratingOf`, `bandOf`),
+`server/src/photon.js` (`game/create`) and `server/src/api.js`; verified only by
+`server/test/ranks-rating.test.js` (6 tests; 110 server tests pass). No live match has rated anyone.
+
+- Elo per wallet, start 1500, K 40 for a wallet's first 30 rated matches and 20 after (FIDE),
+  `E = 1 / (1 + 10^((R_other - R) / 400))`, `R' = R + K (S - E)`, a team rated as the mean of
+  its authenticated humans. Only match events with an authenticated human on each team rate
+  anyone; bots, guests, previews and solo matches move nobody. A season reset does not touch it.
+- The number never leaves the server. `GET /api/rank/me` adds `rating: {band, rated, matches}`:
+  bands are 150 points wide and centred on 1500, numbered 0 to 6; a wallet never rated is band 3.
+- Every room Photon creates carries its creator's band: the services answer `game/create` with
+  `EnterRoomParams.RoomOptions.CustomRoomProperties.C0 = band` and list `C0` in the lobby, from
+  the wallet in the authentication cookie (visitors and guests get band 3). A band the page
+  claims is overwritten; the match journal keeps it as `app.ratingBand`. Without the rank
+  store the answer is what it was.
+- The client filter is not done (the lead owns the menu): the Quantum menu's
+  `OnConnect(connectArgs, ref MatchmakingArguments args)` must set an SQL lobby, the band as
+  `C0` and the chained filter `C0 = b;C0 BETWEEN b-1 AND b+1;C0 BETWEEN b-2 AND b+2`, as the
+  stream E report spells out. `PlayerRanks.cs` gained the `rating` and `lastReset` data
+  classes (not yet compiled by Unity: plain serializable fields).
+- Not verified: Photon applying the `game/create` room options on the public cloud, a rated
+  public match, the lobby filter.

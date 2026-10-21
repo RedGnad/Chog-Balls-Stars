@@ -12,6 +12,7 @@
 // Every event freezes the numbers it was scored with, so a later change alters no past result.
 import { folderOf } from './matches.js';
 import { isAddress } from './chain.js';
+import { RATING, UNRATED_BAND, bandFor, computeRatings } from './rating.js';
 
 export const TIERS = [
   { name: 'BRONZE', at: 0 },
@@ -258,5 +259,21 @@ export function createRanks({ store, matches, now = Date.now }) {
     return resets;
   }
 
-  return { record, eventOf, of, standingOf, timelineOf, allEvents, allResets, wallets, resetSeason };
+  /**
+   * The hidden rating of a wallet (rating.js), computed from every match event where
+   * authenticated humans faced each other; a wallet never rated starts at 1500 with 0 matches.
+   * Never answered to a page as a number: the API gives bandOf.
+   */
+  async function ratingOf(address) {
+    const rated = computeRatings(await allEvents()).get(address.toLowerCase());
+    const rating = rated?.rating ?? RATING.start;
+    return { rating, matches: rated?.matches ?? 0, band: bandFor(rating) };
+  }
+
+  /** The matchmaking band of a wallet: what a room it creates carries, and what it filters on. */
+  async function bandOf(address) {
+    return isAddress(address) ? (await ratingOf(address)).band : UNRATED_BAND;
+  }
+
+  return { record, eventOf, of, standingOf, timelineOf, allEvents, allResets, wallets, resetSeason, ratingOf, bandOf };
 }

@@ -12,6 +12,29 @@ namespace Chog.Match
         public int matches;
         public int wins;
         public PlayerRankGain last;
+        public PlayerRankReset lastReset;
+    }
+
+    /// <summary>The last season's end that brought this wallet down toward the floor; null until one did.</summary>
+    [Serializable]
+    public sealed class PlayerRankReset
+    {
+        public string seasonId;
+        public string at;
+        public int before;
+        public int after;
+        public string tierBefore;
+        public string tierAfter;
+    }
+
+    /// <summary>The hidden rating as the server shows it: a band for matchmaking, never the number.</summary>
+    [Serializable]
+    public sealed class PlayerRating
+    {
+        /// <summary>0 to 6; 3 is where every wallet starts. A room carries its creator's band as "C0".</summary>
+        public int band;
+        public bool rated;
+        public int matches;
     }
 
     [Serializable]
@@ -37,6 +60,7 @@ namespace Chog.Match
     {
         public bool enabled;
         public PlayerRank rank;
+        public PlayerRating rating;
         public PlayerRankMatch latestMatch;
     }
 

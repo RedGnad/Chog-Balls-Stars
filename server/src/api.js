@@ -157,8 +157,11 @@ export function createApi({ chain, sessions, careers, ranks, rankStorageStatus =
       const rank = ranks ? await ranks.of(address) : null;
       const latest = matches?.latestOf ? await matches.latestOf(address) : null;
       const event = latest && ranks ? await ranks.eventOf(latest.gameId) : null;
+      // The hidden rating is answered as a band only, never as a number (rating.js).
+      const rated = ranks ? await ranks.ratingOf(address) : null;
       return json(200, {
         enabled: Boolean(ranks), rank,
+        rating: rated ? { band: rated.band, rated: rated.matches > 0, matches: rated.matches } : null,
         latestMatch: latest ? {
           gameId: latest.gameId,
           status: event ? (event.reason ?? 'ranked') : latest.startedAt ? 'verifying' : 'preparing',

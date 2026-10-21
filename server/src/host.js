@@ -272,6 +272,7 @@ const api = createApi({
   photon: createPhoton({
     secret: await photonSecret(dataFolder, environment.PHOTON_SECRET),
     sessions, careers, chain, shop, rental, standIns, matches, build: photonVersion,
+    ratingBandOf: ranks ? address => ranks.bandOf(address) : undefined,
     previewBuilds: (environment.PREVIEW_BUILDS ?? '').trim(),
     onReplayEnded: judge ? gameId => judgeAndRecord(gameId) : undefined,
   }),
