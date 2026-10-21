@@ -531,10 +531,10 @@ namespace Chog.Screens
                 : tokens.Length > 1 ? (pages > 1 ? (_page + 1) + " / " + pages + "   " : "") + "tap one to play it"
                 : "";
 
-            // A signature records the career of a Genesis. It is not presented to a recruit as a
-            // second primary task and staking stays an opt-in match feature.
+            // A signature records Genesis career or player rank. A connected recruit can sign
+            // for rank points without making staking part of the home screen.
             var signedIn = PlayerWallet.SignIn == SignInState.SignedIn;
-            _signIn.gameObject.SetActive(holds && !signedIn);
+            _signIn.gameObject.SetActive(state == WalletState.Ready && !guest && !signedIn);
             var signInArea = (RectTransform)_signIn.transform;
             if (holds)
             {
@@ -559,7 +559,7 @@ namespace Chog.Screens
             _signInLabel.text = PlayerWallet.SignIn == SignInState.Asking ? "ANSWER IN YOUR WALLET..."
                 : PlayerWallet.SignInProblem.Length > 0 ? "SIGN-IN FAILED, TRY AGAIN"
                 : holds ? (PhotonIdentity.SignInNeededToPlay ? "SIGN IN TO PLAY IT" : "SIGN IN TO RECORD ITS CAREER")
-                : "";
+                : "SIGN IN FOR RANK";
             if (_poster != null && _poster.gameObject.activeSelf)
             {
                 // When no wallet action is available, the poster fills the reserved footer instead of
