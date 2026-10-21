@@ -69,6 +69,10 @@ services:
       # the judge calls their matches void (server/src/photon.js, game/create).
       - key: PREVIEW_BUILDS
         value: "any"
+      # Player ladder events use the durable Upstash store configured in Render's environment.
+      # The host disables rank automatically if its startup write probe fails.
+      - key: RANK_ENABLED
+        value: "1"
       - key: CAREERS_ADDRESS
         value: "0x335bf7bc610645546e2b00de6a9fd0c4709d6111"
       # The deployed wager contract and the key of its referee (contracts/README.md): both or
