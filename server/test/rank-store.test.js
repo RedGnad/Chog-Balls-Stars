@@ -10,7 +10,13 @@ function fakeRedis() {
   const fetchImpl = async (_url, request) => {
     const [name, ...args] = JSON.parse(request.body);
     commands.push(name);
-    if (request.headers.Authorization !== 'Bearer test-token') return Response.json({ error: 'unauthorized' }, { status: 401 });
+    const authorization = request.headers.Authorization;
+    if (authorization !== 'Bearer test-token' && authorization !== 'Bearer read-only-token') {
+      return Response.json({ error: 'unauthorized' }, { status: 401 });
+    }
+    if (authorization === 'Bearer read-only-token' && name === 'SET') {
+      return Response.json({ error: 'command not allowed' }, { status: 400 });
+    }
     let result;
     if (name === 'PING') result = 'PONG';
     else if (name === 'GET') result = values.get(args[0]) ?? null;
@@ -33,6 +39,7 @@ test('remote rank events survive a new adapter and cannot be overwritten', async
   const options = { url: 'https://rank-store.example', token: 'test-token', fetchImpl: redis.fetchImpl };
   const first = createRemoteRankStore(options);
   assert.equal(await first.ping(), true);
+  assert.equal(await first.probeWrite(), true);
   assert.equal(await first.setIfAbsent('ranked/game-1', '{"win":3}'), true);
   assert.equal(await first.setIfAbsent('ranked/game-1', '{"win":20}'), false);
   const second = createRemoteRankStore(options);
@@ -76,4 +83,9 @@ test('remote rank storage refuses missing credentials and failed commands', asyn
     url: 'https://rank-store.example', token: 'wrong-token', fetchImpl: fakeRedis().fetchImpl,
   });
   await assert.rejects(store.get('ranked/game-1'), /HTTP 401/);
+  const readOnly = createRemoteRankStore({
+    url: 'https://rank-store.example', token: 'read-only-token', fetchImpl: fakeRedis().fetchImpl,
+  });
+  assert.equal(await readOnly.ping(), true);
+  await assert.rejects(readOnly.probeWrite(), /HTTP 400/);
 });

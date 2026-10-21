@@ -1,5 +1,6 @@
 // Durable rank events on Upstash Redis. Match replay files remain local to the judge;
 // only a verified rank event must survive a Render restart.
+import { randomUUID } from 'node:crypto';
 
 const NAMESPACE = 'chog:rank:v1:';
 
@@ -26,6 +27,8 @@ export function createRemoteRankStore({ url, token, fetchImpl = fetch }) {
 
   return {
     ping: async () => (await command(['PING'])) === 'PONG',
+    // A short-lived write proves the configured token can credit events, not just read them.
+    probeWrite: async () => (await command(['SET', keyOf(`probe/${randomUUID()}`), 'ready', 'NX', 'EX', 60])) === 'OK',
     get: key => command(['GET', keyOf(key)]),
     // A game ID is credited once, even when two replay callbacks race.
     setIfAbsent: async (key, value) => (await command(['SET', keyOf(key), value, 'NX'])) === 'OK',

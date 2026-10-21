@@ -118,7 +118,7 @@ let rankStorageStatus = 'not_configured';
 if (rankUrl && rankToken) {
   try {
     const candidate = createRemoteRankStore({ url: rankUrl, token: rankToken });
-    if (!await candidate.ping()) throw new Error('unexpected ping response');
+    if (!await candidate.ping() || !await candidate.probeWrite()) throw new Error('storage probe failed');
     rankStore = candidate;
     rankStorageStatus = 'connected';
   } catch {
