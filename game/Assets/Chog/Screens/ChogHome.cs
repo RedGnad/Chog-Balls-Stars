@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Globalization;
 using System.Reflection;
 using Chog.Match;
@@ -24,6 +25,7 @@ namespace Chog.Screens
     {
         private const string ObjectName = "ChogHome";
         private const string RosterResource = "GenesisRoster";
+        private Coroutine _rankRefresh;
 
         // In units of the menu canvas (1920 by 1080 at 16:9), from the corners.
         private const float Margin = 30f;
@@ -137,11 +139,16 @@ namespace Chog.Screens
             GenesisForms.Changed += Refresh;
             if (_ribbonName != null)
                 Refresh();
-            PlayerRanks.Read();
+            RestartRankRefresh();
         }
 
         private void OnDisable()
         {
+            if (_rankRefresh != null)
+            {
+                StopCoroutine(_rankRefresh);
+                _rankRefresh = null;
+            }
             WalletPanel.PlayedChanged -= Refresh;
             PlayerWallet.Changed -= OnWalletChanged;
             PlayerRanks.Changed -= Refresh;
@@ -372,7 +379,34 @@ namespace Chog.Screens
         private void OnWalletChanged()
         {
             Refresh();
-            PlayerRanks.Read();
+            RestartRankRefresh();
+        }
+
+        private void RestartRankRefresh()
+        {
+            if (_rankRefresh != null)
+                StopCoroutine(_rankRefresh);
+            _rankRefresh = StartCoroutine(RefreshPendingRank());
+        }
+
+        // A player may return HOME before Photon has delivered the last replay chunk.
+        // Refresh until the server makes that match final.
+        private IEnumerator RefreshPendingRank()
+        {
+            while (isActiveAndEnabled)
+            {
+                PlayerRankAnswer answer = null;
+                var returned = false;
+                PlayerRanks.Read(value => { answer = value; returned = true; });
+                var deadline = Time.realtimeSinceStartup + 10f;
+                while (!returned && Time.realtimeSinceStartup < deadline && isActiveAndEnabled)
+                    yield return null;
+                var status = answer?.latestMatch?.status;
+                if (status != "verifying" && status != "preparing")
+                    break;
+                yield return new WaitForSecondsRealtime(3f);
+            }
+            _rankRefresh = null;
         }
 
         private void Refresh()

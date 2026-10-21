@@ -96,6 +96,9 @@ namespace Chog.Match
             // The world of the stage, at the root of the scene so that no layout moves it.
             var world = new GameObject("ChogHeroStage World " + index).transform;
             world.position = new Vector3(0f, 9000f, 1000f * index);
+            // A result stage survives the gameplay scene unloading while the referee
+            // completes the replay. OnDestroy removes it with its screen.
+            DontDestroyOnLoad(world.gameObject);
             _stand = world;
 
             var pedestal = new GameObject("Pedestal", typeof(MeshFilter), typeof(MeshRenderer));

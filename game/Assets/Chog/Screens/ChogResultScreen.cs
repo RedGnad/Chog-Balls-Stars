@@ -79,6 +79,7 @@ namespace Chog.Screens
                 return true;
 
             var host = new GameObject(ObjectName, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            Object.DontDestroyOnLoad(host);
             var canvas = host.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 400;
@@ -132,6 +133,13 @@ namespace Chog.Screens
             card.gameObject.SetActive(playing);
             controls = host.AddComponent<ResultControls>();
             controls.TokenId = tokenId;
+            controls.Won = won;
+            var game = QuantumRunner.Default != null ? QuantumRunner.Default.Game : null;
+            var resultFrame = game != null && game.Frames != null ? game.Frames.Verified : null;
+            controls.RankEligible = playing && resultFrame != null && MatchModes.IsSiege(resultFrame);
+            controls.VictoryTitle = title;
+            controls.VictoryGlow = playing && ChogHeroModel.Has(metadataId)
+                ? host.transform.Find("Glow")?.GetComponent<Image>() : null;
             if (tokenId > 0)
             {
                 controls.Road = MasteryRoad.Create(card.transform, new Vector2(0.03f, 0.24f), new Vector2(0.97f, 0.97f));
@@ -164,7 +172,12 @@ namespace Chog.Screens
             else
             {
                 var text = ChogUi.Body("Career", card.transform, new Vector2(0.06f, 0.1f), new Vector2(0.94f, 0.9f), 42f, TextAlignmentOptions.Center);
-                text.text = "A recruit has no career.\nPlay a Genesis to give it one on Monad: connect the wallet that holds it, or rent one.";
+                controls.Career = text;
+                var rank = PlayerRanks.Current?.rank;
+                text.text = PlayerWallet.SignIn == SignInState.SignedIn && rank != null
+                    ? "PLAYER RANK\n<size=150%><color=#FFE27A>" + rank.tier + " " + rank.points +
+                      "</color></size>\n<size=65%>Every verified Siege counts, even as a Recruit.</size>"
+                    : "A recruit has no Genesis career.\nSign in to earn player rank points, or play a Genesis for its own career.";
             }
 
             if (playing)
@@ -246,7 +259,12 @@ namespace Chog.Screens
             public int TokenId;
             public int PointsBefore = -1;
             public bool WaitingForRecord;
+            public bool Won;
+            public bool RankEligible;
+            public TextMeshProUGUI VictoryTitle;
+            public Image VictoryGlow;
             private TextMeshProUGUI _rankStatus;
+            private Image _rankShade;
             private RectTransform _rankMoment;
             private CanvasGroup _rankGroup;
             private TextMeshProUGUI _rankHeading;
@@ -260,6 +278,8 @@ namespace Chog.Screens
             private bool _skipReveal;
             private float _shownAt;
             private bool _leaving;
+            private Task _disconnectTask;
+            private QuantumMenuUIController _menuController;
 
             public void BuildRank(Transform screen)
             {
@@ -268,20 +288,25 @@ namespace Chog.Screens
                 _rankStatus = ChogUi.Body("Words", strip.transform, new Vector2(0.02f, 0.02f), new Vector2(0.98f, 0.98f),
                     22f, TextAlignmentOptions.Center, ChogTheme.Cream);
                 _rankStatus.text = PlayerWallet.SignIn == SignInState.SignedIn &&
-                    !BuildIdentity.PhotonVersion.Contains(BuildIdentity.PreviewSuffix)
-                    ? "PLAYER RANK: VERIFYING THE MATCH" : "PLAYER RANK: CASUAL MATCH";
+                    RankEligible && !BuildIdentity.PhotonVersion.Contains(BuildIdentity.PreviewSuffix)
+                    ? (Won ? "RANK REWARD INCOMING" : "UPDATING PLAYER RANK") : "PLAYER RANK: CASUAL MATCH";
 
-                _rankMoment = ChogUi.Area("RankMoment", screen, new Vector2(0.59f, 0.31f), new Vector2(0.93f, 0.68f));
+                _rankShade = ChogUi.Area("RankShade", screen, Vector2.zero, Vector2.one).gameObject.AddComponent<Image>();
+                _rankShade.color = new Color(ChogTheme.Ink.r, ChogTheme.Ink.g, ChogTheme.Ink.b, 0.60f);
+                _rankShade.raycastTarget = false;
+                _rankShade.gameObject.SetActive(false);
+                _rankMoment = ChogUi.Area("RankMoment", screen, new Vector2(0.25f, 0.28f), new Vector2(0.75f, 0.76f));
                 var plate = _rankMoment.gameObject.AddComponent<Image>();
                 plate.sprite = ChogSprites.Rounded(26, 4, ChogTheme.Ink, ChogTheme.CardRaised);
                 plate.type = Image.Type.Sliced;
                 _rankGroup = _rankMoment.gameObject.AddComponent<CanvasGroup>();
-                _rankHeading = ChogUi.Title("Heading", _rankMoment, new Vector2(0.05f, 0.76f), new Vector2(0.95f, 0.95f), 30f);
-                _rankAmount = ChogUi.Title("Amount", _rankMoment, new Vector2(0.04f, 0.29f), new Vector2(0.96f, 0.76f), 75f);
+                _rankHeading = ChogUi.Title("Heading", _rankMoment, new Vector2(0.05f, 0.77f), new Vector2(0.95f, 0.96f), 38f);
+                _rankHeading.color = ChogTheme.PurpleSoft;
+                _rankAmount = ChogUi.Title("Amount", _rankMoment, new Vector2(0.04f, 0.27f), new Vector2(0.96f, 0.80f), 130f);
                 _rankDetail = ChogUi.Body("Detail", _rankMoment, new Vector2(0.05f, 0.07f), new Vector2(0.95f, 0.28f),
-                    22f, TextAlignmentOptions.Center, ChogTheme.Cream);
+                    30f, TextAlignmentOptions.Center, ChogTheme.Cream);
                 _rankMoment.gameObject.SetActive(false);
-                if (PlayerWallet.SignIn == SignInState.SignedIn &&
+                if (PlayerWallet.SignIn == SignInState.SignedIn && RankEligible &&
                     !BuildIdentity.PhotonVersion.Contains(BuildIdentity.PreviewSuffix))
                     StartCoroutine(PollRank());
             }
@@ -289,7 +314,7 @@ namespace Chog.Screens
             private IEnumerator PollRank()
             {
                 var failures = 0;
-                for (var attempt = 0; attempt < 30 && !_leaving; attempt++)
+                for (var attempt = 0; attempt < 90 && !_leaving; attempt++)
                 {
                     PlayerRankAnswer answer = null;
                     var returned = false;
@@ -315,6 +340,10 @@ namespace Chog.Screens
                         var gain = answer.rank.last;
                         _rankStatus.text = "PLAYER RANK  " + answer.rank.tier + "  " + answer.rank.points +
                             " PTS  (" + (gain.delta >= 0 ? "+" : "") + gain.delta + ")";
+                        if (TokenId == 0 && Career != null)
+                            Career.text = "PLAYER RANK\n<size=150%><color=#FFE27A>" + answer.rank.tier + " " +
+                                answer.rank.points + "</color></size>\n<size=65%>" + answer.rank.matches +
+                                " VERIFIED SIEGE MATCHES</size>";
                         if (gain.delta != 0 || gain.tierAfter != gain.tierBefore)
                             yield return RevealRank(gain);
                         yield break;
@@ -336,29 +365,33 @@ namespace Chog.Screens
                     yield return null;
                 if (_leaving)
                     yield break;
-                _rankHeading.text = gain.tierAfter != gain.tierBefore ? "NEW PLAYER RANK" : "RANK POINTS CONFIRMED";
+                _rankHeading.text = gain.tierAfter != gain.tierBefore ? "RANK UP!" : Won ? "VICTORY REWARD" : "PLAYER RANK";
                 _rankAmount.text = gain.tierAfter != gain.tierBefore ? gain.tierAfter :
                     (gain.delta > 0 ? "+" : "") + gain.delta + " PTS";
                 _rankAmount.color = gain.delta >= 0 ? ChogTheme.Gold : ChogTheme.Cream;
                 _rankDetail.text = gain.before + "  >  " + gain.after + " PLAYER POINTS";
-                _rankMoment.localScale = ChogTheme.ReducedMotion ? Vector3.one : Vector3.one * 0.9f;
+                _rankMoment.localScale = ChogTheme.ReducedMotion ? Vector3.one : Vector3.one * 0.74f;
                 _rankGroup.alpha = 0f;
+                _rankShade.gameObject.SetActive(true);
                 _rankMoment.gameObject.SetActive(true);
                 ChogSounds.Reward(gain.tierAfter != gain.tierBefore ? 2 : 0);
                 var start = Time.unscaledTime;
-                const float duration = 0.28f;
+                const float duration = 0.52f;
                 while (Time.unscaledTime - start < duration && !_leaving)
                 {
                     var t = Mathf.Clamp01((Time.unscaledTime - start) / duration);
                     _rankGroup.alpha = t;
                     if (!ChogTheme.ReducedMotion)
-                        _rankMoment.localScale = Vector3.one * Mathf.Lerp(0.9f, 1f, 1f - (1f - t) * (1f - t));
+                        _rankMoment.localScale = Vector3.one * (t < 0.75f
+                            ? Mathf.Lerp(0.74f, 1.05f, t / 0.75f)
+                            : Mathf.Lerp(1.05f, 1f, (t - 0.75f) / 0.25f));
                     yield return null;
                 }
                 _rankGroup.alpha = 1f;
                 _rankMoment.localScale = Vector3.one;
-                yield return new WaitForSecondsRealtime(1.2f);
+                yield return new WaitForSecondsRealtime(2.4f);
                 _rankMoment.gameObject.SetActive(false);
+                _rankShade.gameObject.SetActive(false);
             }
 
             public void BuildReward(Transform card)
@@ -384,6 +417,65 @@ namespace Chog.Screens
             {
                 _shownAt = Time.unscaledTime;
                 GenesisCareers.Recorded += OnRecorded;
+            }
+
+            private void Start()
+            {
+                if (Won && VictoryTitle != null && !ChogTheme.ReducedMotion)
+                    StartCoroutine(VictoryEntrance());
+                if (QuantumRunner.Default?.NetworkClient?.CurrentRoom != null)
+                    StartCoroutine(CloseFinishedSession());
+            }
+
+            private IEnumerator VictoryEntrance()
+            {
+                var glowAlpha = VictoryGlow != null ? VictoryGlow.color.a : 0f;
+                var start = Time.unscaledTime;
+                const float duration = 0.65f;
+                while (Time.unscaledTime - start < duration)
+                {
+                    var t = Mathf.Clamp01((Time.unscaledTime - start) / duration);
+                    VictoryTitle.rectTransform.localScale = Vector3.one * (t < 0.50f
+                        ? Mathf.Lerp(1.26f, 1.06f, t * 2f)
+                        : Mathf.Lerp(1.06f, 1f, (t - 0.5f) * 2f));
+                    if (VictoryGlow != null)
+                    {
+                        var colour = VictoryGlow.color;
+                        colour.a = Mathf.Lerp(0.70f, glowAlpha, t);
+                        VictoryGlow.color = colour;
+                    }
+                    yield return null;
+                }
+                VictoryTitle.rectTransform.localScale = Vector3.one;
+            }
+
+            // Photon sends the final replay chunk when the finished room closes. Keep
+            // the result canvas alive, close the network session, then await the real award.
+            private IEnumerator CloseFinishedSession()
+            {
+                yield return new WaitForSecondsRealtime(0.8f);
+                if (!_leaving)
+                    _ = DisconnectForResult();
+            }
+
+            private async Task DisconnectForResult()
+            {
+                var gameplay = Object.FindFirstObjectByType<QuantumMenuUIGameplay>(FindObjectsInactive.Include);
+                if (gameplay == null || gameplay.Connection == null || gameplay.Controller == null)
+                    return;
+                _menuController = gameplay.Controller;
+                try
+                {
+                    _disconnectTask = gameplay.Connection.DisconnectAsync(ConnectFailReason.UserRequest);
+                    await _disconnectTask;
+                    if (!_leaving && _menuController != null)
+                        _menuController.Show<QuantumMenuUIMain>();
+                }
+                catch (System.Exception error)
+                {
+                    Debug.LogWarning("CHOG_RESULT could not close the finished session: " + error.Message);
+                    _disconnectTask = null;
+                }
             }
 
             private void OnDestroy() => GenesisCareers.Recorded -= OnRecorded;
@@ -587,7 +679,27 @@ namespace Chog.Screens
                 // Hidden at once, taken away once the menu is back: this object runs the leaving.
                 foreach (Transform child in transform)
                     child.gameObject.SetActive(false);
-                await LeaveMatch(playAgain);
+                if (_disconnectTask != null)
+                {
+                    try
+                    {
+                        await _disconnectTask;
+                        if (_menuController != null)
+                        {
+                            _menuController.Show<QuantumMenuUIMain>();
+                            if (playAgain)
+                                _menuController.Get<QuantumMenuUIMain>()?.SendMessage("OnPlayButtonPressed", SendMessageOptions.DontRequireReceiver);
+                        }
+                    }
+                    catch (System.Exception error)
+                    {
+                        Debug.LogWarning("CHOG_RESULT could not leave the finished session: " + error.Message);
+                    }
+                }
+                else
+                {
+                    await LeaveMatch(playAgain);
+                }
                 Destroy(gameObject);
             }
         }
