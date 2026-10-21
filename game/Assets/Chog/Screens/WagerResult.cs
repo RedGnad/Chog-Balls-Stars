@@ -37,9 +37,9 @@ namespace Chog.Screens
         /// is nothing to tap.
         /// </summary>
         public static (string line, string button) Describe(WagerOutcome outcome, string chainState, bool mine, string stakeWei, string gainWei,
-                                                            string calledOffBecause, bool canClaim, string currency = "$CHOG")
+                                                            string calledOffBecause, bool canClaim, string currency = "$CHOG", double usdPerChog = 0)
         {
-            var stake = MonadTransactions.PriceText(stakeWei) + " " + currency;
+            var stake = ChogPrice.WithUsd(stakeWei, usdPerChog, currency);
             var paid = chainState == "settled" || chainState == "refunded";
             switch (outcome)
             {
@@ -50,7 +50,7 @@ namespace Chog.Screens
                     return ("NOBODY STAKED ON THE OTHER TEAM: YOUR STAKE OF " + stake + (paid ? " WAS GIVEN BACK" : " COMES BACK"),
                         paid ? "OK" : canClaim ? "GET IT BACK" : "");
                 case WagerOutcome.Won when mine:
-                    return ("YOUR TEAM WON: +" + MonadTransactions.PriceText(gainWei) + " " + currency + (paid ? ", PAID" : ""), paid ? "OK" : canClaim ? "CLAIM" : "");
+                    return ("YOUR TEAM WON: +" + ChogPrice.WithUsd(gainWei, usdPerChog, currency) + (paid ? ", PAID" : ""), paid ? "OK" : canClaim ? "CLAIM" : "");
                 case WagerOutcome.Won:
                     return ("YOUR TEAM LOST: YOUR STAKE OF " + stake + " GOES TO THE WINNERS", paid ? "OK" : canClaim ? "SETTLE" : "");
                 case WagerOutcome.Draw:
@@ -85,10 +85,15 @@ namespace Chog.Screens
         private void OnEnable()
         {
             GenesisWager.Changed += Refresh;
+            ChogPrice.Changed += Refresh;
             Refresh();
         }
 
-        private void OnDisable() => GenesisWager.Changed -= Refresh;
+        private void OnDisable()
+        {
+            GenesisWager.Changed -= Refresh;
+            ChogPrice.Changed -= Refresh;
+        }
 
         private void Build()
         {
@@ -159,7 +164,7 @@ namespace Chog.Screens
             var mine = GenesisWager.Outcome == WagerOutcome.Won && GenesisWager.WinnerTeam == GenesisWager.LastTeam;
             var gain = GenesisWager.WinnerGain(GenesisWager.LastStakeWei, GenesisWager.LastWinners, GenesisWager.LastLosers, GenesisWager.BurnedShare);
             var (line, button) = Describe(GenesisWager.Outcome, GenesisWager.LastChainState, mine, GenesisWager.LastStakeWei, gain,
-                GenesisWager.CalledOffBecause, GenesisWager.CanClaim, GenesisWager.Currency);
+                GenesisWager.CalledOffBecause, GenesisWager.CanClaim, GenesisWager.Currency, GenesisWager.IsTest ? 0 : ChogPrice.UsdPerChog);
             _text.text = line;
             _button.gameObject.SetActive(button.Length > 0);
             _buttonLabel.text = button;

@@ -73,6 +73,7 @@ import { createJudge } from './judge.js';
 import { createMatches } from './matches.js';
 import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, reownProjectId, servedBuild, servedPhotonVersion, sessionSecret } from './node.js';
 import { createPhoton } from './photon.js';
+import { createPrice } from './price.js';
 import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
 import { createRanks } from './ranks.js';
@@ -108,7 +109,9 @@ if (!(await stat(join(gameFolder, 'index.html')).catch(() => null))) {
 const rpcUrls = (environment.RPC_URLS ?? '').split(',').map(url => url.trim()).filter(Boolean);
 const chain = createChain({ rpcUrls: rpcUrls.length > 0 ? rpcUrls : DEFAULT_RPC_URLS });
 const shop = createShop({ chain, address: (environment.SHOP_ADDRESS ?? '').trim() });
-const rental = createRental({ chain, address: (environment.RENTAL_ADDRESS ?? '').trim() });
+// The price of $CHOG in dollars, from public sources (price.js): every amount is labelled in both.
+const price = createPrice();
+const rental = createRental({ chain, address: (environment.RENTAL_ADDRESS ?? '').trim(), price });
 const standIns = createStandIns({ chain, setting: environment.STAND_INS ?? '' });
 const sessions = createSessions({ secret: await sessionSecret(dataFolder, environment.SESSION_SECRET) });
 
@@ -277,7 +280,8 @@ const api = createApi({
   }),
   build,
   photonAuthentication: environment.PHOTON_AUTH === '1',
-  wager: createWager({ chain: wagerChain, referee, matches, network: wagerPlace }),
+  wager: createWager({ chain: wagerChain, referee, matches, network: wagerPlace, store: matchStore, price }),
+  price,
   reownProjectId: await reownProjectId(dataFolder, environment.REOWN_PROJECT_ID),
 });
 

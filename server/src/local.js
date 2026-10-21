@@ -42,6 +42,7 @@ import { createJudge } from './judge.js';
 import { createMatches } from './matches.js';
 import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, reownProjectId, sessionSecret } from './node.js';
 import { createPhoton } from './photon.js';
+import { createPrice } from './price.js';
 import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
 import { createRanks } from './ranks.js';
@@ -65,7 +66,9 @@ let chain = createChain(rpc ? { rpcUrls: [rpc] } : {});
 // The shop and the rental read the chain as it is: a pretended holder changes who holds a
 // Genesis, not what was bought or rented.
 const shop = createShop({ chain, address: option('--shop', '') });
-const rental = createRental({ chain, address: option('--rental', '') });
+// The price of $CHOG in dollars is read from the same public sources as in production.
+const price = createPrice();
+const rental = createRental({ chain, address: option('--rental', ''), price });
 const pretend = option('--pretend-holder');
 if (pretend) {
   const [address, list] = pretend.split('=');
@@ -138,7 +141,8 @@ const handle = createApi({
   sessions,
   photon,
   photonAuthentication: process.argv.includes('--photon-auth'),
-  wager: createWager({ chain: wagerChain, referee, matches, network: wagerPlace }),
+  wager: createWager({ chain: wagerChain, referee, matches, network: wagerPlace, store: matchStore, price }),
+  price,
   reownProjectId: await reownProjectId(dataFolder, option('--reown-project-id')),
 });
 

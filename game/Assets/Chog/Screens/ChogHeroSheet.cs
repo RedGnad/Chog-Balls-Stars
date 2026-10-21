@@ -84,10 +84,12 @@ namespace Chog.Screens
             GenesisForms.Changed += Refresh;
             GenesisShop.Changed += Refresh;
             GenesisRental.Changed += Refresh;
+            ChogPrice.Changed += Refresh;
         }
 
         private void OnDisable()
         {
+            ChogPrice.Changed -= Refresh;
             PlayerWallet.Changed -= Refresh;
             GenesisCareers.Changed -= Refresh;
             GuestPass.Changed -= Refresh;
@@ -342,7 +344,7 @@ namespace Chog.Screens
             else if (canBuy)
             {
                 _formLabel.text = "<size=60%>" + _roster.FormName(hero.Shape, 1).ToUpperInvariant() + " NOW FOR</size>\n" +
-                                  MonadTransactions.PriceText(GenesisShop.PriceWei) + " $CHOG";
+                                  ChogPrice.WithUsd(GenesisShop.PriceWei);
             }
             else
             {
@@ -407,11 +409,11 @@ namespace Chog.Screens
                 var now = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
                 _rentOutLabel.text = lentUntil > 0
                     ? "<size=60%>RENTED FOR</size>\n" + GenesisRental.TimeLeft(lentUntil, now).ToUpperInvariant()
-                    : offered ? "<size=60%>RENTED OUT AT</size>\n" + MonadTransactions.PriceText(offer.PricePerDayWei) + " A DAY"
+                    : offered ? "<size=60%>RENTED OUT AT</size>\n" + ChogPrice.WithUsd(offer.PricePerDayWei) + " A DAY"
                     : "RENT OUT";
             }
             if (canRent)
-                _rentLabel.text = "RENT IT, " + MonadTransactions.PriceText(offer.PricePerDayWei) + " $CHOG A DAY";
+                _rentLabel.text = "RENT IT, " + ChogPrice.WithUsd(offer.PricePerDayWei) + " A DAY";
         }
 
         // PLAY IT: this Genesis is chosen, the sheet closes and the match is looked for.

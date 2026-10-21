@@ -287,7 +287,7 @@ namespace Chog.Screens
                 var index = token > 0 && _roster != null ? _roster.IndexOf(token) : -1;
                 var detail = "";
                 if (index >= 0 && _list == List.ForRent && GenesisRental.TryGetOffer(token, out var offer))
-                    detail = MonadTransactions.PriceText(offer.PricePerDayWei) + " A DAY";
+                    detail = WalletPanel.OfferTag(offer.PricePerDayWei, ChogPrice.UsdPerChog);
                 else if (index >= 0 && _list == List.Mine && Array.IndexOf(PlayerWallet.Tokens, token) < 0)
                     detail = GuestPass.State == GuestPassState.Valid && GuestPass.TokenId == token ? "LENT TO YOU" : "RENTED";
                 ShowCell(_cells[i], index, -1, played, detail);
