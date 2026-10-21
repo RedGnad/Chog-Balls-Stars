@@ -1,5 +1,10 @@
 # État courant et décisions
 
+**21 October 2026, 17:55 UTC (result room-close sequencing refined).**
+- **Implemented on `stream/result-home`, not deployed:** the result screen snapshots the final verified match frame before Photon cleanup, then begins `DisconnectAsync` as soon as the persistent result screen starts. The earlier arbitrary 0.8-second wait was removed. The player sees the result immediately; the rank reward appears only after the server confirms it.
+- **Verified:** screen typecheck has 0 errors; 166 view tests pass. The `rankpreview` fixture shows an existing Genesis Mastery Road, so its late screenshot is not evidence of a Recruit rank reveal. No new Unity build, live signed win, verified reward timing or production deployment was performed for this refinement.
+**Next action:** after the shared heavy-job lock is free, build and capture an actual Recruit result through Photon, check room closure and signed rank credit, then request owner review of the rank overlay before deployment.
+
 **21 October 2026, 17:09 UTC (result/home stream, pending runtime review).**
 - **Implemented on `stream/result-home`, not deployed:** commit `7b486d3` keeps the result canvas and hero stage alive while the finished Photon room disconnects, then polls for the server-confirmed player rank on the result screen. The Recruit result card and the home rank chip refresh from that same server answer. No rank point or match verdict is synthesized client-side.
 - **Verified locally:** the screen typecheck reports 0 errors and the current view suite reports 166 passed, 0 failed. A Unity WebGL build of the same source changes succeeded with 0 errors before the branch commit. The existing [public result](../research/evidence/chog-player-rank-public-result-2026-10-21.png) and [public home](../research/evidence/chog-player-rank-public-home-2026-10-21.png) captures show the previous behavior, not the new branch. A new result capture and a signed live win remain unverified while the shared heavy-job lock is held by the lead.

@@ -424,7 +424,7 @@ namespace Chog.Screens
                 if (Won && VictoryTitle != null && !ChogTheme.ReducedMotion)
                     StartCoroutine(VictoryEntrance());
                 if (QuantumRunner.Default?.NetworkClient?.CurrentRoom != null)
-                    StartCoroutine(CloseFinishedSession());
+                    _ = DisconnectForResult();
             }
 
             private IEnumerator VictoryEntrance()
@@ -449,15 +449,8 @@ namespace Chog.Screens
                 VictoryTitle.rectTransform.localScale = Vector3.one;
             }
 
-            // Photon sends the final replay chunk when the finished room closes. Keep
-            // the result canvas alive, close the network session, then await the real award.
-            private IEnumerator CloseFinishedSession()
-            {
-                yield return new WaitForSecondsRealtime(0.8f);
-                if (!_leaving)
-                    _ = DisconnectForResult();
-            }
-
+            // The result has already copied the final verified frame. Close the room
+            // immediately, keep the screen alive, then await the server's real award.
             private async Task DisconnectForResult()
             {
                 var gameplay = Object.FindFirstObjectByType<QuantumMenuUIGameplay>(FindObjectsInactive.Include);
