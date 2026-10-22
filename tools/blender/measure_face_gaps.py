@@ -44,6 +44,8 @@ def main():
     parser = argparse.ArgumentParser(description="Measures how far what is drawn on a head stands off it.")
     parser.add_argument("--genesis", required=True, help="numbers shown in the names, separated by commas")
     parser.add_argument("--into", default=None, help="a folder of built Genesis to read instead of building")
+    parser.add_argument("--dense", type=int, default=4, help="points taken on each triangle, along a side (4: fifteen points; "
+                        "20 looks for the thin places, 22 October 2026)")
     parser.add_argument("--head-set", action="append", default=[], metavar="NAME=VALUE", help="a number of the head put in place "
                         "of its own, to try (22 October 2026), for instance FACE_LIFT=0.0065")
     arguments = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
@@ -62,11 +64,13 @@ def main():
         reach = math.sqrt(sum((offset[index] / half[index]) ** 2 for index in range(3)))
         return offset.length - offset.length / reach if reach else -1.0
 
+    steps = arguments.dense
     for number in [word.strip() for word in arguments.genesis.split(",") if word.strip()]:
         if arguments.into:
             bpy.ops.wm.open_mainfile(filepath=os.path.join(arguments.into, number, "ChogBody.blend"))
         else:
-            traits.build(traits.traits_of(number), None, traits.numbers_given(arguments.head_set) or None)
+            # 0: the recruit, the grey Chog of a player with no Genesis (the base, no trait part)
+            traits.build(None if number == "0" else traits.traits_of(number), None, traits.numbers_given(arguments.head_set) or None)
         head = bpy.data.objects["Head"]
         head_faces, drawn = [], []
         for thing in [head] + [child for child in bpy.data.objects if child.parent == head and child.type == "MESH"]:
@@ -100,9 +104,9 @@ def main():
         found = {}
         for label, corners in drawn:
             on_face = label not in ("Head:ChogFace", "Head:ChogOutline")
-            for i in range(5):
-                for j in range(5 - i):
-                    point = (corners[0] * i + corners[1] * j + corners[2] * (4 - i - j)) / 4.0
+            for i in range(steps + 1):
+                for j in range(steps + 1 - i):
+                    point = (corners[0] * i + corners[1] * j + corners[2] * (steps - i - j)) / float(steps)
                     out = (point - middle).normalized()
                     seen = found.setdefault(label, {"n": 0, "gap": 0.0, "sum": 0.0, "head": 0, "face": 0, "off_face": 0.0})
                     seen["n"] += 1
@@ -110,10 +114,12 @@ def main():
                     if hit[0] is not None:
                         seen["gap"] = max(seen["gap"], hit[3])
                         seen["sum"] += hit[3]
-                    if head_tree.ray_cast(point, out, 0.05)[0] is not None:
+                    poke = head_tree.ray_cast(point, out, 0.05)
+                    if poke[0] is not None:
                         seen["head"] += 1
                         if label == "Head:ChogFace" and seen["head"] <= 6:
-                            print(f"GAPS #{number} head pokes the face at {tuple(round(c, 3) for c in point)} (head axes before turning up)")
+                            print(f"GAPS #{number} head pokes the face by {poke[3]:.4f} at {tuple(round(c, 3) for c in point)} "
+                                  f"(triangle {[tuple(round(c, 3) for c in corner) for corner in corners]})")
                     if face_tree is not None and on_face:
                         if face_tree.ray_cast(point, out, 0.05)[0] is not None:
                             seen["face"] += 1

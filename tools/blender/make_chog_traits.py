@@ -157,6 +157,7 @@ POLISH = {
     # is wider.)
     "FACE_FIT": 0.99,
     "FACE_SQUARENESS_X": 20.0,
+    "FACE_SQUARENESS_X_TOP": 8.0,
     "FRINGE_TEETH": 7,
     "FACE_HALF_HEIGHT": 0.198,
     "FRINGE_DROP": 0.040,
@@ -173,6 +174,7 @@ POLISH = {
     # hair. (A face 0.0030 off the egg let a point of the head show through it at the cheek: the quads by its
     # edge sag up to 0.0032 between their corners.)
     "FACE_LIFT": 0.0046,
+    "FACE_TOP_LIFT": 0.002,
     # (22 October 2026, the specks inside the cheeks seen on the hero stage: FACE_OVER was (0.0008, 0.0038). The cheek is
     # a fan of 12 triangles, its flat triangles sag under the egg between their corners, and so do those of the face, a
     # little differently: measured on the 10,400 points of the two cheeks of #75 (check_face_overlaps.py --decals) the
@@ -890,7 +892,12 @@ def face_place(numbers, angle, amount):
     room = numbers.HEAD_HALF_WIDTH * math.sqrt(max(1.0 - (height / numbers.HEAD_HALF_HEIGHT) ** 2, 0.0))
     # (22 October 2026: the width has its own squareness, FACE_SQUARENESS_X, so that the edge of the face follows the outline of
     # the egg all down its sides, instead of cutting the lower corners off with the rounded square.)
-    return numbers.FACE_FIT * room * power(cosine, getattr(numbers, "FACE_SQUARENESS_X", numbers.FACE_SQUARENESS)) * amount, z * amount
+    squareness = getattr(numbers, "FACE_SQUARENESS_X", numbers.FACE_SQUARENESS)
+    if sine > 0.0:
+        # Over the brow the width is rounded off more (FACE_SQUARENESS_X_TOP): with 20 the edge went straight up the side and
+        # crossed the whole brow in the last degree of its angle, so that no point of the edge lay along the brow (lot 7).
+        squareness = getattr(numbers, "FACE_SQUARENESS_X_TOP", squareness)
+    return numbers.FACE_FIT * room * power(cosine, squareness) * amount, z * amount
 
 
 def opening_rim(numbers, size, margin, tail, step=3.0):
@@ -903,7 +910,8 @@ def opening_rim(numbers, size, margin, tail, step=3.0):
     hood). Past the last degree at which the shell meets the face (its side), "tail" (the same kind of table)
     takes over: the hood closes down to the jaw and the back."""
     key = (tuple(numbers.FACE_MIDDLE), numbers.FACE_FIT, numbers.FACE_TOP, numbers.FACE_HALF_HEIGHT,
-           numbers.FACE_SQUARENESS, getattr(numbers, "FACE_SQUARENESS_X", 0.0), numbers.HEAD_HALF_WIDTH, numbers.HEAD_HALF_HEIGHT,
+           numbers.FACE_SQUARENESS, getattr(numbers, "FACE_SQUARENESS_X", 0.0),
+           getattr(numbers, "FACE_SQUARENESS_X_TOP", 0.0), numbers.HEAD_HALF_WIDTH, numbers.HEAD_HALF_HEIGHT,
            margin, step, tuple(tail),
            tuple(size(degrees) for degrees in range(0, 181, 10)))
     if key in OPENING_RIMS:
@@ -1006,10 +1014,24 @@ def add_settled_face(part, numbers, surface):
         point = surface.towards((towards_middle * (1.0 - share) + towards_edge * share).normalized())
         return point + egg_normal(surface, point) * height
 
-    # The face: its middle, then rings out to its edge.
+    # The face: its middle, then rings out to its edge. Along the brow the edge points of the face are far apart (the top of the
+    # edge is flat and wide) and a flat triangle between two of them sags under the dome of the head by more than FACE_LIFT,
+    # so the head came through the face there, in long jagged bands across the forehead (22 October 2026, the owner on the recruit,
+    # and measure_face_gaps: 41 points on #76 since the face was widened). The face is therefore lifted more, up to FACE_TOP_LIFT,
+    # along the brow, growing with the square of the ring (the edge ring most): the fringe that hides the brow is lifted with it.
+    top_lift = numbers.FACE_TOP_LIFT
+    heights = []
+    for angle in face_edge_angles(numbers, surface, segments):
+        up = face_place(numbers, angle, 1.0)[1]
+        reach = min(1.0, max(0.0, (up - (numbers.FACE_TOP - 0.10)) / 0.08))
+        heights.append(reach * reach * (3.0 - 2.0 * reach))
+
+    def brow_lift(index, share):
+        return lift + top_lift * heights[index] * share * share
+
     loops = [[surface.front(0.0, 0.0, lift)]]
     for share in shares:
-        loops.append([over_the_head(edge, share, lift) for edge in edges])
+        loops.append([over_the_head(edge, share, brow_lift(index, share)) for index, edge in enumerate(edges)])
     full.add_skin(part, surface, loops, full.FACE)
 
     # The dark line: from under the edge of the face out over the head, then into it.
@@ -1038,7 +1060,7 @@ def add_settled_face(part, numbers, surface):
     teeth = numbers.FRINGE_TEETH
     if teeth:
         brow = numbers.FACE_TOP * 0.995
-        hair = lift + numbers.FACE_OVER[1]
+        hair = lift + numbers.FACE_OVER[1] + top_lift
         tip = brow - numbers.FRINGE_DROP
         for index in range(teeth):
             middle = (index - (teeth - 1) * 0.5) * numbers.FRINGE_WIDTH
