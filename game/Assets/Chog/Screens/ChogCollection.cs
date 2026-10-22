@@ -146,6 +146,8 @@ namespace Chog.Screens
                 hit.color = Color.clear;
                 var cell = new Cell { Root = area.gameObject };
                 area.gameObject.AddComponent<Button>().onClick.AddListener(() => OpenSheet(cell));
+                // The lift and growth the themed buttons have under the pointer (ChogTheme.Paint).
+                area.gameObject.AddComponent<ChogHover>();
 
                 var picture = ChogUi.Pinned("Picture", area, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(6f, 0f), new Vector2(112f, 112f));
                 cell.Frame = ChogUi.Plate("Frame", picture, Vector2.zero, Vector2.one, ChogTheme.Ink, 14);

@@ -324,12 +324,12 @@ namespace Chog.Screens
             glow.sprite = ChogSprites.Disc(128, 1f);
             glow.color = new Color(1f, 0.72f, 0.24f, 0.22f);
             glow.raycastTarget = false;
-            var stageFloor = ChogUi.Pinned("StageFloor", area, new Vector2(0.5f, 0.25f), new Vector2(0.5f, 0.5f),
-                Vector2.zero, new Vector2(330f, 94f)).gameObject.AddComponent<Image>();
-            stageFloor.sprite = ChogSprites.Disc(96, 0.14f);
-            stageFloor.color = new Color(0.87f, 0.16f, 0.49f, 0.42f);
-            stageFloor.raycastTarget = false;
+            // (22 October 2026: the flat pink floor that stood here, from before the 3D pedestal, showed as a
+            // second pink oval behind it; the pedestal carries its own contact paint.)
             _stage = ChogHeroStage.Create(ChogUi.Area("Hero", area, Vector2.zero, Vector2.one));
+            // Dragging across the hero turns it, as on its sheet; a tap still opens the sheet (a drag
+            // cancels the tap of the button below).
+            _stage.Draggable = true;
 
             // The whole stage opens the hero's sheet.
             var tap = area.gameObject.AddComponent<Image>();
