@@ -1545,3 +1545,16 @@ Sheet: [clothes-batch4-2026-10-22.jpg](../../research/evidence/clothes-batch4-20
 - **BBC** and **Zero THOTS** (9, 11): the words sit low on the shirt in the art and were too high: BBC 0.062 at 0.340, ZERO THOTS on one line, 0.040 at 0.345.
 - **Judged faithful, unchanged**: Glitch, Sky and Peach Hoodie, Blue Sleeveless, purple and dark vest, Toad pink and green suits (the eyes were set apart in lot 5), Pink and Cyan Shirt, Red 143 Jersey, Boner, the tanks, the holed jackets, Blue Mafia. The tee words (white and dark tee) stay undone: no way to tell which word goes on which Genesis.
 - **Checked**: `--budget`: largest #1742 7,996, none over 8,000. Not verified in Unity.
+## 22 October 2026: strict eye audit, batch 7: the Left lasers (lot 8)
+
+Purple, fire and cyan laser on Side Left (68 Origin and 3 Skull Genesis; #127, #137, #252, #36, #25, #28, #418, #1426). Sheet, 5 Genesis, the art beside the front and three quarter close, before | after:
+[heroes-eyes-batch7-lasers-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch7-lasers-2026-10-22.jpg). The beam already started at the middle of the visible eye (lot 8, `centroid`); what was wrong is that the eyes were two equal lidded eyes where the pictures
+draw, as on every Side Left value, a large flat near eye and a small narrow far one: the three Left laser entries now take `SIDE_LEFT_EYES` (`eye_numbers`), and each beam leaves the middle of its own eye. Seen from the front the beam is a coloured patch
+at the middle of the eye, as in the art. Approximate: the beams stay short stubs (the game draws the long beam when the hero attacks), the art's near eye is a little wider.
+
+## 22 October 2026: strict eye audit, batch 8: Chog Viper and the rest of Retro Glass (lot 8)
+
+Sheet, 6 Genesis (#4, #50, #109 Chog Viper L; #1184, #1621, #312 Retro Glass R), the art beside the front and three quarter close (after only: these two values changed little, the before is batches 1 and 6):
+[heroes-eyes-batch8-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch8-2026-10-22.jpg).
+- **Chog Viper, Left: approximate, made closer.** A thick white frame round the lens (`RIM` 0.016 all round). Still differs: the art's lens is a deeper, rounder goggle with a gradient from dark blue to white and the CHOG lettering (not drawn), a thick strap.
+- **Retro Glass, Right: approximate.** The half-lidded, frowning eyes of batch 1 read as the art (light blue irises under a heavy lid, red thin frame); the art's iris is a little paler and the glints larger. Nothing changed.

@@ -1443,7 +1443,8 @@ EYES = {
         "colours": {"Frame": (0.84, 0.86, 0.90), "Deep": (0.10, 0.18, 0.78), "Blue": (0.12, 0.42, 0.92),
                     "Cyan": (0.30, 0.78, 0.96), "Light": (0.62, 0.92, 0.98)},
         "unlit": ("Deep", "Blue", "Cyan", "Light"),
-        "numbers": {"PIECES": ("Deep", "Blue", "Cyan", "Light", "Cyan", "Blue", "Deep")},
+        # (22 October 2026, strict audit, batch 8, on #4, #50, #109: the lens of the pictures sits in a thick white frame, about 0.016 all round.)
+        "numbers": {"PIECES": ("Deep", "Blue", "Cyan", "Light", "Cyan", "Blue", "Deep"), "RIM": (0.016, 0.016)},
     },
     # Headsets: CHOG #491 (Modern VR: a black lens in a glowing cyan rim, a curved glint) and #46,
     # #191 (Classic VR: a thick grey frame, a black lens, glare stripes).
@@ -1517,19 +1518,19 @@ EYES_OF_SIDE = {
         # The lasers of Side=Left: lidded eyes, and beams of other colours (CHOG #893, #252, #565, #1658),
         # most of their sides the light core with an edge of the darker colour under it.
         "Purple laser": {
-            "kind": "Laser", "eyes": "lidded",
+            "kind": "Laser", "eyes": "lidded", "eye_numbers": {"EYES": SIDE_LEFT_EYES},
             "colours": {"Dark": DARK, "Beam": (0.36, 0.34, 0.90), "Core": (0.95, 0.62, 0.93)},
             "unlit": ("Dark", "Beam", "Core"),
             "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.019, "BEAM_PITCH_DEG": 8.0},
         },
         "fire laser": {
-            "kind": "Laser", "eyes": "lidded",
+            "kind": "Laser", "eyes": "lidded", "eye_numbers": {"EYES": SIDE_LEFT_EYES},
             "colours": {"Dark": DARK, "Beam": (0.90, 0.16, 0.14), "Core": (0.76, 0.90, 0.28)},
             "unlit": ("Dark", "Beam", "Core"),
             "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.019, "BEAM_PITCH_DEG": 8.0},
         },
         "cyan laser": {
-            "kind": "Laser", "eyes": "lidded",
+            "kind": "Laser", "eyes": "lidded", "eye_numbers": {"EYES": SIDE_LEFT_EYES},
             "colours": {"Dark": DARK, "Beam": (0.14, 0.24, 0.62), "Core": (0.34, 0.84, 0.95)},
             "unlit": ("Dark", "Beam", "Core"),
             "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.019, "BEAM_PITCH_DEG": 8.0},
