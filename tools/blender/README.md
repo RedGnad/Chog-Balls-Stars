@@ -1482,3 +1482,28 @@ Side Eye L (34 Origin Genesis), Base L (33), Happy L (33), MOG L (32), Vertical 
   (14 pieces). The art's lens is a smooth rainbow with a thick dark frame and a notch at the nose; ours still shows a step every 0.04.
 - **Checked**: library export builds all 1,970 Genesis under 8,000 triangles; by eye on the sheet only; not in a Unity build.
 - **Left to do**: Left: Frog, Clown Eye, Clown Eye Mix, Chog Viper (shape), Classic VR, Modern VR, Retard, XD, 3D Glass, BTC Glass, Worried, Thug, Angry, Smirk done, the lasers; Right: Retro Glass remainder.
+
+
+### Batch 3: the Side=Left values with 13 Genesis or more, and White Yukata
+
+Sheet: [clothes-batch3-2026-10-22.jpg](../../research/evidence/clothes-batch3-2026-10-22.jpg) (26 rows, the art then before | after: torso, torso from behind, hero stage). The pictures of Side=Left are framed on the face: only
+the collar, the top of the chest and the sleeves show, which limits what the art says. Values seen (two Genesis each): Orange, Yellow, Mon, Electro Hoodie, Tuxedo, Red and Orange Sleeveless, Golden Armor, toad blue suit, pink and purple
+vest, Yellow and Blue 143 Jersey, White Sleeveless, Brown and Grey Homeless Shirt, dark, Red and Blue jacket, Sci Fi, Virgin, red, blue and dark tee, White Shirt, Purple, Grey and Black Shirt, White Yukata.
+
+- **Golden Armor** (17): the art has big rounded gold plates over the shoulders with two rivets each; ours was a striped shirt. `build_armor`, `add_pauldrons`: a plate 0.184 wide on each shoulder (on the sleeve parts) with a rivet (3 stacks, 8 sides, to keep #1742, Golden Armor with the new Chog Viper eyes, at 7,960 after rebasing on main: 8,060 with two rivets and 4 stacks).
+  The chest stays bands of gold.
+- **Sci Fi** (15): the art draws an orange jumpsuit with a thick dark ring round the neck carrying a row of small teal lights, and a dark harness over the chest. `lay_scifi`: the ring, five teal lights, two straps from the shoulders
+  to the chest. The round teal patch on the shoulder is not drawn.
+- **Homeless shirts** (Brown, Grey, Blue: 39): a ragged purple scarf round the neck in the art; ours had patches only. `lay_neck_roll` (a roll of 0.026, 8 stations): #608 went to 8,008 triangles with 10 stations and is 7,992.
+- **Virgin** (14): the word is smaller and at the hem in the art: 0.050 high at 0.335 (0.055 at 0.420).
+- **White Yukata** (11): the crossed fronts and the pink blossoms the notes said were missing: a V of pink (`crossed`, as the Yellow Yukata of batch 2) and four pink blossoms (`flowers`).
+- **Judged faithful, unchanged**: the hoodies (hood down or up, drawstrings, logos), the sleeveless tops, the jerseys (143), the vests, the jackets (stripes and sun emblem), Tuxedo, the toad blue suit, Black, Grey, Purple and White Shirt.
+- **Not done**: the words printed on the tees (blue, red, dark and white tee, 49 Genesis: "purple-pilled", HODL, "I'm a Zynner"...): a different word on each picture, and the metadata does not say which.
+- **Checked**: `--budget`: largest #608 7,992, none over 8,000; library 1,970 Genesis, 0 failures. Not verified in Unity.
+
+### Golden Armor, second pass (the coordinator's review of batch 3)
+
+Sheet: [clothes-golden-armor-2026-10-22.jpg](../../research/evidence/clothes-golden-armor-2026-10-22.jpg) (#247, #473, #450, #547; the art, then before (batch 3) | after: torso, back, hero stage, stage side).
+It still read as a striped yellow tee. Now (`ARMOR`, `build_armor`, `ring_strip`, `add_pauldrons`): no stripes; a plain gold-orange shirt with two overlapping bands of breastplate, each edged by a dark seam
+0.017 tall with a lighter top edge and stepped 0.0035 off the shirt; on each shoulder two domed plates (upper 0.250 wide, lower 0.220) that break the outline from the front, the side and behind, with two big
+rivets (0.024) on the upper. Budget: #1742 7,996 (8,184 with three bands, 12 points and 8 sides: cut to two bands, 10 points, 7 sides), none over 8,000. Rivets are small at stage size.

@@ -1881,6 +1881,110 @@ def lay_scarf(torso, maker, colours):
         shirt_band(torso, maker, torso.named("SashFold"), fold, numbers.FOLD_HALF, numbers.HALF_THICK * 2.0 + 0.008)
 
 
+def lay_neck_roll(torso, maker, key, radius, out_by=0.022, height=0.568):
+    """A roll of cloth round the neck, in the colour "key" of the entry (the ragged purple scarf of the homeless shirts, 22 October 2026, batch 3)."""
+    half_width, half_depth = KIT.torso_section(maker.body, height)
+    path, wide, thick = [], [], []
+    for index in range(8):
+        angle = 2.0 * math.pi * index / 7
+        outward = Vector((math.cos(angle) / (half_width + out_by), math.sin(angle) / (half_depth + out_by), 0.0)).normalized()
+        path.append(Vector((math.cos(angle) * (half_width + out_by), math.sin(angle) * (half_depth + out_by), height)))
+        wide.append(outward * radius)
+        thick.append(Z * radius * 0.85)
+    slab(torso, path, wide, thick, torso.named(key), 0.0, sides=4)
+
+
+SCIFI = {
+    # The collar of the space jumpsuit of "Sci Fi" (22 October 2026, batch 3, from #227, #483, #704: the art draws a thick dark ring round the neck with a
+    # row of small teal lights on it, a dark harness of two straps crossing the chest, and a round teal patch on the shoulder). The ring: height, how far it
+    # stands out, radius; its lights: how many across the front, the span (degrees each side), their radius; the straps (two from the shoulders to the opposite
+    # hip: across and height at the top, at the bottom), half width.
+    "RING": (0.585, 0.024, 0.030), "LIGHTS": (5, 52.0, 0.011),
+    "STRAPS": (((0.118, 0.560), (0.020, 0.420)), ((-0.118, 0.560), (-0.020, 0.420))), "STRAP_HALF": 0.011,
+}
+
+
+def lay_scifi(torso, maker, colours):
+    """The dark collar ring with its lights and the harness of the Sci Fi jumpsuit."""
+    numbers = SimpleNamespace(**SCIFI)
+    height, out_by, radius = numbers.RING
+    half_width, half_depth = KIT.torso_section(maker.body, height)
+    path, wide, thick = [], [], []
+    for index in range(13):
+        angle = 2.0 * math.pi * index / 12
+        outward = Vector((math.cos(angle) / (half_width + out_by), math.sin(angle) / (half_depth + out_by), 0.0)).normalized()
+        path.append(Vector((math.cos(angle) * (half_width + out_by), math.sin(angle) * (half_depth + out_by), height)))
+        wide.append(outward * radius)
+        thick.append(Z * radius)
+    slab(torso, path, wide, thick, torso.named("Ring"), 0.010, sides=4)
+    count, spread, light = numbers.LIGHTS
+    for index in range(count):
+        angle = math.radians(270.0 + (-spread + 2.0 * spread * index / (count - 1)))
+        point = Vector((math.cos(angle) * (half_width + out_by + radius * 0.9), math.sin(angle) * (half_depth + out_by + radius * 0.9), height))
+        out = Vector((math.cos(angle), math.sin(angle), 0.0))
+        disc_on(torso, SimpleNamespace(middle=Vector((0.0, 0.0, height))), point, out, light, torso.named("Light"), segments=6)
+    for (a_side, a_up), (b_side, b_up) in numbers.STRAPS:
+        places = [(a_side + (b_side - a_side) * step / 3.0, a_up + (b_up - a_up) * step / 3.0) for step in range(4)]
+        shirt_band(torso, maker, torso.named("Strap"), places, numbers.STRAP_HALF, 0.012)
+
+
+ARMOR = {
+    # The golden armor (22 October 2026, the coordinator's review of batch 3: "it still reads as a striped yellow tee"). On #247, #473, #450, #501, #547: gold-orange metal,
+    # big domed plates over the shoulders that stand out of the outline (two, the upper larger, with big rivets), a breastplate of overlapping bands each edged by a dark
+    # seam with a light top edge. Seams: the heights of the lower edge of each band; the dark seam's height, the light edge's height, how far each stands off the shirt.
+    "SEAMS": (0.470, 0.350), "SEAM": (0.017, 0.0100), "EDGE": (0.011, 0.0135), "STEP": 0.0035,
+    # The shoulder plates: (centre to the side and up, in the axes of the sleeve), the upper dome's half width, half height, half depth; the lower plate's centre
+    # and size; the rivets on the upper one (turn degrees round its top from the front) and their radius.
+    "UPPER": ((0.060, 0.050), (0.125, 0.078, 0.108)), "LOWER": ((0.092, -0.020), (0.110, 0.060, 0.095)),
+    "RIVETS": (-34.0, 34.0), "RIVET": 0.024,
+}
+
+
+def ring_strip(torso, maker, material, low, high, lift):
+    """A band round the whole torso between two heights, lying "lift" off the shirt."""
+    numbers = maker.numbers(KIT.TEE)
+    rows = []
+    for height in (low, high):
+        half_width, half_depth = KIT.torso_section(maker.body, height)
+        reach = numbers.LIFT + lift
+        rows.append([Vector((math.cos(2.0 * math.pi * index / 10) * (half_width + reach), math.sin(2.0 * math.pi * index / 10) * (half_depth + reach), height))
+                     for index in range(10)])
+    full.add_skin(torso, SimpleNamespace(middle=Vector((0.0, 0.0, (low + high) * 0.5))), rows, material, around=True)
+
+
+def build_armor(maker):
+    """The golden armor: a plain gold shirt, the overlapping bands of the breastplate, the domed plates on the shoulders (which need the sleeves, made after the
+    decoration of the shirt)."""
+    entry = maker.entry
+    maker.entry = {**entry, "stripes": False}
+    KIT.build_tee(maker)
+    maker.entry = entry
+    numbers = SimpleNamespace(**ARMOR)
+    torso = maker.parts[0][0]
+    for index, height in enumerate(numbers.SEAMS):
+        lift = numbers.STEP * (len(numbers.SEAMS) - index)
+        dark_height, dark_lift = numbers.SEAM[0], numbers.SEAM[1]
+        ring_strip(torso, maker, torso.named("Seam"), height, height + dark_height, lift + dark_lift)
+        edge_height, edge_lift = numbers.EDGE
+        ring_strip(torso, maker, torso.named("Edge"), height + dark_height, height + dark_height + edge_height, lift + edge_lift)
+    add_pauldrons(maker, entry)
+
+
+def add_pauldrons(maker, entry):
+    """The domed gold plates on the shoulders: an upper and a lower plate on each, three big rivets on the upper."""
+    numbers = SimpleNamespace(**ARMOR)
+    for (sleeve, on), side in zip(maker.parts[1:3], (1.0, -1.0)):
+        for (across, up), (wide, tall, deep), stacks in ((*numbers.UPPER, 3), (*numbers.LOWER, 2)):
+            centre = Vector((side * across, 0.0, up))
+            sleeve.shell(base.ball_rings(centre, Z, X, tall, wide, deep, stacks), 7, sleeve.named("Plate"), 0.012)
+        (across, up), (wide, tall, deep) = numbers.UPPER
+        centre = Vector((side * across, 0.0, up))
+        for turn in numbers.RIVETS:
+            angle = math.radians(turn)
+            point = centre + Vector((side * wide * 0.70 * math.sin(angle), -deep * 0.80 * math.cos(angle), tall * 0.80 + 0.012))
+            disc_on(sleeve, SimpleNamespace(middle=centre), point, (point - centre).normalized(), numbers.RIVET, sleeve.named("Rivet"), segments=6)
+
+
 def open_front(torso, maker, half_opening, fur_radius):
     """The front of a robe left open (Kings Robe): the faces of the shirt across the middle of the front
     are removed, so the body shows in its skin colour, and a roll of fur runs down each edge."""
@@ -1964,6 +2068,11 @@ def decorate_shirt(maker, torso):
         shirt_band(torso, maker, torso.named("Sash"), places, half_width, lift * 2.0)
     if entry.get("scarf"):
         lay_scarf(torso, maker, colours)
+    if entry.get("neckroll"):
+        lay_neck_roll(torso, maker, *entry["neckroll"])
+    if entry.get("scifi"):
+        lay_scifi(torso, maker, colours)
+
     for places, half_width in entry.get("crossed", ()):
         shirt_band(torso, maker, torso.named("Collar"), places, half_width, lift * 3.0)
     for places, half_width in entry.get("ties", ()):
@@ -3177,7 +3286,7 @@ def build_duck_float(maker):
                 (eye - centre).normalized(), numbers.EYE, float_part.named("Eye"), segments=8)
 
 
-CLOTH_KINDS = {"Jacket": build_jacket, "Track": build_track, "Hoodie": build_hoodie, "Costume": build_costume,
+CLOTH_KINDS = {"Armor": build_armor, "Jacket": build_jacket, "Track": build_track, "Hoodie": build_hoodie, "Costume": build_costume,
                "Astro": build_astro, "DuckFloat": build_duck_float, "Mascot": build_mascot}
 
 
@@ -3339,13 +3448,17 @@ CLOTHES.update({
     "Zero THOTS": with_(tee((0.71, 0.51, 0.90)), colours={"Print": (0.97, 0.93, 0.99)},
                         print=(("ZERO", "THOTS"), 0.425, 0.050, 0.200, 0.0)),
     "Virgin": with_(tee((0.92, 0.56, 0.41)), colours={"Print": (0.99, 0.93, 0.88)},
-                    print=("VIRGIN", 0.420, 0.055, 0.210, 0.0)),
+                    print=("VIRGIN", 0.335, 0.050, 0.200, 0.0)),
     "BBC": with_(tee((0.42, 0.68, 0.95)), colours={"Print": (0.97, 0.97, 0.97), "PrintLine": (0.12, 0.18, 0.25)},
                  print=("BBC", 0.420, 0.075, 0.200, 0.0)),
     # Worn shirts with sewn patches.
-    "Brown Homeless Shirt": with_(tee((0.76, 0.59, 0.44)), colours={"Patch": (0.54, 0.66, 0.75)}, patches=PATCHES),
-    "Grey Homeless Shirt": with_(tee((0.58, 0.64, 0.69)), colours={"Patch": (0.40, 0.45, 0.50)}, patches=PATCHES),
-    "Blue Homeless Shirt": with_(tee((0.55, 0.61, 0.86)), colours={"Patch": (0.40, 0.47, 0.70)}, patches=PATCHES),
+    # (22 October 2026, batch 3: the art draws a ragged purple scarf round the neck of the three homeless shirts.)
+    "Brown Homeless Shirt": with_(tee((0.76, 0.59, 0.44)), colours={"Patch": (0.54, 0.66, 0.75), "Scarf": (0.50, 0.36, 0.70)}, patches=PATCHES,
+                                  neckroll=("Scarf", 0.026)),
+    "Grey Homeless Shirt": with_(tee((0.58, 0.64, 0.69)), colours={"Patch": (0.40, 0.45, 0.50), "Scarf": (0.50, 0.36, 0.70)}, patches=PATCHES,
+                                 neckroll=("Scarf", 0.026)),
+    "Blue Homeless Shirt": with_(tee((0.55, 0.61, 0.86)), colours={"Patch": (0.40, 0.47, 0.70), "Scarf": (0.50, 0.36, 0.70)}, patches=PATCHES,
+                                 neckroll=("Scarf", 0.026)),
     # Track jackets: two stripes down each sleeve, a zip, a small spiky head on the chest.
     "dark jacket": with_(track((0.24, 0.21, 0.40), stripe=(0.97, 0.97, 0.99), zip_colour=(0.90, 0.89, 0.88),
                                SLEEVE=LONG_SLEEVE), colours={"Logo": (0.97, 0.97, 0.99)},
@@ -3591,14 +3704,16 @@ CLOTHES.update({
     "toad blue suit": toad((0.33, 0.56, 0.93), (0.62, 0.80, 1.00), (0.62, 0.92, 0.86), (0.36, 0.78, 0.25)),
     "Toad pink suit": toad((0.93, 0.27, 0.53), (0.98, 0.62, 0.78), (0.98, 0.74, 0.86), (0.30, 0.68, 0.95)),
     "Toad green Suit": toad((0.18, 0.74, 0.56), (0.55, 0.92, 0.75), (0.70, 0.95, 0.82), (0.98, 0.50, 0.15)),
-    "Golden Armor": {"kind": "Tee", "colours": {"Main": (0.96, 0.74, 0.22), "Stripe": (0.82, 0.56, 0.12),
-                                                "Collar": (0.70, 0.46, 0.10)},
-                     "stripes": True, "numbers": {"STEP": 0.046, "SLEEVE": 0.09},
-                     "print_missing": "the round plates on the shoulders"},
-    "Sci Fi": track((0.98, 0.62, 0.14), stripe=(0.25, 0.85, 0.95), collar=(0.15, 0.15, 0.18),
-                    missing="the dark ring of the collar and its lights"),
-    "White Yukata": tee((0.97, 0.95, 0.95), collar=(0.92, 0.64, 0.74), SLEEVE=LONG_SLEEVE,
-                        missing="the crossed fronts and the pink blossoms"),
+    "Golden Armor": {"kind": "Armor", "colours": {"Main": (0.97, 0.69, 0.16), "Stripe": (0.82, 0.56, 0.12),
+                                                "Collar": (0.70, 0.46, 0.10), "Plate": (0.96, 0.68, 0.18), "Rivet": (0.60, 0.33, 0.05),
+                                                "Seam": (0.55, 0.28, 0.04), "Edge": (1.00, 0.86, 0.42)},
+                     "numbers": {"STEP": 0.076, "SLEEVE": 0.09}},
+    # (batch 3: a dark ring with lights at the neck and a harness; the stripe colour (teal) kept for the lights.)
+    "Sci Fi": {**track((0.98, 0.62, 0.14), collar=(0.15, 0.15, 0.18)), "scifi": True},
+    "White Yukata": {**tee((0.97, 0.95, 0.95), collar=(0.92, 0.64, 0.74), SLEEVE=LONG_SLEEVE), "flowers": ((0.080, 0.500, 0.028), (-0.095, 0.360, 0.028),
+                                                                                                          (0.060, 0.290, 0.026), (-0.040, 0.540, 0.022)),
+                     "crossed": ((((0.112, 0.572), (0.078, 0.505), (0.040, 0.447), (0.000, 0.392)), 0.020),
+                                 (((-0.112, 0.572), (-0.078, 0.505), (-0.040, 0.447), (-0.002, 0.392)), 0.020))},
     "Guko": tee((0.98, 0.52, 0.10), collar=(0.16, 0.28, 0.72), missing="the blue undershirt, the belt and the emblem"),
     "Gojo": {**tee((0.13, 0.14, 0.24), (0.09, 0.10, 0.17)), "numbers": {"STEP": 0.076, "COLLAR": (0.600, 0.640),
                                                                          "SLEEVE": LONG_SLEEVE},
@@ -3625,6 +3740,8 @@ CLOTHES.update({
     "Orange Holed Jacket": hoodie((0.96, 0.50, 0.14), print_missing="the holes in the cloth"),
     "Blue Holed Jacket": hoodie((0.32, 0.64, 0.95), print_missing="the holes in the cloth"),
 })
+CLOTHES["Sci Fi"]["colours"].update({"Ring": (0.14, 0.14, 0.17), "Light": (0.35, 0.92, 0.98), "Strap": (0.20, 0.20, 0.24)})
+CLOTHES["White Yukata"]["colours"]["Flower"] = (0.96, 0.62, 0.74)   # the pink blossoms (batch 3, 22 October 2026)
 
 
 CLOTHES_OF_SIDE = {
