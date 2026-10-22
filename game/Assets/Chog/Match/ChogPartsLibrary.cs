@@ -31,7 +31,7 @@ namespace Chog.Match
         public const byte RoleFixed = 0, RoleSkin = 1, RoleFace = 2;
 
         /// <summary>How a material is drawn.</summary>
-        public const byte LightLit = 0, LightUnlit = 1, LightOutline = 2;
+        public const byte LightLit = 0, LightUnlit = 1, LightOutline = 2, LightGlass = 3;
 
         public struct PartMaterial
         {
@@ -269,6 +269,7 @@ namespace Chog.Match
             {
                 case LightUnlit: return 0.6f;
                 case LightOutline: return 0.2f;
+                case LightGlass: return 0.4f;
                 default: return 1f;
             }
         }

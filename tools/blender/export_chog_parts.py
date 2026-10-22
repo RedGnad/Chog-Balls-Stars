@@ -115,7 +115,7 @@ def skin_key(genesis_traits):
     """The name of a Genesis's colours in SKINS."""
     base_name = genesis_traits.get("Base", "Origin")
     return ("" if base_name == "Origin" else base_name + " ") + genesis_traits.get("Skin", "")
-LIGHT_LIT, LIGHT_UNLIT, LIGHT_OUTLINE = 0, 1, 2
+LIGHT_LIT, LIGHT_UNLIT, LIGHT_OUTLINE, LIGHT_GLASS = 0, 1, 2, 3
 
 
 def all_genesis():
@@ -225,7 +225,7 @@ def material_record(material):
         return name, tuple(BASE_COLOURS[name]), ROLE_FIXED, light
     if "srgb" not in material:
         raise SystemExit(f"CHOG_PARTS no colour known for the material {name}")
-    light = LIGHT_UNLIT if material.get("unlit") else LIGHT_LIT
+    light = LIGHT_GLASS if material.get("glass") else LIGHT_UNLIT if material.get("unlit") else LIGHT_LIT
     return name, tuple(material["srgb"]), ROLE_FIXED, light
 
 

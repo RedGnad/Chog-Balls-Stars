@@ -6,6 +6,9 @@
 //        space, not a light of the scene, so both teams (whose cameras face each other) see the
 //        same shading;
 //   0.6  unlit: the colour whatever the light (eyes, mouths, lenses, beams);
+//   0.4  glass (a space helmet): drawn on part of the pixels only, in a fixed screen pattern, more of
+//        them toward its edges, so what is inside it shows through without any sorting of
+//        transparent surfaces; the pixels kept are its colour with a light rim;
 //   0.2  the outline shell: unlit, drawn only from its inside, as Blender culls it, in a dark
 //        violet rather than black (or its own colour times 0.35 when the library gives it one).
 // Nothing is culled by the pipeline: open shapes (a brim, a lens) show from both sides, and the
@@ -99,8 +102,22 @@ Shader "Chog/Hero"
             fixed4 frag(v2f i, fixed facing : VFACE) : SV_Target
             {
                 // The outline shell: kept only where its inside faces the camera.
-                if (i.color.a < 0.4 && facing < 0)
+                if (i.color.a < 0.3 && facing < 0)
                     discard;
+
+                // Glass: a fixed screen pattern (interleaved gradient noise, Jimenez 2014, float only so
+                // every target compiles it) keeps the share of pixels its coverage says, from a third
+                // where it faces the camera to most of them at its edges.
+                half glass = 0;
+                if (i.color.a >= 0.3 && i.color.a < 0.5)
+                {
+                    half towardCamera = saturate(abs(normalize(i.viewNormal).z));
+                    half coverage = lerp(0.9, 0.3, towardCamera * towardCamera);
+                    float pattern = frac(52.9829189 * frac(dot(floor(i.pos.xy), float2(0.06711056, 0.00583715))));
+                    if (pattern > coverage)
+                        discard;
+                    glass = 1 - towardCamera;
+                }
 
                 half side = facing < 0 ? -1.0 : 1.0;
                 fixed3 colour;
@@ -118,10 +135,11 @@ Shader "Chog/Hero"
                     half3 key = _ChogKey.a > 0.5 ? _ChogKey.rgb : half3(1, 1, 1);
                     colour = i.color.rgb * matcap * key + rim * _ChogHeroRim.rgb;
                 }
-                else if (i.color.a < 0.4)
+                else if (i.color.a < 0.3)
                     colour = max(i.color.rgb * 0.35, _ChogHeroOutline.rgb);
                 else
                     colour = i.color.rgb;
+                colour = lerp(colour, fixed3(1, 1, 1), glass * glass * 0.6);
 
                 colour = lerp(colour, fixed3(1, 1, 1), _Flash);
                 return fixed4(colour, 1);
