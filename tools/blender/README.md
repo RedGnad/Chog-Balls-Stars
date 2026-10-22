@@ -864,3 +864,52 @@ bases, set beside the real pictures: [verdicts and what is wrong](../../research
   The hairline follows the taller face (`RADIOACTIVE_HAIRLINE`).
 - **Checked**: `-- --budget`: largest #710 7,971 triangles, none over 8,000; the 90 Skull and Radioactive Genesis built:
   largest 7,980, none failed.
+
+## 22 October 2026: the dragon, astronaut and shark suits from the art (lot 3)
+
+The owner said the three costumes were not accurate. Looked at: all 23 dragon, 24 astronaut and 25 shark Genesis (every
+one is Side=Right on the base Origin; contact sheets of the 256-point pictures), and the 1000-point pictures of #16, #42
+(dragon), #572, #947, #1529 (astronaut), #116 (shark). Sheet, art beside each hero, before and after, front, three
+quarters, side, back and the game camera: [heroes-costumes-2026-10-22.jpg](../../research/evidence/heroes-costumes-2026-10-22.jpg).
+
+**What the art shows, and what the 3D got wrong**
+
+- **Dragon suit** (red-orange hood, `#f04a2a`): a hood that frames a large cream face (the face fills the opening up to
+  its edge); two small dark ovals (nostrils) and dark "w" marks scattered over the top of the hood, the shoulders and
+  the chest; four small blunt tan horns, wide at their foot (one at each upper side of the opening, one at each lower
+  side, at the jaw); a large pale peach belly under the chin; one small bat wing with red ribs behind each shoulder; no
+  tail in the frame. The 3D had six long sharp horns, wings as long as the body, four spikes on a tail, a belly cut by the
+  bottom of the picture, the dark "w" marks few and thin, and a strip of the skin of the head (yellow on #16) showing in
+  the slit between the face and the hood.
+- **Shark Suit** (blue hood `#3ba5e3`): a large face in an opening whose whole edge is a row of white triangular teeth
+  in a thick dark outline, about 20 of them: longer at the top of the opening, short at the sides and under the chin; a
+  white belly; dark blue pectoral fins low at the sides of the body with fine lines. The 3D had eleven tiny teeth along the
+  top of the rim only (nearly invisible), no fins, a thin thorn for a dorsal fin, and the rim a hand-typed shape.
+- **Astro Suit** (24): a white suit, a round helmet closed all round the head, a thick light grey ring round the face and
+  the glass inside; the crown of the head is under the glass (no spike comes out of it); a ribbed grey unit at the side
+  of the helmet (the left of the picture), a ribbed hose from it over the chest, the flag patch (stars and stripes) on the
+  right of the chest, a panel with a lined plate on the chest, a pack at the back. The 3D had a ring that followed the
+  edge of the face and the whole crown of leaves coming out of it like a sunflower, and nothing else of the suit.
+
+**What changed** (`chog_trait_hats.py`, `MASCOT`, `COSTUME`, `ASTRO`; the face edge is `face_place`, lot 1)
+
+- **Dragon**: `OPENING` 0.6 to -0.3 (the rim inside the edge of the face, no more skin in the slit), four horns
+  (`HORN_PLACES`) 0.085 long and 0.052 at the foot where six sharp ones were 0.115 by 0.040, wings 0.27 by 0.19 (0.46 by
+  0.32), fourteen "w" marks instead of eight, drawn as flat strips (8 triangles each, not a 40 triangle tube), nostrils
+  with a dark outline, the belly 0.22 by 0.19 half sizes, the tail spikes taken out (no picture shows a tail). Largest
+  hero 7,784 triangles (was 7,992).
+- **Shark**: `add_shark_teeth()`: 20 teeth all round the opening (the length 0.066 at the sides, 0.082 on top, 0.056
+  under the chin; white inside a dark triangle), cut in three bands because a flat triangle of 0.09 sags 0.004 under
+  the curve of the head and hid under the face; `add_pectoral_fins()`; the dorsal fin shorter and thicker. Heroes 6,260 to
+  6,572 triangles.
+- **Astronaut**: `build_astro()` rebuilt: a round ring across the way the face looks (28 stations, radius 0.046) and a
+  closed shell over the back of the head behind it (`DOME`), the crown taken out (`"head": {"LEAVES": NO_CROWN}`), the ribbed
+  unit (`VENT`), the flag (`FLAG`, 5 stripes and a blue field), the chest panel (`CHEST_BOX`), the pack (`PACK`), the hose
+  (`HOSE`). Heroes 6,921 to 7,363 triangles (was 6,900 to 7,300).
+- **Checked**: all 72 heroes of the three suits build; `-- --budget` over the 1,869 Origin heroes: largest #710 7,971, median
+  7,152, none over 8,000. Each suit seen from the front, three quarters, side, back, above and from the game camera.
+
+Still wrong: the astronaut's glass is an opaque shell (the pictures show the head through it), so from the game camera the
+helmet hides the top of the head; the hose and the flag are small and barely show at the size of the game; the shark's
+teeth read as a zigzag outline at the size of a phone; the dragon's wings still show as dark triangles from behind; no
+picture shows the back of a suit, so the back of each (dorsal fin, pack, wings) is a choice.
