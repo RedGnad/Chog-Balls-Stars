@@ -13,22 +13,28 @@ submitting. Character counts are for the 8,000-character fields.
   that day (its page's own styles): project cards show the image at 16:9 and another view at 16:7,
   both `object-fit: cover`; so 1920 by 1080 with what matters inside the middle 16:7 band.
 
-**Short description** (asked by the owner on 23 October 2026: every feature worth showing, concise and striking: a hook,
+**Short description** (asked by the owner on 23 October 2026: every feature worth showing, concise and striking; the promise is the bet on a
+brutal MOBA where the Chogs come alive, not "your Genesis is your hero", which every project says: a hook,
 the features grouped by what they give the player, one call to action. Checked that day against the code and the live
 services: rental up to 30 days, 10% burned; second form 100 $CHOG; 5% of lost stakes to the Genesis players; ladder
 Bronze to Star; seasons are off live and are not claimed)
 
-> **Your Chog Genesis, alive in a 3v3 arena.**
+> **Bet $CHOG on a brutal 3v3 MOBA where the Chogs come alive.**
 >
-> Connect your wallet: your NFT becomes a 3D hero built from its own traits, and fights the way it looks. All 1,969
-> Genesis, the skulls, the Radioactives and the ten 1:1s included.
+> Stake on your team, fight with your own Chog Genesis, get paid on a result nobody can fake. Three-minute matches,
+> fast and brutal, on your phone, on Monad.
 >
-> **PLAY YOUR NFT**
+> **BET ON YOUR TEAM**
+> - Stake $CHOG before the match; the winners share the losers' stakes. Results come from our server's replay of
+>   Photon's own record of the inputs: a win nobody can fake. Part of every payment is burned.
+>
+> **THE CHOGS COME ALIVE**
+> - All 1,969 Genesis in 3D, built from their own traits, the skulls, the Radioactives and the ten 1:1s included.
 > - Traits are powers. The outfit gives the class (brute, ranger, controller), the eyes the special, the aura its
 >   effect, the rarity how it is delivered, and what it wears or holds the attack: fireballs from a Dragon suit,
 >   snowballs from a Russian Hat, spinning coins from a Dollar Cap.
-> - Fast 3v3 on your phone. Three-minute Sieges (towers that fire lasers from their eyes, a beating heart to break)
->   or Coin races, in the browser, nothing to install. Bots fill the empty seats.
+> - Sieges against towers that fire lasers from their eyes and a beating heart to break, or Coin races. In the
+>   browser, nothing to install; bots fill the empty seats.
 >
 > **EARN WITH YOUR GENESIS**
 > - Rent it out by the day for $CHOG, up to 30 days, without it ever leaving your wallet. The rent is earned by the
@@ -39,16 +45,12 @@ Bronze to Star; seasons are off live and are not claimed)
 > **NO GENESIS? PLAY ANYWAY**
 > - Rent a hero by the day, play a holder's link, or start as a Recruit and pick the Genesis you want.
 >
-> **STAKE $CHOG ON YOUR TEAM**
-> - Winners are paid on our server's replay of Photon's own record of the inputs: a win nobody can fake. Part of
->   every payment is burned.
->
 > **PROGRESS THAT STAYS WITH THE NFT**
 > - Each Genesis keeps a career on Monad (matches, wins, badges, mastery) that follows it to its next holder.
 >   Mastery 2 unlocks its second form, or buy it now with $CHOG. The best Genesis are listed in TOP.
 > - Every player climbs a ladder, Bronze to Star, on verified sieges.
 >
-> **Play now on your phone. No Genesis? Play a Recruit and find yours.**
+> **Stake, brawl, win. Play now on your phone.**
 
 **Description**
 

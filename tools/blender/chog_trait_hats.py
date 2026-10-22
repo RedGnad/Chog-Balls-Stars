@@ -2614,8 +2614,8 @@ MASCOT = {
                (1.23, 0.14, 0.14, 0.11), (1.29, 0.075, 0.19, 0.06), (1.32, 0.045, 0.22, 0.04)),
     "DRAGON": ((0.10, 0.22, 0.00, 0.20), (0.20, 0.31, -0.01, 0.27), (0.35, 0.37, -0.01, 0.31),
                (0.50, 0.39, 0.00, 0.32), (0.65, 0.40, 0.02, 0.31), (0.80, 0.40, 0.04, 0.30),
-               (0.95, 0.37, 0.05, 0.28), (1.05, 0.31, 0.06, 0.23), (1.11, 0.20, 0.07, 0.14),
-               (1.145, 0.0, 0.07, 0.0)),
+               (0.95, 0.37, 0.05, 0.28), (1.02, 0.335, 0.055, 0.25), (1.07, 0.285, 0.06, 0.21),
+               (1.11, 0.205, 0.07, 0.15), (1.135, 0.115, 0.07, 0.085), (1.148, 0.0, 0.07, 0.0)),
     # A banana has five flat sides with their edges rounded off: points across each side (degrees each side
     # of its middle), the edge between two sides being the rest of its 72 degrees. A dragon is round.
     "FACETS": (5, (-30.0, -15.0, 0.0, 15.0, 30.0)),
@@ -2659,21 +2659,33 @@ MASCOT = {
     # SNOUT: the upper jaw, a rounded shell from inside the head forward over the brow: rings from the back to the tip,
     # (how far ahead of the middle of the head, how high above it, half width, half height); in the axes of the head
     # before it is turned up. Its underside is the upper lip, over the top of the face. The tip ring is a point.
-    "SNOUT": ((-0.02, 0.245, 0.27, 0.10), (-0.12, 0.255, 0.265, 0.095), (-0.20, 0.262, 0.245, 0.085),
-              (-0.26, 0.268, 0.21, 0.075), (-0.30, 0.272, 0.16, 0.063), (-0.325, 0.272, 0.09, 0.040),
-              (-0.335, 0.272, 0.0, 0.0)),
-    "SNOUT_SIDES": 12,
+    # (23 October 2026, the owner on the banner: "the dragon suit makes odd angles on the head". The jaw was a flat lid, half as
+    # tall as it was wide, with a hard edge all round: rounder in section now, and lower at its back so it rises out of the skull.)
+    "SNOUT": ((-0.02, 0.225, 0.26, 0.135), (-0.12, 0.240, 0.255, 0.130), (-0.20, 0.250, 0.235, 0.115),
+              (-0.26, 0.256, 0.20, 0.098), (-0.30, 0.258, 0.15, 0.078), (-0.325, 0.256, 0.085, 0.048),
+              (-0.335, 0.254, 0.0, 0.0)),
+    "SNOUT_SIDES": 14,
     # The fangs: where on the rim of the opening (degrees round the face, 0 its left, 90 its top; the rim has 24 points), which
     # way they point (-1 down from the upper rim, +1 up from the lower), length, radius at the foot, and how much they lean
     # in towards the middle of the face (against the up-down way).
-    "FANG_PLACES": ((45.0, -1.0), (135.0, -1.0), (225.0, 1.0), (315.0, 1.0)),
+    # (23 October 2026, the owner: "the lower teeth do not sit on the face as teeth that follow it". They stood at the corners of
+    # the opening and pointed out of the head: now nearer the chin, lying along the face, shorter (LOWER_FANG: length, radius,
+    # lean in, how far they rise off the face against the way up).)
+    "FANG_PLACES": ((45.0, -1.0), (135.0, -1.0), (240.0, 1.0), (300.0, 1.0)),
     "FANG": (0.105, 0.042, 0.55),
+    "LOWER_FANG": (0.082, 0.040, 0.30, 0.04),
     # The eyes (22 October 2026, the owner: "a dragon head with no eyes is not a head"): a plush dragon onesie has two round eyes on
     # the hood above and either side of the snout. A half sunk ball with a dark outline and a dark slit of a pupil facing ahead and
     # up, so it reads from the front, from three quarters and from the game camera. (To each side of the middle, how far ahead of
     # the middle of the head, how high above it, radius, the way the pupil faces (to the side, ahead, up), its half height and
     # half width against the radius.)
     "EYES": (0.185, -0.130, 0.330, 0.052, (0.35, -0.75, 0.55), 0.60, 0.30),
+    # (23 October 2026: the jaw over the face is gone. The pictures draw no jaw standing out: the hood is one round dome over the
+    # face, the two nostrils on its top, the fangs at the corners of the mouth; the jaw made a flat ledge across the brow, the
+    # owner's "odd angles". The eyes and the nostrils now sit on the dome itself: ways from the middle of the head (to the side,
+    # ahead, up, in its axes), and how far the ball of an eye is sunk in it, as a share of its radius.)
+    "DOME_EYES": ((0.50, -0.62, 0.62), 0.40),
+    "DOME_NOSTRILS": ((0.16, -0.62, 0.78), 0.040, 0.024),
     # The nostrils on the top of the snout: to each side, which ring, half length along the snout, half width.
     "NOSTRILS": (0.062, 4, 0.034, 0.020),
     "SCALES": (((0.0, 0.0, 0.81), (-0.40, -0.30, 0.86)), ((0.0, 0.0, 0.81), (0.42, -0.26, 0.87)),
@@ -2707,6 +2719,39 @@ MASCOT = {
                   (0.42, -0.14), (0.14, -0.30)),
     "RIBS": (2, 4, 6),                   # the points of the edge of a wing its dark ribs run to
     "ANKLES": (0.02, 0.16),               # the legs of the suit, from and to these heights
+    # The shark (23 October 2026, the owner: "the shark suit is not a big worked costume like the others, it is still the plain
+    # suit the banana and the shark had before"). The pictures (#116, #139, #215, #169): a big blue shark head round the face,
+    # the face in its open mouth with a ring of white pointed teeth all round it, top and bottom, a pale belly under the mouth,
+    # dark gills on the side. It is the dragon's round volume; then:
+    # TEETH: the rim points that carry a tooth (the rim has 24, 0 the face's left, 6 its top). Each is a flat white blade with a
+    # dark line round it, as the hood's teeth are (add_shark_teeth): its foot on the rim, its tip on the face further in,
+    # "reach" of the way to the middle of the face (top and bottom, sides), half width at the foot, half thickness, outline,
+    # how far off the face the tip stands. (A first try: small cones pointing in, read as eyelashes; then blades reaching 0.22 in,
+    # half hidden under the collar's lip, a pale fuzz round the face; then longer, still a white ruff: lying on the pale face, their
+    # dark lines were inside it. Now nine on top and nine below as the pictures count them, wider, standing off the face.)
+    # Since the fourth try they are laid as the hood lays them: across the width of the face, evenly, the upper ones pointing straight
+    # down from the top of the opening and the lower ones straight up (spread round the oval by angle, they piled up in its corners).
+    # (How many on top and below, the share of the face's width they span, length up and down on the face, half thickness, outline,
+    # how far off the face the foot and the tip stand.)
+    # (Fifth try: evenly across the width they became thin spikes, as the oval is flattened. Now evenly along the edge of the
+    # opening, between these degrees of it on top and below, each as long as it is wide and pointing at the middle of the face:
+    # how many on top and below, the top's and the bottom's degrees, length against width, half thickness, outline, how far off
+    # the face the foot and the tip stand. From 16 degrees the corner teeth lay across the side of the face and out over the hood.)
+    "SHARK_TEETH": (9, 9, (30.0, 150.0), (212.0, 328.0), 0.90, 0.012, 0.009, (0.026, 0.024)),
+    # The dorsal fin on the top of the back: where its foot leaves the volume (a way from the middle of the body at that height),
+    # its outline (along the back, up) in shares of its size, its size and half thickness.
+    "DORSAL": ((0.0, 0.80, 0.60), 0.88, ((0.0, 0.0), (0.18, 0.62), (0.46, 1.00), (0.52, 0.86), (0.60, 0.30), (0.84, 0.0)),
+               (0.34, 0.30), 0.014),
+    # The side fins, from the sides at this height, out, back and down; outline as shares of (span, height), size, thickness.
+    "SIDE_FINS": (0.52, (1.0, 0.55, -0.55), ((0.0, 0.0), (0.30, 0.45), (1.0, 0.10), (0.86, -0.12), (0.30, -0.25)), (0.24, 0.16), 0.012),
+    # The tail from low on the back, straight back and a little up, its rings and radii, then the fin at its end (up and down).
+    "SHARK_TAIL": (((0.0, -0.05, 0.24), (0.0, 0.10, 0.22), (0.0, 0.22, 0.25), (0.0, 0.30, 0.30)), (0.10, 0.08, 0.055, 0.0),
+                   ((0.0, 0.0), (0.10, 0.20), (0.04, 0.0), (0.10, -0.12)), 0.20, 0.012),
+    # The gills: three dark strokes on each side of the head, behind the corners of the mouth: the ways from the middle of the
+    # head (to the side, ahead, up) of the first, how far apart, their half length and half width.
+    "GILLS": ((0.86, -0.30, -0.10), 0.13, 0.060, 0.010),
+    # The eyes: a small dark ball on each side of the dome above the mouth, with a light glint.
+    "SHARK_EYES": ((0.55, -0.55, 0.55), 0.034),
     "OUTLINE_THICKNESS": 0.016,
 }
 # When the head turns (6 degrees running, 8 attacking, ChogBodyAnimator) the collar slides over the volume
@@ -2729,7 +2774,7 @@ def mascot_axes(maker):
 def mascot_rings(maker, shape):
     """The rings of points of the volume, from the bottom up, and its top point when it closes on one."""
     numbers = SimpleNamespace(**MASCOT)
-    rows = numbers.BANANA if shape == "banana" else numbers.DRAGON
+    rows = numbers.BANANA if shape == "banana" else numbers.DRAGON   # the shark has the dragon's round volume
     if shape == "banana":
         count, across = numbers.FACETS
         directions = []
@@ -2889,7 +2934,7 @@ def build_mascot(maker):
         # (The dragon's collar is lower under the chin, where the belly is: 0.011 off the volume, 0.008 at least (flush it fought the volume,
         # patches of both colours), not 0.028: raised so much it stood off the body as a thin slab once painted in the colour of the belly,
         # seen from the side, 22 October 2026.)
-        flush = shape == "dragon"
+        flush = shape in ("dragon", "shark")
         loops.append([to_head(on_volume(middle_body, turn @ beyond(point, degrees),
                                         max(lift * 0.4, 0.008) if flush and numbers.BELLY_CHIN[0] <= index <= numbers.BELLY_CHIN[1] else lift)[0])
                       for index, point in enumerate(rim)])
@@ -2930,6 +2975,15 @@ def build_mascot(maker):
                     7, torso.named("Stem"), numbers.OUTLINE_THICKNESS * 0.8)
         torso.shell(base.tube_rings(tip_middle + way * (length - 0.004), way, X, ((0.0, radius * 0.80), (end, radius * 0.7))),
                     7, torso.named("Tip"), numbers.OUTLINE_THICKNESS * 0.6)
+        return
+
+    if shape == "shark":
+        for band in bands[1:]:
+            collar.paint([band[index % points] for index in range(numbers.BELLY_CHIN[0], numbers.BELLY_CHIN[1] + 1)], collar.named("Belly"))
+        for row_number, first, last in numbers.BELLY:
+            belly = [grid[(row_number, column % count)] for column in range(first, last + 1) if (row_number, column % count) in grid]
+            torso.paint(belly, torso.named("Belly"))
+        add_shark(maker, collar, torso, rim, numbers, on_volume, middle_body, turn)
         return
 
     # The dragon.
@@ -3015,7 +3069,7 @@ def build_mascot(maker):
             torso.shell(base.tube_rings(front + across * offset - toes * 0.012, toes, Z,
                                         ((0.0, claw_radius), (claw_length, 0.0))), 5, torso.named("Fang"),
                         numbers.OUTLINE_THICKNESS * 0.5)
-    add_dragon_head(maker, collar, rim, numbers)
+    add_dragon_head(maker, collar, rim, numbers, torso, lambda way, lift: on_volume(middle_body, turn @ way, lift), middle_body)
 
 
 def oval_on(part, middle, centre, out, along, half_long, half_short, material, segments=10):
@@ -3038,47 +3092,148 @@ def add_snout(part, surface, snout, sides, material, outline):
     return rings
 
 
-def add_dragon_head(maker, collar, rim, numbers):
-    """The head of the dragon on the part of the head (22 October 2026): the snout over the face (the upper jaw, whose
-    underside is the upper lip and whose top carries the two nostrils), and the four fangs on the rim of the opening, which
-    is the mouth. See MASCOT["SNOUT"]."""
+def add_dragon_head(maker, collar, rim, numbers, torso, on_dome, middle_body):
+    """The head of the dragon (22 October 2026; 23 October without the jaw over the face): the two nostrils and the two eyes on the
+    dome of the volume ("on_dome(way, lift)": where a way from the middle of the head, in its axes, leaves the volume, and the way out
+    there), and the four fangs on the rim of the opening, which is the mouth. See MASCOT["DOME_EYES"]."""
     surface = maker.surface
     middle = surface.middle
-    rings = add_snout(collar, surface, numbers.SNOUT, numbers.SNOUT_SIDES, collar.named("Hood"), numbers.OUTLINE_THICKNESS)
-    # The nostrils, two dark ovals with a fill of the colour of the hood, as the pictures draw them, near the tip.
-    side, ring, half_long, half_short = numbers.NOSTRILS
-    centre, first, second = rings[ring]
-    wide, tall = first.length, second.length
+    # The nostrils, two dark ovals with a fill of the colour of the hood, as the pictures draw them, on the top of the dome.
+    way, half_long, half_short = numbers.DOME_NOSTRILS
     for sign in (1.0, -1.0):
-        x = sign * side
-        z = tall * math.sqrt(max(0.0, 1.0 - (x / wide) ** 2))
-        place = centre + Vector((x, 0.0, z))
-        out = (Vector((x / wide ** 2, 0.0, z / tall ** 2)).normalized() - Y * 0.35).normalized()
-        oval_on(collar, middle, place, out, -Y, half_long, half_short, collar.named("Nostril"))
-        oval_on(collar, middle, place + out * 0.0015, out, -Y, half_long * 0.58, half_short * 0.50, collar.named("Hood"))
-    # The eyes: a ball half sunk in the hood on each side of the snout, a dark slit on its front.
-    side, ahead, up, ball, facing, slit_tall, slit_wide = numbers.EYES
+        place, out = on_dome(Vector((sign * way[0], way[1], way[2])), 0.003)
+        oval_on(torso, middle_body, place, out, -Y, half_long, half_short, torso.named("Nostril"))
+        oval_on(torso, middle_body, place + out * 0.0015, out, -Y, half_long * 0.58, half_short * 0.50, torso.named("Hood"))
+    # The eyes: a ball half sunk in the dome on each side, above the corners of the mouth, a dark slit on its front.
+    _, _, _, ball, facing, slit_tall, slit_wide = numbers.EYES
+    way, sunk = numbers.DOME_EYES
     for sign in (1.0, -1.0):
-        centre = middle + Vector((sign * side, ahead, up))
-        collar.shell(base.ball_rings(centre, Z, X, ball, ball, ball * 0.95, 3), 8, collar.named("EyeBall"),
-                     numbers.OUTLINE_THICKNESS * 0.8)
-        way = Vector((sign * facing[0], facing[1], facing[2])).normalized()
-        oval_on(collar, middle, centre + way * (ball * 0.97), way, Z, ball * slit_tall, ball * slit_wide, collar.named("Nostril"))
+        place, out = on_dome(Vector((sign * way[0], way[1], way[2])), 0.0)
+        centre = place + out * (ball * (1.0 - sunk) - ball * 0.5)
+        torso.shell(base.ball_rings(centre, Z, X, ball, ball, ball * 0.95, 3), 8, torso.named("EyeBall"),
+                    numbers.OUTLINE_THICKNESS * 0.8)
+        look = (out + Vector((0.0, -0.6, 0.2))).normalized()
+        oval_on(torso, middle_body, centre + look * (ball * 0.97), look, Z, ball * slit_tall, ball * slit_wide, torso.named("Nostril"))
     # The fangs, on the rim of the opening, pointing into it.
-    length, radius, lean = numbers.FANG
     face = surface.front(0.0, 0.0, 0.0)
     for degrees, vertical in numbers.FANG_PLACES:
+        lower = vertical > 0.0
+        length, radius, lean = numbers.FANG if not lower else numbers.LOWER_FANG[:3]
         index = int(round(degrees / 360.0 * len(rim))) % len(rim)
         out = head_normal_at(surface, rim[index])
-        root = rim[index] + out * COSTUME_FANG_LIFT
+        root = rim[index] + out * (COSTUME_FANG_LIFT if not lower else COSTUME_FANG_LIFT * 0.45)
         inward = Vector((face.x - root.x, 0.0, face.z - root.z)).normalized()
-        way = (Z * vertical + inward * lean + out * 0.30).normalized()
+        way = (Z * vertical + inward * lean + out * (0.30 if not lower else numbers.LOWER_FANG[3])).normalized()
         collar.shell(base.tube_rings(root - way * 0.02, way, X, ((0.0, radius), (length * 0.55, radius * 0.62),
                                                                 (length, 0.0))), 5, collar.named("Fang"),
                      numbers.OUTLINE_THICKNESS * 0.8)
 
 
 COSTUME_FANG_LIFT = 0.030
+
+
+def add_shark(maker, collar, torso, rim, numbers, on_volume, middle_body, turn):
+    """What makes the round volume a shark (MASCOT["SHARK_TEETH"] and after): the teeth all round the mouth, the dorsal fin, the
+    side fins, the tail with its fin, the gills and the eyes."""
+    surface, head = maker.surface, maker.head
+    up_count, down_count, top, bottom, long, half_thick, outline, (foot_lift, tip_lift) = numbers.SHARK_TEETH
+    share, _ = numbers.OPENING
+    grown = 1.0 + head.FACE_LINE * share / head.HEAD_HALF_WIDTH
+    centre = (0.0, head.FACE_MIDDLE[1])
+    middle_of_face = surface.front(centre[0], centre[1], 0.0)
+
+    def along_edge(first, last, count):
+        """"count" places evenly along the edge of the opening between two of its angles (degrees), and the space between two."""
+        steps = 240
+        points = [KIT.face_place(head, math.radians(first + (last - first) * index / steps), grown) for index in range(steps + 1)]
+        lengths = [0.0]
+        for a, b in zip(points, points[1:]):
+            lengths.append(lengths[-1] + math.hypot(b[0] - a[0], b[1] - a[1]))
+        total, places, at = lengths[-1], [], 0
+        for index in range(count):
+            target = total * (index + 0.5) / count
+            while lengths[at + 1] < target:
+                at += 1
+            t = (target - lengths[at]) / max(lengths[at + 1] - lengths[at], 1e-9)
+            places.append((points[at][0] + (points[at + 1][0] - points[at][0]) * t, points[at][1] + (points[at + 1][1] - points[at][1]) * t))
+        return places, total / count
+
+    for count, (first, last), upper in ((up_count, top, True), (down_count, bottom, False)):
+        places, space = along_edge(first, last, count)
+        for side, height in places:
+            to_middle = (centre[0] - side, centre[1] - height)
+            norm = math.hypot(*to_middle)
+            way = (to_middle[0] / norm, to_middle[1] / norm)
+            length = space * long
+            foot = surface.front(side, height, foot_lift)
+            tip = surface.front(side + way[0] * length, height + way[1] * length, tip_lift)
+            if not upper:
+                # Under the face the head looks down: laid on it a tooth is seen edge on from the front, a fringe. The lower
+                # teeth stand up in the space of the head instead, towards the middle of the face, a little forward.
+                # (Standing from the edge of the face they hid behind the chin: their feet stand in front of it, on the lip of the
+                # collar.)
+                foot = surface.front(side, height, 0.0) - Y * 0.045 + Z * 0.004
+                towards = (middle_of_face - foot).normalized()
+                tip = foot + (Z * 0.88 + towards * 0.25 - Y * 0.12).normalized() * (length * 1.2)
+            middle = (foot + tip) * 0.5
+            along = (surface.front(side - way[1] * 0.005, height + way[0] * 0.005, 0.0)
+                     - surface.front(side + way[1] * 0.005, height - way[0] * 0.005, 0.0)).normalized()
+            out = head_normal_at(surface, foot)
+            if not upper:
+                out = -Y
+            wide = space * (0.5 if upper else 0.56)
+            collar.shell([(foot, along * wide, out * half_thick), (middle, along * wide * 0.62, out * half_thick * 0.8),
+                          (tip, Vector(), Vector())], 4, collar.named("Tooth"), outline)
+
+    def plate(root, along, up, edge, size, thick, material):
+        normal = along.cross(up).normalized()
+        points = [root + along * size[0] * x + up * size[1] * y for x, y in edge]
+        KIT.add_loops(torso, [[point - normal * thick for point in points], [point + normal * thick for point in points]],
+                      material, numbers.OUTLINE_THICKNESS)
+
+    way, height, edge, size, thick = numbers.DORSAL
+    root, out = on_volume(Vector((0.0, 0.0, height)), Vector(way), -0.03)
+    plate(root, Y, Z, edge, size, thick, torso.named("Fin"))
+    height, way, edge, size, thick = numbers.SIDE_FINS
+    for sign in (1.0, -1.0):
+        root, out = on_volume(Vector((0.0, 0.0, height)), Vector((sign, 0.15, 0.0)), -0.02)
+        along = Vector((sign * way[0], way[1], way[2])).normalized()
+        up = (Z - along * Z.dot(along)).normalized()
+        plate(root, along, up, edge, size, thick, torso.named("Fin"))
+    rings_at, radii, fin_edge, fin_size, fin_thick = numbers.SHARK_TAIL
+    back_point, _ = on_volume(Vector((0.0, 0.0, rings_at[0][2])), Y, 0.0)
+    points = [Vector((x, back_point.y + behind, z)) for x, behind, z in rings_at]
+    tail_rings = []
+    for index, (point, tail_radius) in enumerate(zip(points, radii)):
+        ahead = points[min(index + 1, len(points) - 1)] - points[max(index - 1, 0)]
+        first, second = base.frame_across(ahead, X)
+        tail_rings.append((point, first * tail_radius, second * tail_radius) if tail_radius > 0.0 else (point, Vector(), Vector()))
+    torso.shell(tail_rings, 7, torso.named("Main"), numbers.OUTLINE_THICKNESS)
+    tail_way = (points[-1] - points[-2]).normalized()
+    plate(points[-2], tail_way, Z, fin_edge, (fin_size, fin_size), fin_thick, torso.named("Fin"))
+    # The gills: short dark strokes on the volume behind each corner of the mouth.
+    first_way, apart, half_long, half_wide = numbers.GILLS
+    for sign in (1.0, -1.0):
+        for stroke in range(3):
+            aim = turn @ Vector((sign * first_way[0], first_way[1] + stroke * apart, first_way[2]))
+            place, out = on_volume(middle_body, aim, 0.0)
+            up = (Z - out * Z.dot(out)).normalized()
+            path = [on_volume(middle_body, (place + up * half_long * step - middle_body), 0.006)[0] for step in (-1.0, -0.5, 0.0, 0.5, 1.0)]
+            lower, upper = [], []
+            for index, point in enumerate(path):
+                ahead = path[min(index + 1, 4)] - path[max(index - 1, 0)]
+                across = out.cross(ahead).normalized() * half_wide
+                lower.append(point - across)
+                upper.append(point + across)
+            full.add_skin(torso, SimpleNamespace(middle=middle_body), [lower, upper], torso.named("Gill"), around=False)
+    # The eyes: a small dark ball half sunk on each side of the dome, a light glint on it.
+    way, ball = numbers.SHARK_EYES
+    for sign in (1.0, -1.0):
+        place, out = on_volume(middle_body, turn @ Vector((sign * way[0], way[1], way[2])), 0.0)
+        centre = place + out * (ball * 0.15)
+        torso.shell(base.ball_rings(centre, Z, X, ball, ball, ball * 0.95, 3), 8, torso.named("Eye"), numbers.OUTLINE_THICKNESS * 0.7)
+        glint = (out + Vector((0.0, -0.4, 0.5))).normalized()
+        oval_on(torso, middle_body, centre + glint * (ball * 0.98), glint, Z, ball * 0.30, ball * 0.22, torso.named("Tooth"))
 
 
 def head_normal_at(surface, point):
@@ -3613,16 +3768,14 @@ CLOTHES.update({
                                                   "Bandana": (0.88, 0.07, 0.07), "Dot": (0.96, 0.91, 0.86)},
                              head={"LEAVES": NO_CROWN, "FRINGE": False, "HIDES": ("Mouth",)}, bandana=True,
                              hood_numbers={"SIZE": ((0.0, 1.14), (60.0, 1.24), (180.0, 1.26))}),
-    # A blue shark: white belly, white teeth all round the face, a fin on the back of the hood.
-    "Shark Suit": costume((0.27, 0.71, 0.92), {"Hood": (0.27, 0.71, 0.92), "Rim": (0.23, 0.55, 0.80),
-                                               "Belly": (0.92, 0.95, 0.97), "Tooth": (1.0, 1.0, 1.0),
-                                               "Fin": (0.13, 0.36, 0.66), "Eye": (0.04, 0.06, 0.14),
-                                               "Gill": (0.12, 0.34, 0.62)},
-                          teeth=True, fin=True,
-                          # (SIZE as the gangster's hood since 22 October 2026, evening: at 1.20 by the side the cheek showed through
-                          # the hood behind its rim on one side, the owner's "hole".)
-                          hood_numbers={"SWELL": (0.085, 0.030, 40.0, 20.0, 26.0), "SIDES": 24,
-                                        "SIZE": ((0.0, 1.14), (60.0, 1.24), (180.0, 1.26))}),
+    # A whole blue shark round the whole Chog (build_mascot, add_shark; 23 October 2026, the owner: until then a hood with teeth
+    # over a plain suit, "not a big worked costume like the others"): white belly, white teeth all round the face, the dorsal
+    # fin, side fins, the tail and its fin, dark gills, small dark eyes.
+    "Shark Suit": {**costume((0.27, 0.71, 0.92), {"Hood": (0.27, 0.71, 0.92), "Rim": (0.23, 0.55, 0.80),
+                                                  "Belly": (0.92, 0.95, 0.97), "Tooth": (1.0, 1.0, 1.0),
+                                                  "Fin": (0.20, 0.55, 0.82), "Eye": (0.04, 0.06, 0.14),
+                                                  "Gill": (0.12, 0.34, 0.62)}),
+                   "kind": "Mascot", "shape": "shark"},
     # A whole banana round the whole Chog (build_mascot, 16 October 2026, after the owner saw a hood over a
     # suit twice): its five sides from yellow round the face to orange at the feet, green over the head, its
     # stalk at the top; colours measured on #37 (until then a hood with a point over a faceted peel).

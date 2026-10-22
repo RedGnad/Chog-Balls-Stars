@@ -111,6 +111,17 @@ def trail(layer, start, end, colour, steps=14):
     return out
 
 
+def distance_look(image, depth, scale, near=8.0):
+    """Far layers a little soft and veiled in the night's colour, so the near heroes read first (the depth of the genre's key art)."""
+    if depth <= near:
+        return image
+    soft = image.filter(ImageFilter.GaussianBlur(min(3.0, (depth - near) * 0.22) * scale * 2))
+    veil = Image.new("RGBA", image.size, (70, 40, 110, 255))
+    veiled = Image.blend(soft, veil, min(0.38, (depth - near) * 0.045))
+    veiled.putalpha(alpha_of(soft))
+    return veiled
+
+
 def shadow(size, feet, depth):
     """A soft dark ellipse under a hero's feet, smaller the farther it stands."""
     layer = Image.new("RGBA", size, (0, 0, 0, 0))
@@ -179,8 +190,8 @@ def main():
     parser.add_argument("--layers", default=os.path.join(ROOT, ".artifacts", "key-art", "banner"))
     parser.add_argument("--out", default=os.path.join(ROOT, "research", "evidence", "banner-key-art.jpg"))
     parser.add_argument("--title", default="CHOG BALLS STARS")
-    parser.add_argument("--tagline", default="YOUR GENESIS IS YOUR HERO")
-    parser.add_argument("--footer", default="3v3 ARENA  •  1,969 GENESIS, EACH A HERO  •  ON MONAD")
+    parser.add_argument("--tagline", default="STAKE $CHOG. WIN THE BRAWL.")
+    parser.add_argument("--footer", default="3v3 MOBA  •  1,969 CHOGS COME ALIVE  •  ON MONAD")
     arguments = parser.parse_args()
     with open(os.path.join(arguments.layers, "layers.json"), encoding="utf-8") as file:
         layers = json.load(file)
@@ -208,7 +219,7 @@ def main():
 
     # The towers, far behind their teams, their eyes firing towards the clash.
     for tower in sorted(layers.get("towers", []), key=lambda entry: -entry["depth"]):
-        image = load(tower["file"])
+        image = distance_look(load(tower["file"]), tower["depth"], scale)
         colour = TEAM["blue"] if tower["side"] == "Ours" else TEAM["red"]
         picture.alpha_composite(rim_glow(image, colour, round(8 * scale), 0.8))
         picture.alpha_composite(image)
@@ -221,7 +232,7 @@ def main():
     heroes = sorted(layers["heroes"], key=lambda entry: -entry["depth"])
     objects = list(layers.get("objects", []))
     for hero in heroes:
-        image = load(hero["file"])
+        image = distance_look(load(hero["file"]), hero["depth"], scale)
         picture.alpha_composite(shadow(size, hero["feet"][:2], hero["depth"]))
         picture.alpha_composite(rim_glow(image, TEAM[hero["team"]], round(9 * scale), 0.9))
         picture.alpha_composite(image)

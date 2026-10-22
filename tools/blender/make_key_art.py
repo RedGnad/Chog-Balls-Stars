@@ -258,7 +258,7 @@ def floor_layer(layout, folder):
     setup_render(scene, layout["size"], 32)
     mesh = bpy.data.meshes.new("KeyArtFloor")
     shapes = bmesh.new()
-    bmesh.ops.create_grid(shapes, x_segments=1, y_segments=1, size=60.0)
+    bmesh.ops.create_grid(shapes, x_segments=1, y_segments=1, size=layout.get("floor_size", 60.0))
     shapes.to_mesh(mesh)
     shapes.free()
     floor = bpy.data.objects.new("KeyArtFloor", mesh)
