@@ -190,7 +190,7 @@ def paint_where(part, faces, rule):
 # ---------------------------------------------------------------------------------------------
 USHANKA = {
     "SIDES": 24,
-    # (23 October 2026, the owner: "not tall enough and does not match". On the 67 pictures the fur crown stands high above the head,
+    # (22 October 2026, the owner: "not tall enough and does not match". On the 67 pictures the fur crown stands high above the head,
     # a tall cylinder of fur whose lower edge is a thick wavy roll across the brow, with the ear flaps hanging down beside the face
     # to the jaw: fur flaps on Side=Right, dark leather flaps with snaps on Side=Left. Until then a low cap with a thin roll and short
     # flaps laid on the head.)
@@ -199,7 +199,7 @@ USHANKA = {
     # (half width, half depth, how far its middle stands behind the middle of the head), the height of the top of the wall, and how
     # high its rounded top rises above that.
     "LOW": ((0.0, 0.292), (60.0, 0.275), (110.0, 0.235), (180.0, 0.170)),
-    "FLARE": 0.20,
+    "FLARE": 0.26,
     "BULGE": 0.06,        # the wall swells a little at its middle, as a fur crown does
     "WALL": (0.350, 0.275, 0.035),
     "TOP": 0.520,
@@ -207,12 +207,16 @@ USHANKA = {
     # The rows of the wall as shares of its height from the lower edge (the first, tucked on the head, the next ones the roll of fur),
     # the shares at which the colour of the fur gives way to that of the crown (the first bands are fur), and the bumps of the fur round
     # the lower edge (how many, how deep against the wall).
-    "ROWS": (0.0, 0.05, 0.11, 0.20, 0.55, 1.0),
-    "FUR_BANDS": 3,
-    "FUR_WAVES": (8, 0.030),
+    # (22 October 2026 on the first try, 0.0 to 0.20 and 3 bands: the owner saw the roll swallowed from the front, a plain cylinder. Now the roll
+    # is taller (0.30 of the wall), stands out of the wall by ROLL and its fur bumps are deeper, so it shows from the front and three quarters.)
+    "ROWS": (0.0, 0.06, 0.15, 0.26, 0.36, 0.62, 1.0),
+    "FUR_BANDS": 4,
+    "ROLL": 0.11,
+    "FUR_WAVES": (8, 0.045),
+    "WAVE_Z": 0.012,     # the lower edge rises and falls with the bumps of the fur (a fluffy edge)
     # An ear flap: how far out of the middle at its top, at its middle and at its foot (it hangs nearly upright beside the face), how
     # far ahead of the middle of the head, its heights (top, then foot), half width at the top and at the foot, half thickness.
-    "FLAP": ((0.325, 0.340, 0.335, 0.325), -0.015, (0.330, 0.230, 0.120, 0.0, -0.075), (0.098, 0.090, 0.082, 0.072, 0.055), 0.030),
+    "FLAP": ((0.325, 0.340, 0.335, 0.325), -0.015, (0.330, 0.195, 0.055, -0.075), (0.098, 0.088, 0.078, 0.055), 0.030),
     # Where a flap is leather (the colour "Snap" is given: Side=Left), a rim of fur behind it: how much wider and longer the rim is,
     # and how far behind the leather it lies.
     "FLAP_RIM": (0.020, 0.024, 0.014),
@@ -249,15 +253,16 @@ def build_ushanka(maker):
     for share in numbers.ROWS:
         loop = []
         for angle in angles:
-            low = interpolate(numbers.LOW, from_front(angle))
+            low = interpolate(numbers.LOW, from_front(angle)) + numbers.WAVE_Z * math.cos(waves * angle) * (1.0 - share)
             z = low + (numbers.TOP - low) * share
             head_wide, head_deep = head_radii(z)
             grow = math.sin(0.5 * math.pi * min(1.0, share / numbers.FLARE))
-            barrel = 1.0 + numbers.BULGE * math.sin(math.pi * share) * grow
+            barrel = 1.0 + numbers.BULGE * math.sin(math.pi * share) * grow \
+                + numbers.ROLL * math.sin(math.pi * min(1.0, share / (numbers.FLARE * 1.45)))
             wide = (head_wide * 1.02 + (wall_wide - head_wide * 1.02) * grow) * barrel
             deep = (head_deep * 1.02 + (wall_deep - head_deep * 1.02) * grow) * barrel
             centre_y = wall_back * grow
-            if share < 0.5:
+            if share < 0.45:
                 bump = 1.0 + depth * grow * math.cos(waves * angle)
                 wide, deep = wide * bump, deep * bump
             loop.append(point(angle, z, wide, deep, centre_y))
@@ -770,7 +775,8 @@ CLOWN_NOSE = {
     # then the ball stood 0.022 off the face with an outline shell, which showed from the side as a dark crescent and a thin ring, a
     # button's rim. Now the ball is half sunk (its middle 0.004 off the face), no shell: the outline is the dark of a patch laid on the
     # face under it, EDGE wider than the ball, which the face meets round the ball as a clean outline.)
-    "OFF": 0.004,
+    # (22 October 2026, the owner liked it but wants it "a tiny bit more out": the middle 0.014 off the face, 0.004 before.)
+    "OFF": 0.014,
     "RADIUS": 0.052,
     "SIDES": 12,
     "STACKS": 6,
@@ -1269,7 +1275,7 @@ HATS = {
     # The new shapes.
     "Russian Hat": {
         "shape": "Ushanka",
-        "colours": {"Crown": (0.80, 0.59, 0.44), "Fur": (0.89, 0.76, 0.64), "Flap": (0.86, 0.70, 0.57)},
+        "colours": {"Crown": (0.78, 0.56, 0.41), "Fur": (0.94, 0.83, 0.70), "Flap": (0.86, 0.70, 0.57)},
     },
     "Red Headband": {
         "shape": "Headband",

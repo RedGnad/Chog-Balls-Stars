@@ -1204,11 +1204,11 @@ mouths, the art then before | after (front close, three quarter close, bust, her
 - **Checked**: 7 Genesis before | after; `--budget`: largest #630 7,991 (it wears the nose; +10 triangles), none over 8,000; library 1,970 Genesis, 0 failures.
   Not verified in Unity.
 
-## 23 October 2026: lot 7, the owner's review of the heroes (turning them on the hero stage)
+## 22 October 2026: lot 7, the owner's review of the heroes (turning them on the hero stage)
 
 ### 7.1 The Russian Hat (ushanka)
 
-Sheet: [costumes-ushanka-2026-10-23.jpg](../../research/evidence/costumes-ushanka-2026-10-23.jpg) (9 Genesis of both Sides, the art then before | after: front
+Sheet: [costumes-ushanka-2026-10-22.jpg](../../research/evidence/costumes-ushanka-2026-10-22.jpg) (9 Genesis of both Sides, the art then before | after: front
 close, three quarter, side, hero stage).
 
 - **What the art draws** (67 Genesis, #39, #58, #90, #148, #166 on Side=Right, #34, #91, #137, #144 on Side=Left): a tall crown of fur, a cylinder
@@ -1220,6 +1220,15 @@ close, three quarter, side, hero stage).
   roll of fur (the lower three bands in `Fur`, 8 bumps), a barrel of 6 per cent, its top at 0.52 with a rounded dome 0.07 higher
   (the old crown was 0.10 above the head); the flaps hang nearly upright beside the face (0.33 to 0.34 out) from 0.33 down to -0.075, with
   their fur rim and snaps on Side=Left; the teeth of hair on the brow are off (`FRINGE`). The leaves under the rim (`USHANKA_RIM_ROW`) follow.
+- **Roll of fur kept visible** (the coordinator, after the first try: on Side=Right the roll was swallowed from the front, a plain tan cylinder): the roll
+  is taller (the lower 0.36 of the wall, 4 bands), swells out of the wall by 11 per cent (`ROLL`), its fur bumps are deeper and the lower edge rises
+  and falls with them (`WAVE_Z`), and on Side=Right the fur colour is lighter (0.94 0.83 0.70) against the crown (0.78 0.56 0.41). The flaps have 4
+  stations (5): #608 was 8,028 triangles.
 - **Checked**: 9 Genesis before | after; `--budget`: largest #630 7,991, the hat heroes up to #608 7,932, none over 8,000; library 1,970 Genesis, 0 failures.
   Not verified in Unity. The top of the hat is hidden by the frame of every picture of the art, so its height is estimated from the brow line to the top
   of the frame (at least 0.7 of the face).
+
+### 7.2 The clown nose, a tiny bit more out
+
+[costumes-clown-nose-out-2026-10-22.jpg](../../research/evidence/costumes-clown-nose-out-2026-10-22.jpg) (#210, #248, #195, before | after): the owner liked the sunk ball of
+lot 6 and asked for it to stick out a tiny bit more: its middle is 0.014 off the face (0.004), the radius, the glint and the outline patch unchanged.
