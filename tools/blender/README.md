@@ -1382,3 +1382,28 @@ The title of the sheet of the ten said 23 October: it says 22 October now (the f
   Not done: the glowing outline (the outline material is shared by every hero), the dark-gold shading on the head.
 - **#434 The Scream**: the hands are 0.082 by 0.120 (0.052 by 0.088), flat on the cheeks (0.205 out, 0.058 off the face), with the thumb and four fingers standing up along the face, so they show from the front.
 - **Checked**: #53 7,976 triangles (7,311: the tongues of the flame head cost 665), #434 7,427, #1373 6,373; `--budget`: largest hero #630 7,983, none over 8,000; library 1,970 Genesis, 0 failures; what each throws is unchanged (#53, #434, #1373 throw the leaf: `1:1 Flame Hair` is in `ATTACK_OF_HEAD`, or the 2,240 triangles of the flames would be thrown).
+
+## 22 October 2026: the Radioactive and Skull bases (lot 9)
+
+Three items of the owner's review, one sheet each, the art beside the hero stage view (front and three quarter close), before | after:
+[skins](../../research/evidence/heroes-radioactive-skins-2026-10-22.jpg), [jaws](../../research/evidence/heroes-jaws-2026-10-22.jpg),
+[bones](../../research/evidence/heroes-bones-2026-10-22.jpg). New in the previews: the stage look draws the skin gradient of a Radioactive as the game does (`game_look_material`, stops).
+
+1. **Multicoloured skins** (30 Radioactive Genesis: Green 8, Blue 8, Multi Colored 7, Red 7; compared on #31, #473, #772, #1531 green; #343, #598, #1281, #1200 blue; #672, #703, #834, #1134 red; #140, #275,
+   #415, #625, #1187, #1192, #1225 multi coloured). The art runs the skin through several bands from the crown to the chest: Multi Colored is a white-pink crown, magenta over the forehead and cheeks, orange then yellow
+   at the jaw, lime then green on the chest; Green yellow over the eyes then lime then green; Blue pale aqua, sky blue, blue; Red pale pink, hot pink, red-pink. The game keeps two colours (the bottom, and the top reached at
+   1.12: `ChogPartsLibrary.ColourOf`, the library format), so **the two colours are re-read for the head and the jaw** (`RADIOACTIVE_SKINS`, Multi Colored (0.50, 0.90, 0.24) to (1.00, 0.56, 0.86), Green, Blue and Red
+   deeper at the chest, lighter at the crown) and the **bands are given as stops** (`RADIOACTIVE_BANDS`, 4 to 6 per colour, the previews draw them with `CHOG_BANDS=1`): the sheet shows both, the two-colour result and the bands
+   beside the art. The bands are not in the game: a third and fourth colour need a library with N stops (`ChogPartsLibrary.SkinColours`, its reader and the exporter's table), which is the lead's file; the exporter side is ready
+   to write them (`skin["bands"]`). A two-colour skin cannot run pink to green without a grey middle, which the Multi Colored head shows.
+2. **The jaw.** The art draws a real jaw, wide and flat, under a dark open mouth: on the Skulls (#54, #1079, #1313, #1642, #1776, #81) a lower jaw of its own standing out under the cranium with its outline and a row of big
+   square teeth on it, under a row on the cranium; on the Radioactives (#140, #275, #1187, #1281, #1531) a dark band (the mouth) over a row of big teeth, the jaw line flat across the chin and turning up at the sides.
+   Before, the Skull had two rows of small beads on the ball of the head and the Radioactive a U line. Now: **Skull**, one row of seven big teeth on the cranium (`SKULL_FACE`, half height 0.024) and a lower jaw that is a
+   volume, a rounded wedge (`JAW_VOLUME`, `add_mandible`, `JawSurface`) with its outline and its own row of six teeth; **Radioactive**, the mouth band (`TEETH["MOUTH"]`), bigger teeth (`GLOW_ROW` 0.020) and a flat jaw
+   line (`JAW_LINE`, 0.205 wide). Hats and hoods close on it (checked on #552, #816, #259, #1647, #1405, #1045, #388, #1000). Not exact: the Skull jaw is a smooth egg, the art's has a corner at the chin; the Left jaw opens
+   less than the art's.
+3. **The bones.** On the art the ribs show only on bare skin: on the 14 Skull and Radioactive Genesis that wear nothing, and under an open Wizard Cape (#388, #459, #846, #1000), a Kings Robe (#1045, #1667) and
+   Mummy wraps; under a shirt, a hoodie, a vest, a jacket or an armour (#1647, #1405, #1953, #415, #1192) and under the white Jesus Robe (#1214, #1311) none show. `add_ribs` is now called only for those bodies
+   (`BONES_SHOW` in `chog_trait_bases.py`, read in `make_chog_traits.build`), and a Radioactive's ribs are in the deeper tone of its skin, not black. Not done: the bones through the translucent vest or tank top of a few
+   Radioactives (#275, #1192) and the arm bones on the art.
+- **Checked**: the 114 Skull and Radioactive heroes (`export_chog_parts.py` builds all of them, limit 8,000 triangles). Not in a Unity build.

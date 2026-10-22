@@ -54,24 +54,33 @@ SKULL_SKINS = {
 # rise); a tooth is outlined by LINE, GAP apart.
 SKULL_FACE = {
     "Right": {
-        # The two rows are little rounded beads, not a large, square monster grin.
-        "ROWS": ((-0.096, 0.132, 0.0145, 7, 0.010), (-0.123, 0.112, 0.011, 6, 0.009)),
+        # (22 October 2026, the owner: the jaw of the skulls "rises as a single line where the art draws a real horizontal jaw, a row of teeth
+        # across". On #54, #1079, #1313, #1642, #1776 the skull has a lower jaw of its own, a wide rounded wedge standing out under the cranium
+        # with its own outline, and a row of big square teeth on it under a row on the cranium: the two rows were drawn as little beads on the
+        # surface of the ball of the head. Now ONE row of seven big teeth on the cranium (0.024 half height), the nose above it, and the
+        # jaw is a volume (JAW_VOLUME, add_mandible) carrying the lower row.)
+        "ROWS": ((-0.064, 0.140, 0.024, 7, 0.005),),
         "MOUTH": None,
         "CRACK": ((0.172, -0.128), (0.190, -0.104), (0.204, -0.078), (0.212, -0.056)),
         "CRACK_THICK": (0.014, 0.011, 0.007, 0.003),
-        "NOSE": (-0.040, 0.030, 0.024),
+        "NOSE": (-0.022, 0.030, 0.024),
         "CHEEK": (0.168, -0.040, 0.040, 0.027),
     },
     "Left": {
-        "ROWS": ((-0.112, 0.118, 0.018, 6, 0.012),),
+        "ROWS": ((-0.070, 0.130, 0.023, 6, 0.006),),
         # The open mouth under the row: middle height, half width, half height.
-        "MOUTH": (-0.151, 0.070, 0.013),
+        "MOUTH": (-0.108, 0.090, 0.012),
         "CRACK": (),
         "CRACK_THICK": (),
-        "NOSE": (-0.046, 0.022, 0.019),
+        "NOSE": (-0.026, 0.022, 0.019),
         "CHEEK": (0.168, -0.040, 0.040, 0.027),
     },
 }
+# The lower jaw of a skull, a volume in the axes of the part Head before it is turned up: its middle (to the side, ahead of the middle of the
+# head, height above its middle), its half sizes (width, depth, height), then the row of teeth on its front: middle height on the jaw (above its
+# middle), half its width, half the height of a tooth, how many, how far its ends rise.
+JAW_VOLUME = {"AT": (0.0, -0.135, -0.200), "HALF": (0.175, 0.095, 0.062), "STACKS": 6, "SIDES": 14,
+              "ROW": (0.012, 0.128, 0.019, 6, 0.004)}
 TEETH = {
     "LINE": 0.0035,                          # the dark line round a skull tooth
     "GAP": 0.004,                            # between two teeth of a row, the line showing there
@@ -83,11 +92,17 @@ TEETH = {
     # #1134, #140). Row: middle height, half width, half height, count, how far its ends rise.
     # The Genesis art uses six small, almost round teeth, then a short shallow chin curve: it is the skull
     # seen through the glow, not a rectangular grill across the whole mouth.
-    "GLOW_ROW": (-0.136, 0.112, 0.0145, 6, 0.012),
+    # (22 October 2026, the owner: the jaw of the Radioactive "rises as a single line where the art draws a real horizontal jaw, a row of teeth
+    # across". On #140, #275, #1187, #1281, #1531 under the cheeks there is a dark cavity, a mouth, a band as wide as the jaw; under it a
+    # row of big teeth along the top of a jaw whose lower edge runs flat across the chin and turns up at the sides: a box, not a U. Row
+    # 0.128 half width, teeth 0.020 half height, nearly level (rise 0.004; 0.112, 0.0145 and 0.012 before); the jaw line flat across the
+    # bottom and 0.20 wide; the mouth a band over the teeth, MOUTH: its middle height, half its width, half its height.)
+    "GLOW_ROW": (-0.146, 0.128, 0.020, 6, 0.004),
     "GLOW_LINE": 0.0038,
-    "JAW_LINE": ((-0.158, -0.104), (-0.140, -0.138), (-0.086, -0.163), (0.0, -0.171), (0.086, -0.163),
-                 (0.140, -0.138), (0.158, -0.104)),
-    "JAW_THICK": 0.006,
+    "MOUTH": (-0.108, 0.150, 0.016),
+    "JAW_LINE": ((-0.205, -0.098), (-0.196, -0.138), (-0.160, -0.172), (-0.100, -0.184), (0.0, -0.186), (0.100, -0.184),
+                 (0.160, -0.172), (0.196, -0.138), (0.205, -0.098)),
+    "JAW_THICK": 0.007,
     "CHEEKBONE": ((0.198, -0.028), (0.185, -0.070), (0.153, -0.106), (0.117, -0.122)),
     "CHEEKBONE_THICK": (0.004, 0.006, 0.006, 0.004),
 }
@@ -95,6 +110,9 @@ NOSE = {"UP": -0.040, "HALF_WIDTH": 0.026, "HALF_HEIGHT": 0.021}
 
 # Ribs: how many, from which height of the torso to which (shares of its height), how far around the
 # front they go (degrees either side of straight ahead), their thickness.
+# The values of "Body" under which the ribs show on the pictures (#388, #459, #846, #1667, #552, #816, #1000: an open cape, a robe, wraps; a Duck Float
+# leaves the torso bare), and none: a Genesis with no body. Under a shirt, a hoodie, a vest, a jacket or an armour the cloth covers them (22 October 2026).
+BONES_SHOW = (None, "None", "Wizard Cape", "Kings Robe", "Mummy", "Duck Float")
 RIBS = {"COUNT": 5, "FROM": 0.34, "TO": 0.80, "SPREAD_DEG": 64.0, "THICK": 0.014}
 
 
@@ -104,11 +122,27 @@ RIBS = {"COUNT": 5, "FROM": 0.34, "TO": 0.80, "SPREAD_DEG": 64.0, "THICK": 0.014
 # eyes that glow in a pale tint of the skin. (bottom, top) colours, read on their pictures.
 # (Pushed further apart on 16 October 2026, the owner finding the run of colour faint on some: the bottoms
 # deeper, the tops lighter, as the pictures glow.)
+# (22 October 2026, the owner: "some Radioactive skins are more multicoloured on the art than our two colour gradient". Read on the 1000 point pictures of
+# the 30 Genesis (#31, #473, #772, #1531, #1009 green; #343, #598, #1281, #1200 blue; #672, #703, #834, #1134 red; #140, #275, #415, #625, #1187, #1192, #1225
+# multi coloured): in the pictures the skin runs from the crown to the chest through several bands, and the two colour gradient, running from the feet
+# to the top of the crown over 0.62 to 1.12, was too slow: the head was one colour. Green: yellow over the eyes, lime then green at the jaw and chest. Blue: pale
+# aqua over the eyes, sky blue then blue. Red: pale pink, hot pink, red-pink at the chest. Multi Colored: white-pink crown and forehead, magenta over the
+# cheeks, orange then yellow at the jaw, lime then green on the chest. RADIOACTIVE_BANDS gives them as stops (height over the feet, colour); the library
+# format of the game keeps two colours (the bottom and the top, between GradientLow 0.62 and GradientHigh 1.12), so the pairs below are the nearest two
+# colour approximations: a bottom colour at the chest and a top at the crown, read at the jaw and at the forehead, in the way the game draws them. The bands
+# are drawn by the previews with CHOG_BANDS=1 and are a proposal for the game (README, lot 9).)
 RADIOACTIVE_SKINS = {
-    "Green": ((0.20, 0.70, 0.14), (0.96, 1.00, 0.34)),
-    "Blue": ((0.10, 0.40, 0.88), (0.62, 0.97, 1.00)),
-    "Multi Colored": ((0.30, 0.82, 0.30), (1.00, 0.62, 0.90)),
-    "Red": ((0.80, 0.12, 0.36), (1.00, 0.72, 0.84)),
+    "Green": ((0.28, 0.80, 0.16), (0.96, 0.98, 0.34)),
+    "Blue": ((0.12, 0.52, 0.95), (0.56, 0.97, 0.96)),
+    "Multi Colored": ((0.50, 0.90, 0.24), (1.00, 0.56, 0.86)),
+    "Red": ((0.92, 0.14, 0.38), (1.00, 0.66, 0.90)),
+}
+RADIOACTIVE_BANDS = {
+    "Green": ((0.60, (0.25, 0.78, 0.15)), (0.80, (0.55, 0.90, 0.18)), (0.92, (0.90, 0.97, 0.30)), (1.12, (0.96, 1.00, 0.38))),
+    "Blue": ((0.60, (0.10, 0.55, 0.95)), (0.80, (0.20, 0.78, 0.95)), (0.95, (0.45, 0.95, 0.90)), (1.12, (0.62, 0.97, 1.00))),
+    "Red": ((0.60, (0.90, 0.15, 0.40)), (0.80, (1.00, 0.35, 0.65)), (0.95, (1.00, 0.55, 0.85)), (1.12, (1.00, 0.72, 0.92))),
+    "Multi Colored": ((0.55, (0.35, 0.85, 0.25)), (0.66, (0.72, 0.92, 0.30)), (0.76, (1.00, 0.62, 0.30)), (0.86, (1.00, 0.42, 0.78)),
+                      (1.00, (1.00, 0.78, 0.92)), (1.12, (1.00, 0.92, 0.97))),
 }
 # The tone the skull shows in through the skin (its nose, teeth, jaw and cheekbones), read on the pictures (#31,
 # #343, #598, #1134, #140; 18 October 2026): a deeper, saturated tone of the skin, never black (they were black
@@ -188,7 +222,8 @@ def skin_of(traits):
         colours = RADIOACTIVE_SKINS.get(traits.get("Skin"))
         if colours is None:
             raise SystemExit(f"CHOG_TRAITS no colours recorded for a Radioactive of Skin={traits.get('Skin')}")
-        return {"skin": colours[0], "face": RADIOACTIVE_LINES[traits.get("Skin")], "top": colours[1]}
+        return {"skin": colours[0], "face": RADIOACTIVE_LINES[traits.get("Skin")], "top": colours[1],
+                "bands": RADIOACTIVE_BANDS[traits.get("Skin")]}
     colour = SKULL_SKINS.get(traits.get("Skin"))
     if colour is None:
         raise SystemExit(f"CHOG_TRAITS no bone colour recorded for a Skull of Skin={traits.get('Skin')}")
@@ -279,6 +314,9 @@ def add_skull_face(part, numbers, surface, full, draw_shape, oval, SKIN, EYE, BL
         # A radioactive Chog: the skull seen through the skin, in the deeper tone of the face's material.
         up, half_w, half_h = NOSE["UP"], NOSE["HALF_WIDTH"], NOSE["HALF_HEIGHT"]
         draw_shape(part, surface, FACE, upside_down_heart((0.0, up), half_w, half_h), dark_lift, middle=(0.0, up))
+        mouth_up, mouth_half_wide, mouth_half_tall = TEETH["MOUTH"]
+        draw_shape(part, surface, FACE, rounded((0.0, mouth_up), mouth_half_wide, mouth_half_tall, 16, 2.4), dark_lift,
+                   middle=(0.0, mouth_up))
         tooth_row(part, surface, draw_shape, TEETH["GLOW_ROW"], TEETH["GLOW_LINE"], SKIN, FACE, (dark_lift, bone_lift))
         jaw = list(TEETH["JAW_LINE"])
         traits_module.draw_line(part, surface, FACE, jaw, [TEETH["JAW_THICK"]] * len(jaw), dark_lift)
@@ -315,6 +353,39 @@ def narrow_jaw(part, numbers, side="Right"):
         share = min(1.0, max(0.0, (jaw["FROM"] - height) / (jaw["FROM"] - jaw["TO"])))
         share = share * share * (3.0 - 2.0 * share)
         point.co.x *= 1.0 - jaw["NARROW"] * share
+
+
+class JawSurface:
+    """The front of the lower jaw of a skull, with the interface of full.HeadSurface that the drawing of a face uses (front, towards,
+    middle, half): an egg in the axes of the part Head."""
+
+    def __init__(self, middle, half):
+        self.middle, self.half, self.face_middle = middle, half, (0.0, 0.0)
+
+    def front(self, side, up, lift):
+        x, z = side, up
+        inside = 1.0 - (x / self.half.x) ** 2 - (z / self.half.z) ** 2
+        y = -self.half.y * math.sqrt(max(inside, 0.0004))
+        outward = Vector((x / self.half.x ** 2, y / self.half.y ** 2, z / self.half.z ** 2)).normalized()
+        return self.middle + Vector((x, y, z)) + outward * lift
+
+    def towards(self, direction):
+        reach = 1.0 / math.sqrt(sum((direction[index] / self.half[index]) ** 2 for index in range(3)))
+        return self.middle + direction * reach
+
+
+def add_mandible(part, numbers, full, draw_shape, SKIN, EYE, outline):
+    """The lower jaw of a skull: a rounded wedge standing out under the cranium (JAW_VOLUME), in the bone colour with its outline, and
+    on its front the lower row of teeth (22 October 2026, see JAW_VOLUME). Added after narrow_jaw, so that it is not narrowed with the head."""
+    import make_chog_traits as traits_module
+    jaw = JAW_VOLUME
+    middle = Vector((jaw["AT"][0], jaw["AT"][1], numbers.HEAD_MIDDLE + jaw["AT"][2]))
+    half = Vector(jaw["HALF"])
+    rings = base.ball_rings(middle, Z, X, half.z, half.x, half.y, jaw["STACKS"])
+    part.shell(rings, jaw["SIDES"], SKIN, outline)
+    surface = JawSurface(middle, half)
+    tooth_row(part, surface, draw_shape, (jaw["ROW"][0], jaw["ROW"][1], jaw["ROW"][2], jaw["ROW"][3], jaw["ROW"][4]),
+              TEETH["LINE"], SKIN, EYE, (traits_module.DRAWN[0], traits_module.DRAWN[1]))
 
 
 def bone_hands(parts, materials, skin, glove):
