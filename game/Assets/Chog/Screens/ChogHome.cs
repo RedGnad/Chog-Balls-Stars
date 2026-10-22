@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Globalization;
 using System.Reflection;
 using Chog.Match;
@@ -26,6 +27,13 @@ namespace Chog.Screens
         private const string ObjectName = "ChogHome";
         private const string RosterResource = "GenesisRoster";
         private Coroutine _rankRefresh;
+        private Coroutine _rankReveal;
+        private RectTransform _rankToast;
+        private CanvasGroup _rankToastGroup;
+        private TextMeshProUGUI _rankToastTitle;
+        private TextMeshProUGUI _rankToastPoints;
+        private TextMeshProUGUI _rankToastNext;
+        private RectTransform _rankToastFill;
 
         // In units of the menu canvas (1920 by 1080 at 16:9), from the corners.
         private const float Margin = 30f;
@@ -150,6 +158,13 @@ namespace Chog.Screens
                 StopCoroutine(_rankRefresh);
                 _rankRefresh = null;
             }
+            if (_rankReveal != null)
+            {
+                StopCoroutine(_rankReveal);
+                _rankReveal = null;
+            }
+            if (_rankToast != null)
+                _rankToast.gameObject.SetActive(false);
             WalletPanel.PlayedChanged -= Refresh;
             PlayerWallet.Changed -= OnWalletChanged;
             PlayerRanks.Changed -= Refresh;
@@ -393,6 +408,13 @@ namespace Chog.Screens
 
         private void OnWalletChanged()
         {
+            if (_rankReveal != null)
+            {
+                StopCoroutine(_rankReveal);
+                _rankReveal = null;
+            }
+            if (_rankToast != null)
+                _rankToast.gameObject.SetActive(false);
             Refresh();
             RestartRankRefresh();
         }
@@ -404,24 +426,113 @@ namespace Chog.Screens
             _rankRefresh = StartCoroutine(RefreshPendingRank());
         }
 
-        // A player may return HOME before Photon has delivered the last replay chunk.
-        // Refresh until the server makes that match final.
+        // The exact finished room is retained across leaving the result and page reloads.
+        // Never animate a different match or an unverified point change.
         private IEnumerator RefreshPendingRank()
         {
-            while (isActiveAndEnabled)
+            var address = PlayerWallet.Address;
+            var gameId = PlayerWallet.SignIn == SignInState.SignedIn
+                ? ChogResultScreen.PendingRankGameId(address) : "";
+            for (var attempt = 0; attempt < 90 && isActiveAndEnabled && !string.IsNullOrEmpty(gameId);)
             {
+                if (!string.Equals(address, PlayerWallet.Address, StringComparison.OrdinalIgnoreCase) ||
+                    PlayerWallet.SignIn != SignInState.SignedIn)
+                    break;
+                if (ChogResultScreen.PendingRankGameId(address) != gameId)
+                    break;
+                if (ChogResultScreen.IsShown)
+                {
+                    yield return new WaitForSecondsRealtime(0.5f);
+                    continue;
+                }
+                attempt++;
                 PlayerRankAnswer answer = null;
                 var returned = false;
                 PlayerRanks.Read(value => { answer = value; returned = true; });
                 var deadline = Time.realtimeSinceStartup + 10f;
                 while (!returned && Time.realtimeSinceStartup < deadline && isActiveAndEnabled)
                     yield return null;
-                var status = answer?.latestMatch?.status;
-                if (status != "verifying" && status != "preparing")
+                if (answer != null && !answer.enabled)
+                {
+                    ChogResultScreen.ClearPendingRank(address, gameId);
                     break;
+                }
+                var gain = answer?.rank?.last;
+                if (gain != null && gain.gameId == gameId)
+                {
+                    if (gain.delta != 0 || gain.tierBefore != gain.tierAfter)
+                    {
+                        _rankReveal = StartCoroutine(RevealRankOnHome(gain, answer.rank, address, gameId));
+                        yield return _rankReveal;
+                        _rankReveal = null;
+                    }
+                    else
+                        ChogResultScreen.ClearPendingRank(address, gameId);
+                    break;
+                }
+                var match = answer?.latestMatch;
+                if (match != null && match.gameId == gameId &&
+                    match.status != "verifying" && match.status != "preparing")
+                {
+                    ChogResultScreen.ClearPendingRank(address, gameId);
+                    break;
+                }
                 yield return new WaitForSecondsRealtime(3f);
             }
             _rankRefresh = null;
+        }
+
+        private void BuildRankToast()
+        {
+            _rankToast = ChogUi.Area("RankUpdate", transform, new Vector2(0.28f, 0.72f), new Vector2(0.72f, 0.92f));
+            var panel = _rankToast.gameObject.AddComponent<Image>();
+            panel.sprite = ChogSprites.Rounded(24, 4, ChogTheme.Ink, ChogTheme.CardRaised);
+            panel.type = Image.Type.Sliced;
+            panel.raycastTarget = false;
+            _rankToastGroup = _rankToast.gameObject.AddComponent<CanvasGroup>();
+            _rankToastGroup.blocksRaycasts = false;
+            _rankToastTitle = ChogUi.Title("RankTitle", _rankToast, new Vector2(0.04f, 0.67f), new Vector2(0.96f, 0.94f), 38f);
+            _rankToastTitle.color = ChogTheme.Gold;
+            _rankToastPoints = ChogUi.Title("RankPoints", _rankToast, new Vector2(0.04f, 0.35f), new Vector2(0.96f, 0.70f), 60f);
+            var track = ChogUi.Plate("ProgressTrack", _rankToast, new Vector2(0.08f, 0.22f), new Vector2(0.92f, 0.32f), ChogTheme.Night, 12);
+            _rankToastFill = ChogUi.Area("ProgressFill", track.transform, Vector2.zero, new Vector2(0.001f, 1f));
+            var fill = _rankToastFill.gameObject.AddComponent<Image>();
+            fill.sprite = ChogSprites.Rounded(16, 3, ChogTheme.Ink, ChogTheme.Gold);
+            fill.type = Image.Type.Sliced;
+            fill.raycastTarget = false;
+            _rankToastNext = ChogUi.Body("NextRank", _rankToast, new Vector2(0.04f, 0.03f), new Vector2(0.96f, 0.18f),
+                23f, TextAlignmentOptions.Center, ChogTheme.Cream);
+            _rankToast.gameObject.SetActive(false);
+        }
+
+        private IEnumerator RevealRankOnHome(PlayerRankGain gain, PlayerRank rank, string address, string gameId)
+        {
+            if (_rankToast == null)
+                BuildRankToast();
+            _rankToast.SetAsLastSibling();
+            _rankToast.gameObject.SetActive(true);
+            _rankToastTitle.text = gain.tierBefore != gain.tierAfter
+                ? (gain.delta > 0 ? "RANK UP: " : "RANK CHANGED: ") + gain.tierAfter : "MATCH RANK UPDATE";
+            _rankToastNext.text = rank.next > 0 ? "NEXT RANK AT " + rank.next + " POINTS" : "TOP RANK";
+            var start = Time.unscaledTime;
+            const float duration = 0.80f;
+            ChogSounds.Reward(gain.tierBefore != gain.tierAfter ? 2 : 0);
+            while (Time.unscaledTime - start < duration)
+            {
+                var t = ChogTheme.ReducedMotion ? 1f : Mathf.Clamp01((Time.unscaledTime - start) / duration);
+                var eased = t * t * (3f - 2f * t);
+                var displayed = Mathf.RoundToInt(Mathf.Lerp(gain.before, gain.after, eased));
+                _rankToastPoints.text = (gain.delta > 0 ? "+" : "") + gain.delta + " PTS  |  " + displayed + " TOTAL";
+                _rankToastFill.anchorMax = new Vector2(rank.next > 0
+                    ? Mathf.Clamp((float)displayed / rank.next, 0.001f, 1f) : 1f, 1f);
+                _rankToastGroup.alpha = t;
+                yield return null;
+            }
+            _rankToastPoints.text = (gain.delta > 0 ? "+" : "") + gain.delta + " PTS  |  " + gain.after + " TOTAL";
+            _rankToastGroup.alpha = 1f;
+            ChogResultScreen.ClearPendingRank(address, gameId);
+            yield return new WaitForSecondsRealtime(2f);
+            _rankToast.gameObject.SetActive(false);
         }
 
         private void Refresh()
