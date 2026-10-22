@@ -49,10 +49,10 @@ submitting. Character counts are for the 8,000-character fields.
 
 ## 02 Show it
 
-- **App link:** `https://chogarena.vercel.app` (pages on Vercel, services on Render behind `/api/`, see
-  `docs/DEPLOY.md`). **Known on 16 October 2026:** MetaMask's dApp scan labels this new address a "drainer",
-  as it did a blank test page the same evening; MetaMask then shows "Continue at your own risk" when
-  connecting. The owner decides whether to report it to Blockaid.
+- **App link:** `https://chogtanks.vercel.app/chog-balls-stars/` (pages on Vercel, services on Render behind
+  `/api/`, see `docs/DEPLOY.md`). The first address, `https://chogarena.vercel.app`, sends players there:
+  MetaMask's dApp scan labels that new address a "drainer" (a false positive it also gave a blank test page),
+  while it judges the owner's earlier Chog game, chogtanks.vercel.app, clean (22 October 2026).
 - **Demo video:** **[not yet]** (script below).
 - **Tech stack:** Unity 6 (WebGL, mobile first), Photon Quantum 3 (deterministic simulation,
   server-side input recording), Node.js services (wallet sign-in, Photon custom authentication and
@@ -88,7 +88,7 @@ submitting. Character counts are for the 8,000-character fields.
 > "careerOf(uint256)((uint32,uint32,uint32,uint32,uint32,uint16,uint16,uint64))" 1795 --rpc-url
 > https://rpc.monad.xyz` answers matches, wins, draws, rented, as a guest, streak, best streak, last
 > played (for #1287 that day: 3, 2, 0, 1, 1, 1, 1, 1792230364); the game reads the same through
-> https://chogarena.vercel.app/api/career?tokens=1795. The rental, the wager and the shop are the
+> https://chogtanks.vercel.app/chog-balls-stars/api/career?tokens=1795. The rental, the wager and the shop are the
 > contracts listed in the tech stack above.
 
 ## 04 Why Chog matters (the "NFT gate")

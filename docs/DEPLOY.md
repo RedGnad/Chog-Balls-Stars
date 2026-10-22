@@ -351,6 +351,15 @@ calls Render directly, and cron-job.org keeps calling `https://chog-genesis-game
 
 ## MetaMask's site scan (found 16 October 2026)
 
+**Way out taken on 22 October 2026.** The game is played at `https://chogtanks.vercel.app/chog-balls-stars/`:
+the owner's earlier game's address answers `NONE` (with or without the path; a `vercel.app` page is judged by
+its hostname), and no domain could be bought. The chogtanks project's front (`tools/release/chogtanks_front.sh`)
+passes `/chog-balls-stars/` on to this game's Vercel project and everything else to the chogtanks deployment of
+10 October; Render's `PUBLIC_ORIGIN` is `https://chogtanks.vercel.app` and the domain is allowed at Reown; a page
+opened at `chogarena.vercel.app` is sent there (`tools/release/vercel_site.sh`). Deploying the front from inside
+this repository was blocked by Vercel (`TEAM_ACCESS_REQUIRED`, the commit author), so the script deploys from a
+temporary folder.
+
 MetaMask blocks `chog-genesis-game.onrender.com` with a warning page before anything is connected. The
 extension asks `https://dapp-scanning.api.cx.metamask.io/v2/scan?url=<hostname>` (constants
 `PHISHING_DETECTION_BASE_URL` and `PHISHING_DETECTION_SCAN_ENDPOINT` in

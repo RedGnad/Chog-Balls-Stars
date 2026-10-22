@@ -33,9 +33,10 @@ services:
       # The public address of the game, without a trailing slash; it is written in the message a
       # wallet signs. Since 16 October 2026 the pages are served by Vercel
       # (tools/release/vercel_site.sh), which passes /api/ on to this service; a page asked here is
-      # sent there (movedToPublic in server/src/static.js).
+      # sent there (movedToPublic in server/src/static.js). Since 22 October 2026 the game is played at
+      # https://chogtanks.vercel.app/chog-balls-stars/ (tools/release/chogtanks_front.sh): an origin has no path.
       - key: PUBLIC_ORIGIN
-        value: https://chogarena.vercel.app
+        value: https://chogtanks.vercel.app
       - key: SESSION_SECRET
         generateValue: true
       # What Photon's dashboard sends with its requests (docs/DEPLOY.md, "Photon"). Asked when
