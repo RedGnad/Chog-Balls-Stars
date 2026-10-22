@@ -117,7 +117,13 @@ results as before while `WAGER_ADDRESS` still names version 1, and the game enco
 version `/api/wager` tells it. Tests: `test/ChogWager.t.sol` (the split, the signed list, the cap,
 the deploy bound, a fuzz that every unit is with a winner, a Genesis player or burned).
 
-**Deployed on Monad mainnet on 22 October 2026 at `0xc2c1e282dd8c1cc2a4689972ac9c48d3b1454425`** (block 115554918,
+**Version 3 (one signature to stake: the services relay the player's EIP-2612 permit with its ticket, `stakeWithPermit`)
+deployed on Monad mainnet on 22 October 2026 at `0xa9d1faa2e09753f5419d768cae05b1e2596b3e4f`** (block 115733839, transaction
+`0x8a05bc5536e4579694ef9840b340a501b4a4358a321623b1117792074a93a743`; `/api/wager` read back the same evening: version 3,
+relay true, referee `0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34`, burnedShare 500, genesisShare 500). Version 2 below is
+no longer used.
+
+**Version 2 deployed on Monad mainnet on 22 October 2026 at `0xc2c1e282dd8c1cc2a4689972ac9c48d3b1454425`** (block 115554918,
 transaction `0x9785295a1c5568cc81394488b6c5b0d70f0c9ae621a2aaa3ab3497814b3053aa`; read back the same day: referee
 `0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34`, owner `0x981F6E0Ea94f45fDB8ee7680DC862212E3C720e0`, burnedShare 500,
 genesisShare 500, $CHOG). The password prompt needs a real terminal: run from a `!` line, forge fails with
