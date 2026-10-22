@@ -1490,7 +1490,7 @@ Sheet: [clothes-batch3-2026-10-22.jpg](../../research/evidence/clothes-batch3-20
 the collar, the top of the chest and the sleeves show, which limits what the art says. Values seen (two Genesis each): Orange, Yellow, Mon, Electro Hoodie, Tuxedo, Red and Orange Sleeveless, Golden Armor, toad blue suit, pink and purple
 vest, Yellow and Blue 143 Jersey, White Sleeveless, Brown and Grey Homeless Shirt, dark, Red and Blue jacket, Sci Fi, Virgin, red, blue and dark tee, White Shirt, Purple, Grey and Black Shirt, White Yukata.
 
-- **Golden Armor** (17): the art has big rounded gold plates over the shoulders with two rivets each; ours was a striped shirt. `build_armor`, `add_pauldrons`: a plate 0.184 wide on each shoulder (on the sleeve parts) with two rivets.
+- **Golden Armor** (17): the art has big rounded gold plates over the shoulders with two rivets each; ours was a striped shirt. `build_armor`, `add_pauldrons`: a plate 0.184 wide on each shoulder (on the sleeve parts) with a rivet (3 stacks, 8 sides, to keep #1742, Golden Armor with the new Chog Viper eyes, at 7,960 after rebasing on main: 8,060 with two rivets and 4 stacks).
   The chest stays bands of gold.
 - **Sci Fi** (15): the art draws an orange jumpsuit with a thick dark ring round the neck carrying a row of small teal lights, and a dark harness over the chest. `lay_scifi`: the ring, five teal lights, two straps from the shoulders
   to the chest. The round teal patch on the shoulder is not drawn.

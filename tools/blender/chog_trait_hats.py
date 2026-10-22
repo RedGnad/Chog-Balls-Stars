@@ -1939,8 +1939,8 @@ def add_pauldrons(maker, entry):
     body = maker.body
     for (sleeve, on), side in zip(maker.parts[1:3], (1.0, -1.0)):
         centre = Vector((side * 0.030, 0.0, 0.030))
-        sleeve.shell(base.ball_rings(centre, Z, X, 0.052, 0.092, 0.080, 4), 9, sleeve.named("Plate"), 0.012)
-        for turn in (-35.0, 35.0):
+        sleeve.shell(base.ball_rings(centre, Z, X, 0.052, 0.092, 0.080, 3), 8, sleeve.named("Plate"), 0.012)
+        for turn in (-30.0,):
             angle = math.radians(turn)
             point = centre + Vector((side * 0.092 * math.sin(angle) * 0.9, -0.080 * math.cos(angle) * 0.9, 0.040))
             disc_on(sleeve, SimpleNamespace(middle=centre), point, (point - centre).normalized(), 0.011, sleeve.named("Rivet"), segments=6)
