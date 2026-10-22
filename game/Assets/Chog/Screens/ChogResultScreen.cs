@@ -183,7 +183,11 @@ namespace Chog.Screens
             }
 
             if (playing)
+            {
                 controls.BuildRank(host.transform);
+                // The stake of this match, when this device staked on it (nothing otherwise).
+                WagerResultCard.Show(host.transform, localTeam);
+            }
 
             var again = ChogUi.Button("PlayAgain", host.transform, new Vector2(0.545f, 0.09f), new Vector2(0.80f, 0.215f), ChogTheme.ButtonKind.Primary,
                 "PLAY AGAIN", 60f);

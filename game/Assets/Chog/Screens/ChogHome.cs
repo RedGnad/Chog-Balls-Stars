@@ -137,6 +137,7 @@ namespace Chog.Screens
             GenesisCareers.Changed += Refresh;
             GenesisRental.Changed += Refresh;
             GenesisForms.Changed += Refresh;
+            ChogPrice.Changed += Refresh;
             if (_ribbonName != null)
                 Refresh();
             RestartRankRefresh();
@@ -155,6 +156,7 @@ namespace Chog.Screens
             GenesisCareers.Changed -= Refresh;
             GenesisRental.Changed -= Refresh;
             GenesisForms.Changed -= Refresh;
+            ChogPrice.Changed -= Refresh;
         }
 
         // The mural is a separate background layer based on the approved Chog-head direction. It contains
@@ -455,7 +457,7 @@ namespace Chog.Screens
             var balance = GenesisRental.BalanceWei;
             _chogPill.SetActive(ready && balance.Length > 0);
             if (balance.Length > 0)
-                _chogWords.text = Compact(MonadTransactions.PriceText(balance));
+                _chogWords.text = ChogPrice.PillText(balance);
 
             // The ribbon and the chips: the name of the hero and its kit as it will be played.
             if (index >= 0)
@@ -497,18 +499,6 @@ namespace Chog.Screens
                 if (_portrait != null && _portraitFor == metadata)
                     _portrait.texture = texture;
             });
-        }
-
-        // "39.03", "12.4K", "3.1M": an amount that fits its pill.
-        private static string Compact(string amount)
-        {
-            if (!double.TryParse(amount, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
-                return amount;
-            if (value >= 1e6)
-                return (value / 1e6).ToString("0.#", CultureInfo.InvariantCulture) + "M";
-            if (value >= 1e4)
-                return (value / 1e3).ToString("0.#", CultureInfo.InvariantCulture) + "K";
-            return amount;
         }
 
         // The stage: the sheet of the Genesis played; a recruit sees every hero instead.
