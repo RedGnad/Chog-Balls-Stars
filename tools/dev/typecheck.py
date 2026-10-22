@@ -23,7 +23,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 GAME = ROOT / "game"
-DAG = "Library/Bee/artifacts/2000b0aE.dag"
+def editor_dag(assembly="Chog.Match"):
+    """The Editor's compile folder for "assembly" (its name changes, as after a build from an empty
+    cache): the one whose arguments for it were written last."""
+    found = sorted((GAME / "Library/Bee/artifacts").glob(f"*.dag/{assembly}.rsp"), key=lambda path: path.stat().st_mtime)
+    return str(found[-1].parent.relative_to(GAME)) if found else "Library/Bee/artifacts/2000b0aE.dag"
+
+
+DAG = editor_dag()
 OUT = ROOT / ".artifacts/typecheck"
 SDK = Path("/Applications/Unity/Hub/Editor/6000.6.4f1/Unity.app/Contents/Resources/Scripting/DotNetSdk")
 OWN_ASSEMBLY_FOLDERS = {"Tests", "Editor"}
@@ -47,13 +54,23 @@ def main():
     parser.add_argument("--unsafe", action="store_true")
     args = parser.parse_args()
 
-    arguments = GAME / DAG / f"{args.assembly}.rsp"
-    if not arguments.is_file():
+    arguments = GAME / editor_dag(args.assembly) / f"{args.assembly}.rsp"
+    saved = OUT / f"{args.assembly}.check.rsp"
+    if arguments.is_file():
+        text = arguments.read_text()
+    elif saved.is_file():
+        # The Editor no longer writes them (its compile folder was rebuilt without the tests): the
+        # arguments of the last check, moved to the current folder, without references it lacks.
+        print(f"{args.assembly}: no compiler arguments from the Editor; using those of the last check")
+        text = re.sub(r"Library/Bee/artifacts/[0-9a-zA-Z]+\.dag", DAG, saved.read_text())
+        text = "\n".join(line for line in text.splitlines()
+                         if not (line.startswith(f'-r:"{DAG}/') and not (GAME / line[4:-1]).is_file()))
+    else:
         print(f"{args.assembly}: no compiler arguments at {arguments}; let the Editor compile the project once")
         return 2
 
     lines = []
-    for line in arguments.read_text().splitlines():
+    for line in text.splitlines():
         if re.match(r"^(-analyzer|-out:|-refout:|/additionalfile|-additionalfile|-ruleset)", line):
             continue
         if any(f"/{name}.ref.dll" in line for name in args.use):
