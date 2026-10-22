@@ -183,6 +183,8 @@ approximate (lenses a little small), BTC Glass (#189, #288, #510) approximate (c
 
 Batch 7, Left lasers ([sheet](heroes-eyes-batch7-lasers-2026-10-22.jpg)): Purple, fire and cyan laser on Side Left (#127, #137, #252, #36, #25, #418): wrong eyes (two equal), now a large near eye and a narrow far one with the beam from the middle of each: approximate.
 
+Batch 8 ([sheet](heroes-eyes-batch8-2026-10-22.jpg)): Chog Viper L approximate (thicker frame; lettering and the lens gradient not exact); Retro Glass R approximate (reads as the art). The strict audit of the Origin Eyes values is complete.
+
 ## The 64 Origin rows
 
 <!-- audit table start -->

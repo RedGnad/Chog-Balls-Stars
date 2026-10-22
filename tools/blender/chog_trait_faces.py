@@ -1443,7 +1443,8 @@ EYES = {
         "colours": {"Frame": (0.84, 0.86, 0.90), "Deep": (0.10, 0.18, 0.78), "Blue": (0.12, 0.42, 0.92),
                     "Cyan": (0.30, 0.78, 0.96), "Light": (0.62, 0.92, 0.98)},
         "unlit": ("Deep", "Blue", "Cyan", "Light"),
-        "numbers": {"PIECES": ("Deep", "Blue", "Cyan", "Light", "Cyan", "Blue", "Deep")},
+        # (22 October 2026, strict audit, batch 8, on #4, #50, #109: the lens of the pictures sits in a thick white frame, about 0.016 all round.)
+        "numbers": {"PIECES": ("Deep", "Blue", "Cyan", "Light", "Cyan", "Blue", "Deep"), "RIM": (0.016, 0.016)},
     },
     # Headsets: CHOG #491 (Modern VR: a black lens in a glowing cyan rim, a curved glint) and #46,
     # #191 (Classic VR: a thick grey frame, a black lens, glare stripes).

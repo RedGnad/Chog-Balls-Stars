@@ -1517,3 +1517,10 @@ Purple, fire and cyan laser on Side Left (68 Origin and 3 Skull Genesis; #127, #
 [heroes-eyes-batch7-lasers-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch7-lasers-2026-10-22.jpg). The beam already started at the middle of the visible eye (lot 8, `centroid`); what was wrong is that the eyes were two equal lidded eyes where the pictures
 draw, as on every Side Left value, a large flat near eye and a small narrow far one: the three Left laser entries now take `SIDE_LEFT_EYES` (`eye_numbers`), and each beam leaves the middle of its own eye. Seen from the front the beam is a coloured patch
 at the middle of the eye, as in the art. Approximate: the beams stay short stubs (the game draws the long beam when the hero attacks), the art's near eye is a little wider.
+
+## 22 October 2026: strict eye audit, batch 8: Chog Viper and the rest of Retro Glass (lot 8)
+
+Sheet, 6 Genesis (#4, #50, #109 Chog Viper L; #1184, #1621, #312 Retro Glass R), the art beside the front and three quarter close (after only: these two values changed little, the before is batches 1 and 6):
+[heroes-eyes-batch8-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch8-2026-10-22.jpg).
+- **Chog Viper, Left: approximate, made closer.** A thick white frame round the lens (`RIM` 0.016 all round). Still differs: the art's lens is a deeper, rounder goggle with a gradient from dark blue to white and the CHOG lettering (not drawn), a thick strap.
+- **Retro Glass, Right: approximate.** The half-lidded, frowning eyes of batch 1 read as the art (light blue irises under a heavy lid, red thin frame); the art's iris is a little paler and the glints larger. Nothing changed.
