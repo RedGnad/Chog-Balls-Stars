@@ -78,7 +78,7 @@ services:
       # The deployed wager contract and the key of its referee (contracts/README.md): both or
       # neither. Leave empty while there is none: no match is then staked on.
       - key: WAGER_ADDRESS
-        value: "0xc7524a808d2b00b43a4d3e2becb8500e409b41e3"
+        value: "0xc2c1e282dd8c1cc2a4689972ac9c48d3b1454425"
       # The key of the referee 0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34 (.artifacts/services-public/
       # mainnet-referee-key on the development Mac): pasted when the service is created, never written here.
       - key: REFEREE_KEY

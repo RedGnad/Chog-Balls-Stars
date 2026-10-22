@@ -526,8 +526,9 @@ namespace Chog.Screens
             private IEnumerator FlyPoints(PlayerRankGain gain, PlayerRank rank, bool tierChanged)
             {
                 var sparks = Mathf.Min(gain.delta, MaxSparks);
-                var canvas = _rankMoment.GetComponentInParent<Canvas>();
-                var layer = canvas != null ? canvas.transform : _rankMoment.parent;
+                // The sparks fly on the screen the window sits on (anchored at its centre, the points of
+                // the "+N" and of the bar brought into that same space), over everything of it.
+                var layer = (RectTransform)_rankMoment.parent;
                 var from = (RectTransform)_rankAmount.transform;
                 var to = _rankFill.parent as RectTransform;
                 var flying = new System.Collections.Generic.List<(RectTransform spark, float born, Vector2 start, Vector2 end, float bend)>();
@@ -591,12 +592,14 @@ namespace Chog.Screens
                 return spark;
             }
 
-            // A point of a rect ("offset" in shares of its size from its centre) as an anchored position in "layer".
-            private static Vector2 WorldCentre(RectTransform rect, Transform layer, Vector2 offset)
+            // A point of a rect ("offset" in shares of its size from its centre) as the anchored position of a
+            // spark pinned at the centre of "layer": the local point of the layer, offset by where its own
+            // centre lies (its pivot may not be its middle).
+            private static Vector2 WorldCentre(RectTransform rect, RectTransform layer, Vector2 offset)
             {
                 var world = rect.TransformPoint(new Vector3(rect.rect.width * offset.x, rect.rect.height * offset.y, 0f) + (Vector3)rect.rect.center);
-                var local = layer.InverseTransformPoint(world);
-                return new Vector2(local.x, local.y);
+                var local = (Vector2)layer.InverseTransformPoint(world);
+                return local - layer.rect.center;
             }
 
             private IEnumerator PulseBar()
