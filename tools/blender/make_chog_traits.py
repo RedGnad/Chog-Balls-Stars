@@ -128,10 +128,17 @@ POLISH = {
     "LEAF_WIDTH": 1.0,
     # The nose is a little smaller than on H3: it has to show between a pair of glasses and a grin.
     "NOSE": (0.0, -0.042, 0.018, 0.012),
-    # The face spans the head as the pictures draw it, more so at the brow; the cheeks and the teeth
-    # of hair follow. (H3: 0.225 wide from its middle, 0.10 wider at the brow.)
-    "FACE_HALF_WIDTH": 0.250,
-    "FACE_TAPER": 0.22,
+    # The face fills the front of the head, as the pictures draw it (22 October 2026): up to the edge of the
+    # hood, the hat or the costume, and at the sides up to the skin of the crown. Its edge follows the egg of
+    # the head: at each height it takes FACE_FIT of the width the head has there (face_place), so the cream
+    # runs out to the side of the head and the dark skin ring around it is gone. FACE_TOP is how far the brow
+    # stands above the middle of the face (FACE_HALF_HEIGHT, of H3, is how far the chin stands below it).
+    # (Until then: a rounded square 0.250 from its middle, 0.305 at the brow, 0.178 high, which left 0.04 of
+    # bare skin each side of the cheeks and 0.12 above the brow: the owner saw a delimited oval, smaller than
+    # the face of the pictures. FACE_FIT 0.85 at the cheeks, 0.47 at the brow corner.)
+    "FACE_FIT": 0.985,
+    "FACE_TOP": 0.235,
+    "FACE_SQUARENESS": 4.0,
     "CHEEK": (0.180, -0.062, 0.046, 0.032),
     "FRINGE_WIDTH": 0.088,
     "FRINGE_DROP": 0.050,
@@ -143,8 +150,8 @@ POLISH = {
     # closes it goes. FACE_OVER: how much higher than the face the cheeks and the nose lie, and the teeth of
     # hair. (A face 0.0030 off the egg let a point of the head show through it at the cheek: the quads by its
     # edge sag up to 0.0032 between their corners.)
-    "FACE_LIFT": 0.0038,
-    "FACE_OVER": (0.0016, 0.0046),
+    "FACE_LIFT": 0.0046,
+    "FACE_OVER": (0.0008, 0.0038),
     "FACE_RING_SHARES": (0.2, 0.4, 0.6, 0.8, 1.0),
     "FACE_SEGMENTS": 24,
     "FACE_EDGE": (0.012, 0.0012, 0.0020, 0.005, 0.012),
@@ -832,14 +839,73 @@ def along_egg(surface, start, away, distance, lift):
 
 
 def face_place(numbers, angle, amount):
-    """A place of the face (to the side, above its middle): on its edge at "angle" when "amount" is 1, as
-    patch_loops of make_chog_full.py lays it (rounded square, wider at the brow)."""
-    width, height = numbers.FACE_HALF_WIDTH, numbers.FACE_HALF_HEIGHT
+    """A place of the face (to the side, above its middle): on its edge at "angle" when "amount" is 1. The
+    edge is a rounded square whose width at each height is FACE_FIT of the width of the egg of the head at
+    that height (22 October 2026: it was a fixed oval, so a head narrower at the brow and at the chin left
+    a ring of skin round the face), FACE_TOP above the middle of the face and FACE_HALF_HEIGHT below."""
     cosine, sine = math.cos(angle), math.sin(angle)
-    x = width * power(cosine, numbers.FACE_SQUARENESS)
-    z = height * power(sine, numbers.FACE_SQUARENESS)
-    x *= 1.0 + numbers.FACE_TAPER * z / height
-    return x * amount, z * amount
+    z = (numbers.FACE_TOP if sine >= 0.0 else numbers.FACE_HALF_HEIGHT) * power(sine, numbers.FACE_SQUARENESS)
+    height = numbers.FACE_MIDDLE[1] + z * amount
+    room = numbers.HEAD_HALF_WIDTH * math.sqrt(max(1.0 - (height / numbers.HEAD_HALF_HEIGHT) ** 2, 0.0))
+    return numbers.FACE_FIT * room * power(cosine, numbers.FACE_SQUARENESS) * amount, z * amount
+
+
+def opening_rim(numbers, size, margin, tail, step=3.0):
+    """The edge of a hood or a helmet round the face, as a table (degrees from the front, polar degrees: the
+    "RIM" of chog_trait_hats.py), made to follow the edge of the face (22 October 2026). Until then the tables
+    were typed in for a smaller face, and a bigger one went under the hood or left a band of skin round it.
+    "size(degrees from the front)" is how much larger than the head the shell is there. For each degree from
+    the front, the rim is the first polar angle, from the top down, at which the shell leaves the sky and
+    enters the face seen from the front, its edge pushed out by "margin" (the dark line and the roll of the
+    hood). Past the last degree at which the shell meets the face (its side), "tail" (the same kind of table)
+    takes over: the hood closes down to the jaw and the back."""
+    key = (tuple(numbers.FACE_MIDDLE), numbers.FACE_FIT, numbers.FACE_TOP, numbers.FACE_HALF_HEIGHT,
+           numbers.FACE_SQUARENESS, numbers.HEAD_HALF_WIDTH, numbers.HEAD_HALF_HEIGHT, margin, step, tuple(tail),
+           tuple(size(degrees) for degrees in range(0, 181, 10)))
+    if key in OPENING_RIMS:
+        return OPENING_RIMS[key]
+    middle = (0.0, numbers.FACE_MIDDLE[1])
+    outline = []
+    for index in range(120):
+        x, up = face_place(numbers, 2.0 * math.pi * index / 120, 1.0)
+        point = (x, numbers.FACE_MIDDLE[1] + up)
+        away = math.hypot(point[0] - middle[0], point[1] - middle[1])
+        grown = 1.0 + margin / max(away, 1e-6)
+        outline.append((middle[0] + (point[0] - middle[0]) * grown, middle[1] + (point[1] - middle[1]) * grown))
+
+    def inside(x, z):
+        crossings = False
+        for (x1, z1), (x2, z2) in zip(outline, outline[1:] + outline[:1]):
+            if (z1 > z) != (z2 > z) and x < x1 + (z - z1) * (x2 - x1) / (z2 - z1):
+                crossings = not crossings
+        return crossings
+
+    table, degrees = [], 0.0
+    while degrees <= 180.0:
+        shell = size(degrees)
+        sideways = numbers.HEAD_HALF_WIDTH * shell * math.sin(math.radians(degrees))
+        found = None
+        for half_degrees in range(0, 360):
+            polar = math.radians(half_degrees * 0.5)
+            if inside(sideways * math.sin(polar), numbers.HEAD_HALF_HEIGHT * shell * math.cos(polar)):
+                found = half_degrees * 0.5
+                break
+        if found is None:
+            break
+        table.append((degrees, found))
+        degrees += step
+    if not table:
+        raise SystemExit("CHOG_TRAITS opening_rim: the shell never meets the face")
+    # Where the shell no longer meets the face its side edge drops, almost upright, from there down to the
+    # first line of the tail (about 7 degrees round the head).
+    last, last_polar = table[-1]
+    drop = tail[0][1]
+    table += [(last + 3.0, last_polar + (drop - last_polar) * 0.5), (last + 7.0, drop)]
+    OPENING_RIMS[key] = tuple(table) + tuple(item for item in tail if item[0] > last + 8.0)
+    return OPENING_RIMS[key]
+
+
+OPENING_RIMS = {}
 
 
 def face_edge_angles(numbers, surface, segments):
@@ -927,7 +993,7 @@ def add_settled_face(part, numbers, surface):
     # through it (0.0015 over the face, in one triangle, it did).
     teeth = numbers.FRINGE_TEETH
     if teeth:
-        brow = numbers.FACE_HALF_HEIGHT * 0.995
+        brow = numbers.FACE_TOP * 0.995
         hair = lift + numbers.FACE_OVER[1]
         tip = brow - numbers.FRINGE_DROP
         for index in range(teeth):
