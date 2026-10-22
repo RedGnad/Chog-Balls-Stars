@@ -203,7 +203,8 @@ namespace Chog.Screens
                 ChogTheme.ButtonKind.Quiet, "", 30f);
             var plate = ChogTheme.ImageOf(chip);
             ChogTheme.AsCard(plate, raised: true);
-            chip.onClick.AddListener(Rename);
+            // The chip opens the player's profile, which can also rename (22 October 2026).
+            chip.onClick.AddListener(() => ChogProfile.Open(_main.transform, PlayerName, Rename));
 
             var portrait = ChogUi.Pinned("Portrait", chip.transform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(12f, 0f),
                 new Vector2(90f, 90f));
@@ -398,7 +399,7 @@ namespace Chog.Screens
             _stage.Show(played > 0 && ChogHeroModel.Has(played) ? played : ChogHeroModel.Recruit);
 
             // The sample writes the player's name when its screen shows and after a change.
-            var name = _usernameLabel is TMP_Text tmp ? tmp.text : _usernameLabel is Text legacy ? legacy.text : "";
+            var name = PlayerName();
             if (name != _shownName)
             {
                 _shownName = name;
@@ -634,7 +635,9 @@ namespace Chog.Screens
                 ChogCollection.Open(_main.transform);
         }
 
-        // The chip: the sample's window that changes the player's name, over everything else.
+        private string PlayerName() => _usernameLabel is TMP_Text tmp ? tmp.text : _usernameLabel is Text legacy ? legacy.text : "";
+
+        // The sample's window that changes the player's name, over everything else (from the profile).
         private void Rename()
         {
             if (_usernameView != null)

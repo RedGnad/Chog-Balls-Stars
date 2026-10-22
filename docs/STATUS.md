@@ -1,5 +1,10 @@
 # État courant et décisions
 
+**22 October 2026, 20:55 UTC (lead: the player profile; deployed).**
+- **Deployed:** build `20261022T204810762Z-0a2072c290e5405fa52f1de5eda02279`, stamp `7e77d8cf4a7c1e99`. The chip at the top left opens a PROFILE (`ChogProfile`): name and CHANGE NAME (the sample's window), the player rank with its tier, points and bar, the verified sieges played and won with the win rate and the last season's tier, the wallet's Genesis (up to eight) with their mastery and matches, the badges they earned. Every number from the services (PlayerRanks, GenesisCareers). Modelled on the profiles of Clash Royale and Brawl Stars (wikis and trackers, not official documents).
+- **Verified:** 176 view tests; the profile with a holder test wallet (not signed in); a local siege without error; judge fixtures agree.
+- **Not verified:** the profile of a signed-in wallet with a rank (the owner's).
+
 **22 October 2026, 20:45 UTC (lead: smirk, coin, Angry eyes, ushanka colour, home card, stake notice, admin off; deployed).**
 - **Deployed:** build `20261022T203149800Z-026af36ab42042d2b5bd0e185d888873`, stamp `7e77d8cf4a7c1e99` (unchanged since 20:20). Smirk: both eyes tilted the same way, as the seven Smirk pictures (`SAME_TILT`); the coin held in the teeth upright and turned to the stage camera (`COIN_TURN` 34, -6), `try-coin.jpg`; Angry on Side Left a black half disc under a flat lid with a large glint (#410, #29, #276; `try-angry.jpg`); the ushanka one fur, crown as the flap, squarer (`try-chapka3.jpg`). Home: the card's foot at 0.305, clear of SIEGE and PLAY when hovered. The stake notice of the menu a gold-framed card with the $CHOG coin in the middle of the top bar, in the theme's fonts. Admin testing off (`PlayerWallet.AdminTesting`), at the owner's request; the services still accept it.
 - **Verified:** export 1,970 Genesis, 0 failed, none over 8,000; 176 view tests; a local siege without error; the home with a holder test wallet (card clear of the buttons); judge fixtures agree.
