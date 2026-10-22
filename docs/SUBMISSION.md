@@ -22,21 +22,24 @@ submitting. Character counts are for the 8,000-character fields.
 > traits decide how it plays: its outfit gives its class (brute, ranger, controller), its eyes its
 > special attack, its aura the effect of that attack, its rarity how the attack is delivered, and its
 > hat what its basic attack throws: snowballs from a Russian Hat, dollar coins from a Dollar Cap, its
-> own cap spinning like a frisbee from a word cap, a leaf of its spiky crown when it wears nothing.
+> own cap spinning like a frisbee from a word cap, a leaf of its spiky crown when it wears nothing;
+> a full costume throws what it is: fireballs from a Dragon suit, sea water from a Shark Suit,
+> bananas from a Banana suit, a little ringed planet from an Astro Suit.
 > Two modes: SIEGE, where each team defends a tower with a Chog's head that shoots lasers from its eyes
 > and a beating heart for a core, three minutes to bring the other core down or to do more damage; and
 > COINS, a race for the coins of the arena. Matches are played on Photon Quantum's deterministic engine; after each match our services replay
 > the recorded inputs to decide the winner themselves, so a result can be trusted with $CHOG at
 > stake. Each Genesis keeps a public career that follows the NFT, not the wallet (matches, wins,
 > badges, mastery; mastery 2 unlocks the second form of its special), and the Genesis with the most
-> wins are listed in TOP on the home screen. That career is written on Monad mainnet by our referee
+> wins are listed in TOP on the home screen. Every signed-in player also climbs a ladder (Bronze,
+> Silver, Gold, Star) on the matches the replay has decided, shown on the end screen and at home. That career is written on Monad mainnet by our referee
 > once the replay has decided the match (the ChogCareers contract), so anyone can read it and it
 > follows the Genesis to its next holder. $CHOG runs through our contracts on Monad mainnet: players
 > stake $CHOG on their own team and the winners are paid on the replayed result; a holder rents their
 > Genesis out at a price a day while keeping it in their wallet, the renter's payment is earned by the
 > second and the rental ends, with the rest paid back, when the holder sells the Genesis; and the
 > second form of a Genesis can be bought now instead of at mastery 2. A tenth of every payment is
-> burned. A holder can also lend their Genesis for free with a link, without moving it. The screens
+> burned. The home screen shows the player's $CHOG and what it is worth in dollars. A holder can also lend their Genesis for free with a link, without moving it. The screens
 > follow the language of the arena brawlers players know: a home screen with the hero on its pedestal
 > and its mastery road, a sheet for each of the 1,969 heroes that says which trait gives which power,
 > the moment a Genesis comes to life when its wallet connects, and a coach for the first match.
@@ -120,8 +123,8 @@ submitting. Character counts are for the 8,000-character fields.
 
 ## 06 What's next
 
-> The special attacks in 3D; seasons and a ladder per mode; more items for a Genesis in the shop;
-> tournaments staked in $CHOG.
+> The special attacks in 3D; the ladder's seasons and matchmaking by rating in the game (both
+> already kept by the services); more items for a Genesis in the shop; tournaments staked in $CHOG.
 
 ## The 3-minute video (script)
 
