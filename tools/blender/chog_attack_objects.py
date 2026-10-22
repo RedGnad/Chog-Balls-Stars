@@ -322,13 +322,20 @@ def build_yellow_ring(shapes, word_pieces):
 
 
 def build_spear(shapes, word_pieces):
-    tube(shapes, Y * 0.30, FORWARD, [(0.0, 0.014), (0.40, 0.014)], shapes.named("Shaft"), sides=8)
-    tube(shapes, Y * -0.10, FORWARD, [(0.0, 0.03), (0.04, 0.045), (0.16, 0.0)], shapes.named("Tip"), sides=6)
+    """A Spartan's spear, pointing along -Y: a thick shaft, a broad leaf of a blade in front, a short spike at the back.
+    (23 October 2026, the owner: "the spear is small, is that normal?" The game brings every object to the same largest
+    size, its length for a spear: a shaft 0.028 thick and a blade 0.09 wide came out as a stick. Thicker now, the blade a
+    leaf twice as wide.)"""
+    # (Then still a line from the game camera: a chunky toy spear now, as the genre draws them.)
+    tube(shapes, Y * 0.30, FORWARD, [(0.0, 0.042), (0.40, 0.042)], shapes.named("Shaft"), sides=8)
+    tube(shapes, Y * -0.10, FORWARD, [(0.0, 0.055), (0.04, 0.115), (0.14, 0.095), (0.25, 0.0)], shapes.named("Tip"), sides=6)
+    tube(shapes, Y * 0.30, -FORWARD, [(0.0, 0.050), (0.08, 0.0)], shapes.named("Tip"), sides=6)
 
 
 def build_arrow(shapes, word_pieces):
-    tube(shapes, Y * 0.24, FORWARD, [(0.0, 0.011), (0.40, 0.011)], shapes.named("Shaft"), sides=8)
-    tube(shapes, Y * -0.16, FORWARD, [(0.0, 0.026), (0.09, 0.0)], shapes.named("Tip"), sides=6)
+    # (Thicker on 23 October 2026, as the spear: brought to the size of the other objects by its length, it was a line.)
+    tube(shapes, Y * 0.24, FORWARD, [(0.0, 0.019), (0.40, 0.019)], shapes.named("Shaft"), sides=8)
+    tube(shapes, Y * -0.16, FORWARD, [(0.0, 0.045), (0.11, 0.0)], shapes.named("Tip"), sides=6)
     for u in (X, Z):
         vane = ((0.0, 0.0), (0.06, 0.03), (0.06, 0.13), (0.0, 0.10))
         prism(shapes, vane, Y * 0.12, u, Y, 0.006, shapes.named("Feather"), outline=0.006)

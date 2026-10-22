@@ -148,10 +148,11 @@ namespace Chog.Match
             };
 
             _started = Time.time;
-            // "&t=0.15": stopped that long after the moment of the third turn (the pools are warm by then).
+            // "&t=0.15": stopped that long after the moment of the third turn (the pools are warm by then); "&t=-0.15" that long
+            // before it, an object still in flight.
             if (PerformanceSampling.TryGetQueryValue(url, "t", out var text) && float.TryParse(text,
                     System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var after))
-                _stopAt = _started + 2f * _period + Moment + Mathf.Max(0f, after);
+                _stopAt = _started + 2f * _period + Moment + Mathf.Max(-Moment, after);
             Debug.Log("CHOG_IMPACTS " + _cells.Count + " cells, effects " + GenesisEffects.Level);
         }
 
@@ -186,6 +187,9 @@ namespace Chog.Match
                 cell.Hero = Figure(number, cell.Place + Vector3.left * 2.2f, Vector3.right);
                 Figure(ChogHeroModel.Recruit, cell.Place + Vector3.left * 2.2f + Vector3.right * (cell.Reach + 0.5f), Vector3.left);
                 var attack = new GameObject("Attack " + number);
+                // Thrown to the right, as a match turns an attack where it goes (its view follows the simulation's rotation):
+                // a spear or a fireball points the way it flies (23 October 2026: the viewer left them pointing up the screen).
+                attack.transform.rotation = Quaternion.LookRotation(Vector3.right, Vector3.up);
                 attack.SetActive(false);
                 cell.Attack = attack.transform;
             }

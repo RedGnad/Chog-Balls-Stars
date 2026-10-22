@@ -1,5 +1,5 @@
 {
- "about": "Banner, second composition (23 October 2026, the owner: more creative, clearer, a better camera): a low camera near the ground with a wide lens and a tilted frame. The teams come at each other along a V that closes on the clash in the middle: the blue Dragon leaps at the lens at the front left, the red Shark answers at the front right, the others stand farther along each side, each one apart so every silhouette reads, and the two towers rise on the horizon behind the clash. Focal 1067 pixels across 1920 (20 mm): x units aside at depth d land 1067 x / d pixels from the middle. A whole costume (the dragon, the shark) holds the face in an opening of the body's volume: the head must not turn in it, so their poses keep the head in line with the body and lean the body less.",
+ "about": "Banner, second composition (23 October 2026, the owner: more creative, clearer, a better camera): a low camera near the ground with a wide lens and a tilted frame. The teams come at each other along a V that closes on the clash in the middle: the blue Dragon leaps at the lens at the front left, the red Shark answers at the front right, the others stand farther along each side, each one apart so every silhouette reads, and the two towers rise on the horizon behind the clash. Focal 1067 pixels across 1920 (20 mm): x units aside at depth d land 1067 x / d pixels from the middle. A whole costume (the dragon, the shark) holds the face in an opening of the body's volume: the head must not turn in it, so their poses keep the head in line with the body and lean the body less. Heroes chosen for varied looks (23 October 2026, the owner: three of them had the same green laser eyes): Dragon #773, Shark #1299, Wizard #334.",
  "size": [
   1920,
   1080
@@ -68,7 +68,7 @@
    }
   },
   {
-   "number": 77,
+   "number": 334,
    "team": "blue",
    "at": [
     -1.57,
@@ -100,7 +100,7 @@
    }
   },
   {
-   "number": 215,
+   "number": 1299,
    "team": "red",
    "at": [
     2.65,
@@ -125,7 +125,7 @@
    "scale": 1.0
   },
   {
-   "number": 42,
+   "number": 773,
    "team": "blue",
    "at": [
     -1.5,

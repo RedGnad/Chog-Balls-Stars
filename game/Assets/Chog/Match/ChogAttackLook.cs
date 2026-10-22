@@ -254,7 +254,9 @@ namespace Chog.Match
                 // Out, a little larger than thrown, then gone: the blow lasts as long as the attack.
                 var t = Mathf.Clamp01(_age / StrikeSeconds);
                 size *= 1.3f * Mathf.Sin(Mathf.PI * Mathf.Min(1f, t * 1.1f + 0.05f));
-                _object.localRotation = Quaternion.Euler(0f, 360f * t, 0f) * Rest();
+                // A thing that points (the fireball, the water, a spear) strikes point first; anything else whirls round
+                // (23 October 2026, the owner: "some thrown objects look backwards": a fireball whirling flat showed its tail first).
+                _object.localRotation = (_style == ChogHeroModel.AttackStyle.Point ? Turned(_age) : Quaternion.Euler(0f, 360f * t, 0f)) * Rest();
             }
             else if (_lob)
             {

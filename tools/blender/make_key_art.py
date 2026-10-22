@@ -183,7 +183,17 @@ def object_layer(thing, index, layout, folder):
                 cache[name] = material
         made.data.materials[slot_index] = cache[name]
     root.location = Vector(thing["at"])
-    root.rotation_euler = tuple(math.radians(value) for value in thing.get("turn", (0.0, 0.0, 0.0)))
+    if "from" in thing:
+        # A thrown object points where it flies: its front is -Y (chog_attack_objects), turned to the way from the hand to here,
+        # then rolled about that way by "roll" degrees. (23 October 2026, the owner: "the fireball, the water, the spear are
+        # backwards"; until then the turns were given by hand.)
+        flight = (Vector(thing["at"]) - Vector(thing["from"])).normalized()
+        turn = Vector((0.0, -1.0, 0.0)).rotation_difference(flight)
+        root.rotation_mode = "QUATERNION"
+        from mathutils import Quaternion
+        root.rotation_quaternion = Quaternion(flight, math.radians(thing.get("roll", 0.0))) @ turn
+    else:
+        root.rotation_euler = tuple(math.radians(value) for value in thing.get("turn", (0.0, 0.0, 0.0)))
     root.scale = Vector([thing.get("scale", 1.0)] * 3)
     scene = bpy.context.scene
     setup_render(scene, layout["size"], 32)

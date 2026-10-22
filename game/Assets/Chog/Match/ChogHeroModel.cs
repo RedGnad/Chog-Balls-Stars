@@ -40,6 +40,9 @@ namespace Chog.Match
 
         /// <summary>The largest side of every attack object in the arena, in world units.</summary>
         public const float AttackSize = 0.8f;
+        // An object this many times longer than it is wide is drawn this much larger (AttackMesh).
+        public const float LongObjectRatio = 3f;
+        public const float LongObjectGrowth = 1.6f;
 
         // The meshes of the attack objects, made once for each piece and skin: attacks come often.
         private static readonly Dictionary<long, (Mesh Mesh, Color Impact, Color Second)> s_attacks = new Dictionary<long, (Mesh, Color, Color)>();
@@ -383,7 +386,13 @@ namespace Chog.Match
             }
             var centre = (low + high) * 0.5f;
             var extent = high - low;
-            var scale = size / Mathf.Max(0.001f, Mathf.Max(extent.x, Mathf.Max(extent.y, extent.z)));
+            var longest = Mathf.Max(extent.x, Mathf.Max(extent.y, extent.z));
+            var scale = size / Mathf.Max(0.001f, longest);
+            // A long thin object (the spear, the arrow) brought to the size of a ball by its length is a line in flight
+            // (23 October 2026, the owner: "the spear is small, is that normal?"): it is made longer.
+            var middleExtent = extent.x + extent.y + extent.z - longest - Mathf.Min(extent.x, Mathf.Min(extent.y, extent.z));
+            if (longest > LongObjectRatio * Mathf.Max(0.001f, middleExtent))
+                scale *= LongObjectGrowth;
 
             var vertices = new Vector3[count];
             var normals = new Vector3[count];

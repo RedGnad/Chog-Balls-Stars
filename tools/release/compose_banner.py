@@ -191,7 +191,7 @@ def main():
     parser.add_argument("--out", default=os.path.join(ROOT, "research", "evidence", "banner-key-art.jpg"))
     parser.add_argument("--title", default="CHOG BALLS STARS")
     parser.add_argument("--tagline", default="BET $CHOG. WIN THE BRAWL.")
-    parser.add_argument("--footer", default="3v3 MOBA  •  1,969 CHOGS COME ALIVE  •  ON MONAD")
+    parser.add_argument("--footer", default="", help="a line under the heroes; none by default (the owner, 23 October 2026)")
     arguments = parser.parse_args()
     with open(os.path.join(arguments.layers, "layers.json"), encoding="utf-8") as file:
         layers = json.load(file)
@@ -269,9 +269,10 @@ def main():
     tagline = outlined_text(size, arguments.tagline, font("LilitaOne-Regular.ttf", round(54 * scale)), (width * 0.5, height * 0.315),
                             (255, 255, 255), (220, 210, 255), INK, round(6 * scale), (0, round(6 * scale)), tilt=2.0)
     picture.alpha_composite(tagline)
-    footer = outlined_text(size, arguments.footer, font("Nunito-Black.ttf", round(34 * scale)), (width * 0.5, height * 0.85),
-                           (255, 255, 255), (235, 230, 255), INK, round(5 * scale), (0, round(4 * scale)))
-    picture.alpha_composite(footer)
+    if arguments.footer:
+        footer = outlined_text(size, arguments.footer, font("Nunito-Black.ttf", round(34 * scale)), (width * 0.5, height * 0.85),
+                               (255, 255, 255), (235, 230, 255), INK, round(5 * scale), (0, round(4 * scale)))
+        picture.alpha_composite(footer)
 
     os.makedirs(os.path.dirname(arguments.out), exist_ok=True)
     picture.convert("RGB").save(arguments.out, quality=92)
