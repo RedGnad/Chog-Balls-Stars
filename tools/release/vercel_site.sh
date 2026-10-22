@@ -24,6 +24,26 @@ rsync -a --delete --exclude .vercel --exclude hero --exclude genesis-art --exclu
 rsync -a --delete "$ROOT/web/hero/" "$OUT/hero/"
 rsync -a --delete "$ROOT/site/genesis-art/" "$OUT/genesis-art/"
 
+# Since 22 October 2026 the game's public address is https://chogtanks.vercel.app/chog-balls-stars/ (MetaMask's
+# scan blocks this project's own address; tools/release/chogtanks_front.sh passes that path on to here). A page
+# opened at chogarena.vercel.app goes there, so the sign-in message (Render's PUBLIC_ORIGIN) names the page the
+# player is on; a page reached through chogtanks keeps its own address. CHOG_MOVED_TO= (empty) leaves it out.
+MOVED_TO=${CHOG_MOVED_TO-https://chogtanks.vercel.app/chog-balls-stars}
+if [ -n "$MOVED_TO" ]; then
+  for page in "$OUT/index.html" "$OUT/hero/index.html"; do
+    python3 - "$page" "$MOVED_TO" <<'PY'
+import sys
+from pathlib import Path
+page, moved_to = Path(sys.argv[1]), sys.argv[2]
+text = page.read_text(encoding='utf-8')
+script = ('<script>if(location.hostname==="chogarena.vercel.app")location.replace("' + moved_to
+          + '"+location.pathname+location.search+location.hash)</script>')
+if script not in text:
+    page.write_text(text.replace('<head>', '<head>' + script, 1), encoding='utf-8')
+PY
+  done
+fi
+
 # The three .gz files of the Unity build are sent as they are, with the header that tells the
 # browser they are compressed (as server/src/static.js does on Render).
 cat > "$OUT/vercel.json" <<EOF
