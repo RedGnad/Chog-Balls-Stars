@@ -1507,3 +1507,14 @@ Sheet: [clothes-golden-armor-2026-10-22.jpg](../../research/evidence/clothes-gol
 It still read as a striped yellow tee. Now (`ARMOR`, `build_armor`, `ring_strip`, `add_pauldrons`): no stripes; a plain gold-orange shirt with two overlapping bands of breastplate, each edged by a dark seam
 0.017 tall with a lighter top edge and stepped 0.0035 off the shirt; on each shoulder two domed plates (upper 0.250 wide, lower 0.220) that break the outline from the front, the side and behind, with two big
 rivets (0.024) on the upper. Budget: #1742 7,996 (8,184 with three bands, 12 points and 8 sides: cut to two bands, 10 points, 7 sides), none over 8,000. Rivets are small at stage size.
+
+### Batch 4: the remaining Side=Left values
+
+Sheet: [clothes-batch4-2026-10-22.jpg](../../research/evidence/clothes-batch4-2026-10-22.jpg) (#218, #641 Army Vest, #474, #556 Guko, #358, #1745 Gojo, #63, #217 BBC, #189, #229 Zero THOTS; the art, then before | after). 43 Genesis of the 24 values were built.
+
+- **Army Vest** (11): camouflage blotches over the olive plate and the small flag patch (red and white stripes, blue canton) on the chest; was plain olive.
+- **Guko** (9): the black spiky emblem of the vest; the blue undershirt sleeves and the belt are not drawn.
+- **Gojo** (4): the round button of the high collar (a disc).
+- **BBC** and **Zero THOTS** (9, 11): the words sit low on the shirt in the art and were too high: BBC 0.062 at 0.340, ZERO THOTS on one line, 0.040 at 0.345.
+- **Judged faithful, unchanged**: Glitch, Sky and Peach Hoodie, Blue Sleeveless, purple and dark vest, Toad pink and green suits (the eyes were set apart in lot 5), Pink and Cyan Shirt, Red 143 Jersey, Boner, the tanks, the holed jackets, Blue Mafia. The tee words (white and dark tee) stay undone: no way to tell which word goes on which Genesis.
+- **Checked**: `--budget`: largest #1742 7,996, none over 8,000. Not verified in Unity.

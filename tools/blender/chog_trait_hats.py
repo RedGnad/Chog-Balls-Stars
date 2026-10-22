@@ -2068,6 +2068,21 @@ def decorate_shirt(maker, torso):
         shirt_band(torso, maker, torso.named("Sash"), places, half_width, lift * 2.0)
     if entry.get("scarf"):
         lay_scarf(torso, maker, colours)
+    if entry.get("camo"):
+        # Camouflage (batch 4, 22 October 2026, the Army Vest): darker blotches of fixed places, across the chest.
+        sequence = random.Random(20261022)
+        for _ in range(entry["camo"]):
+            shirt_square(torso, maker, torso.named("Camo"), sequence.uniform(-0.15, 0.15), sequence.uniform(0.25, 0.54), sequence.uniform(0.016, 0.028),
+                         sequence.uniform(0.0, 90.0), lift * 1.5, tall=sequence.uniform(0.010, 0.020))
+    for across, height, radius, key in entry.get("discs", ()):
+        centre = shirt_front(maker, height, across, 0.008)
+        out = (shirt_front(maker, height, across, 0.020) - centre).normalized()
+        disc_on(torso, SimpleNamespace(middle=Vector((0.0, 0.0, height))), centre, out, radius, torso.named(key), segments=10)
+    for across, height, half_wide, half_tall in entry.get("flag", ()):
+        shirt_square(torso, maker, torso.named("FlagWhite"), across, height, half_wide, 0.0, lift * 2.0, tall=half_tall)
+        for step in (-0.5, 0.5):
+            shirt_square(torso, maker, torso.named("FlagRed"), across, height + step * half_tall * 1.0, half_wide, 0.0, lift * 2.5, tall=half_tall * 0.22)
+        shirt_square(torso, maker, torso.named("FlagBlue"), across - half_wide * 0.5, height + half_tall * 0.35, half_wide * 0.5, 0.0, lift * 3.0, tall=half_tall * 0.62)
     if entry.get("neckroll"):
         lay_neck_roll(torso, maker, *entry["neckroll"])
     if entry.get("scifi"):
@@ -3446,11 +3461,11 @@ CLOTHES.update({
     "Cyan Shirt": tee((0.49, 0.92, 0.87)),
     # Tees with their word.
     "Zero THOTS": with_(tee((0.71, 0.51, 0.90)), colours={"Print": (0.97, 0.93, 0.99)},
-                        print=(("ZERO", "THOTS"), 0.425, 0.050, 0.200, 0.0)),
+                        print=("ZERO THOTS", 0.345, 0.040, 0.240, 0.0)),
     "Virgin": with_(tee((0.92, 0.56, 0.41)), colours={"Print": (0.99, 0.93, 0.88)},
                     print=("VIRGIN", 0.335, 0.050, 0.200, 0.0)),
     "BBC": with_(tee((0.42, 0.68, 0.95)), colours={"Print": (0.97, 0.97, 0.97), "PrintLine": (0.12, 0.18, 0.25)},
-                 print=("BBC", 0.420, 0.075, 0.200, 0.0)),
+                 print=("BBC", 0.340, 0.062, 0.170, 0.0)),
     # Worn shirts with sewn patches.
     # (22 October 2026, batch 3: the art draws a ragged purple scarf round the neck of the three homeless shirts.)
     "Brown Homeless Shirt": with_(tee((0.76, 0.59, 0.44)), colours={"Patch": (0.54, 0.66, 0.75), "Scarf": (0.50, 0.36, 0.70)}, patches=PATCHES,
@@ -3479,8 +3494,9 @@ CLOTHES.update({
     "dark vest": {"kind": "Tee", "colours": {"Main": (0.28, 0.25, 0.33), "Stripe": (0.22, 0.20, 0.27),
                                              "Collar": (0.17, 0.15, 0.21)},
                   "stripes": True, "numbers": {"SLEEVE": 0.0, "STEP": 0.046}},
-    "Army Vest": {**tee((0.50, 0.53, 0.33), collar=(0.36, 0.37, 0.22), **SLEEVELESS),
-                  "print_missing": "the camouflage and the flag patch"},
+    # (batch 4: the art draws a camouflage plate vest with a small flag patch on the chest.)
+    "Army Vest": {**tee((0.45, 0.50, 0.31), collar=(0.36, 0.37, 0.22), **SLEEVELESS),
+                  "camo": 12, "flag": ((0.060, 0.330, 0.024, 0.016),)},
 })
 
 def printed(name, colours=None, **keys):
@@ -3714,10 +3730,12 @@ CLOTHES.update({
                                                                                                           (0.060, 0.290, 0.026), (-0.040, 0.540, 0.022)),
                      "crossed": ((((0.112, 0.572), (0.078, 0.505), (0.040, 0.447), (0.000, 0.392)), 0.020),
                                  (((-0.112, 0.572), (-0.078, 0.505), (-0.040, 0.447), (-0.002, 0.392)), 0.020))},
-    "Guko": tee((0.98, 0.52, 0.10), collar=(0.16, 0.28, 0.72), missing="the blue undershirt, the belt and the emblem"),
+    # (batch 4: the black spiky emblem of the vest; the blue sleeves of the undershirt are not drawn.)
+    "Guko": {**tee((0.98, 0.52, 0.10), collar=(0.16, 0.28, 0.72), missing="the blue sleeves of the undershirt and the belt"),
+             "discs": ((0.085, 0.470, 0.030, "Emblem"),)},
     "Gojo": {**tee((0.13, 0.14, 0.24), (0.09, 0.10, 0.17)), "numbers": {"STEP": 0.076, "COLLAR": (0.600, 0.640),
                                                                          "SLEEVE": LONG_SLEEVE},
-             "print_missing": "the round button of the high collar"},
+             "discs": ((0.0, 0.560, 0.018, "Button"),)},
     "Wizard Cape": {"kind": "Cape", "colours": {"Cape": (0.17, 0.22, 0.52), "Collar": (0.10, 0.12, 0.32),
                                                 "Clasp": (0.96, 0.78, 0.22)},
                     "print_missing": "the yellow pattern of the cape"},
@@ -3741,6 +3759,9 @@ CLOTHES.update({
     "Blue Holed Jacket": hoodie((0.32, 0.64, 0.95), print_missing="the holes in the cloth"),
 })
 CLOTHES["Sci Fi"]["colours"].update({"Ring": (0.14, 0.14, 0.17), "Light": (0.35, 0.92, 0.98), "Strap": (0.20, 0.20, 0.24)})
+CLOTHES["Army Vest"]["colours"].update({"Camo": (0.27, 0.32, 0.17), "FlagWhite": (0.96, 0.96, 0.97), "FlagRed": (0.80, 0.14, 0.20), "FlagBlue": (0.16, 0.22, 0.58)})
+CLOTHES["Guko"]["colours"]["Emblem"] = (0.08, 0.06, 0.08)
+CLOTHES["Gojo"]["colours"]["Button"] = (0.55, 0.57, 0.65)
 CLOTHES["White Yukata"]["colours"]["Flower"] = (0.96, 0.62, 0.74)   # the pink blossoms (batch 3, 22 October 2026)
 
 
