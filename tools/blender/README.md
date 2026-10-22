@@ -971,3 +971,29 @@ Skull Genesis, or the same value on the Origin base): [sheet](../../research/evi
   eye: half width, height, thickness, rise; `build_happy`, `make_chog_traits.py`): near eye 0.066, 0.026, 0.019, rise 0.034;
   far eye 0.032, 0.032, 0.013, no rise. Seen on #925, #1430, #1207 and #1405 only; the other Happy Left Genesis follow by the
   value. Side=Right Happy is unchanged.
+
+## 22 October 2026: the shark's teeth, the astronaut's flag and hose at phone size (lot 4c)
+
+Sheet at the size of the game (126 points across, the hero about 65 points tall), then the same views enlarged, before | after, for
+four sharks (#116, #139, #169, #289) and four astronauts (#249, #1529, #675, #708):
+[heroes-phone-size-2026-10-22.jpg](../../research/evidence/heroes-phone-size-2026-10-22.jpg). What the camera of the game sees of
+a hero is the top of the hood or the helmet, the face under it and the mittens: the head is wider than the chest, so the chest
+and the arms are under it.
+
+- **Shark teeth** (`COSTUME["TEETH"]`): 20 teeth 0.066 to 0.082 long with a thin dark edge were a fine zigzag; now 14, 0.072 to
+  0.104 long, the dark triangle 1.20 times the tooth (1.10) and the white 0.76 (0.74). Read from the front and from the game
+  angle as a row of teeth; at the true phone size they are still small (the whole mouth is about 20 points across). The pictures
+  draw about 20: 14 is a departure from them, for the size of the game. Face still readable from the front (the teeth do not
+  reach the eyes).
+- **Astronaut hose** (`ASTRO["HOSE_OUT"]`, `HOSE_OUT_RADIUS`, `HOSE`): 0.030 thick (0.020), darker (srgb 0.34/0.38/0.50 against
+  0.60/0.61/0.66), and a new first part: it leaves the tip of the ribbed unit and hangs down outside the helmet, where the camera
+  sees it (on the head part, 112 triangles). The part over the chest is still under the helmet from the game camera.
+- **Astronaut flag** (`ASTRO["FLAG"]`, `FLAG_LIFT`): moved from the chest, where the helmet hides it, to the top of the right
+  sleeve (0.085 long, as wide as the arm, 5 stripes and the blue field at the shoulder end), where the pictures draw it at the
+  shoulder. Seen between the helmet and the mitten from the front; from the game camera from behind it is hidden.
+- **Triangles**: sharks 6,304 to 6,488 (6,3xx to 6,6xx before), astronauts 7,051 to 7,605 (the hose, 112); `--budget`: largest
+  #710 7,971, median 7,164, none over 8,000. Library: 1,970 Genesis, 0 failures.
+
+Not done: no change makes the flag or the hose clearly readable from the game camera at the phone size, because they are the
+size of a few pixels and partly hidden by design; the shark's teeth are a clear improvement from the front and at 2x, a small
+one at 1x.

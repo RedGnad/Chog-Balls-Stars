@@ -1995,7 +1995,10 @@ COSTUME = {
     # invisible). How many, how long (on the sides, at the top of the opening, at its bottom), how large the dark triangle is
     # and the white one inside it, against the triangle between two points of the edge and the tip (the dark one shows
     # all round the white as the outline the pictures draw).
-    "TEETH": (20, (0.066, 0.082, 0.056), (1.10, 0.74)),
+    # (22 October 2026, phone size: 20 teeth 0.066 to 0.082 long were a fine zigzag of 6 pixels at the size of the game; 14
+    # larger ones, with a bolder dark edge, read as teeth. The pictures draw about 20, so this leaves them a little: said in
+    # the README.)
+    "TEETH": (14, (0.088, 0.104, 0.072), (1.20, 0.76)),
     # The fin on the back of the hood (not drawn by any picture: the hood is out of the frame): polar degrees where
     # it starts and ends, its height, half thickness. (0.150 and 0.016 until 22 October 2026: a thin thorn.)
     "FIN": (24.0, 96.0, 0.105, 0.026),
@@ -2612,12 +2615,21 @@ ASTRO = {
     # (to the side, behind the middle of the head, height above its middle), then its stations (along, radius).
     "VENT_AT": (-0.318, 0.035, 0.015),
     "VENT": ((0.0, 0.046), (0.020, 0.064), (0.038, 0.050), (0.056, 0.064), (0.074, 0.050), (0.092, 0.064), (0.112, 0.050)),
-    # The hose from under the helmet to the chest, on the right of the character: (to the side, height) points of its
-    # way over the front of the chest, its radius. The flag patch on the chest: its middle (to the side, height), its half
-    # width and half height. The chest box: half width, from and to what height. The pack on the back: half width, half
-    # depth, from and to what height.
-    "HOSE": (((-0.205, 0.600), (-0.248, 0.568), (-0.258, 0.530), (-0.238, 0.490), (-0.200, 0.462)), 0.020),
-    "FLAG": ((-0.105, 0.535), 0.040, 0.026),
+    # The hose, on the right of the character, in two parts. HOSE_OUT: from the tip of the ribbed unit down outside the helmet
+    # (offsets from the tip, in the axes of the head), its radius. HOSE: (to the side, height) points of its way over the front
+    # of the chest, its radius. The flag patch, on the top of the right sleeve: from how far down the arm to how far, its half
+    # width in degrees round the arm; FLAG_LIFT: how far it stands off the arm's axis beyond ARM_RADIUS. The chest box: half
+    # width, from and to what height. The pack on the back: half width, half depth, from and to what height.
+    # (22 October 2026, phone size: the helmet hides the chest from the game camera, so the hose 0.020 thick and the flag
+    # 0.080 by 0.052 that lay on it were not seen at all. The hose is now 0.030 thick, darker, and its first part hangs
+    # outside the helmet where the camera sees it; the flag is on the sleeve, 0.085 long and as wide as the arm, between the
+    # helmet and the mitten. At the size of the game both are a few pixels at best: the chest is under the head.)
+    "HOSE_OUT": ((0.0, 0.0, 0.0), (-0.030, -0.020, -0.090), (-0.045, -0.060, -0.180), (-0.040, -0.110, -0.270),
+                 (-0.020, -0.140, -0.340)),
+    "HOSE_OUT_RADIUS": 0.030,
+    "HOSE": (((-0.215, 0.600), (-0.262, 0.560), (-0.280, 0.510), (-0.268, 0.455), (-0.225, 0.410)), 0.030),
+    "FLAG": (0.105, 0.190, 45.0),
+    "FLAG_LIFT": 0.012,
     "CHEST_BOX": (0.105, 0.500, 0.390),
     "PACK": (0.125, 0.052, 0.560, 0.360),
     # The collar of the suit around the neck: height, how far it stands out, its radius.
@@ -2628,8 +2640,8 @@ ASTRO = {
 
 def build_astro(maker):
     """The space suit of the pictures (22 October 2026): a white suit with long sleeves (grey stripes down them), a thick
-    collar, the flag patch on the right of the chest, a box on the chest, the ribbed hose from the helmet down the
-    chest, a pack on the back; and a round helmet: a thick ring round the face and a glass dome over the rest of the
+    collar, the flag patch on the top of the right sleeve, a box on the chest, the ribbed hose from the helmet's unit
+    down to the chest, a pack on the back; and a round helmet: a thick ring round the face and a glass dome over the rest of the
     head (a material drawn on a share of the pixels, with no outline), a ribbed unit at its right side. The face is open
     in the ring, as the pictures draw it; the crown of the head is under the glass as short leaves, none comes through."""
     numbers = SimpleNamespace(**ASTRO)
@@ -2646,19 +2658,33 @@ def build_astro(maker):
         thick.append(Z * radius)
     slab(torso, path, wide, thick, torso.named("Ring"), numbers.OUTLINE_THICKNESS, sides=6)
 
-    # The flag patch: a blue field and stripes, flat on the chest.
-    (flag_side, flag_height), flag_wide, flag_tall = numbers.FLAG
-    chest = SimpleNamespace(middle=Vector((0.0, 0.0, flag_height)))
+    # The flag patch: a blue field and stripes, on the top of the right sleeve of the character (the left of the pictures,
+    # where the flag sits at the shoulder). (Until 22 October 2026 flat on the chest under the chin, where the helmet hides
+    # it from the game camera; the top of the sleeve is seen between the helmet and the mitten.) The stripes run along the
+    # arm, as the field does at its shoulder end: its half length along the arm, its half width in degrees round the arm.
+    sleeve, on_arm = maker.parts[2]
+    spread, ahead = math.radians(body.ARM_SPREAD_DEG), math.radians(body.ARM_FORWARD_DEG)
+    down = Vector((-math.sin(spread), -math.sin(ahead), -math.cos(spread) * math.cos(ahead))).normalized()
+    first, second = base.frame_across(down, -Y)
+    top_of_arm = second * 1.0
+    flag_start, flag_stop, flag_turn = numbers.FLAG
+    reach = body.ARM_RADIUS + numbers.FLAG_LIFT
     stripes = 5
+    field_stop = flag_start + (flag_stop - flag_start) * 0.42
+
+    def on_sleeve(distance, degrees, lift=0.0):
+        way = top_of_arm * math.cos(math.radians(degrees)) + first * math.sin(math.radians(degrees))
+        return down * distance + way * (reach + lift)
+
     for index in range(stripes):
-        top = flag_height + flag_tall - 2.0 * flag_tall * index / stripes
-        bottom = flag_height + flag_tall - 2.0 * flag_tall * (index + 1) / stripes
-        rows = [[shirt_front(maker, level, flag_side + edge, 0.003) for edge in (-flag_wide, flag_wide)]
-                for level in (top, bottom)]
-        full.add_skin(torso, chest, rows, torso.named("FlagRed" if index % 2 == 0 else "FlagWhite"), around=False)
-    rows = [[shirt_front(maker, level, flag_side + edge, 0.0045) for edge in (-flag_wide, -flag_wide * 0.1)]
-            for level in (flag_height + flag_tall, flag_height + flag_tall * 0.1)]
-    full.add_skin(torso, chest, rows, torso.named("FlagBlue"), around=False)
+        low = -flag_turn + 2.0 * flag_turn * index / stripes
+        high = -flag_turn + 2.0 * flag_turn * (index + 1) / stripes
+        rows = [[on_sleeve(distance, degrees) for degrees in (low, high)] for distance in (flag_start, flag_stop)]
+        full.add_skin(sleeve, SimpleNamespace(middle=down * flag_start), rows,
+                      sleeve.named("FlagRed" if index % 2 == 0 else "FlagWhite"), around=False)
+    rows = [[on_sleeve(distance, degrees, 0.0015) for degrees in (-flag_turn, flag_turn * 0.2)]
+            for distance in (flag_start, field_stop)]
+    full.add_skin(sleeve, SimpleNamespace(middle=down * flag_start), rows, sleeve.named("FlagBlue"), around=False)
 
     # The box on the chest and the pack on the back.
     box_wide, box_top, box_foot = numbers.CHEST_BOX
@@ -2678,7 +2704,7 @@ def build_astro(maker):
     for index, point in enumerate(way):
         ahead = way[min(index + 1, len(way) - 1)] - way[max(index - 1, 0)]
         first, second = base.frame_across(ahead, Y)
-        swell = 1.0 + 0.22 * (index % 2)
+        swell = 1.0 + 0.30 * (index % 2)
         across.append(first * hose_radius * swell)
         through.append(second * hose_radius * swell)
     slab(torso, way, across, through, torso.named("Hose"), numbers.OUTLINE_THICKNESS * 0.7, sides=6)
@@ -2728,6 +2754,18 @@ def build_astro(maker):
     start = surface.middle + Vector((side, behind, up))
     ring.shell(base.tube_rings(start, Vector((-1.0, 0.0, 0.0)), Y, numbers.VENT), 8, ring.named("Vent"),
                numbers.OUTLINE_THICKNESS * 0.8)
+    # The hose leaves the tip of the unit and hangs down outside the helmet to the shoulder (22 October 2026: the art draws it
+    # from the unit to the chest; the chest is hidden under the helmet from the game camera, this part of it is not).
+    tip = start + Vector((-numbers.VENT[-1][0], 0.0, 0.0))
+    way = [tip + Vector(offset) for offset in numbers.HOSE_OUT]
+    across, through = [], []
+    for index, point in enumerate(way):
+        ahead = way[min(index + 1, len(way) - 1)] - way[max(index - 1, 0)]
+        first, second = base.frame_across(ahead, Y)
+        swell = 1.0 + 0.30 * (index % 2)
+        across.append(first * numbers.HOSE_OUT_RADIUS * swell)
+        through.append(second * numbers.HOSE_OUT_RADIUS * swell)
+    slab(ring, way, across, through, ring.named("Hose"), numbers.OUTLINE_THICKNESS * 0.7, sides=6)
 
 
 DUCK = {
@@ -3072,7 +3110,7 @@ CLOTHES.update({
     "Astro Suit": {"kind": "Astro", "colours": {"Main": (0.90, 0.88, 0.84), "Collar": (0.70, 0.70, 0.72),
                                                 "Stripe": (0.52, 0.56, 0.69), "Ring": (0.72, 0.73, 0.76),
                                                 "Glass": (0.80, 0.90, 0.98), "Vent": (0.64, 0.65, 0.70),
-                                                "Panel": (0.52, 0.55, 0.70), "Hose": (0.60, 0.61, 0.66),
+                                                "Panel": (0.52, 0.55, 0.70), "Hose": (0.34, 0.38, 0.50),
                                                 "FlagRed": (0.80, 0.14, 0.20), "FlagWhite": (0.96, 0.96, 0.97),
                                                 "FlagBlue": (0.16, 0.22, 0.58)},
                    "numbers": {"STEP": 0.076, "SLEEVE": LONG_SLEEVE},
