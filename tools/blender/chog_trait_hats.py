@@ -190,32 +190,22 @@ def paint_where(part, faces, rule):
 # ---------------------------------------------------------------------------------------------
 USHANKA = {
     "SIDES": 24,
-    # (22 October 2026, the owner: "not tall enough and does not match". On the 67 pictures the fur crown stands high above the head,
-    # a tall cylinder of fur whose lower edge is a thick wavy roll across the brow, with the ear flaps hanging down beside the face
-    # to the jaw: fur flaps on Side=Right, dark leather flaps with snaps on Side=Left. Until then a low cap with a thin roll and short
-    # flaps laid on the head.)
-    # The crown is a tall oval cylinder, as it is worn: its lower edge by degrees from the front (height above the neck in the axes
-    # of the head: just over the brow, higher at the sides, low at the back), how far it flares from the head to the wall, the wall
-    # (half width, half depth, how far its middle stands behind the middle of the head), the height of the top of the wall, and how
-    # high its rounded top rises above that.
-    "LOW": ((0.0, 0.292), (60.0, 0.275), (110.0, 0.235), (180.0, 0.170)),
-    "FLARE": 0.26,
-    "BULGE": 0.06,        # the wall swells a little at its middle, as a fur crown does
-    "WALL": (0.350, 0.275, 0.035),
-    # (22 October 2026, evening, the owner: "the Russian hat is still not a Russian hat". At 1000 points (#91, #34, #144) the crown is a
-    # rounded dome of fur, not a cylinder with a flat lid: TOP 0.520 and DOME 0.070 read as a pot. Lower wall, rounder top.)
-    "TOP": 0.470,
-    "DOME": 0.150,
-    # The rows of the wall as shares of its height from the lower edge (the first, tucked on the head, the next ones the roll of fur),
-    # the shares at which the colour of the fur gives way to that of the crown (the first bands are fur), and the bumps of the fur round
-    # the lower edge (how many, how deep against the wall).
-    # (22 October 2026 on the first try, 0.0 to 0.20 and 3 bands: the owner saw the roll swallowed from the front, a plain cylinder. Now the roll
-    # is taller (0.30 of the wall), stands out of the wall by ROLL and its fur bumps are deeper, so it shows from the front and three quarters.)
-    "ROWS": (0.0, 0.06, 0.15, 0.26, 0.36, 0.62, 1.0),
-    "FUR_BANDS": 4,
-    "ROLL": 0.11,
-    "FUR_WAVES": (8, 0.045),
-    "WAVE_Z": 0.012,     # the lower edge rises and falls with the bumps of the fur (a fluffy edge)
+    # (22 October 2026, evening, the owner: "an ushanka has NO crown, it has a raised front, and the Genesis shows it: just the front is
+    # light". At 1000 points (#91, #39, #144, #322): a round cap that fits the head, the front flap of fur turned up and standing over the
+    # forehead from the brow to the top of the hat (the light part, its top edge furry), the ear flaps down beside the face. Until then a
+    # tall fur cylinder with a roll round its foot, a pot.)
+    # The cap: its rim by degrees from the front (polar degrees: over the brow, over the ears, low at the back), how much larger than the
+    # head it is, how many rows up to its top.
+    "CAP_RIM": ((0.0, 66.0), (70.0, 84.0), (110.0, 100.0), (180.0, 108.0)),
+    "CAP_SIZE": 1.07,     # (1.04 tried: the spikes under its rim at the back could not clear it)
+    "CAP_ROWS": 4,
+    # The front flap turned up: how far round from the front it goes on each side (degrees), the polar degrees of its foot, how much
+    # larger than the head its foot is, its half height, its half thickness, how far it leans out from upright (degrees), the bumps of
+    # the fur along its top edge (how many, how high) and how many points along it.
+    # (Tried at 0.105 half height: the cap showed above the flap; on the pictures the flap's furry top edge IS the top of the hat seen from
+    # the front.)
+    "FRONT": {"SPAN": 80.0, "FOOT": 70.0, "SIZE": 1.10, "HALF_HEIGHT": 0.125, "HALF_THICK": 0.034, "LEAN": 6.0,
+              "WAVES": (7, 0.016), "POINTS": 11},     # (0.165 tried: a tall wall, a chef's hat)
     # An ear flap: how far out of the middle at its top, at its middle and at its foot (it hangs nearly upright beside the face), how
     # far ahead of the middle of the head, its heights (top, then foot), half width at the top and at the foot, half thickness.
     # (22 October 2026, evening: on the pictures the flaps frame the face, their outer face of leather seen from the front three
@@ -243,46 +233,32 @@ def build_ushanka(maker):
     numbers = maker.numbers(USHANKA)
     part, surface = maker.part(), maker.surface
     sides, outline = numbers.SIDES, numbers.OUTLINE_THICKNESS
-    angles = [2.0 * math.pi * index / sides for index in range(sides)]
-    middle, half = surface.middle, surface.half
-    wall_wide, wall_deep, wall_back = numbers.WALL
-    waves, depth = numbers.FUR_WAVES
+    middle = surface.middle
 
-    def head_radii(z):
-        reach = math.sqrt(max(1.0 - ((z - middle.z) / half.z) ** 2, 0.0))
-        return half.x * reach, half.y * reach
+    # The cap, fitting the head.
+    dome(part, surface, part.named("Crown"), sides, numbers.CAP_RIM, numbers.CAP_ROWS, numbers.CAP_SIZE, outline)
 
-    def point(angle, z, wide, deep, centre_y):
-        return Vector((math.cos(angle) * wide, centre_y + math.sin(angle) * deep, z))
-
-    # The crown: rows from the lower edge, tucked on the head, flaring out to the wall, up the wall, then a rounded top.
-    loops = []
-    for share in numbers.ROWS:
-        loop = []
-        for angle in angles:
-            low = interpolate(numbers.LOW, from_front(angle)) + numbers.WAVE_Z * math.cos(waves * angle) * (1.0 - share)
-            z = low + (numbers.TOP - low) * share
-            head_wide, head_deep = head_radii(z)
-            grow = math.sin(0.5 * math.pi * min(1.0, share / numbers.FLARE))
-            barrel = 1.0 + numbers.BULGE * math.sin(math.pi * share) * grow \
-                + numbers.ROLL * math.sin(math.pi * min(1.0, share / (numbers.FLARE * 1.45)))
-            wide = (head_wide * 1.02 + (wall_wide - head_wide * 1.02) * grow) * barrel
-            deep = (head_deep * 1.02 + (wall_deep - head_deep * 1.02) * grow) * barrel
-            centre_y = wall_back * grow
-            if share < 0.45:
-                bump = 1.0 + depth * grow * math.cos(waves * angle)
-                wide, deep = wide * bump, deep * bump
-            loop.append(point(angle, z, wide, deep, centre_y))
-        loops.append(loop)
-    for lift in (30.0, 60.0):
-        phi = math.radians(lift)
-        loops.append([point(angle, numbers.TOP + numbers.DOME * math.sin(phi), wall_wide * math.cos(phi), wall_deep * math.cos(phi),
-                            wall_back) for angle in angles])
-    loops.append([Vector((0.0, wall_back, numbers.TOP + numbers.DOME))])
-    shares = [(0.0,) * sides] + [(1.0,) * sides] * (len(loops) - 2) + [(1.0,)]
-    bands, _ = KIT.add_loops(part, loops, part.named("Crown"), outline, shares=shares)
-    for band in bands[:numbers.FUR_BANDS]:
-        part.paint(band, part.named("Fur"))
+    # The front flap, turned up: a thick strip of fur round the front of the cap from the brow up, leaning out a little.
+    front = numbers.FRONT
+    foot = math.radians(front["FOOT"])
+    waves, wave_height = front["WAVES"]
+    path, wide, thick = [], [], []
+    count = front["POINTS"]
+    for index in range(count):
+        share = index / (count - 1)
+        turn = math.radians(-front["SPAN"] + 2.0 * front["SPAN"] * share)
+        angle = math.radians(270.0) + turn
+        base = on_head(surface, angle, foot, front["SIZE"])
+        out = Vector((math.cos(angle), math.sin(angle), 0.0))
+        lean = math.radians(front["LEAN"])
+        up = (Z * math.cos(lean) + out * math.sin(lean)).normalized()
+        # The ends are lower and thinner, as the turned-up flap curls down at the sides.
+        end_drop = 1.0 - 0.35 * (2.0 * share - 1.0) ** 4
+        half_height = front["HALF_HEIGHT"] * end_drop + wave_height * math.cos(waves * math.pi * share)
+        path.append(base + up * half_height)
+        wide.append(up * half_height)
+        thick.append(out * front["HALF_THICK"] * (0.6 + 0.4 * end_drop))
+    slab(part, path, wide, thick, part.named("Fur"), outline)
 
     # The flaps, hanging beside the face.
     out_x, ahead, heights, widths, half_thick = numbers.FLAP
@@ -1327,7 +1303,8 @@ HATS = {
     # The new shapes.
     "Russian Hat": {
         "shape": "Ushanka",
-        "colours": {"Crown": (0.78, 0.56, 0.41), "Fur": (0.94, 0.83, 0.70), "Flap": (0.86, 0.70, 0.57)},
+        # #39 at 1000 points: the flap tan (0.85, 0.72, 0.59), the fur darker in its shadows (0.71, 0.49, 0.34), the flaps alike.
+        "colours": {"Crown": (0.71, 0.49, 0.34), "Fur": (0.85, 0.72, 0.59), "Flap": (0.82, 0.68, 0.55)},
     },
     "Red Headband": {
         "shape": "Headband",
@@ -1414,7 +1391,7 @@ HATS_OF_SIDE = {
         "Russian Hat": {
             "shape": "Ushanka",
             # The crown is fur too on the pictures (#91: 0.91, 0.85, 0.74 on its top, tan patches), the roll lighter (0.98, 0.93, 0.81).
-            "colours": {"Crown": (0.88, 0.78, 0.64), "Fur": (0.97, 0.92, 0.81), "Flap": (0.32, 0.27, 0.38),
+            "colours": {"Crown": (0.82, 0.66, 0.50), "Fur": (0.97, 0.92, 0.81), "Flap": (0.32, 0.27, 0.38),
                         "Snap": (0.95, 0.95, 0.95)},
         },
     },

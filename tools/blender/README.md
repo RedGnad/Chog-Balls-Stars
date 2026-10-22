@@ -1573,7 +1573,7 @@ is judged beside the LIVE hero, not only the art: `sh tools/dev/heavy_lock.sh <w
 (close, three quarters, front) and writes `research/evidence/try-<try>.jpg`: art | live | try. About ten seconds a Genesis.
 
 Kept this evening, each better than live on its sheet: Retro Glass eyes without the dark pupil disc, a pale highlight as the art draws
-(`try-retro-eyes.jpg`); a flatter, tilted smirk under a heavy lid (`try-smirk.jpg`); the Russian Hat a rounder fur dome, flaps turned to
-show their leather and ending at the jaw (`try-ushanka.jpg`, `try-ushanka-right.jpg`); the dragon belly painted only under the chin's
+(`try-retro-eyes.jpg`); a flatter, tilted smirk under a heavy lid (`try-smirk.jpg`); the Russian Hat rebuilt as an ushanka: a fitted cap, the front flap of fur turned up, ear flaps turned to show their face
+(`try-chapka.jpg`; the rounder dome of `try-ushanka.jpg` was still a pot); the dragon belly painted only under the chin's
 middle (`try-dragon-belly.jpg`). Not done: spikes beside the Spartan helmet (the leaves that would show there cross the shell,
 `try-spartan.jpg`); they need spikes of the helmet's own.

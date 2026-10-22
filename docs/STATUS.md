@@ -1,5 +1,9 @@
 # État courant et décisions
 
+**22 October 2026, 19:20 UTC (lead: the Russian Hat as an ushanka; deployed).**
+- **Deployed:** build `20261022T191353266Z-d53874b2800c45b2aba3c9ba4c2e545b`, stamp unchanged. The owner: "an ushanka has NO crown, it has a raised front". `build_ushanka` is now a cap that fits the head (`dome`, CAP_RIM), the front flap of fur turned up over the forehead with a furry top edge (FRONT, a `slab` round the front), the ear flaps turned to show their face; colours read on #39 and #91. Sheet `research/evidence/try-chapka.jpg` (art | live | try). Includes the 19:15 UTC changes (home kit panel, siege crates, Retro Glass eyes, smirk, dragon belly).
+- **Verified:** export 1,970 Genesis, 0 failed (the spikes under the rim at the back clear the new cap); turnaround of #91; judge fixtures agree.
+
 **22 October 2026, 19:15 UTC (lead: home kit panel, siege crates, eyes and hats against live; deploying).**
 - **Build** `20261022T190222981Z-64ab90f7eb4a4e8a8d514aafc360970e`, stamp unchanged. The home's right panel shows the played Genesis' kit (class, what its basic attack throws, its special) in place of the mastery road (the owner: "the mastery road window in the landing, I don't know what to do with it"); an ADMIN pick reads ADMIN TEST. The siege's crates take the candy skin again: its rebuilt map names them "Crate <cell>" (`ChogArenaCoverSkin.IsCrate`). 3D, each judged against the live hero (`tools/blender/try_against_live.py`): Retro Glass eyes, smirk, Russian Hat, dragon belly. Spartan side spikes not done.
 - **Verified:** export 1,970 Genesis, 0 failed; 176 view tests; a local siege shows textured pink crates; the home with a holder test wallet shows the kit panel.
