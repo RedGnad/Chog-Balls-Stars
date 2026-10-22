@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/QuantumUser/Scenes/Gameplay.unity
     guid: dc56afaaab8e8f948a3e328a9a2cd765
+  - enabled: 1
+    path: Assets/QuantumUser/Scenes/GameplaySiege.unity
+    guid: 4e074d7c006b44736b15c01426529e4a
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 8012c229df5d8f84683449de40029a6b,
       type: 2}

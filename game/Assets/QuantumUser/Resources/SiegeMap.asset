@@ -39,7 +39,7 @@ MonoBehaviour:
   GridNodeSize: 4
   NavMeshLinks:
   - Id:
-      Value: 0
+      Value: 537436249469291994
   Regions:
   - MainArea
   StaticColliders2D:
@@ -16483,317 +16483,317 @@ MonoBehaviour:
     - rid: 946701941981839360
     - rid: 946701941981839361
   - Components:
-    - rid: 4074753602495709184
-    - rid: 4074753602495709185
+    - rid: 3824144730380304384
+    - rid: 3824144730380304385
   - Components:
-    - rid: 9206138691032973312
-    - rid: 9206138691032973313
+    - rid: 8825353236383793152
+    - rid: 8825353236383793153
   - Components:
-    - rid: 6684348593794449408
-    - rid: 6684348593794449409
+    - rid: 5978763242476929024
+    - rid: 5978763242476929025
   - Components:
-    - rid: 7354581165207977984
-    - rid: 7354581165207977985
+    - rid: 5750114834498715648
+    - rid: 5750114834498715649
   - Components:
-    - rid: 4574031189739831296
-    - rid: 4574031189739831297
+    - rid: 5492826998327738368
+    - rid: 5492826998327738369
   - Components:
-    - rid: 169238423180148736
-    - rid: 169238423180148737
+    - rid: 4506361321406595072
+    - rid: 4506361321406595073
   - Components:
-    - rid: 5058217157406490624
-    - rid: 5058217157406490625
+    - rid: 410535511992565760
+    - rid: 410535511992565761
   - Components:
-    - rid: 7238857366668574720
-    - rid: 7238857366668574721
+    - rid: 4679672387195633664
+    - rid: 4679672387195633665
   - Components:
-    - rid: 931096807524532224
-    - rid: 931096807524532225
+    - rid: 225061822523244544
+    - rid: 225061822523244545
   - Components:
-    - rid: 7096152529888608256
-    - rid: 7096152529888608257
+    - rid: 5250805713604706304
+    - rid: 5250805713604706305
   - Components:
-    - rid: 8939002720338051072
-    - rid: 8939002720338051073
+    - rid: 4221701669395628032
+    - rid: 4221701669395628033
   - Components:
-    - rid: 7869594237019357184
-    - rid: 7869594237019357185
+    - rid: 6983651049890381824
+    - rid: 6983651049890381825
   - Components:
-    - rid: 5582612284628271104
-    - rid: 5582612284628271105
+    - rid: 8341333638570311680
+    - rid: 8341333638570311681
   - Components:
-    - rid: 4811108020064878592
-    - rid: 4811108020064878593
+    - rid: 3374482008339120128
+    - rid: 3374482008339120129
   - Components:
-    - rid: 2716896760550129664
-    - rid: 2716896760550129665
+    - rid: 3241012974743191552
+    - rid: 3241012974743191553
   - Components:
-    - rid: 6755156777551003648
-    - rid: 6755156777551003649
+    - rid: 2903428742846087168
+    - rid: 2903428742846087169
   - Components:
-    - rid: 3045977268586283008
-    - rid: 3045977268586283009
+    - rid: 4035729009953210368
+    - rid: 4035729009953210369
   - Components:
-    - rid: 6341822761505128448
-    - rid: 6341822761505128449
+    - rid: 2770144699934048256
+    - rid: 2770144699934048257
   - Components:
-    - rid: 6122797401699778560
-    - rid: 6122797401699778561
+    - rid: 6644574658307817472
+    - rid: 6644574658307817473
   - Components:
-    - rid: 3465505548743475200
-    - rid: 3465505548743475201
+    - rid: 7816915539715948544
+    - rid: 7816915539715948545
   - Components:
-    - rid: 5315923772216180736
-    - rid: 5315923772216180737
+    - rid: 4283547254985326592
+    - rid: 4283547254985326593
   - Components:
-    - rid: 6132573767320207360
-    - rid: 6132573767320207361
+    - rid: 3670283232865157120
+    - rid: 3670283232865157121
   - Components:
-    - rid: 4354365497555288064
-    - rid: 4354365497555288065
+    - rid: 1156092023694950400
+    - rid: 1156092023694950401
   - Components:
-    - rid: 3111503228831793152
-    - rid: 3111503228831793153
+    - rid: 1283143064038146048
+    - rid: 1283143064038146049
   - Components:
-    - rid: 1925326924175900672
-    - rid: 1925326924175900673
+    - rid: 7995696673705689088
+    - rid: 7995696673705689089
   - Components:
-    - rid: 2121901411888267264
-    - rid: 2121901411888267265
+    - rid: 2490864047784722432
+    - rid: 2490864047784722433
   - Components:
-    - rid: 3333240381595713536
-    - rid: 3333240381595713537
+    - rid: 3983487712119226368
+    - rid: 3983487712119226369
   - Components:
-    - rid: 7137475166157668352
-    - rid: 7137475166157668353
+    - rid: 4420307382433742848
+    - rid: 4420307382433742849
   - Components:
-    - rid: 170072986865369088
-    - rid: 170072986865369089
+    - rid: 7162878145366851584
+    - rid: 7162878145366851585
   - Components:
-    - rid: 6672975408725491712
-    - rid: 6672975408725491713
+    - rid: 8813270943624331264
+    - rid: 8813270943624331265
   - Components:
-    - rid: 5807174452131135488
-    - rid: 5807174452131135489
+    - rid: 5454602581814804480
+    - rid: 5454602581814804481
   - Components:
-    - rid: 5365184422876282880
-    - rid: 5365184422876282881
+    - rid: 1499050226046992384
+    - rid: 1499050226046992385
   - Components:
-    - rid: 8872421321271672832
-    - rid: 8872421321271672833
+    - rid: 3671002399369068544
+    - rid: 3671002399369068545
   - Components:
-    - rid: 924569125102026752
-    - rid: 924569125102026753
+    - rid: 5117846526986551296
+    - rid: 5117846526986551297
   - Components:
-    - rid: 2584941361476141056
-    - rid: 2584941361476141057
+    - rid: 1264878741381709824
+    - rid: 1264878741381709825
   - Components:
-    - rid: 434725244545007616
-    - rid: 434725244545007617
+    - rid: 7489955968134938624
+    - rid: 7489955968134938625
   - Components:
-    - rid: 8796312971778195456
-    - rid: 8796312971778195457
+    - rid: 8331818922357555200
+    - rid: 8331818922357555201
   - Components:
-    - rid: 6969665023614386176
-    - rid: 6969665023614386177
+    - rid: 1761902052763500544
+    - rid: 1761902052763500545
   - Components:
-    - rid: 6483722392848826368
-    - rid: 6483722392848826369
+    - rid: 6124255034143145984
+    - rid: 6124255034143145985
   - Components:
-    - rid: 6897660856822136832
-    - rid: 6897660856822136833
+    - rid: 5181905474580119552
+    - rid: 5181905474580119553
   - Components:
-    - rid: 3315702290664390656
-    - rid: 3315702290664390657
+    - rid: 6255070452260012032
+    - rid: 6255070452260012033
   - Components:
-    - rid: 6315606014842372096
-    - rid: 6315606014842372097
+    - rid: 593090942982946816
+    - rid: 593090942982946817
   - Components:
-    - rid: 5056999020929482752
-    - rid: 5056999020929482753
+    - rid: 621778489841811456
+    - rid: 621778489841811457
   - Components:
-    - rid: 8405368257321631744
-    - rid: 8405368257321631745
+    - rid: 4920366524876718080
+    - rid: 4920366524876718081
   - Components:
-    - rid: 1512771609323110400
-    - rid: 1512771609323110401
+    - rid: 188215525724127232
+    - rid: 188215525724127233
   - Components:
-    - rid: 1508127542790324224
-    - rid: 1508127542790324225
+    - rid: 6241649456849092608
+    - rid: 6241649456849092609
   - Components:
-    - rid: 4497580859917860864
-    - rid: 4497580859917860865
+    - rid: 3964712863880183808
+    - rid: 3964712863880183809
   - Components:
-    - rid: 3110320158615273472
-    - rid: 3110320158615273473
+    - rid: 2733919975096975360
+    - rid: 2733919975096975361
   - Components:
-    - rid: 7891908915699384320
-    - rid: 7891908915699384321
+    - rid: 2741091522509275136
+    - rid: 2741091522509275137
   - Components:
-    - rid: 2190659609901924352
-    - rid: 2190659609901924353
+    - rid: 7872823620781735936
+    - rid: 7872823620781735937
   - Components:
-    - rid: 1001657611902255104
-    - rid: 1001657611902255105
+    - rid: 3064501883440726016
+    - rid: 3064501883440726017
   - Components:
-    - rid: 1075246363928690688
-    - rid: 1075246363928690689
+    - rid: 1452818201640435712
+    - rid: 1452818201640435713
   - Components:
-    - rid: 2603476035143991296
-    - rid: 2603476035143991297
+    - rid: 1058246121014427648
+    - rid: 1058246121014427649
   - Components:
-    - rid: 2031426317332774912
-    - rid: 2031426317332774913
+    - rid: 9152642693665390592
+    - rid: 9152642693665390593
   - Components:
-    - rid: 7602437470092787712
-    - rid: 7602437470092787713
+    - rid: 3452382087191986176
+    - rid: 3452382087191986177
   - Components:
-    - rid: 1740362403079520256
-    - rid: 1740362403079520257
+    - rid: 4467141000761966592
+    - rid: 4467141000761966593
   - Components:
-    - rid: 8193153025578106880
-    - rid: 8193153025578106881
+    - rid: 4711810192952524800
+    - rid: 4711810192952524801
   - Components:
-    - rid: 953819527425032192
-    - rid: 953819527425032193
+    - rid: 5335756234677026816
+    - rid: 5335756234677026817
   - Components:
-    - rid: 3715621837502152704
-    - rid: 3715621837502152705
+    - rid: 5564282719271124992
+    - rid: 5564282719271124993
   - Components:
-    - rid: 4157707964502769664
-    - rid: 4157707964502769665
+    - rid: 357561456230662144
+    - rid: 357561456230662145
   - Components:
-    - rid: 3229810370742845440
-    - rid: 3229810370742845441
+    - rid: 4589482053266833408
+    - rid: 4589482053266833409
   - Components:
-    - rid: 2388013477412208640
-    - rid: 2388013477412208641
+    - rid: 3159778712778440704
+    - rid: 3159778712778440705
   - Components:
-    - rid: 4939320655788113920
-    - rid: 4939320655788113921
+    - rid: 2159263263676694528
+    - rid: 2159263263676694529
   - Components:
-    - rid: 8617195565471498240
-    - rid: 8617195565471498241
+    - rid: 2958597539781148672
+    - rid: 2958597539781148673
   - Components:
-    - rid: 8761591822649655296
-    - rid: 8761591822649655297
+    - rid: 3024553016083611648
+    - rid: 3024553016083611649
   - Components:
-    - rid: 1537109769502851072
-    - rid: 1537109769502851073
+    - rid: 7722271837949788160
+    - rid: 7722271837949788161
   - Components:
-    - rid: 3095063665980735488
-    - rid: 3095063665980735489
+    - rid: 4149671676965027840
+    - rid: 4149671676965027841
   - Components:
-    - rid: 7479043154167988224
-    - rid: 7479043154167988225
+    - rid: 7524924496642310144
+    - rid: 7524924496642310145
   - Components:
-    - rid: 1388870300426305536
-    - rid: 1388870300426305537
+    - rid: 1393558134823321600
+    - rid: 1393558134823321601
   - Components:
-    - rid: 8328157847137288192
-    - rid: 8328157847137288193
+    - rid: 6973602157857603584
+    - rid: 6973602157857603585
   - Components:
-    - rid: 7489821950122917888
-    - rid: 7489821950122917889
+    - rid: 2640386896038985728
+    - rid: 2640386896038985729
   - Components:
-    - rid: 8232859542963093504
-    - rid: 8232859542963093505
+    - rid: 4710195431278116864
+    - rid: 4710195431278116865
   - Components:
-    - rid: 2144197469737582592
-    - rid: 2144197469737582593
+    - rid: 3154505869475971072
+    - rid: 3154505869475971073
   - Components:
-    - rid: 2005596815658844160
-    - rid: 2005596815658844161
+    - rid: 2190159143132725248
+    - rid: 2190159143132725249
   - Components:
-    - rid: 872912975759933440
-    - rid: 872912975759933441
+    - rid: 1067349942000943104
+    - rid: 1067349942000943105
   - Components:
-    - rid: 3641162637338738688
-    - rid: 3641162637338738689
+    - rid: 7323292332751585280
+    - rid: 7323292332751585281
   - Components:
-    - rid: 2021105717078917120
-    - rid: 2021105717078917121
+    - rid: 2277465745824677888
+    - rid: 2277465745824677889
   - Components:
-    - rid: 1566314228560691200
-    - rid: 1566314228560691201
+    - rid: 149124193684815872
+    - rid: 149124193684815873
   - Components:
-    - rid: 27036907175149568
-    - rid: 27036907175149569
+    - rid: 5493871021125533696
+    - rid: 5493871021125533697
   - Components:
-    - rid: 3163292038976241664
-    - rid: 3163292038976241665
+    - rid: 2966567087822077952
+    - rid: 2966567087822077953
   - Components:
-    - rid: 3580022626828943360
-    - rid: 3580022626828943361
+    - rid: 2123966346264838144
+    - rid: 2123966346264838145
   - Components:
-    - rid: 4996176522319495168
-    - rid: 4996176522319495169
+    - rid: 2172453325138558976
+    - rid: 2172453325138558977
   - Components:
-    - rid: 1120084501796487168
-    - rid: 1120084501796487169
+    - rid: 8440234980071702528
+    - rid: 8440234980071702529
   - Components:
-    - rid: 4528807982284144640
-    - rid: 4528807982284144641
+    - rid: 7127472217390055424
+    - rid: 7127472217390055425
   SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
     RefIds:
-    - rid: 27036907175149568
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 589824
-          Y:
-            RawValue: 851968
-        Rotation:
-          RawValue: 0
-    - rid: 27036907175149569
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 13
-        StaticColliderId: 375
-        NorthNeighborId: 379
-        SouthNeighborId: 371
-        EastNeighborId: 376
-        WestNeighborId: -1
-    - rid: 169238423180148736
+    - rid: 149124193684815872
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: -589824
           Y:
-            RawValue: -851968
+            RawValue: 851968
         Rotation:
           RawValue: 0
-    - rid: 169238423180148737
+    - rid: 149124193684815873
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 0
-        StaticColliderId: 302
-        NorthNeighborId: 306
-        SouthNeighborId: 298
+        GroupId: 12
+        StaticColliderId: 374
+        NorthNeighborId: 378
+        SouthNeighborId: 370
         EastNeighborId: -1
-        WestNeighborId: 301
-    - rid: 170072986865369088
+        WestNeighborId: 373
+    - rid: 188215525724127232
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -262144
+          Y:
+            RawValue: 65536
+        Rotation:
+          RawValue: 0
+    - rid: 188215525724127233
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 6
+        StaticColliderId: 341
+        NorthNeighborId: -1
+        SouthNeighborId: 337
+        EastNeighborId: 342
+        WestNeighborId: -1
+    - rid: 225061822523244544
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: -655360
           Y:
-            RawValue: -393216
+            RawValue: -786432
         Rotation:
           RawValue: 0
-    - rid: 170072986865369089
+    - rid: 225061822523244545
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 4
-        StaticColliderId: 325
-        NorthNeighborId: 329
-        SouthNeighborId: 321
-        EastNeighborId: 326
+        GroupId: 0
+        StaticColliderId: 305
+        NorthNeighborId: -1
+        SouthNeighborId: 301
+        EastNeighborId: 306
         WestNeighborId: -1
     - rid: 323074928280600576
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
@@ -16809,81 +16809,81 @@ MonoBehaviour:
       type: {class: EscapeRoutePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         TeamId: 1
-    - rid: 434725244545007616
+    - rid: 357561456230662144
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: 655360
           Y:
-            RawValue: -327680
+            RawValue: 458752
         Rotation:
           RawValue: 0
-    - rid: 434725244545007617
+    - rid: 357561456230662145
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 5
-        StaticColliderId: 332
-        NorthNeighborId: -1
-        SouthNeighborId: 328
+        GroupId: 9
+        StaticColliderId: 356
+        NorthNeighborId: 360
+        SouthNeighborId: 352
         EastNeighborId: -1
-        WestNeighborId: 331
-    - rid: 872912975759933440
+        WestNeighborId: 355
+    - rid: 410535511992565760
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: 589824
           Y:
-            RawValue: 786432
+            RawValue: -851968
         Rotation:
           RawValue: 0
-    - rid: 872912975759933441
+    - rid: 410535511992565761
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 13
-        StaticColliderId: 371
-        NorthNeighborId: 375
-        SouthNeighborId: -1
-        EastNeighborId: 372
+        GroupId: 1
+        StaticColliderId: 303
+        NorthNeighborId: 307
+        SouthNeighborId: 299
+        EastNeighborId: 304
         WestNeighborId: -1
-    - rid: 924569125102026752
+    - rid: 593090942982946816
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: -589824
+            RawValue: -196608
           Y:
-            RawValue: -327680
+            RawValue: 0
         Rotation:
           RawValue: 0
-    - rid: 924569125102026753
+    - rid: 593090942982946817
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 4
-        StaticColliderId: 330
-        NorthNeighborId: -1
-        SouthNeighborId: 326
+        GroupId: 6
+        StaticColliderId: 338
+        NorthNeighborId: 342
+        SouthNeighborId: 334
         EastNeighborId: -1
-        WestNeighborId: 329
-    - rid: 931096807524532224
+        WestNeighborId: 337
+    - rid: 621778489841811456
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: -655360
+            RawValue: 196608
           Y:
-            RawValue: -786432
+            RawValue: 0
         Rotation:
           RawValue: 0
-    - rid: 931096807524532225
+    - rid: 621778489841811457
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 0
-        StaticColliderId: 305
-        NorthNeighborId: -1
-        SouthNeighborId: 301
-        EastNeighborId: 306
+        GroupId: 7
+        StaticColliderId: 339
+        NorthNeighborId: 343
+        SouthNeighborId: 335
+        EastNeighborId: 340
         WestNeighborId: -1
     - rid: 946701941981839360
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
@@ -16899,43 +16899,43 @@ MonoBehaviour:
       type: {class: ObjectivePointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
-    - rid: 953819527425032192
+    - rid: 1058246121014427648
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: -589824
+            RawValue: -655360
           Y:
-            RawValue: 458752
+            RawValue: 393216
         Rotation:
           RawValue: 0
-    - rid: 953819527425032193
+    - rid: 1058246121014427649
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 8
-        StaticColliderId: 354
-        NorthNeighborId: 358
-        SouthNeighborId: 350
-        EastNeighborId: -1
-        WestNeighborId: 353
-    - rid: 1001657611902255104
+        StaticColliderId: 349
+        NorthNeighborId: 353
+        SouthNeighborId: 345
+        EastNeighborId: 350
+        WestNeighborId: -1
+    - rid: 1067349942000943104
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: 589824
           Y:
-            RawValue: 327680
+            RawValue: 786432
         Rotation:
           RawValue: 0
-    - rid: 1001657611902255105
+    - rid: 1067349942000943105
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 9
-        StaticColliderId: 347
-        NorthNeighborId: 351
+        GroupId: 13
+        StaticColliderId: 371
+        NorthNeighborId: 375
         SouthNeighborId: -1
-        EastNeighborId: 348
+        EastNeighborId: 372
         WestNeighborId: -1
     - rid: 1074489043082805248
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
@@ -16951,45 +16951,64 @@ MonoBehaviour:
       type: {class: ObjectivePointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
-    - rid: 1075246363928690688
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 655360
-          Y:
-            RawValue: 327680
-        Rotation:
-          RawValue: 0
-    - rid: 1075246363928690689
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 9
-        StaticColliderId: 348
-        NorthNeighborId: 352
-        SouthNeighborId: -1
-        EastNeighborId: -1
-        WestNeighborId: 347
-    - rid: 1120084501796487168
+    - rid: 1156092023694950400
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: 589824
           Y:
-            RawValue: 917504
+            RawValue: -524288
         Rotation:
           RawValue: 0
-    - rid: 1120084501796487169
+    - rid: 1156092023694950401
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 13
-        StaticColliderId: 379
-        NorthNeighborId: -1
-        SouthNeighborId: 375
-        EastNeighborId: 380
+        GroupId: 5
+        StaticColliderId: 319
+        NorthNeighborId: 323
+        SouthNeighborId: -1
+        EastNeighborId: 320
         WestNeighborId: -1
-    - rid: 1388870300426305536
+    - rid: 1264878741381709824
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 589824
+          Y:
+            RawValue: -327680
+        Rotation:
+          RawValue: 0
+    - rid: 1264878741381709825
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 5
+        StaticColliderId: 331
+        NorthNeighborId: -1
+        SouthNeighborId: 327
+        EastNeighborId: 332
+        WestNeighborId: -1
+    - rid: 1283143064038146048
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 655360
+          Y:
+            RawValue: -524288
+        Rotation:
+          RawValue: 0
+    - rid: 1283143064038146049
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 5
+        StaticColliderId: 320
+        NorthNeighborId: 324
+        SouthNeighborId: -1
+        EastNeighborId: -1
+        WestNeighborId: 319
+    - rid: 1393558134823321600
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
@@ -16999,7 +17018,7 @@ MonoBehaviour:
             RawValue: 655360
         Rotation:
           RawValue: 0
-    - rid: 1388870300426305537
+    - rid: 1393558134823321601
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 10
@@ -17008,121 +17027,121 @@ MonoBehaviour:
         SouthNeighborId: 361
         EastNeighborId: 366
         WestNeighborId: -1
-    - rid: 1508127542790324224
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -196608
-          Y:
-            RawValue: 65536
-        Rotation:
-          RawValue: 0
-    - rid: 1508127542790324225
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 6
-        StaticColliderId: 342
-        NorthNeighborId: -1
-        SouthNeighborId: 338
-        EastNeighborId: -1
-        WestNeighborId: 341
-    - rid: 1512771609323110400
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -262144
-          Y:
-            RawValue: 65536
-        Rotation:
-          RawValue: 0
-    - rid: 1512771609323110401
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 6
-        StaticColliderId: 341
-        NorthNeighborId: -1
-        SouthNeighborId: 337
-        EastNeighborId: 342
-        WestNeighborId: -1
-    - rid: 1537109769502851072
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -458752
-          Y:
-            RawValue: 589824
-        Rotation:
-          RawValue: 0
-    - rid: 1537109769502851073
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 10
-        StaticColliderId: 362
-        NorthNeighborId: 366
-        SouthNeighborId: -1
-        EastNeighborId: -1
-        WestNeighborId: 361
-    - rid: 1566314228560691200
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -589824
-          Y:
-            RawValue: 851968
-        Rotation:
-          RawValue: 0
-    - rid: 1566314228560691201
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 12
-        StaticColliderId: 374
-        NorthNeighborId: 378
-        SouthNeighborId: 370
-        EastNeighborId: -1
-        WestNeighborId: 373
-    - rid: 1740362403079520256
+    - rid: 1452818201640435712
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: 655360
           Y:
-            RawValue: 393216
+            RawValue: 327680
         Rotation:
           RawValue: 0
-    - rid: 1740362403079520257
+    - rid: 1452818201640435713
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 9
-        StaticColliderId: 352
-        NorthNeighborId: 356
-        SouthNeighborId: 348
+        StaticColliderId: 348
+        NorthNeighborId: 352
+        SouthNeighborId: -1
         EastNeighborId: -1
-        WestNeighborId: 351
-    - rid: 1925326924175900672
+        WestNeighborId: 347
+    - rid: 1499050226046992384
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 655360
+          Y:
+            RawValue: -393216
+        Rotation:
+          RawValue: 0
+    - rid: 1499050226046992385
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 5
+        StaticColliderId: 328
+        NorthNeighborId: 332
+        SouthNeighborId: 324
+        EastNeighborId: -1
+        WestNeighborId: 327
+    - rid: 1761902052763500544
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -196608
+          Y:
+            RawValue: -65536
+        Rotation:
+          RawValue: 0
+    - rid: 1761902052763500545
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 6
+        StaticColliderId: 334
+        NorthNeighborId: 338
+        SouthNeighborId: -1
+        EastNeighborId: -1
+        WestNeighborId: 333
+    - rid: 2123966346264838144
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: -655360
           Y:
-            RawValue: -458752
+            RawValue: 917504
         Rotation:
           RawValue: 0
-    - rid: 1925326924175900673
+    - rid: 2123966346264838145
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 4
-        StaticColliderId: 321
-        NorthNeighborId: 325
-        SouthNeighborId: 317
-        EastNeighborId: 322
+        GroupId: 12
+        StaticColliderId: 377
+        NorthNeighborId: -1
+        SouthNeighborId: 373
+        EastNeighborId: 378
         WestNeighborId: -1
-    - rid: 2005596815658844160
+    - rid: 2159263263676694528
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 589824
+          Y:
+            RawValue: 524288
+        Rotation:
+          RawValue: 0
+    - rid: 2159263263676694529
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 9
+        StaticColliderId: 359
+        NorthNeighborId: -1
+        SouthNeighborId: 355
+        EastNeighborId: 360
+        WestNeighborId: -1
+    - rid: 2172453325138558976
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -589824
+          Y:
+            RawValue: 917504
+        Rotation:
+          RawValue: 0
+    - rid: 2172453325138558977
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 12
+        StaticColliderId: 378
+        NorthNeighborId: -1
+        SouthNeighborId: 374
+        EastNeighborId: -1
+        WestNeighborId: 377
+    - rid: 2190159143132725248
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
@@ -17132,7 +17151,7 @@ MonoBehaviour:
             RawValue: 786432
         Rotation:
           RawValue: 0
-    - rid: 2005596815658844161
+    - rid: 2190159143132725249
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 12
@@ -17141,101 +17160,6 @@ MonoBehaviour:
         SouthNeighborId: -1
         EastNeighborId: -1
         WestNeighborId: 369
-    - rid: 2021105717078917120
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -655360
-          Y:
-            RawValue: 851968
-        Rotation:
-          RawValue: 0
-    - rid: 2021105717078917121
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 12
-        StaticColliderId: 373
-        NorthNeighborId: 377
-        SouthNeighborId: 369
-        EastNeighborId: 374
-        WestNeighborId: -1
-    - rid: 2031426317332774912
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -589824
-          Y:
-            RawValue: 393216
-        Rotation:
-          RawValue: 0
-    - rid: 2031426317332774913
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 8
-        StaticColliderId: 350
-        NorthNeighborId: 354
-        SouthNeighborId: 346
-        EastNeighborId: -1
-        WestNeighborId: 349
-    - rid: 2121901411888267264
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -589824
-          Y:
-            RawValue: -458752
-        Rotation:
-          RawValue: 0
-    - rid: 2121901411888267265
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 4
-        StaticColliderId: 322
-        NorthNeighborId: 326
-        SouthNeighborId: 318
-        EastNeighborId: -1
-        WestNeighborId: 321
-    - rid: 2144197469737582592
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -655360
-          Y:
-            RawValue: 786432
-        Rotation:
-          RawValue: 0
-    - rid: 2144197469737582593
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 12
-        StaticColliderId: 369
-        NorthNeighborId: 373
-        SouthNeighborId: -1
-        EastNeighborId: 370
-        WestNeighborId: -1
-    - rid: 2190659609901924352
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -589824
-          Y:
-            RawValue: 327680
-        Rotation:
-          RawValue: 0
-    - rid: 2190659609901924353
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 8
-        StaticColliderId: 346
-        NorthNeighborId: 350
-        SouthNeighborId: -1
-        EastNeighborId: -1
-        WestNeighborId: 345
     - rid: 2235556487889944576
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -17250,62 +17174,62 @@ MonoBehaviour:
       type: {class: EscapeRoutePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         TeamId: 0
-    - rid: 2388013477412208640
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -589824
-          Y:
-            RawValue: 524288
-        Rotation:
-          RawValue: 0
-    - rid: 2388013477412208641
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 8
-        StaticColliderId: 358
-        NorthNeighborId: -1
-        SouthNeighborId: 354
-        EastNeighborId: -1
-        WestNeighborId: 357
-    - rid: 2584941361476141056
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 589824
-          Y:
-            RawValue: -327680
-        Rotation:
-          RawValue: 0
-    - rid: 2584941361476141057
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 5
-        StaticColliderId: 331
-        NorthNeighborId: -1
-        SouthNeighborId: 327
-        EastNeighborId: 332
-        WestNeighborId: -1
-    - rid: 2603476035143991296
+    - rid: 2277465745824677888
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: -655360
           Y:
-            RawValue: 393216
+            RawValue: 851968
         Rotation:
           RawValue: 0
-    - rid: 2603476035143991297
+    - rid: 2277465745824677889
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 8
-        StaticColliderId: 349
-        NorthNeighborId: 353
-        SouthNeighborId: 345
-        EastNeighborId: 350
+        GroupId: 12
+        StaticColliderId: 373
+        NorthNeighborId: 377
+        SouthNeighborId: 369
+        EastNeighborId: 374
+        WestNeighborId: -1
+    - rid: 2490864047784722432
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -589824
+          Y:
+            RawValue: -458752
+        Rotation:
+          RawValue: 0
+    - rid: 2490864047784722433
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 4
+        StaticColliderId: 322
+        NorthNeighborId: 326
+        SouthNeighborId: 318
+        EastNeighborId: -1
+        WestNeighborId: 321
+    - rid: 2640386896038985728
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 458752
+          Y:
+            RawValue: 655360
+        Rotation:
+          RawValue: 0
+    - rid: 2640386896038985729
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 11
+        StaticColliderId: 367
+        NorthNeighborId: -1
+        SouthNeighborId: 363
+        EastNeighborId: 368
         WestNeighborId: -1
     - rid: 2660380172812812288
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
@@ -17321,64 +17245,7 @@ MonoBehaviour:
       type: {class: SpawnPointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Team: 0
-    - rid: 2716896760550129664
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 458752
-          Y:
-            RawValue: -655360
-        Rotation:
-          RawValue: 0
-    - rid: 2716896760550129665
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 3
-        StaticColliderId: 311
-        NorthNeighborId: 315
-        SouthNeighborId: -1
-        EastNeighborId: 312
-        WestNeighborId: -1
-    - rid: 3045977268586283008
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -524288
-          Y:
-            RawValue: -589824
-        Rotation:
-          RawValue: 0
-    - rid: 3045977268586283009
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 2
-        StaticColliderId: 313
-        NorthNeighborId: -1
-        SouthNeighborId: 309
-        EastNeighborId: 314
-        WestNeighborId: -1
-    - rid: 3095063665980735488
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 458752
-          Y:
-            RawValue: 589824
-        Rotation:
-          RawValue: 0
-    - rid: 3095063665980735489
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 11
-        StaticColliderId: 363
-        NorthNeighborId: 367
-        SouthNeighborId: -1
-        EastNeighborId: 364
-        WestNeighborId: -1
-    - rid: 3110320158615273472
+    - rid: 2733919975096975360
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
@@ -17388,7 +17255,7 @@ MonoBehaviour:
             RawValue: 65536
         Rotation:
           RawValue: 0
-    - rid: 3110320158615273473
+    - rid: 2733919975096975361
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 7
@@ -17397,26 +17264,83 @@ MonoBehaviour:
         SouthNeighborId: 340
         EastNeighborId: -1
         WestNeighborId: 343
-    - rid: 3111503228831793152
+    - rid: 2741091522509275136
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -655360
+          Y:
+            RawValue: 327680
+        Rotation:
+          RawValue: 0
+    - rid: 2741091522509275137
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 8
+        StaticColliderId: 345
+        NorthNeighborId: 349
+        SouthNeighborId: -1
+        EastNeighborId: 346
+        WestNeighborId: -1
+    - rid: 2770144699934048256
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -458752
+          Y:
+            RawValue: -589824
+        Rotation:
+          RawValue: 0
+    - rid: 2770144699934048257
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 2
+        StaticColliderId: 314
+        NorthNeighborId: -1
+        SouthNeighborId: 310
+        EastNeighborId: -1
+        WestNeighborId: 313
+    - rid: 2903428742846087168
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 524288
+          Y:
+            RawValue: -655360
+        Rotation:
+          RawValue: 0
+    - rid: 2903428742846087169
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 3
+        StaticColliderId: 312
+        NorthNeighborId: 316
+        SouthNeighborId: -1
+        EastNeighborId: -1
+        WestNeighborId: 311
+    - rid: 2958597539781148672
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: 655360
           Y:
-            RawValue: -524288
+            RawValue: 524288
         Rotation:
           RawValue: 0
-    - rid: 3111503228831793153
+    - rid: 2958597539781148673
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 5
-        StaticColliderId: 320
-        NorthNeighborId: 324
-        SouthNeighborId: -1
+        GroupId: 9
+        StaticColliderId: 360
+        NorthNeighborId: -1
+        SouthNeighborId: 356
         EastNeighborId: -1
-        WestNeighborId: 319
-    - rid: 3163292038976241664
+        WestNeighborId: 359
+    - rid: 2966567087822077952
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
@@ -17426,7 +17350,7 @@ MonoBehaviour:
             RawValue: 851968
         Rotation:
           RawValue: 0
-    - rid: 3163292038976241665
+    - rid: 2966567087822077953
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 13
@@ -17435,82 +17359,139 @@ MonoBehaviour:
         SouthNeighborId: 372
         EastNeighborId: -1
         WestNeighborId: 375
-    - rid: 3229810370742845440
+    - rid: 3024553016083611648
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: -655360
+            RawValue: -524288
           Y:
-            RawValue: 524288
+            RawValue: 589824
         Rotation:
           RawValue: 0
-    - rid: 3229810370742845441
+    - rid: 3024553016083611649
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 8
-        StaticColliderId: 357
-        NorthNeighborId: -1
-        SouthNeighborId: 353
-        EastNeighborId: 358
+        GroupId: 10
+        StaticColliderId: 361
+        NorthNeighborId: 365
+        SouthNeighborId: -1
+        EastNeighborId: 362
         WestNeighborId: -1
-    - rid: 3315702290664390656
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -262144
-          Y:
-            RawValue: 0
-        Rotation:
-          RawValue: 0
-    - rid: 3315702290664390657
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 6
-        StaticColliderId: 337
-        NorthNeighborId: 341
-        SouthNeighborId: 333
-        EastNeighborId: 338
-        WestNeighborId: -1
-    - rid: 3333240381595713536
+    - rid: 3064501883440726016
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: 589824
           Y:
-            RawValue: -458752
+            RawValue: 327680
         Rotation:
           RawValue: 0
-    - rid: 3333240381595713537
+    - rid: 3064501883440726017
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 5
-        StaticColliderId: 323
-        NorthNeighborId: 327
-        SouthNeighborId: 319
-        EastNeighborId: 324
+        GroupId: 9
+        StaticColliderId: 347
+        NorthNeighborId: 351
+        SouthNeighborId: -1
+        EastNeighborId: 348
         WestNeighborId: -1
-    - rid: 3465505548743475200
+    - rid: 3154505869475971072
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: 524288
+            RawValue: -655360
           Y:
-            RawValue: -589824
+            RawValue: 786432
         Rotation:
           RawValue: 0
-    - rid: 3465505548743475201
+    - rid: 3154505869475971073
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 12
+        StaticColliderId: 369
+        NorthNeighborId: 373
+        SouthNeighborId: -1
+        EastNeighborId: 370
+        WestNeighborId: -1
+    - rid: 3159778712778440704
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -589824
+          Y:
+            RawValue: 524288
+        Rotation:
+          RawValue: 0
+    - rid: 3159778712778440705
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 8
+        StaticColliderId: 358
+        NorthNeighborId: -1
+        SouthNeighborId: 354
+        EastNeighborId: -1
+        WestNeighborId: 357
+    - rid: 3241012974743191552
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 458752
+          Y:
+            RawValue: -655360
+        Rotation:
+          RawValue: 0
+    - rid: 3241012974743191553
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 3
-        StaticColliderId: 316
-        NorthNeighborId: -1
-        SouthNeighborId: 312
+        StaticColliderId: 311
+        NorthNeighborId: 315
+        SouthNeighborId: -1
+        EastNeighborId: 312
+        WestNeighborId: -1
+    - rid: 3374482008339120128
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -458752
+          Y:
+            RawValue: -655360
+        Rotation:
+          RawValue: 0
+    - rid: 3374482008339120129
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 2
+        StaticColliderId: 310
+        NorthNeighborId: 314
+        SouthNeighborId: -1
         EastNeighborId: -1
-        WestNeighborId: 315
+        WestNeighborId: 309
+    - rid: 3452382087191986176
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 589824
+          Y:
+            RawValue: 393216
+        Rotation:
+          RawValue: 0
+    - rid: 3452382087191986177
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 9
+        StaticColliderId: 351
+        NorthNeighborId: 355
+        SouthNeighborId: 347
+        EastNeighborId: 352
+        WestNeighborId: -1
     - rid: 3544439065447235584
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -17525,62 +17506,62 @@ MonoBehaviour:
       type: {class: SpawnPointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Team: 1
-    - rid: 3580022626828943360
+    - rid: 3670283232865157120
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -589824
+          Y:
+            RawValue: -524288
+        Rotation:
+          RawValue: 0
+    - rid: 3670283232865157121
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 4
+        StaticColliderId: 318
+        NorthNeighborId: 322
+        SouthNeighborId: -1
+        EastNeighborId: -1
+        WestNeighborId: 317
+    - rid: 3671002399369068544
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: -655360
           Y:
-            RawValue: 917504
+            RawValue: -327680
         Rotation:
           RawValue: 0
-    - rid: 3580022626828943361
+    - rid: 3671002399369068545
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 12
-        StaticColliderId: 377
+        GroupId: 4
+        StaticColliderId: 329
         NorthNeighborId: -1
-        SouthNeighborId: 373
-        EastNeighborId: 378
+        SouthNeighborId: 325
+        EastNeighborId: 330
         WestNeighborId: -1
-    - rid: 3641162637338738688
+    - rid: 3824144730380304384
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: 655360
+            RawValue: -655360
           Y:
-            RawValue: 786432
+            RawValue: -917504
         Rotation:
           RawValue: 0
-    - rid: 3641162637338738689
+    - rid: 3824144730380304385
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 13
-        StaticColliderId: 372
-        NorthNeighborId: 376
+        GroupId: 0
+        StaticColliderId: 297
+        NorthNeighborId: 301
         SouthNeighborId: -1
-        EastNeighborId: -1
-        WestNeighborId: 371
-    - rid: 3715621837502152704
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 589824
-          Y:
-            RawValue: 458752
-        Rotation:
-          RawValue: 0
-    - rid: 3715621837502152705
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 9
-        StaticColliderId: 355
-        NorthNeighborId: 359
-        SouthNeighborId: 351
-        EastNeighborId: 356
+        EastNeighborId: 298
         WestNeighborId: -1
     - rid: 3893268851017646080
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
@@ -17596,44 +17577,101 @@ MonoBehaviour:
       type: {class: SpawnPointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Team: 0
-    - rid: 4074753602495709184
+    - rid: 3964712863880183808
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: -655360
+            RawValue: 196608
           Y:
-            RawValue: -917504
+            RawValue: 65536
         Rotation:
           RawValue: 0
-    - rid: 4074753602495709185
+    - rid: 3964712863880183809
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 0
-        StaticColliderId: 297
-        NorthNeighborId: 301
-        SouthNeighborId: -1
-        EastNeighborId: 298
+        GroupId: 7
+        StaticColliderId: 343
+        NorthNeighborId: -1
+        SouthNeighborId: 339
+        EastNeighborId: 344
         WestNeighborId: -1
-    - rid: 4157707964502769664
+    - rid: 3983487712119226368
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: 655360
+            RawValue: 589824
           Y:
-            RawValue: 458752
+            RawValue: -458752
         Rotation:
           RawValue: 0
-    - rid: 4157707964502769665
+    - rid: 3983487712119226369
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 9
-        StaticColliderId: 356
-        NorthNeighborId: 360
-        SouthNeighborId: 352
-        EastNeighborId: -1
-        WestNeighborId: 355
+        GroupId: 5
+        StaticColliderId: 323
+        NorthNeighborId: 327
+        SouthNeighborId: 319
+        EastNeighborId: 324
+        WestNeighborId: -1
+    - rid: 4035729009953210368
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -524288
+          Y:
+            RawValue: -589824
+        Rotation:
+          RawValue: 0
+    - rid: 4035729009953210369
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 2
+        StaticColliderId: 313
+        NorthNeighborId: -1
+        SouthNeighborId: 309
+        EastNeighborId: 314
+        WestNeighborId: -1
+    - rid: 4149671676965027840
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 458752
+          Y:
+            RawValue: 589824
+        Rotation:
+          RawValue: 0
+    - rid: 4149671676965027841
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 11
+        StaticColliderId: 363
+        NorthNeighborId: 367
+        SouthNeighborId: -1
+        EastNeighborId: 364
+        WestNeighborId: -1
+    - rid: 4221701669395628032
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 589824
+          Y:
+            RawValue: -786432
+        Rotation:
+          RawValue: 0
+    - rid: 4221701669395628033
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 1
+        StaticColliderId: 307
+        NorthNeighborId: -1
+        SouthNeighborId: 303
+        EastNeighborId: 308
+        WestNeighborId: -1
     - rid: 4226635025598119936
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -17662,81 +17700,100 @@ MonoBehaviour:
       type: {class: ObjectivePointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
-    - rid: 4354365497555288064
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 589824
-          Y:
-            RawValue: -524288
-        Rotation:
-          RawValue: 0
-    - rid: 4354365497555288065
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 5
-        StaticColliderId: 319
-        NorthNeighborId: 323
-        SouthNeighborId: -1
-        EastNeighborId: 320
-        WestNeighborId: -1
-    - rid: 4497580859917860864
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 196608
-          Y:
-            RawValue: 65536
-        Rotation:
-          RawValue: 0
-    - rid: 4497580859917860865
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 7
-        StaticColliderId: 343
-        NorthNeighborId: -1
-        SouthNeighborId: 339
-        EastNeighborId: 344
-        WestNeighborId: -1
-    - rid: 4528807982284144640
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 655360
-          Y:
-            RawValue: 917504
-        Rotation:
-          RawValue: 0
-    - rid: 4528807982284144641
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 13
-        StaticColliderId: 380
-        NorthNeighborId: -1
-        SouthNeighborId: 376
-        EastNeighborId: -1
-        WestNeighborId: 379
-    - rid: 4574031189739831296
+    - rid: 4283547254985326592
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: -655360
           Y:
+            RawValue: -524288
+        Rotation:
+          RawValue: 0
+    - rid: 4283547254985326593
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 4
+        StaticColliderId: 317
+        NorthNeighborId: 321
+        SouthNeighborId: -1
+        EastNeighborId: 318
+        WestNeighborId: -1
+    - rid: 4420307382433742848
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 655360
+          Y:
+            RawValue: -458752
+        Rotation:
+          RawValue: 0
+    - rid: 4420307382433742849
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 5
+        StaticColliderId: 324
+        NorthNeighborId: 328
+        SouthNeighborId: 320
+        EastNeighborId: -1
+        WestNeighborId: 323
+    - rid: 4467141000761966592
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 655360
+          Y:
+            RawValue: 393216
+        Rotation:
+          RawValue: 0
+    - rid: 4467141000761966593
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 9
+        StaticColliderId: 352
+        NorthNeighborId: 356
+        SouthNeighborId: 348
+        EastNeighborId: -1
+        WestNeighborId: 351
+    - rid: 4506361321406595072
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -589824
+          Y:
             RawValue: -851968
         Rotation:
           RawValue: 0
-    - rid: 4574031189739831297
+    - rid: 4506361321406595073
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 0
-        StaticColliderId: 301
-        NorthNeighborId: 305
-        SouthNeighborId: 297
-        EastNeighborId: 302
+        StaticColliderId: 302
+        NorthNeighborId: 306
+        SouthNeighborId: 298
+        EastNeighborId: -1
+        WestNeighborId: 301
+    - rid: 4589482053266833408
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -655360
+          Y:
+            RawValue: 524288
+        Rotation:
+          RawValue: 0
+    - rid: 4589482053266833409
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 8
+        StaticColliderId: 357
+        NorthNeighborId: -1
+        SouthNeighborId: 353
+        EastNeighborId: 358
         WestNeighborId: -1
     - rid: 4649439068722036736
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
@@ -17752,6 +17809,63 @@ MonoBehaviour:
       type: {class: ObjectivePointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
+    - rid: 4679672387195633664
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 655360
+          Y:
+            RawValue: -851968
+        Rotation:
+          RawValue: 0
+    - rid: 4679672387195633665
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 1
+        StaticColliderId: 304
+        NorthNeighborId: 308
+        SouthNeighborId: 300
+        EastNeighborId: -1
+        WestNeighborId: 303
+    - rid: 4710195431278116864
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 524288
+          Y:
+            RawValue: 655360
+        Rotation:
+          RawValue: 0
+    - rid: 4710195431278116865
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 11
+        StaticColliderId: 368
+        NorthNeighborId: -1
+        SouthNeighborId: 364
+        EastNeighborId: -1
+        WestNeighborId: 367
+    - rid: 4711810192952524800
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -655360
+          Y:
+            RawValue: 458752
+        Rotation:
+          RawValue: 0
+    - rid: 4711810192952524801
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 8
+        StaticColliderId: 353
+        NorthNeighborId: 357
+        SouthNeighborId: 349
+        EastNeighborId: 354
+        WestNeighborId: -1
     - rid: 4782336762145931264
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -17766,139 +17880,101 @@ MonoBehaviour:
       type: {class: SpawnPointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Team: 1
-    - rid: 4811108020064878592
+    - rid: 4920366524876718080
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: -458752
+            RawValue: 262144
           Y:
-            RawValue: -655360
+            RawValue: 0
         Rotation:
           RawValue: 0
-    - rid: 4811108020064878593
+    - rid: 4920366524876718081
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 2
-        StaticColliderId: 310
-        NorthNeighborId: 314
-        SouthNeighborId: -1
+        GroupId: 7
+        StaticColliderId: 340
+        NorthNeighborId: 344
+        SouthNeighborId: 336
         EastNeighborId: -1
-        WestNeighborId: 309
-    - rid: 4939320655788113920
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 589824
-          Y:
-            RawValue: 524288
-        Rotation:
-          RawValue: 0
-    - rid: 4939320655788113921
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 9
-        StaticColliderId: 359
-        NorthNeighborId: -1
-        SouthNeighborId: 355
-        EastNeighborId: 360
-        WestNeighborId: -1
-    - rid: 4996176522319495168
+        WestNeighborId: 339
+    - rid: 5117846526986551296
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: -589824
           Y:
-            RawValue: 917504
+            RawValue: -327680
         Rotation:
           RawValue: 0
-    - rid: 4996176522319495169
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 12
-        StaticColliderId: 378
-        NorthNeighborId: -1
-        SouthNeighborId: 374
-        EastNeighborId: -1
-        WestNeighborId: 377
-    - rid: 5056999020929482752
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 196608
-          Y:
-            RawValue: 0
-        Rotation:
-          RawValue: 0
-    - rid: 5056999020929482753
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 7
-        StaticColliderId: 339
-        NorthNeighborId: 343
-        SouthNeighborId: 335
-        EastNeighborId: 340
-        WestNeighborId: -1
-    - rid: 5058217157406490624
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 589824
-          Y:
-            RawValue: -851968
-        Rotation:
-          RawValue: 0
-    - rid: 5058217157406490625
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 1
-        StaticColliderId: 303
-        NorthNeighborId: 307
-        SouthNeighborId: 299
-        EastNeighborId: 304
-        WestNeighborId: -1
-    - rid: 5315923772216180736
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -655360
-          Y:
-            RawValue: -524288
-        Rotation:
-          RawValue: 0
-    - rid: 5315923772216180737
+    - rid: 5117846526986551297
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 4
-        StaticColliderId: 317
-        NorthNeighborId: 321
-        SouthNeighborId: -1
-        EastNeighborId: 318
-        WestNeighborId: -1
-    - rid: 5365184422876282880
+        StaticColliderId: 330
+        NorthNeighborId: -1
+        SouthNeighborId: 326
+        EastNeighborId: -1
+        WestNeighborId: 329
+    - rid: 5181905474580119552
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: 655360
+            RawValue: 262144
           Y:
-            RawValue: -393216
+            RawValue: -65536
         Rotation:
           RawValue: 0
-    - rid: 5365184422876282881
+    - rid: 5181905474580119553
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 5
-        StaticColliderId: 328
-        NorthNeighborId: 332
-        SouthNeighborId: 324
+        GroupId: 7
+        StaticColliderId: 336
+        NorthNeighborId: 340
+        SouthNeighborId: -1
         EastNeighborId: -1
-        WestNeighborId: 327
+        WestNeighborId: 335
+    - rid: 5250805713604706304
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -589824
+          Y:
+            RawValue: -786432
+        Rotation:
+          RawValue: 0
+    - rid: 5250805713604706305
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 0
+        StaticColliderId: 306
+        NorthNeighborId: -1
+        SouthNeighborId: 302
+        EastNeighborId: -1
+        WestNeighborId: 305
+    - rid: 5335756234677026816
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -589824
+          Y:
+            RawValue: 458752
+        Rotation:
+          RawValue: 0
+    - rid: 5335756234677026817
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 8
+        StaticColliderId: 354
+        NorthNeighborId: 358
+        SouthNeighborId: 350
+        EastNeighborId: -1
+        WestNeighborId: 353
     - rid: 5396649376909099008
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -17913,24 +17989,81 @@ MonoBehaviour:
       type: {class: ObjectivePointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
-    - rid: 5582612284628271104
+    - rid: 5454602581814804480
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: -524288
+            RawValue: 589824
           Y:
-            RawValue: -655360
+            RawValue: -393216
         Rotation:
           RawValue: 0
-    - rid: 5582612284628271105
+    - rid: 5454602581814804481
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 2
-        StaticColliderId: 309
-        NorthNeighborId: 313
-        SouthNeighborId: -1
-        EastNeighborId: 310
+        GroupId: 5
+        StaticColliderId: 327
+        NorthNeighborId: 331
+        SouthNeighborId: 323
+        EastNeighborId: 328
+        WestNeighborId: -1
+    - rid: 5492826998327738368
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -655360
+          Y:
+            RawValue: -851968
+        Rotation:
+          RawValue: 0
+    - rid: 5492826998327738369
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 0
+        StaticColliderId: 301
+        NorthNeighborId: 305
+        SouthNeighborId: 297
+        EastNeighborId: 302
+        WestNeighborId: -1
+    - rid: 5493871021125533696
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 589824
+          Y:
+            RawValue: 851968
+        Rotation:
+          RawValue: 0
+    - rid: 5493871021125533697
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 13
+        StaticColliderId: 375
+        NorthNeighborId: 379
+        SouthNeighborId: 371
+        EastNeighborId: 376
+        WestNeighborId: -1
+    - rid: 5564282719271124992
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 589824
+          Y:
+            RawValue: 458752
+        Rotation:
+          RawValue: 0
+    - rid: 5564282719271124993
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 9
+        StaticColliderId: 355
+        NorthNeighborId: 359
+        SouthNeighborId: 351
+        EastNeighborId: 356
         WestNeighborId: -1
     - rid: 5730006602925211648
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
@@ -17946,24 +18079,43 @@ MonoBehaviour:
       type: {class: SpawnPointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Team: 1
-    - rid: 5807174452131135488
+    - rid: 5750114834498715648
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 655360
+          Y:
+            RawValue: -917504
+        Rotation:
+          RawValue: 0
+    - rid: 5750114834498715649
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 1
+        StaticColliderId: 300
+        NorthNeighborId: 304
+        SouthNeighborId: -1
+        EastNeighborId: -1
+        WestNeighborId: 299
+    - rid: 5978763242476929024
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: 589824
           Y:
-            RawValue: -393216
+            RawValue: -917504
         Rotation:
           RawValue: 0
-    - rid: 5807174452131135489
+    - rid: 5978763242476929025
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 5
-        StaticColliderId: 327
-        NorthNeighborId: 331
-        SouthNeighborId: 323
-        EastNeighborId: 328
+        GroupId: 1
+        StaticColliderId: 299
+        NorthNeighborId: 303
+        SouthNeighborId: -1
+        EastNeighborId: 300
         WestNeighborId: -1
     - rid: 5994779967945179136
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
@@ -17979,44 +18131,25 @@ MonoBehaviour:
       type: {class: SpawnPointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Team: 0
-    - rid: 6122797401699778560
+    - rid: 6124255034143145984
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: 458752
+            RawValue: 196608
           Y:
-            RawValue: -589824
+            RawValue: -65536
         Rotation:
           RawValue: 0
-    - rid: 6122797401699778561
+    - rid: 6124255034143145985
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 3
-        StaticColliderId: 315
-        NorthNeighborId: -1
-        SouthNeighborId: 311
-        EastNeighborId: 316
-        WestNeighborId: -1
-    - rid: 6132573767320207360
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -589824
-          Y:
-            RawValue: -524288
-        Rotation:
-          RawValue: 0
-    - rid: 6132573767320207361
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 4
-        StaticColliderId: 318
-        NorthNeighborId: 322
+        GroupId: 7
+        StaticColliderId: 335
+        NorthNeighborId: 339
         SouthNeighborId: -1
-        EastNeighborId: -1
-        WestNeighborId: 317
+        EastNeighborId: 336
+        WestNeighborId: -1
     - rid: 6140042320310960128
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -18031,62 +18164,43 @@ MonoBehaviour:
       type: {class: ObjectivePointPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
-    - rid: 6315606014842372096
+    - rid: 6241649456849092608
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: -196608
           Y:
-            RawValue: 0
+            RawValue: 65536
         Rotation:
           RawValue: 0
-    - rid: 6315606014842372097
+    - rid: 6241649456849092609
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 6
-        StaticColliderId: 338
-        NorthNeighborId: 342
-        SouthNeighborId: 334
-        EastNeighborId: -1
-        WestNeighborId: 337
-    - rid: 6341822761505128448
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -458752
-          Y:
-            RawValue: -589824
-        Rotation:
-          RawValue: 0
-    - rid: 6341822761505128449
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 2
-        StaticColliderId: 314
+        StaticColliderId: 342
         NorthNeighborId: -1
-        SouthNeighborId: 310
+        SouthNeighborId: 338
         EastNeighborId: -1
-        WestNeighborId: 313
-    - rid: 6483722392848826368
+        WestNeighborId: 341
+    - rid: 6255070452260012032
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: 196608
+            RawValue: -262144
           Y:
-            RawValue: -65536
+            RawValue: 0
         Rotation:
           RawValue: 0
-    - rid: 6483722392848826369
+    - rid: 6255070452260012033
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 7
-        StaticColliderId: 335
-        NorthNeighborId: 339
-        SouthNeighborId: -1
-        EastNeighborId: 336
+        GroupId: 6
+        StaticColliderId: 337
+        NorthNeighborId: 341
+        SouthNeighborId: 333
+        EastNeighborId: 338
         WestNeighborId: -1
     - rid: 6631092685098713088
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
@@ -18102,178 +18216,140 @@ MonoBehaviour:
       type: {class: EscapeRoutePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         TeamId: 1
-    - rid: 6672975408725491712
+    - rid: 6644574658307817472
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
+            RawValue: 458752
+          Y:
             RawValue: -589824
-          Y:
-            RawValue: -393216
         Rotation:
           RawValue: 0
-    - rid: 6672975408725491713
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 4
-        StaticColliderId: 326
-        NorthNeighborId: 330
-        SouthNeighborId: 322
-        EastNeighborId: -1
-        WestNeighborId: 325
-    - rid: 6684348593794449408
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 589824
-          Y:
-            RawValue: -917504
-        Rotation:
-          RawValue: 0
-    - rid: 6684348593794449409
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 1
-        StaticColliderId: 299
-        NorthNeighborId: 303
-        SouthNeighborId: -1
-        EastNeighborId: 300
-        WestNeighborId: -1
-    - rid: 6755156777551003648
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 524288
-          Y:
-            RawValue: -655360
-        Rotation:
-          RawValue: 0
-    - rid: 6755156777551003649
+    - rid: 6644574658307817473
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 3
-        StaticColliderId: 312
-        NorthNeighborId: 316
-        SouthNeighborId: -1
-        EastNeighborId: -1
-        WestNeighborId: 311
-    - rid: 6897660856822136832
+        StaticColliderId: 315
+        NorthNeighborId: -1
+        SouthNeighborId: 311
+        EastNeighborId: 316
+        WestNeighborId: -1
+    - rid: 6973602157857603584
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: 262144
+            RawValue: -458752
           Y:
-            RawValue: -65536
+            RawValue: 655360
         Rotation:
           RawValue: 0
-    - rid: 6897660856822136833
+    - rid: 6973602157857603585
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 7
-        StaticColliderId: 336
-        NorthNeighborId: 340
-        SouthNeighborId: -1
+        GroupId: 10
+        StaticColliderId: 366
+        NorthNeighborId: -1
+        SouthNeighborId: 362
         EastNeighborId: -1
-        WestNeighborId: 335
-    - rid: 6969665023614386176
+        WestNeighborId: 365
+    - rid: 6983651049890381824
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: -196608
-          Y:
-            RawValue: -65536
-        Rotation:
-          RawValue: 0
-    - rid: 6969665023614386177
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 6
-        StaticColliderId: 334
-        NorthNeighborId: 338
-        SouthNeighborId: -1
-        EastNeighborId: -1
-        WestNeighborId: 333
-    - rid: 7096152529888608256
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -589824
+            RawValue: 655360
           Y:
             RawValue: -786432
         Rotation:
           RawValue: 0
-    - rid: 7096152529888608257
+    - rid: 6983651049890381825
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        GroupId: 0
-        StaticColliderId: 306
+        GroupId: 1
+        StaticColliderId: 308
         NorthNeighborId: -1
-        SouthNeighborId: 302
+        SouthNeighborId: 304
         EastNeighborId: -1
-        WestNeighborId: 305
-    - rid: 7137475166157668352
+        WestNeighborId: 307
+    - rid: 7127472217390055424
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: 655360
           Y:
-            RawValue: -458752
+            RawValue: 917504
         Rotation:
           RawValue: 0
-    - rid: 7137475166157668353
+    - rid: 7127472217390055425
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 13
+        StaticColliderId: 380
+        NorthNeighborId: -1
+        SouthNeighborId: 376
+        EastNeighborId: -1
+        WestNeighborId: 379
+    - rid: 7162878145366851584
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -655360
+          Y:
+            RawValue: -393216
+        Rotation:
+          RawValue: 0
+    - rid: 7162878145366851585
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 4
+        StaticColliderId: 325
+        NorthNeighborId: 329
+        SouthNeighborId: 321
+        EastNeighborId: 326
+        WestNeighborId: -1
+    - rid: 7323292332751585280
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 655360
+          Y:
+            RawValue: 786432
+        Rotation:
+          RawValue: 0
+    - rid: 7323292332751585281
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 13
+        StaticColliderId: 372
+        NorthNeighborId: 376
+        SouthNeighborId: -1
+        EastNeighborId: -1
+        WestNeighborId: 371
+    - rid: 7489955968134938624
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 655360
+          Y:
+            RawValue: -327680
+        Rotation:
+          RawValue: 0
+    - rid: 7489955968134938625
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 5
-        StaticColliderId: 324
-        NorthNeighborId: 328
-        SouthNeighborId: 320
+        StaticColliderId: 332
+        NorthNeighborId: -1
+        SouthNeighborId: 328
         EastNeighborId: -1
-        WestNeighborId: 323
-    - rid: 7238857366668574720
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 655360
-          Y:
-            RawValue: -851968
-        Rotation:
-          RawValue: 0
-    - rid: 7238857366668574721
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 1
-        StaticColliderId: 304
-        NorthNeighborId: 308
-        SouthNeighborId: 300
-        EastNeighborId: -1
-        WestNeighborId: 303
-    - rid: 7354581165207977984
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 655360
-          Y:
-            RawValue: -917504
-        Rotation:
-          RawValue: 0
-    - rid: 7354581165207977985
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 1
-        StaticColliderId: 300
-        NorthNeighborId: 304
-        SouthNeighborId: -1
-        EastNeighborId: -1
-        WestNeighborId: 299
-    - rid: 7479043154167988224
+        WestNeighborId: 331
+    - rid: 7524924496642310144
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
@@ -18283,7 +18359,7 @@ MonoBehaviour:
             RawValue: 589824
         Rotation:
           RawValue: 0
-    - rid: 7479043154167988225
+    - rid: 7524924496642310145
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 11
@@ -18292,25 +18368,6 @@ MonoBehaviour:
         SouthNeighborId: -1
         EastNeighborId: -1
         WestNeighborId: 363
-    - rid: 7489821950122917888
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 458752
-          Y:
-            RawValue: 655360
-        Rotation:
-          RawValue: 0
-    - rid: 7489821950122917889
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 11
-        StaticColliderId: 367
-        NorthNeighborId: -1
-        SouthNeighborId: 363
-        EastNeighborId: 368
-        WestNeighborId: -1
     - rid: 7588063442913722368
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -18325,178 +18382,83 @@ MonoBehaviour:
       type: {class: EscapeRoutePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         TeamId: 0
-    - rid: 7602437470092787712
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 589824
-          Y:
-            RawValue: 393216
-        Rotation:
-          RawValue: 0
-    - rid: 7602437470092787713
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 9
-        StaticColliderId: 351
-        NorthNeighborId: 355
-        SouthNeighborId: 347
-        EastNeighborId: 352
-        WestNeighborId: -1
-    - rid: 7869594237019357184
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 655360
-          Y:
-            RawValue: -786432
-        Rotation:
-          RawValue: 0
-    - rid: 7869594237019357185
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 1
-        StaticColliderId: 308
-        NorthNeighborId: -1
-        SouthNeighborId: 304
-        EastNeighborId: -1
-        WestNeighborId: 307
-    - rid: 7891908915699384320
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -655360
-          Y:
-            RawValue: 327680
-        Rotation:
-          RawValue: 0
-    - rid: 7891908915699384321
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 8
-        StaticColliderId: 345
-        NorthNeighborId: 349
-        SouthNeighborId: -1
-        EastNeighborId: 346
-        WestNeighborId: -1
-    - rid: 8193153025578106880
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -655360
-          Y:
-            RawValue: 458752
-        Rotation:
-          RawValue: 0
-    - rid: 8193153025578106881
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 8
-        StaticColliderId: 353
-        NorthNeighborId: 357
-        SouthNeighborId: 349
-        EastNeighborId: 354
-        WestNeighborId: -1
-    - rid: 8232859542963093504
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 524288
-          Y:
-            RawValue: 655360
-        Rotation:
-          RawValue: 0
-    - rid: 8232859542963093505
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 11
-        StaticColliderId: 368
-        NorthNeighborId: -1
-        SouthNeighborId: 364
-        EastNeighborId: -1
-        WestNeighborId: 367
-    - rid: 8328157847137288192
+    - rid: 7722271837949788160
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
             RawValue: -458752
           Y:
-            RawValue: 655360
-        Rotation:
-          RawValue: 0
-    - rid: 8328157847137288193
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 10
-        StaticColliderId: 366
-        NorthNeighborId: -1
-        SouthNeighborId: 362
-        EastNeighborId: -1
-        WestNeighborId: 365
-    - rid: 8405368257321631744
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 262144
-          Y:
-            RawValue: 0
-        Rotation:
-          RawValue: 0
-    - rid: 8405368257321631745
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 7
-        StaticColliderId: 340
-        NorthNeighborId: 344
-        SouthNeighborId: 336
-        EastNeighborId: -1
-        WestNeighborId: 339
-    - rid: 8617195565471498240
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 655360
-          Y:
-            RawValue: 524288
-        Rotation:
-          RawValue: 0
-    - rid: 8617195565471498241
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 9
-        StaticColliderId: 360
-        NorthNeighborId: -1
-        SouthNeighborId: 356
-        EastNeighborId: -1
-        WestNeighborId: 359
-    - rid: 8761591822649655296
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -524288
-          Y:
             RawValue: 589824
         Rotation:
           RawValue: 0
-    - rid: 8761591822649655297
+    - rid: 7722271837949788161
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 10
-        StaticColliderId: 361
-        NorthNeighborId: 365
+        StaticColliderId: 362
+        NorthNeighborId: 366
         SouthNeighborId: -1
-        EastNeighborId: 362
+        EastNeighborId: -1
+        WestNeighborId: 361
+    - rid: 7816915539715948544
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 524288
+          Y:
+            RawValue: -589824
+        Rotation:
+          RawValue: 0
+    - rid: 7816915539715948545
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 3
+        StaticColliderId: 316
+        NorthNeighborId: -1
+        SouthNeighborId: 312
+        EastNeighborId: -1
+        WestNeighborId: 315
+    - rid: 7872823620781735936
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -589824
+          Y:
+            RawValue: 327680
+        Rotation:
+          RawValue: 0
+    - rid: 7872823620781735937
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 8
+        StaticColliderId: 346
+        NorthNeighborId: 350
+        SouthNeighborId: -1
+        EastNeighborId: -1
+        WestNeighborId: 345
+    - rid: 7995696673705689088
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -655360
+          Y:
+            RawValue: -458752
+        Rotation:
+          RawValue: 0
+    - rid: 7995696673705689089
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 4
+        StaticColliderId: 321
+        NorthNeighborId: 325
+        SouthNeighborId: 317
+        EastNeighborId: 322
         WestNeighborId: -1
-    - rid: 8796312971778195456
+    - rid: 8331818922357555200
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
@@ -18506,7 +18468,7 @@ MonoBehaviour:
             RawValue: -65536
         Rotation:
           RawValue: 0
-    - rid: 8796312971778195457
+    - rid: 8331818922357555201
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 6
@@ -18514,6 +18476,44 @@ MonoBehaviour:
         NorthNeighborId: 337
         SouthNeighborId: -1
         EastNeighborId: 334
+        WestNeighborId: -1
+    - rid: 8341333638570311680
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -524288
+          Y:
+            RawValue: -655360
+        Rotation:
+          RawValue: 0
+    - rid: 8341333638570311681
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 2
+        StaticColliderId: 309
+        NorthNeighborId: 313
+        SouthNeighborId: -1
+        EastNeighborId: 310
+        WestNeighborId: -1
+    - rid: 8440234980071702528
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 589824
+          Y:
+            RawValue: 917504
+        Rotation:
+          RawValue: 0
+    - rid: 8440234980071702529
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 13
+        StaticColliderId: 379
+        NorthNeighborId: -1
+        SouthNeighborId: 375
+        EastNeighborId: 380
         WestNeighborId: -1
     - rid: 8805492555987812352
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
@@ -18529,45 +18529,26 @@ MonoBehaviour:
       type: {class: EscapeRoutePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         TeamId: 1
-    - rid: 8872421321271672832
+    - rid: 8813270943624331264
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
           X:
-            RawValue: -655360
+            RawValue: -589824
           Y:
-            RawValue: -327680
+            RawValue: -393216
         Rotation:
           RawValue: 0
-    - rid: 8872421321271672833
+    - rid: 8813270943624331265
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 4
-        StaticColliderId: 329
-        NorthNeighborId: -1
-        SouthNeighborId: 325
-        EastNeighborId: 330
-        WestNeighborId: -1
-    - rid: 8939002720338051072
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: 589824
-          Y:
-            RawValue: -786432
-        Rotation:
-          RawValue: 0
-    - rid: 8939002720338051073
-      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        GroupId: 1
-        StaticColliderId: 307
-        NorthNeighborId: -1
-        SouthNeighborId: 303
-        EastNeighborId: 308
-        WestNeighborId: -1
-    - rid: 9206138691032973312
+        StaticColliderId: 326
+        NorthNeighborId: 330
+        SouthNeighborId: 322
+        EastNeighborId: -1
+        WestNeighborId: 325
+    - rid: 8825353236383793152
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         Position:
@@ -18577,7 +18558,7 @@ MonoBehaviour:
             RawValue: -917504
         Rotation:
           RawValue: 0
-    - rid: 9206138691032973313
+    - rid: 8825353236383793153
       type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         GroupId: 0
@@ -18586,3 +18567,22 @@ MonoBehaviour:
         SouthNeighborId: -1
         EastNeighborId: -1
         WestNeighborId: 297
+    - rid: 9152642693665390592
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -589824
+          Y:
+            RawValue: 393216
+        Rotation:
+          RawValue: 0
+    - rid: 9152642693665390593
+      type: {class: InvisibilitySpotPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        GroupId: 8
+        StaticColliderId: 350
+        NorthNeighborId: 354
+        SouthNeighborId: 346
+        EastNeighborId: -1
+        WestNeighborId: 349

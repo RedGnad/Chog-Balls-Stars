@@ -133,7 +133,7 @@ def main():
     baked_blocks = {(round(vec(c["Position"])[0]), round(vec(c["Position"])[1])) for c in colliders
                     if c["StaticData"]["Name"] == "Collider" and c["Layer"] == 6}
     baked_bushes = {(round(vec(c["Position"])[0]), round(vec(c["Position"])[1])) for c in colliders
-                    if c["StaticData"]["Name"] == "InvisibleProp" and c["Layer"] == 10 and c["StaticData"]["IsTrigger"]}
+                    if c["StaticData"]["Name"].startswith("InvisibleProp") and c["Layer"] == 10 and c["StaticData"]["IsTrigger"]}
     walls = [c for c in colliders if c["StaticData"]["Name"] == "QuadStaticCollider"]
     cover = [c for c in colliders if c["StaticData"]["Name"].startswith("CoverPoint")]
     check(baked_blocks == blocks, f"blocks on the Static layer at the layout's {len(blocks)} '#' cells ({len(baked_blocks)} baked)")
@@ -157,7 +157,7 @@ def main():
     spots = [e for e in entities if "InvisibilitySpotPrototype" in e]
     index_of = {c["StaticData"]["ColliderIndex"]: c for c in colliders}
     spots_ok = len(spots) == len(bushes) and all(
-        index_of.get(s["InvisibilitySpotPrototype"]["StaticColliderId"], {}).get("StaticData", {}).get("Name") == "InvisibleProp"
+        index_of.get(s["InvisibilitySpotPrototype"]["StaticColliderId"], {}).get("StaticData", {}).get("Name", "").startswith("InvisibleProp")
         and vec(index_of[s["InvisibilitySpotPrototype"]["StaticColliderId"]]["Position"]) == s["at"] for s in spots)
     neighbours = sum(1 for s in spots for key in ("NorthNeighborId", "SouthNeighborId", "EastNeighborId", "WestNeighborId")
                      if s["InvisibilitySpotPrototype"][key] >= 0)
