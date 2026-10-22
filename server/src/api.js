@@ -152,6 +152,20 @@ export function createApi({ chain, sessions, careers, ranks, seasons, rankStorag
     // What happened to the last judged matches: verdict, and the career transaction or why none.
     'GET /api/careers/recent': async () => json(200, { matches: recentRecords ? recentRecords() : [] }),
 
+    // The record of one match as Photon's server sent it (its configs and its slices of input, nothing of a player), so that a
+    // verdict can be replayed again elsewhere and compared with the record a test page kept of the same match.
+    'GET /api/match/record': async (request, url) => {
+      const gameId = url.searchParams.get('gameId') ?? '';
+      if (!matches?.replayOf || gameId.length === 0) return failure(400, 'bad_game', 'gameId is needed');
+      const record = await matches.replayOf(gameId);
+      if (!record.start && record.chunks.length === 0) return failure(404, 'no_record', 'no record of that match here');
+      const { AppId, ...start } = record.start ?? {};
+      return json(200, {
+        gameId, ended: record.ended, missing: record.missing, start: record.start ? start : null,
+        chunks: record.chunks.map(({ AppId: ignored, ...slice }) => slice),
+      });
+    },
+
     'GET /api/career/top': async (request, url) => {
       const limit = Number(url.searchParams.get('limit') ?? 10);
       if (!Number.isInteger(limit) || limit < 1 || limit > MAX_TOKENS_PER_READ) {

@@ -27,6 +27,11 @@ namespace Chog.Screens
         private const string ObjectName = "ChogResultScreen";
         // The buttons answer after this long, so a click or a key still held from the match does not leave at once.
         private const float ArmSeconds = 1.2f;
+        // The finished room is closed this long after the result shows, never sooner, even when the player leaves at once
+        // (22 October 2026: Photon's record of a match stops a few ticks before the room closes, about 0.17 s on a public
+        // siege; closed at the first frame of the result, every match since 21 October was judged void, "the match did not
+        // reach its end", with no rank points, no mastery and every stake given back). 75 ticks of margin.
+        private const float CloseAfterSeconds = 2.5f;
 
         // A private-page design fixture exercises the reward motion without a wallet, a Photon
         // room, a career write or a claim that its sample numbers are live player data.
@@ -184,7 +189,7 @@ namespace Chog.Screens
             {
                 controls.BuildRank(host.transform);
                 // The stake of this match, when this device staked on it (nothing otherwise).
-                WagerResultCard.Show(host.transform, localTeam);
+                WagerResultCard.Show(host.transform, localTeam, winnerTeam);
             }
 
             var again = ChogUi.Button("PlayAgain", host.transform, new Vector2(0.545f, 0.09f), new Vector2(0.80f, 0.215f), ChogTheme.ButtonKind.Primary,
@@ -288,6 +293,7 @@ namespace Chog.Screens
             private float _shownAt;
             private bool _leaving;
             private Task _disconnectTask;
+            private bool _closing;
             private QuantumMenuUIController _menuController;
 
             public void BuildRecruitRank(Transform card)
@@ -640,7 +646,14 @@ namespace Chog.Screens
                 if (Won && VictoryTitle != null && !ChogTheme.ReducedMotion)
                     StartCoroutine(VictoryEntrance());
                 if (QuantumRunner.Default?.NetworkClient?.CurrentRoom != null)
-                    _ = DisconnectForResult();
+                    StartCoroutine(CloseFinishedSession());
+            }
+
+            private IEnumerator CloseFinishedSession()
+            {
+                _closing = true;
+                yield return new WaitForSecondsRealtime(CloseAfterSeconds);
+                _ = DisconnectForResult();
             }
 
             private IEnumerator VictoryEntrance()
@@ -665,8 +678,8 @@ namespace Chog.Screens
                 VictoryTitle.rectTransform.localScale = Vector3.one;
             }
 
-            // The result has already copied the final verified frame. Close the room
-            // immediately, keep the screen alive, then await the server's real award.
+            // The result has already copied the final verified frame. Close the room once its
+            // record holds the end (CloseAfterSeconds), keep the screen alive, then await the server's real award.
             private async Task DisconnectForResult()
             {
                 var gameplay = Object.FindFirstObjectByType<QuantumMenuUIGameplay>(FindObjectsInactive.Include);
@@ -895,6 +908,9 @@ namespace Chog.Screens
                 // Hidden at once, taken away once the menu is back: this object runs the leaving.
                 foreach (Transform child in transform)
                     child.gameObject.SetActive(false);
+                // A player who leaves at once still lets the room's record reach the end of the match.
+                while (_disconnectTask == null && _closing && Time.unscaledTime - _shownAt < CloseAfterSeconds + 1f)
+                    await Task.Yield();
                 if (_disconnectTask != null)
                 {
                     try

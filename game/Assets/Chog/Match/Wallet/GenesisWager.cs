@@ -139,6 +139,13 @@ namespace Chog.Match
         /// <summary>The version of the wager contract: 2 pays the Genesis players of a match.</summary>
         public static int Version { get; private set; } = 1;
 
+        /// <summary>
+        /// Whether a stake is one signature in the wallet, no gas (version 3, 22 October 2026: the owner found approve then stake, two
+        /// wallet windows, too much): the wallet signs a permit of $CHOG for exactly the stake and the services bring it to the
+        /// contract with the referee's key. Without it, the two transactions of before.
+        /// </summary>
+        public static bool Relayed { get; private set; }
+
         /// <summary>What is taken from the lost stakes before the winners share them: burned, and the Genesis players' share.</summary>
         public static int TakenShare => BurnedShare + GenesisShare;
 
@@ -181,6 +188,7 @@ namespace Chog.Match
         private static string s_decisionSignature = "";
         // The wallets the referee signed as the Genesis players of the last match (version 2).
         private static string[] s_genesisPlayers = Array.Empty<string>();
+        private static int[] s_stakerTeams = Array.Empty<int>();
 
         /// <summary>Whether the week of the signed-in wallet was read (ReadWeek), and for which address.</summary>
         public static bool WeekRead => s_weekOf.Length == 42 && s_weekOf == PlayerWallet.Address;
@@ -208,6 +216,7 @@ namespace Chog.Match
             public int burnedShare;
             public int genesisShare;
             public int version;
+            public bool relay;
             public int chainId;
             public string chainName;
             public string rpcUrl;
@@ -325,7 +334,8 @@ namespace Chog.Match
                 Token = answer.token ?? "";
                 BurnedShare = answer.burnedShare;
                 GenesisShare = answer.genesisShare;
-                Version = answer.version >= 2 ? 2 : 1;
+                Version = answer.version >= 3 ? 3 : answer.version >= 2 ? 2 : 1;
+                Relayed = answer.relay;
                 Chain = chain ?? MonadTransactions.Mainnet;
                 IsTest = answer.test;
                 Debug.Log("CHOG_WAGER " + (State == WagerState.Open ? "open on " + Chain.Name + " (" + Chain.HexId + ")" : "closed"));
@@ -391,6 +401,11 @@ namespace Chog.Match
                 SetStep(WagerStep.Switching, WagerAction.Stake, "");
                 MonadTransactions.SwitchTo(Chain, () =>
                 {
+                    if (Relayed)
+                    {
+                        StakeBySignature(player, ticket);
+                        return;
+                    }
                     MonadTransactions.AllowPayment(player, Token, Address, ticket.amount, "the stake is",
                         () => SetStep(WagerStep.Approving, WagerAction.Stake, ""),
                         () =>
@@ -473,6 +488,108 @@ namespace Chog.Match
         }
 
         /// <summary>Reads what became of the last match this device staked on; "Changed" follows.</summary>
+        [Serializable]
+        private sealed class PermitDomain
+        {
+            public string name;
+            public string version;
+            public long chainId;
+            public string verifyingContract;
+        }
+
+        [Serializable]
+        private sealed class PermitAnswer
+        {
+            public PermitDomain domain;
+            public string spender;
+            public string nonce;
+            public long deadline;
+        }
+
+        [Serializable]
+        private sealed class RelayRequest
+        {
+            public string matchKey;
+            public int team;
+            public string amount;
+            public long deadline;
+            public string signature;
+            public long permitDeadline;
+            public int v;
+            public string r;
+            public string s;
+        }
+
+        // Version 3: the services describe the permit, the wallet signs it (eth_signTypedData_v4, one window, no gas), the services
+        // bring the stake. Any refusal is shown as the stake's failure, as with the transactions.
+        private static void StakeBySignature(string player, TicketAnswer ticket)
+        {
+            PlayerWallet.Run(GameServices.Call("wager/permit", null, PlayerWallet.Session, (status, text) =>
+            {
+                var permit = Parsed<PermitAnswer>(status, text);
+                if (permit == null || permit.domain == null || string.IsNullOrEmpty(permit.spender))
+                {
+                    Fail(0, "the game server could not prepare the signature (" + status + ")");
+                    return;
+                }
+
+                var typed = "{\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},"
+                    + "{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],"
+                    + "\"Permit\":[{\"name\":\"owner\",\"type\":\"address\"},{\"name\":\"spender\",\"type\":\"address\"},"
+                    + "{\"name\":\"value\",\"type\":\"uint256\"},{\"name\":\"nonce\",\"type\":\"uint256\"},{\"name\":\"deadline\",\"type\":\"uint256\"}]},"
+                    + "\"primaryType\":\"Permit\",\"domain\":{\"name\":\"" + permit.domain.name + "\",\"version\":\"" + permit.domain.version
+                    + "\",\"chainId\":" + permit.domain.chainId + ",\"verifyingContract\":\"" + permit.domain.verifyingContract + "\"},"
+                    + "\"message\":{\"owner\":\"" + player + "\",\"spender\":\"" + permit.spender + "\",\"value\":\"" + ticket.amount
+                    + "\",\"nonce\":\"" + permit.nonce + "\",\"deadline\":\"" + permit.deadline + "\"}}";
+                // The typed data goes as a string, the second parameter of the call.
+                var parameters = "[\"" + player + "\"," + JsonString(typed) + "]";
+                SetStep(WagerStep.Sending, WagerAction.Stake, "");
+                PlayerWallet.Request("eth_signTypedData_v4", parameters, (answer, error, code) =>
+                {
+                    var signature = (answer ?? "").Trim('"');
+                    if (error != null || signature.Length != 132 || !signature.StartsWith("0x"))
+                    {
+                        Fail(code, "the stake was not signed" + (error != null ? ": " + error : ""));
+                        return;
+                    }
+
+                    var v = Convert.ToInt32(signature.Substring(130, 2), 16);
+                    if (v < 27)
+                        v += 27;
+                    var request = new RelayRequest
+                    {
+                        matchKey = ticket.matchKey, team = ticket.team, amount = ticket.amount, deadline = ticket.deadline,
+                        signature = ticket.signature, permitDeadline = permit.deadline, v = v,
+                        r = "0x" + signature.Substring(2, 64), s = "0x" + signature.Substring(66, 64),
+                    };
+                    SetStep(WagerStep.Confirming, WagerAction.Stake, "");
+                    PlayerWallet.Run(GameServices.Call("wager/relay", JsonUtility.ToJson(request), PlayerWallet.Session, (relayStatus, relayText) =>
+                    {
+                        if (relayStatus != 200)
+                        {
+                            Fail(0, "the stake was refused: " + MessageOf(relayText, relayStatus));
+                            return;
+                        }
+                        Remember(ticket.gameId, ticket.matchKey, ticket.team, ticket.amount);
+                        Confirm(() => HasStaked, ReadMine, "the stake");
+                    }));
+                });
+            }));
+        }
+
+        // A JSON string literal of a text: quotes and backslashes escaped.
+        private static string JsonString(string text) => "\"" + text.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+
+        private static string MessageOf(string text, long status)
+        {
+            var at = (text ?? "").IndexOf("\"message\":\"", StringComparison.Ordinal);
+            if (at < 0)
+                return "error " + status;
+            var start = at + "\"message\":\"".Length;
+            var end = text.IndexOf('"', start);
+            return end > start ? text.Substring(start, end - start) : "error " + status;
+        }
+
         public static void ReadOutcome(Action then = null)
         {
             if (State != WagerState.Open || !HasLastMatch)
@@ -500,8 +617,12 @@ namespace Chog.Match
                         ? answer.stakes.firstStakeAt + answer.refundAfterSeconds : 0;
                     LastWinners = 0;
                     LastLosers = 0;
+                    s_stakerTeams = Array.Empty<int>();
                     if (answer.stakes != null && answer.stakes.stakers != null)
                     {
+                        s_stakerTeams = new int[answer.stakes.stakers.Length];
+                        for (var i = 0; i < s_stakerTeams.Length; i++)
+                            s_stakerTeams[i] = answer.stakes.stakers[i] != null ? answer.stakes.stakers[i].team : -1;
                         foreach (var staker in answer.stakes.stakers)
                         {
                             if (Outcome == WagerOutcome.Won && staker.team == WinnerTeam)
@@ -639,6 +760,7 @@ namespace Chog.Match
             RefundableAt = 0;
             LastChainState = "";
             s_decisionSignature = "";
+            s_stakerTeams = Array.Empty<int>();
             PlayerPrefs.DeleteKey(LastMatchKey);
             PlayerPrefs.Save();
             Changed?.Invoke();
@@ -662,6 +784,7 @@ namespace Chog.Match
             Outcome = WagerOutcome.Unknown;
             RefundableAt = 0;
             LastChainState = "";
+            s_stakerTeams = Array.Empty<int>();
             PlayerPrefs.SetString(LastMatchKey, Kept(LastGameId, s_lastMatchKey, team, LastStakeWei));
             PlayerPrefs.Save();
         }
@@ -765,6 +888,24 @@ namespace Chog.Match
                     return staker.Team;
 
             return -1;
+        }
+
+        /// <summary>
+        /// How many stakes of the last match read backed "team" and how many the other team, for the result the game showed
+        /// while the server still replays the match.
+        /// </summary>
+        public static (int with, int against) StakersFor(int team)
+        {
+            var with = 0;
+            var against = 0;
+            foreach (var staked in s_stakerTeams)
+            {
+                if (staked == team)
+                    with++;
+                else if (staked == 0 || staked == 1)
+                    against++;
+            }
+            return (with, against);
         }
 
         /// <summary>

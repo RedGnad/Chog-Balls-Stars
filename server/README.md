@@ -40,6 +40,8 @@ serves the game, the hero page, the portraits and the services from one process
 | `GET /api/rental/rented?address=0x…` | the Genesis that address rents now, each with the second its rental ends | anyone |
 | `GET /api/rank/me` with `Authorization: Bearer <session>` | the player ladder of that wallet (`rank`: points, tier, last match, last season reset), its hidden rating as a band only (`rating`), the season and its summary (`season`), the state of its latest match; `{"enabled": false}` without the ladder | the signed-in wallet |
 | `GET /api/season` | the ladder season: id, start, end, whether it ended and was closed; `{"enabled": false}` without one | anyone |
+| `GET /api/careers/recent` | the last 30 matches judged since the services started: verdict, why a match is void, its mode and scores, how far its record went (`ticks`: selection end, end, last tick, rate), when its last slice came and how long judging took | anyone |
+| `GET /api/match/record?gameId=…` | the record Photon's server sent of that match (its start and slices, without the AppId), to replay it elsewhere: `python3 tools/quantum/fetch_live_record.py "<gameId>"`; lost at the next deploy | anyone |
 | `GET /api/season/rewards?season=<id>` | once that season was closed here: every wallet that played in it, with its final tier and points, for the $CHOG reward paid elsewhere; 404 before | anyone |
 | `GET /api/wallet` | `{"reownProjectId": "…"}`: what the game page needs to connect a wallet app when the browser has no wallet; an empty text when none is set, and the page then offers no such connection | anyone |
 

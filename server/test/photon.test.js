@@ -230,6 +230,16 @@ test('the record of a match is kept as Photon sent it, and the match is judged o
   assert.equal(kept.claims.length, 1, 'what the pages claim is kept');
   assert.equal(kept.verdict, null, 'and decides nothing');
   assert.ok(kept.closedAt);
+
+  // The record can be read back from outside, to replay it elsewhere; the AppId is not repeated.
+  const reader = createApi({ matches, photon: null, publicOrigin: ORIGIN });
+  const read = await reader(new Request(`${ORIGIN}/api/match/record?gameId=g4`)).then(response => response.json());
+  assert.equal(read.ended, true);
+  assert.deepEqual(read.chunks.map(slice => slice.ChunkNumber), [0, 1, 2]);
+  assert.equal(read.start.RuntimeConfig, 'H4sIAAAA');
+  assert.equal(read.start.AppId, undefined);
+  assert.equal(read.chunks[0].AppId, undefined);
+  assert.equal((await reader(new Request(`${ORIGIN}/api/match/record?gameId=nothing`))).status, 404);
 });
 
 // A match of two admitted players whose record is whole.

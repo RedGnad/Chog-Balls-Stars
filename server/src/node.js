@@ -1,7 +1,7 @@
 // What the services need from Node itself: an HTTP server around handlers written against the
 // web-standard Request and Response, and careers and the session secret kept in a folder.
 
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { mkdir, readdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
@@ -253,4 +253,101 @@ export function dotnetReplay({ dotnet, verifier, database, lut, matchesRoot }) {
       readFile(report, 'utf8').then(text => resolve(JSON.parse(text)), reject);
     });
   });
+}
+
+const JUDGED = 'CHOG_JUDGED ';
+
+/**
+ * The same program kept running ("--serve"), which judges one match after another: it reads the
+ * asset database and compiles the simulation once. On the free server a verdict took 145 s,
+ * nearly all of it the start of the program; the replay itself takes about a second on a laptop.
+ * The reports are the same as those of a fresh start (checked on the recorded matches on
+ * 22 October 2026). A program that stops or takes more than "timeoutMs" is started again for the
+ * next match; the match it was judging gets no verdict and can be judged again. "warm(record)"
+ * judges a record once at start so that the first real match does not pay the start.
+ * @param {object} options as dotnetReplay, and spawnProgram (for the tests: what starts the program)
+ */
+export function residentReplay({ dotnet, verifier, database, lut, matchesRoot, timeoutMs = 330_000, spawnProgram = spawn }) {
+  let program = null;
+  let waiting = null;
+  let heard = '';
+  let said = '';
+  let queue = Promise.resolve();
+
+  function start() {
+    const started = spawnProgram(dotnet, [verifier, '--serve', database, lut], { stdio: ['pipe', 'pipe', 'pipe'] });
+    started.stdout.setEncoding('utf8');
+    started.stdout.on('data', text => {
+      heard += text;
+      let end;
+      while ((end = heard.indexOf('\n')) >= 0) {
+        const line = heard.slice(0, end);
+        heard = heard.slice(end + 1);
+        if (line.startsWith(JUDGED) && waiting?.on === started) waiting.done(Number(line.slice(JUDGED.length)), said);
+      }
+    });
+    // A program that stopped makes a write fail: its exit already said so.
+    started.stdin.on('error', () => {});
+    started.stderr.setEncoding('utf8');
+    started.stderr.on('data', text => { said = (said + text).slice(-600); });
+    // "close" comes once its output was all read, so what it said before it stopped is known.
+    started.on('close', () => {
+      if (program === started) program = null;
+      if (waiting?.on === started) waiting.fail(new Error(`the judge stopped: ${said}`));
+    });
+    started.on('error', error => {
+      if (program === started) program = null;
+      if (waiting?.on === started) waiting.fail(error);
+    });
+    program = started;
+    heard = '';
+    return started;
+  }
+
+  function judgeOne(record, report) {
+    return new Promise((resolve, reject) => {
+      const running = program ?? start();
+      const timer = setTimeout(() => {
+        // The next match starts a new program at once; this one is stopped.
+        if (program === running) program = null;
+        waiting?.fail(new Error('the judge took too long'));
+        running.kill('SIGKILL');
+      }, timeoutMs);
+      const finish = () => {
+        clearTimeout(timer);
+        waiting = null;
+      };
+      said = '';
+      waiting = {
+        on: running,
+        done: (code, said) => {
+          finish();
+          if (code !== 0) reject(new Error(`exit ${code}: ${said}`));
+          else readFile(report, 'utf8').then(text => resolve(JSON.parse(text)), reject);
+        },
+        fail: error => {
+          finish();
+          reject(error);
+        },
+      };
+      running.stdin.write(`${record}\t${report}\n`);
+    });
+  }
+
+  // One match at a time: the program reads one line, judges, answers.
+  const inTurn = (record, report) => {
+    const turn = queue.then(() => judgeOne(record, report));
+    queue = turn.catch(() => {});
+    return turn;
+  };
+
+  const replay = folder => {
+    const record = join(matchesRoot, folder);
+    return inTurn(record, join(record, 'replay-report.json')).catch(error => {
+      throw new Error(`The replay of ${folder} failed: ${String(error.message).slice(-600)}`);
+    });
+  };
+  replay.warm = (record, report) => inTurn(record, report);
+  replay.stop = () => program?.kill();
+  return replay;
 }

@@ -16,6 +16,13 @@
 // the build (quantum-db.json); the LUT folder is game/Assets/Photon/Quantum/Resources/LUT.
 // The report is written as JSON and the exit code is 0 when the match could be replayed to the
 // end of its record, whoever won.
+//
+//   Chog.Quantum.Verifier --serve <asset database.json> <LUT folder>
+//
+// stays running and judges one match for each line read on its input, "<record>\t<report.json>",
+// answering each with a line "CHOG_JUDGED <exit code>". The game services keep it running: on
+// their free server nearly all the time of a verdict was the start of the program (145 s for a
+// siege on 22 October 2026, where the replay itself takes 1 s on a laptop).
 
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -25,7 +32,42 @@ using Quantum.Json;
 
 internal static unsafe class Verifier
 {
+    public const string Judged = "CHOG_JUDGED ";
+    private static string s_lutRead;
+    private static string s_databaseRead;
+    private static AssetObject[] s_assets;
+    private static ResourceManagerStatic s_resources;
+
     private static int Main(string[] args)
+    {
+        if (args.Length == 3 && args[0] == "--serve")
+            return Serve(args[1], args[2]);
+        return Judge(args);
+    }
+
+    private static int Serve(string databasePath, string lutPath)
+    {
+        string line;
+        while ((line = Console.In.ReadLine()) != null)
+        {
+            var paths = line.Split('\t');
+            int code;
+            try
+            {
+                code = paths.Length == 2 ? Judge(new[] { paths[0], databasePath, lutPath, paths[1] }) : 2;
+            }
+            catch (Exception error)
+            {
+                Console.Error.WriteLine(error.Message);
+                code = 1;
+            }
+            Console.Out.WriteLine(Judged + code);
+            Console.Out.Flush();
+        }
+        return 0;
+    }
+
+    private static int Judge(string[] args)
     {
         // A test of the rules, never a verdict: "--test-core-falls 1@900" destroys the core of
         // team 1 once tick 900 is reached, to see the match end for the other team. A report
@@ -75,7 +117,12 @@ internal static unsafe class Verifier
 
         string recordPath = args[0], databasePath = args[1], lutPath = args[2], reportPath = args[3];
         Quantum.Log.InitializeForConsole(LogLevel.Warn);
-        FPLut.Init(lutPath);
+        // Read once by a program that stays running (--serve): the tables do not change between matches.
+        if (s_lutRead != lutPath)
+        {
+            FPLut.Init(lutPath);
+            s_lutRead = lutPath;
+        }
 
         var replay = Directory.Exists(recordPath)
             ? FromServerRecord(recordPath)
@@ -91,9 +138,18 @@ internal static unsafe class Verifier
         // A few rules of the sample's game manager are compiled by Unity into the game's own
         // assembly; here they are part of the simulation (tools/quantum/headless.py), and the
         // assets that name them are read accordingly.
-        var database = File.ReadAllText(databasePath).Replace(", Assembly-CSharp\"", ", Quantum.Simulation\"");
-        var assets = serializer.AssetsFromByteArray(System.Text.Encoding.UTF8.GetBytes(database));
-        using var resources = new ResourceManagerStatic(assets, DotNetRunnerFactory.CreateNativeAllocator());
+        // A program that stays running (--serve) reads the database once and keeps its assets loaded, as a game keeps
+        // them for match after match: reading them was nearly all the time of a verdict.
+        if (s_databaseRead != databasePath)
+        {
+            s_resources?.Dispose();
+            var database = File.ReadAllText(databasePath).Replace(", Assembly-CSharp\"", ", Quantum.Simulation\"");
+            s_assets = serializer.AssetsFromByteArray(System.Text.Encoding.UTF8.GetBytes(database));
+            s_resources = new ResourceManagerStatic(s_assets, DotNetRunnerFactory.CreateNativeAllocator());
+            s_databaseRead = databasePath;
+        }
+        var assets = s_assets;
+        var resources = s_resources;
         var runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.RuntimeConfigData.Decode(), compressed: true);
         var testedRules = seed != null || mode != null || mapAsked != null || sightAsked != null;
         if (seed != null)

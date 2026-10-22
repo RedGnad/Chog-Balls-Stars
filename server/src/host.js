@@ -67,7 +67,8 @@
 //                   season is closed once: every wallet above Gold gets its reset event (seasons.js)
 //                   Without both store settings, the player ladder stays disabled.
 
-import { mkdir, stat } from 'node:fs/promises';
+import { mkdir, readdir, stat } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createApi } from './api.js';
@@ -76,7 +77,7 @@ import { createChainCareers } from './careers-onchain.js';
 import { createChain, DEFAULT_RPC_URLS } from './chain.js';
 import { createJudge } from './judge.js';
 import { createMatches } from './matches.js';
-import { careerFile, createHttpServer, dotnetReplay, matchFiles, mirroredMatchStore, photonSecret, reownProjectId, servedBuild, servedPhotonVersion, sessionSecret } from './node.js';
+import { careerFile, createHttpServer, dotnetReplay, matchFiles, mirroredMatchStore, photonSecret, residentReplay, reownProjectId, servedBuild, servedPhotonVersion, sessionSecret } from './node.js';
 import { createPhoton } from './photon.js';
 import { createPrice } from './price.js';
 import { createReferee } from './referee.js';
@@ -207,15 +208,26 @@ console.log(`Photon names this game ${(await photonVersion()) || '(any)'}.`);
 console.log((await build())
   ? `Serving the build ${await build()}: a room or a match of another build is refused.`
   : 'The site folder names no build (no RELEASE.json): matches of any build are accepted and judged.');
+// The judge program stays running between matches (residentReplay); JUDGE_RESIDENT=0 starts it for each match instead.
+const judgeOptions = { dotnet: environment.DOTNET ?? 'dotnet', verifier: verifier ? resolve(verifier) : '', database, lut: tables, matchesRoot: matchStore.root };
+const judgeProgram = environment.JUDGE_RESIDENT === '0' ? dotnetReplay(judgeOptions) : residentReplay(judgeOptions);
 const judge = verifier && (await exists(database))
   ? createJudge({
     matches,
     build: photonVersion,
-    replay: dotnetReplay({
-      dotnet: environment.DOTNET ?? 'dotnet', verifier: resolve(verifier), database, lut: tables, matchesRoot: matchStore.root,
-    }),
+    replay: judgeProgram,
   })
   : null;
+// The first match judged would pay the start of the program: a recorded match is judged once now, in the background.
+if (judge && judgeProgram.warm) {
+  const fixtures = join(root, 'tests', 'fixtures', 'replays');
+  readdir(fixtures).then(names => names.filter(name => name.endsWith('.json')).sort().at(-1)).then(name => {
+    if (!name) return;
+    const began = Date.now();
+    return judgeProgram.warm(join(fixtures, name), join(tmpdir(), 'chog-judge-warm.json'))
+      .then(() => console.log(`The judge is ready (warmed on ${name} in ${Math.round((Date.now() - began) / 1000)} s).`));
+  }).catch(error => console.warn(`The judge could not be warmed: ${error.message}`));
+}
 // Stakes without a judge would only ever be given back after an hour: say so at the start.
 if (referee && !judge) console.warn('WAGER_ADDRESS is set without VERIFIER_DLL: no match will get a verdict, stakes can only be refunded.');
 
