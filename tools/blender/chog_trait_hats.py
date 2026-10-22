@@ -319,8 +319,11 @@ HEADBAND = {
     # of the upper pairs of leaves then lay under it and every leaf but the top one went through it.)
     # At the front its upper edge covers the dark line at the top of the face (54 degrees); at the sides
     # it is lower, under the roots of the upper pair of leaves.
-    "LOWER": ((0.0, 82.0), (90.0, 80.0), (180.0, 76.0)),
-    "UPPER": ((0.0, 50.0), (35.0, 53.0), (70.0, 62.0), (180.0, 60.0)),
+    # (22 October 2026, the owner: the bands sit too high, the art crosses the brow just above the eyes, the lower edge on the top of the
+    # eyes. The face was lowered on 22 October (its top 0.29 above the neck, 0.40 before) and the bands stayed where they were: lower
+    # edge 82 degrees at the front, 87 now, upper edge 50, 58 now; 5 degrees lower all round.)
+    "LOWER": ((0.0, 87.0), (90.0, 85.0), (180.0, 81.0)),
+    "UPPER": ((0.0, 58.0), (35.0, 60.0), (70.0, 66.0), (180.0, 64.0)),
     "SIZE": ((0.0, 1.075), (90.0, 1.10), (180.0, 1.10)),
     "LINE": 0.30,                # the share of the band, from its lower edge, in the colour "Line"
     "SUN": (0.046, 0.008),       # radius, lift off the band
@@ -561,7 +564,9 @@ DURAG = {
     # crown went through the cloth. The pictures draw the spikes of the far side from the cloth down.)
     # (Batch 4: lower at the back, 98 and 106 degrees until then, so that the pair of the back row comes
     # out under it beside the tails, as the pictures draw three spikes down the far side.)
-    "RIM": ((0.0, 66.0), (50.0, 72.0), (95.0, 82.0), (135.0, 86.0), (160.0, 94.0), (180.0, 100.0)),
+    # (22 October 2026, with the headbands: the face was lowered and the cloth stayed on the old brow, 66 degrees at the front, leaving a strip of
+    # forehead and the teeth of hair above the eyes. The art, #51 and #153: the front edge of the cloth lies just above the eyes. 82 now.)
+    "RIM": ((0.0, 82.0), (45.0, 82.0), (95.0, 84.0), (135.0, 86.0), (160.0, 94.0), (180.0, 100.0)),
     # (1.06 and 1.085 until 15 October 2026: the teeth of hair the base draws on the brow came through
     # the cloth as small triangles of skin.)
     "SIZE": 1.10,
@@ -575,7 +580,7 @@ DURAG = {
     # by the owner on 15 October 2026): how many, degrees from the front to the outermost, polar degrees
     # of their roots (under the cloth) and of their tips, half width (degrees), how far off the head
     # (above the face, 0.012, and under the cloth, about 0.027 there).
-    "HAIR_POINTS": (7, 46.0, 58.0, 79.0, 5.5, 0.020),
+    "HAIR_POINTS": None,     # (7, 46.0, 58.0, 79.0, 5.5, 0.020) until 22 October 2026: under the new rim they would show nothing
     # The cloth covers the top and the back: the lowest pair of the star stays, brought under its rim at
     # the sides, and the pair of the back row, turned to the sides beside it; the leaf straight back
     # would go through the two tails.
@@ -716,10 +721,14 @@ SPARTAN = {
     # Short and narrow, as the points drawn behind the helmet.
     # (They are longer than on a bare head: the helmet stands 0.05 off the head, and the pictures draw them
     # large beside it.)
-    "LEAVES": (GONE, GONE, GONE, leaf(1.60, 118.0, 26.0, 0.0, 0.58), GONE, leaf(1.60, 94.0, 40.0, 0.0, 0.55),
-               leaf(1.30, None, 100.0, 0.0, 0.62)),
+    # (22 October 2026, the owner: two spikes pointed DOWN at the back like a bug, and the sides did not show as the art draws them: 3 or 4
+    # short spikes out of the rear edge of the helmet, pointing out and a little up. The lowest pair was turned to 118 degrees (down) and the back
+    # row to 100 (down), 1.6 and 1.3 times as long as a leaf of the crown. Now two pairs out of the rear edge (92 and 80 degrees, each tried against the shell, leaf_crossings), 1.45 times a leaf of the crown, as long as the pictures draw them beside the shell, the points bending up; the leaf straight back is gone, it hung down the nape whatever its lean, the head being turned up.)
+    "LEAVES": (GONE, GONE, GONE, leaf(1.45, 92.0, 55.0, 0.55, 0.62), GONE, leaf(1.45, 80.0, 70.0, 0.55, 0.58), GONE),
     # The pictures show no teeth of hair on the brow inside the helmet.
     "FRINGE": False,
+    # Where a tip must show from above and from the game camera: the two sides behind the helmet and straight back.
+    "SECTORS": (135, -135),
 }
 
 
@@ -1418,6 +1427,16 @@ def seen(looked_at, art, leaves, under_rim=None, **numbers):
             "under_rim": under_rim}
 
 
+# The crown of the two headbands (22 October 2026, the owner: "the yellow hair spikes poke through the band at the top"). Until then the whole
+# crown stood, its crossings with the band only noted (THROUGH): the upper pair, the middle pair, the lowest pair and the back row all
+# go through a band 0.09 to 0.12 tall across the brow. Each line was tried alone against the new band (probe: leaf_crossings): the
+# top leaf clears it; the upper pair clears it turned in to 24 degrees from straight up (it was 38); the middle pair cannot (gone); the lowest
+# pair clears it brought out below at 130 degrees; the top of the back row cannot at its own lean, leaning 36 degrees; the pair of
+# the back row at 125 degrees and 40 back; the leaf straight back leaning to 104. No leaf crosses the band now (THROUGH is off).
+BAND_CROWN = (WHOLE, leaf(1.0, 24.0), GONE, leaf(1.2, 130.0, None, 0.35), leaf(1.0, None, 36.0), leaf(1.2, 125.0, 40.0, 0.35),
+              leaf(1.2, None, 104.0, 0.35))
+
+
 # The row under the rim (15 October 2026, after batch 4): every hat of Side=Right that leaves the
 # spikes out under it takes it in place of the leaves of SIDE_POINTS and the like below, which kept
 # pairs of the seven lines of the crown: from behind and from above, two spikes on each side and none
@@ -1433,7 +1452,7 @@ BUCKET_RIM_ROW = {"LENGTH": 1.40, "WIDTH": 0.70, "SWEEP_DEG": 30.0}
 # to the jaw, so the row starts behind them, and the check wants it seen behind and three quarters behind.
 # Its second row (make_chog_traits.UNDER_RIM, "EXTRA_ROWS") only behind: the flaps hide the sides, and with a
 # heavy robe or the duck float the whole row went over 8,000 triangles (#766, #1644, 16 October 2026).
-USHANKA_RIM_ROW = {"ANGLES": (94.0, 116.0, 138.0, 160.0, 180.0), "SWEEP_DEG": 18.0, "SECTORS": (135, -135, 180),
+USHANKA_RIM_ROW = {"ANGLES": (94.0, 116.0, 138.0, 160.0, 180.0), "SWEEP_DEG": 18.0, "SECTORS": (135, -135),
                    "EXTRA_ROWS": ({"ANGLES": (127.0, 149.0, 171.0), "BELOW_DEG": 20.0, "DROOP_DEG": 30.0,
                                    "LENGTH": 0.80, "WIDTH": 0.85, "LIFT": 0.12, "SIDES": 4},)}
 
@@ -1529,8 +1548,12 @@ HEAD_VALUES = {
                                   "down to the cheek, larger than under a cap", NO_CROWN, BIG_RIM_ROW),
     ("Durag", "Right"): seen((51, 570, 1001, 1563, 1884), "3 large spikes on the far side, from the height of "
                              "the top of the durag down to the cheek; no point of hair on the brow", NO_CROWN, BIG_RIM_ROW),
+    # (22 October 2026, the owner: the crown's spikes must show at the sides and the back below the helmet, as the art draws them, and two
+    # pointed DOWN at the back like a bug. Until then a row planted under the real rim of the shell all round the back, pointing down: a collar.
+    # Now the leaves of the shape itself: the lowest pair and the back pair brought out beside the helmet, and the leaf straight back.)
     ("Spartan Helmet", "Right"): seen((21, 331, 1081, 1536, 1903), "a full helmet down to the jaw, nose guard, "
-                                      "red plume; 3 or 4 spikes behind it on the far side", NO_CROWN, USHANKA_RIM_ROW),
+                                      "red plume; 3 or 4 spikes out of its rear edge, at the sides and the back, pointing out and a little up",
+                                      SPARTAN["LEAVES"]),
     ("Russian Hat", "Right"): seen((39, 322, 830, 1177, 1785), "tan fur hat, fur flaps; 1 or 2 small spikes on "
                                    "the far side, behind the flap, near the top", NO_CROWN, USHANKA_RIM_ROW),
     ("Russian Hat", "Left"): seen((34, 504, 982, 1518, 1876), "cream fur, dark leather flaps with snaps; " + LEFT_HEAD,
@@ -1538,9 +1561,9 @@ HEAD_VALUES = {
     # A headband is tied around the spiky head: the whole crown stays and the band passes under the spikes
     # (16 October 2026, the owner: no reason to leave room for a band; the crossings are kept, not refused).
     ("Red Headband", "Right"): seen((12, 686, 1014, 1790, 1957), "the whole crown above the band and down the far "
-                                    "side; a darker line along its lower edge", FULL_CROWN),
+                                    "side; a darker line along its lower edge", BAND_CROWN, THROUGH=False),
     ("Japan Headband", "Right"): seen((65, 523, 891, 1435, 1962), "the whole crown above the white band, a red "
-                                      "sun on its front", FULL_CROWN),
+                                      "sun on its front", BAND_CROWN, THROUGH=False),
     ("Bob Hair", "Right"): seen((43, 48, 159, 470, 482, 1137, 1380), "yellow curly hair, a red band with waving "
                                 "edges tied over the brow; the tip of one spike above the band, far side",
                                 NO_CROWN),
