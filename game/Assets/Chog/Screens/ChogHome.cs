@@ -246,8 +246,21 @@ namespace Chog.Screens
             ChogTheme.Paint(chog, ChogTheme.ButtonKind.Quiet);
             chog.onClick.AddListener(WalletPanel.OpenRentals);
             var coin = ChogUi.Pinned("Coin", chog.transform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(10f, 2f), new Vector2(52f, 52f));
-            ChogUi.Plate("Plate", coin, Vector2.zero, Vector2.one, ChogTheme.Cheek, 26);
-            ChogUi.Title("Letter", coin, new Vector2(0f, 0.06f), Vector2.one, 30f).text = "C";
+            // The coin of the token itself (22 October 2026: the logo $CHOG has on CoinGecko, the Chog
+            // in a gold rim), a coin as Supercell draws its currencies rather than a letter.
+            var token = Resources.Load<Texture2D>("ChogTokenCoin");
+            if (token != null)
+            {
+                var picture = coin.gameObject.AddComponent<Image>();
+                picture.sprite = Sprite.Create(token, new Rect(0f, 0f, token.width, token.height), new Vector2(0.5f, 0.5f), 100f);
+                picture.preserveAspect = true;
+                picture.raycastTarget = false;
+            }
+            else
+            {
+                ChogUi.Plate("Plate", coin, Vector2.zero, Vector2.one, ChogTheme.Cheek, 26);
+                ChogUi.Title("Letter", coin, new Vector2(0f, 0.06f), Vector2.one, 30f).text = "C";
+            }
             _chogWords = ChogUi.Number("Amount", chog.transform, new Vector2(0.33f, 0.14f), new Vector2(0.94f, 0.88f), 30f,
                 TextAlignmentOptions.Center, Color.white);
             _chogPill = chog.gameObject;

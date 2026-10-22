@@ -566,7 +566,7 @@ namespace Chog.Screens
             _signInLabel.text = PlayerWallet.SignIn == SignInState.Asking ? "ANSWER IN YOUR WALLET..."
                 : PlayerWallet.SignInProblem.Length > 0 ? "SIGN-IN FAILED, TRY AGAIN"
                 : holds ? (PhotonIdentity.SignInNeededToPlay ? "SIGN IN TO PLAY IT" : "SIGN IN TO RECORD ITS CAREER")
-                : "SIGN IN FOR RANK";
+                : "SIGN ONCE TO EARN RANK";
             if (_poster != null && _poster.gameObject.activeSelf)
             {
                 // When no wallet action is available, the poster fills the reserved footer instead of
@@ -575,10 +575,14 @@ namespace Chog.Screens
                     _market.gameObject.activeSelf || _signIn.gameObject.activeSelf;
                 _poster.anchorMin = new Vector2(0.01f, footer ? 0.18f : 0.01f);
             }
-            // The signature is asked by itself whenever this wallet has a Genesis to play (held or
-            // rented) and no session: right after connecting, after a rental, after a switch of
-            // account. Once per address in a visit, so a player who closes the wallet is not asked again.
-            if (holds && PhotonIdentity.SignInNeededToPlay && PlayerWallet.SignIn == SignInState.SignedOut
+            // The signature is asked by itself whenever this wallet has no session: right after
+            // connecting, after a rental, after a switch of account; for a wallet without a Genesis too
+            // (22 October 2026: a connected player saw "SIGN IN FOR RANK" and took it for a second
+            // connection; its rank points need the same one signature; asked only when the player has just
+            // connected, not when a page opens on a wallet already connected). Once per address in a
+            // visit, so a player who closes the wallet is not asked again and keeps the button.
+            var wantsSession = holds ? PhotonIdentity.SignInNeededToPlay : state == WalletState.Ready && !guest && _justConnected;
+            if (wantsSession && PlayerWallet.SignIn == SignInState.SignedOut
                 && PlayerWallet.SignInProblem.Length == 0 && _signInAskedFor != PlayerWallet.Address)
             {
                 _signInAskedFor = PlayerWallet.Address;
