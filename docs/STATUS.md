@@ -1,5 +1,10 @@
 # État courant et décisions
 
+**22 October 2026, 01:45 UTC (lead: eyes and mouths lot deployed).**
+- **Deployed:** build `20261022T013733208Z-4f2e75ac4a1a42adbc50bc44b8a3350c`, stamp unchanged. Lot 2 of `stream/heroes-faces` (6af4e6d): audit of the 64 Origin eye and mouth rows against the art (`research/evidence/heroes-faces-audit-2026-10-22.md`: 48 faithful, 16 approximate, none wrong; Round, Round Eye and Dead fixed); the 17 Radioactive eye values drawn with the ink of their variant as the art does, Round Eye without pupil, the third eye as a white almond (`research/evidence/heroes-faces-fix-2026-10-22.jpg`). Skull: 17 of 25 eye values looked at.
+- **Verified:** export 1,970 Genesis, 0 failed; 168 view tests (the type-check tool now finds the Editor's renamed compile folder); heroes load in `?impacts=`; judge fixtures agree.
+**Next action:** lot 3 (dragon, astronaut, shark suits) running on `stream/heroes-faces`.
+
 **22 October 2026, 01:20 UTC (lead: costumes attack, full face, ladder and economy lots deployed).**
 - **Deployed:** build `20261022T010049645Z-64406dda6bec4f97800607be4f87ed3d` (simulation stamp unchanged, `f4a81f1ddbd919b6`, no new Photon version), from `lead/integration` fast-forwarded into `main`.
 - **In it:** full costumes give the basic attack (`chog_attack_objects.ATTACK_OF_BODY`: Dragon fireball with a flame trail, Shark water with bubbles, Banana, Astro planet, Toad lily pad, Gangster money bag; 147 Genesis that threw a crown leaf under their hood); the face fills the front of the head (`stream/heroes-faces` e6f9091, sheet `research/evidence/heroes-face-fill-2026-10-22.jpg`); ladder lots 3-4 (hidden Elo as a band, seasons on the API) with the room band C0 kept off behind `RATING_BAND_ROOMS=1` until a public room creation is checked; economy lots 2-3 (stake card on the result screen, cheapest rentals and rental ledger, home balance in dollars). Build requests accept `clean` (a stale IL2CPP cache failed to link the result screen's async methods).
