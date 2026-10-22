@@ -1502,3 +1502,11 @@ Frog L (27 Origin Genesis), Clown Eye L (27), Clown Eye Mix L (25), Retard L (23
   the Kings Robe, Mummy wraps and the Duck Float; 0 wrong. The costumes agent's sheet (`clothes-batch2`, row #121) shows the bands: their tree must have been built before lot 9 (the code with `BONES_SHOW`, 4f28646) reached it.
 - **Checked**: library export builds all 1,970 Genesis under 8,000 triangles; by eye on the sheet only; not in a Unity build.
 - **Left to do**: Left: Chog Viper (shape), Classic VR, Modern VR, 3D Glass, BTC Glass, Thug and the lasers of Left; Right: the rest of Retro Glass.
+
+## 22 October 2026: strict eye audit, batch 6: Side Left glasses and headsets (lot 8)
+
+Classic VR (24 Origin Genesis), Modern VR (24), 3D Glass (22), BTC Glass (19), Thug (15), 2 to 5 Genesis each (#46, #124; #491, #219, #227; #361, #419, #424; #189, #288, #510; #141, #203, #250).
+Sheet, 10 Genesis, the art beside the front and the three quarter close, before | after: [heroes-eyes-batch6-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch6-2026-10-22.jpg).
+Unlike the bare eyes of batches 4 and 5, these are objects worn over the eyes and the pictures draw them as a pair of equal pieces: no per-eye difference to add. Changed: the headsets (Classic and Modern VR) are taller,
+a rounded visor 0.072 high in the middle (0.064). Approximate, not changed: Modern VR's glossy rim and its curved glint are plainer than the art's; the 3D Glass lenses are a little larger and the frame a little thinner than the art's;
+the BTC coins are a little smaller than the art's; Thug is as drawn.

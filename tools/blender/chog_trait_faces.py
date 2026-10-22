@@ -308,7 +308,8 @@ GOGGLES = {
 HEADSET = {
     **GOGGLES,
     "UP": 0.020,
-    "HALF_HEIGHT": (0.064, 0.056),
+    # (22 October 2026, strict audit, batch 6 (Side Left), on #491, #219, #227, #46, #124: the headsets of the pictures are taller, a rounded visor 0.072 high in the middle.)
+    "HALF_HEIGHT": (0.072, 0.062),
     "THICKNESS": 0.040,
     "RIM": (0.016, 0.016),
     "NOTCH": (0.0, 0.2),
