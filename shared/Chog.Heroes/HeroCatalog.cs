@@ -60,6 +60,7 @@ namespace Chog.Heroes
                 Require(tier != null && !String.IsNullOrWhiteSpace(tier.Tier) && !String.IsNullOrWhiteSpace(tier.Base),
                         "Invalid tier definition.");
                 Require(expressions.Contains(tier.ExpressionId), "Unknown tier expression.");
+                Require(String.IsNullOrEmpty(tier.ShapeId) || shapes.Contains(tier.ShapeId), "Unknown tier shape.");
                 Require(!tiers.ContainsKey(tier.Tier), "Duplicate tier: " + tier.Tier);
                 tiers.Add(tier.Tier, tier);
             }
@@ -120,6 +121,11 @@ namespace Chog.Heroes
             }
             var roleId = bodyTable.Match(traits, trace);
             var shape = eyeTable.Match(traits, trace);
+            if (!String.IsNullOrEmpty(tier.ShapeId))
+            {
+                trace.Add("Tier=" + tierName + " -> shape " + tier.ShapeId + ", whatever the Eyes");
+                shape = tier.ShapeId;
+            }
             var effect = auraTable.Match(traits, trace);
             return Definition(snapshot, metadata, roles[roleId], shape, effect, tier.ExpressionId, tierName, null, trace);
         }

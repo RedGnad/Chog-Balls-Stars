@@ -53,6 +53,9 @@ namespace Chog.Heroes
         [DataMember(Name = "tier", IsRequired = true)] public string Tier;
         [DataMember(Name = "base", IsRequired = true)] public string Base;
         [DataMember(Name = "expressionId", IsRequired = true)] public string ExpressionId;
+        // A shape every Genesis of this tier fires whatever its Eyes (22 October 2026: Radioactive Genesis fire a
+        // radioactive burst); absent for a tier whose shape comes from the Eyes.
+        [DataMember(Name = "shapeId", IsRequired = false)] public string ShapeId;
     }
 
     [DataContract]

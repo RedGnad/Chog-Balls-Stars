@@ -180,6 +180,18 @@ namespace Chog.Match
                     painter.Bar(center, size * 2f, size * 0.36f, 0f, main);
                     break;
 
+                case GenesisEyeGlyph.Trefoil:
+                    // The sign of radioactivity: three blades of 60 degrees round a dot, a dark rim under each.
+                    for (var blade = 0; blade < 3; blade++)
+                    {
+                        var middle = 90f + blade * 120f;
+                        painter.Arc(center, size * 0.28f, size * 1.22f, middle - 34f, middle + 34f, main);
+                        painter.Arc(center, size * 0.36f, size * 1.08f, middle - 28f, middle + 28f, light);
+                    }
+                    painter.Ellipse(center, size * 0.26f, size * 0.26f, main);
+                    painter.Ellipse(center, size * 0.17f, size * 0.17f, light);
+                    break;
+
                 case GenesisEyeGlyph.Chevron:
                     // Squeezed shut: the point of each eye is towards the nose.
                     painter.Bar(center + new Vector2(0f, size * 0.36f), size * 1.8f, size * 0.36f, side * 26f, main);

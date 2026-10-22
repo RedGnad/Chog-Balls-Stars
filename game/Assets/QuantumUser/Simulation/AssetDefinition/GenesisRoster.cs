@@ -65,7 +65,8 @@ namespace Quantum
         Dash = 10,       // a closed, flat eye
         Chevron = 11,    // squeezed shut: > and <
         Band = 12,       // ski goggles: one band across both eyes
-        Shades = 13      // pixel sunglasses
+        Shades = 13,     // pixel sunglasses
+        Trefoil = 14     // the sign of radioactivity, three blades round a dot: the burst of a Radioactive Genesis
     }
 
     // The sign drawn on a target for each Aura effect.
@@ -147,6 +148,9 @@ namespace Quantum
         // sentence about it, parallel to ShapeIds. A hero plays the first form unless its player
         // equipped the second one.
         public const int FormCount = 2;
+
+        // The delivery of every Radioactive Genesis, whose special is the radioactive burst (22 October 2026).
+        public const string RadioactiveExpression = "persistent-zone";
         public string[] SecondFormNames;
         public string[] SecondFormSummaries;
 
@@ -171,6 +175,11 @@ namespace Quantum
         // The 1:1 Genesis carry no trait: the look of each is authored for its token.
         public GenesisUniqueLook[] UniqueLooks;
 
+        // What every Radioactive Genesis fires (22 October 2026): its burst draws the sign of radioactivity in the
+        // colours of radiation, not its eyes, and its hero takes that glow. Unused when its Glyph is None.
+        public GenesisEyeLook RadioactiveLook;
+        public UnityEngine.Color RadioactiveSkin;
+
         // The eyes and the colour of a hero: its own when it is a 1:1, else those of its Eyes and
         // Skin values. What is unknown stays transparent.
         public void LookOf(GenesisRosterEntry hero, out GenesisEyeLook look, out UnityEngine.Color skin)
@@ -186,6 +195,14 @@ namespace Quantum
                     skin = UniqueLooks[i].Skin;
                     return;
                 }
+            }
+
+            if (RadioactiveLook.Glyph != GenesisEyeGlyph.None && ExpressionIds != null && hero.Expression < ExpressionIds.Length
+                && ExpressionIds[hero.Expression] == RadioactiveExpression)
+            {
+                look = RadioactiveLook;
+                skin = RadioactiveSkin;
+                return;
             }
 
             if (EyeLooks != null && hero.Eye < EyeLooks.Length) look = EyeLooks[hero.Eye];
@@ -230,7 +247,15 @@ namespace Quantum
         {
             var authored = hero.Body == 0 && hero.Eye == 0 && hero.Aura == 0 && IsLast(TierNames, hero.Tier);
             var eyes = CardLine("Eyes", authored, EyeValues, hero.Eye, ShapeIds, ShapeSummaries, hero.Shape);
-            if (form == 1 && HasSecondForm(hero.Shape))
+            // A Radioactive Genesis fires its radioactive burst whatever its eyes: the card says where it comes from.
+            if (ExpressionIds != null && hero.Expression < ExpressionIds.Length && ExpressionIds[hero.Expression] == RadioactiveExpression)
+            {
+                eyes.Trait = "Radioactivity";
+                eyes.Value = "Radioactive";
+                eyes.Gives = "radioactive burst";
+                eyes.Summary = "a burst of radioactivity all around you, then a toxic zone";
+            }
+            else if (form == 1 && HasSecondForm(hero.Shape))
             {
                 eyes.Gives = SecondFormNames[hero.Shape];
                 eyes.Summary = SecondFormSummaries != null && hero.Shape < SecondFormSummaries.Length

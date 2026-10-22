@@ -77,6 +77,12 @@ namespace Chog.Editor
             public float ReturnShare;
             // A persistent zone: what the zone left behind deals at each of its ticks; 0 for none.
             public float ZoneDamagePerTick;
+            // The inversion, the super attack of a 1:1 (22 October 2026): this many more copies leave at once,
+            // turned SpreadDegrees apart; a shape that does not aim (the nova) or a lobbed one (the puddle)
+            // strikes that many more times instead, SpreadInterval apart. 0 for the other deliveries.
+            public int Spread;
+            public float SpreadDegrees;
+            public float SpreadInterval;
         }
 
         private const string NotBuiltSummary = "not built yet, plays like a direct hit";
@@ -100,7 +106,11 @@ namespace Chog.Editor
                            Share = 0.6f, ReturnShare = 0.8f },
             // The damage is spread over time, and a target can walk out of the zone.
             new Delivery { Expression = "persistent-zone", Summary = "hits at 50%, then leaves a zone for 3 s",
-                           Share = 0.5f, ZoneDamagePerTick = 500f }
+                           Share = 0.5f, ZoneDamagePerTick = 500f },
+            // The ten 1:1 Genesis are the rarest: their signature is a super attack, three times at full
+            // strength, in three directions when it aims.
+            new Delivery { Expression = "inversion", Summary = "a super attack: three at once at full strength, in three directions",
+                           Spread = 2, SpreadDegrees = 120f, SpreadInterval = 0.35f }
         };
 
         /// <summary>What the roster needs from this importer, parallel to its id tables.</summary>
@@ -244,6 +254,14 @@ namespace Chog.Editor
             Unique(1884, Look(new Color(0.45f, 0.02f, 0.05f), new Color(0.9f, 0.1f, 0.12f), new Color(1f, 0.6f, 0.55f)),
                    new Color(0.9f, 0.3f, 0.35f))
         };
+
+        // The burst of every Radioactive Genesis (22 October 2026): the sign of radioactivity, yellow-green on a
+        // dark rim, on discs of the glow of radiation, whatever its eyes.
+        public static GenesisEyeLook RadioactiveLook() => new GenesisEyeLook
+        {
+            Outline = Ink, Outer = new Color(0.10f, 0.12f, 0.06f), Core = new Color(0.85f, 1f, 0.25f), Glyph = GenesisEyeGlyph.Trefoil
+        };
+        public static readonly Color RadioactiveSkin = new Color(0.55f, 0.95f, 0.2f);
 
         /// <summary>The looks authored for the 1:1 Genesis, by token.</summary>
         public static GenesisUniqueLook[] UniqueLooks() => (GenesisUniqueLook[])Uniques.Clone();
@@ -427,6 +445,19 @@ namespace Chog.Editor
                     var skill = LoadOrCreate<GenesisSignatureSkillData>(name + "SkillData", written);
                     CopySkill(plainSkill, skill);
                     Repeat(skill, delivery);
+                    // The super attack: copies turned apart for a shape that aims, more strikes for the nova.
+                    skill.Spread = 0;
+                    skill.SpreadDegrees = FP._0;
+                    if (delivery.Spread > 0)
+                    {
+                        if (sweep.Shape == "nova")
+                            Repeat(skill, new Delivery { Hits = delivery.Spread + 1, Interval = delivery.SpreadInterval });
+                        else
+                        {
+                            skill.Spread = delivery.Spread;
+                            skill.SpreadDegrees = Fixed(delivery.SpreadDegrees);
+                        }
+                    }
                     skill.AttackPrototype = attackPrototype;
                     skill.AttackDataOverride = new AssetRef<AttackData> { Id = GuidOf(attack) };
                     skill.Reach = Fixed(sweep.Reach);
@@ -466,10 +497,14 @@ namespace Chog.Editor
                 if (delivery.ReturnShare > 0f || delivery.ZoneDamagePerTick > 0f)
                     continue;
 
+                // A lobbed puddle cannot turn: the super attack lobs it that many more times.
+                var lobbed = delivery.Spread > 0
+                    ? new Delivery { Expression = delivery.Expression, Hits = delivery.Spread + 1, Interval = delivery.SpreadInterval, Share = delivery.Share }
+                    : delivery;
                 for (var form = 0; form < GenesisRoster.FormCount; form++)
                 {
                     skills[form + "/" + delivery.Expression + "/" + PuddleShape + "/" + aura.Effect] =
-                        ImportPuddle(aura, effect, delivery, deliverySuffix + (form == 0 ? "" : SecondFormSuffix), form == 1,
+                        ImportPuddle(aura, effect, lobbed, deliverySuffix + (form == 0 ? "" : SecondFormSuffix), form == 1,
                             written, attackPrototype, shapeMaterial);
                 }
             }
