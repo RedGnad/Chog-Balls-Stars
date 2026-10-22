@@ -2924,10 +2924,13 @@ def build(traits=None, replaced=None, head_replaced=None):
     body = variants.PartShapes(full.MATERIAL_ORDER)
     variants.add_torso(body, body_n)
     variants.add_legs_and_feet(body, body_n)
-    if bases.is_skull(traits) or bases.is_radioactive(traits):
-        # The skeleton under the skull, or seen through a radioactive body: ribs and breastbone on the
-        # torso (clothing covers them).
-        bases.add_ribs(body, body_n, full.EYE)
+    if (bases.is_skull(traits) or bases.is_radioactive(traits)) and (traits or {}).get("Body") in bases.BONES_SHOW:
+        # The skeleton under the skull, or seen through a radioactive body: ribs and breastbone on the torso, where the
+        # skin shows (22 October 2026, the owner: "skeleton lines on the body even when they wear a T-shirt"; on the pictures
+        # of the 14 Skull and Radioactive Genesis that wear nothing the ribs show, and with an open cape, a robe or wraps (BONES_SHOW);
+        # under a shirt, a hoodie, a vest, a jacket or an armour none do: the cloth is opaque). A radioactive body draws them in the
+        # deeper tone of its skin, never in black.
+        bases.add_ribs(body, body_n, full.FACE if bases.is_radioactive(traits) else full.EYE)
 
     head = variants.PartShapes(full.MATERIAL_ORDER)
     surface = full.HeadSurface(head_n)
@@ -2941,6 +2944,7 @@ def build(traits=None, replaced=None, head_replaced=None):
         bases.add_skull_face(head, head_n, surface, full, draw_shape, oval, SKIN, full.EYE, full.BLUSH, full.FACE,
                              side=side)
         bases.narrow_jaw(head, head_n, side)
+        bases.add_mandible(head, head_n, full, draw_shape, SKIN, full.EYE, head_n.OUTLINE_THICKNESS)
     elif bases.is_radioactive(traits):
         # A radioactive Chog: the crown its hat leaves (all of it under horns), no cream face, the skull's
         # teeth and nose showing, no cheek.
@@ -3176,6 +3180,8 @@ def make_one(number, out=None, hat=None, replaced=None, head_replaced=None):
         root["chog_skin"] = list(skin["skin"])
         if "top" in skin:
             root["chog_skin_top"] = list(skin["top"])
+        if "bands" in skin:
+            root["chog_skin_bands"] = [[height, *colour] for height, colour in skin["bands"]]
         root["chog_face"] = list(skin.get("face", GENESIS_FACE))
         root["chog_blush"] = list(one.BLUSH.get(one.number_of(traits), GENESIS_BLUSH))
         root["chog_side"] = traits.get("Side", "Right")

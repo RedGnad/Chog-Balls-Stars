@@ -218,9 +218,11 @@ GAME_RIM_COLOUR = (1.0, 0xF6 / 255.0, 0xE0 / 255.0)
 GAME_RIM = 0.35
 
 
-def game_look_material(name, colour):
+def game_look_material(name, colour, stops=None):
     """A lit material as ChogHero.shader draws it (Matcap and the rim of its fragment function), in the gamma space the
-    shader computes in; the result is turned to linear for the renderer."""
+    shader computes in; the result is turned to linear for the renderer. "stops": for a skin that runs through colours with its
+    height over the feet (the Radioactive base), a list of (height, colour) in order: the game's skin gradient (ChogPartsLibrary.ColourOf)
+    in a first form with two stops, with more the bands of the proposal (22 October 2026)."""
     material = bpy.data.materials.new(name)
     tree = render.node_tree(material)
     nodes, links = tree.nodes, tree.links
@@ -272,7 +274,28 @@ def game_look_material(name, colour):
     shade = number("SUBTRACT", 1.0, ramp.outputs["Result"])
     # lerp((1, 1, 1), GAME_SHADE, shade)
     tone = vector("ADD", vector("SCALE", (1.0, 1.0, 1.0), number("SUBTRACT", 1.0, shade)), vector("SCALE", GAME_SHADE, shade))
-    lit = vector("MULTIPLY", tuple(colour), tone)
+    if stops:
+        position = nodes.new("ShaderNodeNewGeometry")
+        parts = nodes.new("ShaderNodeSeparateXYZ")
+        links.new(position.outputs["Position"], parts.inputs["Vector"])
+        ramp = nodes.new("ShaderNodeValToRGB")
+        ramp.color_ramp.interpolation = "LINEAR"
+        low, high = stops[0][0], stops[-1][0]
+        while len(ramp.color_ramp.elements) < len(stops):
+            ramp.color_ramp.elements.new(0.5)
+        for element, (height, stop_colour) in zip(ramp.color_ramp.elements, stops):
+            element.position = (height - low) / max(high - low, 1e-6)
+            element.color = (stop_colour[0], stop_colour[1], stop_colour[2], 1.0)
+        ranged = nodes.new("ShaderNodeMapRange")
+        ranged.clamp = True
+        ranged.inputs["From Min"].default_value = low
+        ranged.inputs["From Max"].default_value = high
+        links.new(parts.outputs["Z"], ranged.inputs["Value"])
+        links.new(ranged.outputs["Result"], ramp.inputs["Fac"])
+        base_colour = ramp.outputs["Color"]
+    else:
+        base_colour = tuple(colour)
+    lit = vector("MULTIPLY", base_colour, tone)
     edge = number("SUBTRACT", 1.0, facing)
     flat = math.hypot(key_x, key_y)
     toward_key = number("ADD", number("MULTIPLY_ADD", ny, key_y / flat, number("MULTIPLY", nx, key_x / flat)), 0.0, clamp=True)
@@ -290,6 +313,19 @@ def game_look_material(name, colour):
     output = nodes.new("ShaderNodeOutputMaterial")
     links.new(emission.outputs["Emission"], output.inputs["Surface"])
     return material
+
+
+GRADIENT_LOW, GRADIENT_HIGH = 0.62, 1.12      # ChogPartsLibrary.GradientLow and GradientHigh
+
+
+def skin_stops_of(root):
+    """The stops (height over the feet, colour) of the skin of a Radioactive hero: the two colours of its record by default, those of
+    chog_trait_bases.RADIOACTIVE_BANDS when it has bands (22 October 2026)."""
+    bands = root.get("chog_skin_bands")
+    if bands and os.environ.get("CHOG_BANDS"):
+        return [(float(band[0]), (band[1], band[2], band[3])) for band in bands]
+    bottom, top = tuple(root["chog_skin"]), tuple(root["chog_skin_top"])
+    return [(GRADIENT_LOW, bottom), (GRADIENT_HIGH, top)]
 
 
 def probe_pixel(camera, at):
@@ -323,8 +359,9 @@ def probe_pixel(camera, at):
         print(f"CHOG_PROBE {depth:.5f} {name} {material} (inside by {edge})")
 
 
-def game_look(things):
-    """Gives each lit material of the objects (those of a Principled BSDF) the look of the game."""
+def game_look(things, skin_stops=None):
+    """Gives each lit material of the objects (those of a Principled BSDF) the look of the game. "skin_stops": the stops of a
+    Radioactive skin, for the material of the skin."""
     made = {}
     for thing in things:
         for index, slot in enumerate(thing.data.materials):
@@ -336,7 +373,8 @@ def game_look(things):
             if slot.name not in made:
                 linear = shader.inputs["Base Color"].default_value
                 srgb = tuple(max(0.0, min(1.0, value)) ** (1.0 / 2.2) for value in linear[:3])
-                made[slot.name] = game_look_material("ChogGame" + slot.name, srgb)
+                made[slot.name] = game_look_material("ChogGame" + slot.name, srgb,
+                                                     skin_stops if slot.name == "ChogRenderSkin" else None)
             thing.data.materials[index] = made[slot.name]
 
 
@@ -540,7 +578,10 @@ def render_one(name, blend=None, out=None, only=None, colour=None, size=504, bus
         lights[0].data.energy = render.KEY_LIGHT
         sky.inputs["Color"].default_value = grey
         scene.render.resolution_x = scene.render.resolution_y = max(STAGE_SIZE, size) if size != 504 else STAGE_SIZE
-        game_look([thing for thing in bpy.data.objects if thing.type == "MESH" and thing.name != "ChogRenderGround"])
+        stops = None
+        if genesis and "chog_skin_top" in root:
+            stops = skin_stops_of(root)
+        game_look([thing for thing in bpy.data.objects if thing.type == "MESH" and thing.name != "ChogRenderGround"], stops)
         for thing in bpy.data.objects:
             if hasattr(thing, "visible_shadow"):
                 thing.visible_shadow = False      # the game's hero shader draws no shadow on itself
