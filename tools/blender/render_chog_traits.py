@@ -99,6 +99,10 @@ PEDESTAL_VIEWS = {
     "pedestal_side": (90.0, 12.0, False, 0.66, 1.80, False),
     "pedestal_back34": (145.0, 16.0, False, 0.66, 1.80, False),
     "pedestal_back": (180.0, 12.0, False, 0.66, 1.80, False),
+    # The clothes (22 October 2026, the audit of the Body values): the torso and the arms close, from the front, a little to the side, to be set beside the
+    # bust of the art: chog_<name>_pedestal_torso.png and _pedestal_torso_back.png.
+    "pedestal_torso": (15.0, 14.0, False, 0.34, 0.74, False),
+    "pedestal_torso_back": (180.0, 10.0, False, 0.34, 0.74, False),
 }
 shots.VIEWS.update(PEDESTAL_VIEWS)
 # The stage of the home screen (ChogHeroStage.cs, 22 October 2026): a perspective camera of 24 degrees, 10 degrees above the

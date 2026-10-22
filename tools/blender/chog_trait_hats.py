@@ -1667,7 +1667,7 @@ LEFT_OUT = {
 JACKET = {
     "V_TOP": 0.580,
     "V_FOOT": 0.455,
-    "V_HALF_WIDTH": 0.060,
+    "V_HALF_WIDTH": 0.078,
     "TIE": (0.574, 0.470, 0.011, 0.017),   # top, foot, half width at the knot and at its widest
     "LIFTS": (0.006, 0.010),
     # The lapels (15 October 2026, asked by the owner): a band along each side of the V, in the colour
@@ -1837,6 +1837,50 @@ def shirt_band(torso, maker, material, places, half_width, lift):
     full.add_skin(torso, middle, [lower, upper], material, around=False)
 
 
+SCARF = {
+    # The red scarf of "Jesus" (22 October 2026, from #47, #267, #331 and the skeletons #1214, #1311: not a flat stripe: a thick cloth wrapped round the neck, one end
+    # hanging down the chest over the shoulder, its darker folds running along it). The neck roll: its height, how far it stands out of the torso, its radius. The
+    # hanging end: its places (across, height) from the neck to the hip, half width, half thickness, the folds (how far from the middle, as a share of the half width).
+    "ROLL": (0.572, 0.024, 0.030),
+    "END": ((0.105, 0.560), (0.062, 0.495), (0.010, 0.430), (-0.045, 0.365), (-0.090, 0.300)), "HALF_WIDTH": 0.052, "HALF_THICK": 0.014,
+    "FOLDS": (-0.45, 0.10, 0.55), "FOLD_HALF": 0.006,
+    "STATIONS": 9,
+}
+
+
+def lay_scarf(torso, maker, colours):
+    """The scarf of the Jesus robe: a thick roll round the neck and an end hanging down the chest with its folds."""
+    numbers = SimpleNamespace(**SCARF)
+    height, out_by, radius = numbers.ROLL
+    half_width, half_depth = KIT.torso_section(maker.body, height)
+    path, wide, thick = [], [], []
+    for index in range(numbers.STATIONS + 1):
+        angle = 2.0 * math.pi * index / numbers.STATIONS
+        outward = Vector((math.cos(angle) / (half_width + out_by), math.sin(angle) / (half_depth + out_by), 0.0)).normalized()
+        path.append(Vector((math.cos(angle) * (half_width + out_by), math.sin(angle) * (half_depth + out_by), height)))
+        wide.append(outward * radius)
+        thick.append(Z * radius * 0.9)
+    slab(torso, path, wide, thick, torso.named("Sash"), 0.010, sides=5)
+    # The hanging end, a flat cloth standing off the shirt.
+    path, wide, thick, places = [], [], [], list(numbers.END)
+    for index, (across, up) in enumerate(places):
+        centre = shirt_front(maker, up, across, numbers.HALF_THICK + 0.004)
+        out = (shirt_front(maker, up, across, numbers.HALF_THICK + 0.014) - centre).normalized()
+        before, after = places[max(index - 1, 0)], places[min(index + 1, len(places) - 1)]
+        along = (shirt_front(maker, after[1], after[0], 0.0) - shirt_front(maker, before[1], before[0], 0.0)).normalized()
+        width = numbers.HALF_WIDTH * (1.0 if index < len(places) - 1 else 0.7)
+        path.append(centre)
+        wide.append(out.cross(along).normalized() * width)
+        thick.append(out * numbers.HALF_THICK)
+    slab(torso, path, wide, thick, torso.named("Sash"), 0.010, sides=4)
+    # The folds: darker lines along it.
+    for share in numbers.FOLDS:
+        fold = []
+        for (across, up), (_, ahead) in zip(places, places[1:] + [places[-1]]):
+            fold.append((across - share * numbers.HALF_WIDTH * 0.7, up + share * numbers.HALF_WIDTH * 0.7))
+        shirt_band(torso, maker, torso.named("SashFold"), fold, numbers.FOLD_HALF, numbers.HALF_THICK * 2.0 + 0.008)
+
+
 def open_front(torso, maker, half_opening, fur_radius):
     """The front of a robe left open (Kings Robe): the faces of the shirt across the middle of the front
     are removed, so the body shows in its skin colour, and a roll of fur runs down each edge."""
@@ -1918,6 +1962,8 @@ def decorate_shirt(maker, torso):
     if entry.get("sash"):
         places, half_width = entry["sash"]
         shirt_band(torso, maker, torso.named("Sash"), places, half_width, lift * 2.0)
+    if entry.get("scarf"):
+        lay_scarf(torso, maker, colours)
     for places, half_width in entry.get("swirls", ()):
         shirt_band(torso, maker, torso.named("Swirl"), places, half_width, lift)
     for across, height, size in entry.get("flowers", ()):
@@ -3328,7 +3374,7 @@ def arc(across, height, radius, start_deg, stop_deg, steps=6):
 INK_BLACK = (0.08, 0.06, 0.07)
 CLOTHES.update({
     "Inmate": printed("Inmate", {"Label": (0.83, 0.39, 0.10), "Print": (0.30, 0.15, 0.06)},
-                      labels=((0.060, 0.330, 0.062, 0.020),), print=("INMATE", 0.326, 0.026, 0.110, 0.060)),
+                      labels=((0.060, 0.322, 0.088, 0.030),), print=("INMATE", 0.318, 0.036, 0.150, 0.060)),
     "Six Seven": printed("Six Seven", {"Print": INK_BLACK, "PrintLine": WHITE}, print=("67", 0.395, 0.110, 0.200, 0.0)),
     "Chug Life": printed("Chug Life", {"Print": INK_BLACK}, print=("CHUG LIFE", 0.420, 0.046, 0.250, 0.0)),
     "CWO": printed("CWO", {"Print": (0.96, 0.67, 0.25), "PrintLine": INK_DARK}, print=("CWO", 0.410, 0.075, 0.220, 0.0)),
@@ -3345,11 +3391,11 @@ CLOTHES.update({
                                      (arc(-0.06, 0.34, 0.032, -90.0, 180.0), 0.006),
                                      (arc(0.00, 0.43, 0.022, 0.0, 300.0), 0.005))),
     "Squid Game Guard": printed("Squid Game Guard", {"Logo": (0.97, 0.97, 0.97)},
-                                logos=(("triangle", 0.075, 0.395, 0.030, "Logo"),)),
-    "Jesus": printed("Jesus", {"Sash": (0.80, 0.22, 0.14)},
-                     sash=(((0.118, 0.565), (0.055, 0.485), (-0.020, 0.405), (-0.100, 0.310)), 0.034)),
+                                logos=(("triangle", 0.078, 0.385, 0.048, "Logo"),)),
+    # (22 October 2026: a thick scarf, not a stripe: see SCARF.)
+    "Jesus": printed("Jesus", {"Sash": (0.80, 0.18, 0.12), "SashFold": (0.52, 0.08, 0.06)}, scarf=True),
     # Its front is open: the body shows in its skin colour between two rolls of white fur.
-    "Kings Robe": printed("Kings Robe", {"Fur": (0.96, 0.91, 0.89)}, open_front=(0.058, 0.022)),
+    "Kings Robe": printed("Kings Robe", {"Fur": (0.96, 0.91, 0.89)}, open_front=(0.062, 0.034)),
     # Yellow triangles along the edge of the cape and a dark bow at the neck.
     "Wizard": printed("Wizard", {"Trim": (0.92, 0.68, 0.10), "Bow": (0.09, 0.11, 0.27)}, zigzag=(0.442, 0.478, 16),
                       logos=(("bow", 0.0, 0.552, 0.030, "Bow"),)),
@@ -3534,8 +3580,9 @@ CLOTHES.update({
     "Wizard Cape": {"kind": "Cape", "colours": {"Cape": (0.17, 0.22, 0.52), "Collar": (0.10, 0.12, 0.32),
                                                 "Clasp": (0.96, 0.78, 0.22)},
                     "print_missing": "the yellow pattern of the cape"},
-    "Jesus Robe": tee((0.95, 0.94, 0.90), collar=(0.80, 0.16, 0.13), SLEEVE=LONG_SLEEVE,
-                      missing="the red sash over the shoulder"),
+    # (22 October 2026: the red scarf of the robe, as "Jesus" has it.)
+    "Jesus Robe": with_(tee((0.95, 0.94, 0.90), collar=(0.80, 0.16, 0.13), SLEEVE=LONG_SLEEVE),
+                        colours={"Sash": (0.80, 0.18, 0.12), "SashFold": (0.52, 0.08, 0.06)}, scarf=True),
     "Mummy": {"kind": "Mummy", "colours": {"Wrap": (0.94, 0.91, 0.82)}},
     "CEO Vest": {"kind": "Tee", "colours": {"Main": (0.30, 0.31, 0.35), "Stripe": (0.22, 0.23, 0.27),
                                             "Collar": (0.19, 0.20, 0.24)},

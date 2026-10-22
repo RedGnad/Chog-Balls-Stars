@@ -1382,3 +1382,26 @@ The title of the sheet of the ten said 23 October: it says 22 October now (the f
   Not done: the glowing outline (the outline material is shared by every hero), the dark-gold shading on the head.
 - **#434 The Scream**: the hands are 0.082 by 0.120 (0.052 by 0.088), flat on the cheeks (0.205 out, 0.058 off the face), with the thumb and four fingers standing up along the face, so they show from the front.
 - **Checked**: #53 7,976 triangles (7,311: the tongues of the flame head cost 665), #434 7,427, #1373 6,373; `--budget`: largest hero #630 7,983, none over 8,000; library 1,970 Genesis, 0 failures; what each throws is unchanged (#53, #434, #1373 throw the leaf: `1:1 Flame Hair` is in `ATTACK_OF_HEAD`, or the 2,240 triangles of the flames would be thrown).
+
+## 22 October 2026: item 7, the audit of the clothes against the art
+
+Method: for each value of "Body" (91 of them, from the metadata), three Genesis of different skins, their 256 point pictures beside the 3D hero (`render_chog_traits.py`, new views `pedestal_torso`
+and `pedestal_torso_back`: the chest and the arms close, from the front and from behind, which the head hides on the bust), read for what the drawing shows and the 3D lost; the values are audited
+in batches by number of Genesis. The prints and logos of the first passes (`CLOTHES`, `printed()`) are judged on these views too.
+
+### Batch 1: the 14 most worn values of Side=Right (Jesus, Kings Robe, Black Trackset, Farmer Shirt, Tuxedo, Squid Game Guard, Black Vest, Inmate, Red Tuxedo, White tuxedo, Six Seven, Prisoner, Stripes, White Pure Shirt)
+
+Sheet: [clothes-batch1-2026-10-22.jpg](../../research/evidence/clothes-batch1-2026-10-22.jpg) (15 rows: #47, #24, #8, #66, #10, #84, #95, #19, #5, #87, #12, #11, #126, #1, #1214; the art, then before | after:
+torso, torso from behind, hero stage).
+
+- **White Pure Shirt** (28 Genesis, #1, #30, #145, #233, #254, #307, #1960): the art draws a plain white short-sleeved shirt with a thin rolled neckline and no sash; ours is that (white, a grey collar): unchanged. The red sash
+  of the brief is **Jesus** (24 Genesis) and the robe of the two skeletons (**Jesus Robe**, #1214, #1311).
+- **Jesus** (the red sash): the art is a thick red scarf wrapped round the neck with one end hanging down the chest over the shoulder, folds running along it; ours was one flat red stripe. Now `SCARF`, `lay_scarf`:
+  a roll round the neck (radius 0.030) and a hanging end 0.104 wide standing 0.014 off the shirt, five stations from the shoulder to the hip, two darker fold lines (`SashFold`). **Jesus Robe** has it too.
+- **Squid Game Guard**: the triangle of the chest was 0.030 across and lost beside the art's: 0.048, and a little lower.
+- **Inmate**: the word INMATE was a speck (0.026 high on a label 0.124 wide); now 0.036 high on a label 0.176 wide, lower on the hem, as the art draws it at the bottom of the shirt.
+- **Tuxedos** (the nine values, ~270 Genesis): the V of the shirt in the jacket was 0.12 wide at the top, the art's collar is wide and open: 0.156.
+- **Kings Robe**: the rolls of white fur along the open front are thicker (0.034 in place of 0.022); the art's fur is fluffy and broad, ours stays a smooth roll.
+- **Judged faithful, unchanged**: Black Trackset (zip, white stripes along the sleeves), Farmer Shirt, Black Vest (padded bands), Six Seven (67), Prisoner and Stripes (bands), White tuxedo.
+- **Checked**: `--budget` after the scarf: largest #710 7,981, #911 (a Jesus) 7,931 (8,043 with the first scarf of 12 stations and 6 sides, so the scarf was cut to 9 stations and 5 sides), none over 8,000;
+  library 1,970 Genesis, 0 failures. Not verified in Unity.
