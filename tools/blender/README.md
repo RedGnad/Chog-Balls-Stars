@@ -1065,3 +1065,27 @@ no shadow), `render_recruit.py --size`, `make_chog_stage_sheet.py` and `check_fa
   Meanwhile `FACE_FIT` 0.985 to 0.96 leaves the most grazing part of the face to the skin.
 - **Checked**: 35 Genesis (hoods, costumes, caps, bare heads of both Sides) build with no failure; `--budget` largest #710 7,971, median 7,165, none over
   8,000; library 1,970 Genesis, 0 failures. Not verified in Unity.
+
+
+## 22 October 2026: the costumes reasoned as objects, lot 2: the shark
+
+Sheet: [costumes-shark-2026-10-22.jpg](../../research/evidence/costumes-shark-2026-10-22.jpg) (6 sharks: #116, #139, #289, #169, #1966, #215;
+the art, then before | after in the same views as lot 1).
+
+- **What the Shark Suit is**: the hood IS a shark's head and the face looks out of its open mouth: a row of white triangular teeth with
+  black outlines on the rim of the opening (#116: about 8 on top pointing down, 6 at the bottom pointing up), none across the face. The
+  owner: "understand that the costume IS a shark; we do not care whether teeth show on a phone". The body is the same animal: a white
+  belly under the chin (#116) and a dark blue pectoral fin low at the side of the body, nothing on the arms.
+- **Changed** (`COSTUME`, `add_shark_teeth`, `add_snout`, `add_dorsal_fin`, `add_tail_fin`, `add_back_fin`, `add_pectoral_fins`,
+  `add_shark_head`): the teeth are 14 small white blades with an outline shell, each made on the rim and pointing into the opening (the
+  old ones were flat triangles with a larger dark triangle behind each: a ring of fine dark wedges that read as the rays of a sun; the
+  owner saw it too); a rounded snout over the face (the hood's top coming forward, as the dragon's); a tall dorsal fin on the top
+  and back of the hood, thicker (the main read from above), a smaller fin on the back of the body, a tail fin behind the lower back
+  (crescent, standing), small shark eyes on the sides of the hood and three gill lines behind each (a choice: no picture shows the hood
+  from the side; they help it read as a shark); the pectoral fins moved from the height of the arms (0.46, where they read as wings) to
+  the hip (0.30), behind the arm; a broad white belly (0.28 wide, from 0.13 to 0.57; it was a stripe 0.17 wide) cut a little off the
+  suit (0.010) so it does not sag into the shirt.
+- **Checked**: 6 sharks before | after; `--budget`: largest hero #710 7,971 (not a shark), none over 8,000, the sharks 6,912 to 7,120;
+  library 1,970 Genesis, 0 failures, 0 lacking a part, 3,660,417 bytes.
+- **Not done / not verified**: not seen in Unity. The dorsal fin is seen edge on from the game camera from behind (a line, with its
+  outline); the teeth are small at the true phone size and the snout hides the upper ones a little from the game camera in front.

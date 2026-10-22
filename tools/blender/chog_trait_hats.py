@@ -1988,23 +1988,44 @@ def build_hoodie(maker):
 # ---------------------------------------------------------------------------------------------
 COSTUME = {
     # The belly in another colour (shark): half its width, its lower and upper edge.
-    "BELLY": (0.085, 0.300, 0.540),
-    # The teeth of the shark: a full row of white triangles in a dark outline all round the opening, the upper jaw
-    # and the lower (22 October 2026, from the 25 pictures, which draw about 24 round the face: nine on top, four
-    # on each side, seven under the chin; until then eleven small ones along the top of the rim, nearly
-    # invisible). How many, how long (on the sides, at the top of the opening, at its bottom), how large the dark triangle is
-    # and the white one inside it, against the triangle between two points of the edge and the tip (the dark one shows
-    # all round the white as the outline the pictures draw).
-    # (22 October 2026, phone size: 20 teeth 0.066 to 0.082 long were a fine zigzag of 6 pixels at the size of the game; 14
-    # larger ones, with a bolder dark edge, read as teeth. The pictures draw about 20, so this leaves them a little: said in
-    # the README.)
-    "TEETH": (14, (0.088, 0.104, 0.072), (1.20, 0.76)),
-    # The fin on the back of the hood (not drawn by any picture: the hood is out of the frame): polar degrees where
-    # it starts and ends, its height, half thickness. (0.150 and 0.016 until 22 October 2026: a thin thorn.)
-    "FIN": (24.0, 96.0, 0.105, 0.026),
-    # The pectoral fin on each side of the body (the pictures draw it low at the side, dark blue, swept back and
-    # down, with three lines): its root (height, how far back), its reach out, back and down, its half thickness.
-    "PECTORAL": (0.46, 0.02, (0.17, 0.12, 0.12), 0.014),
+    # (22 October 2026: 0.085 half wide, a stripe; the pictures, #116 first, draw a broad white belly under the chin.)
+    "BELLY": (0.140, 0.130, 0.570),
+    # The teeth of the shark (22 October 2026, from #116 and the 25 pictures): white, a dark line round each, in one row on the rim of
+    # the opening, the upper ones pointing down and the lower ones pointing up, none across the face (about 8 on top, 6
+    # at the bottom on #116). Each is a small blade of its own, made on the rim and pointing into the opening, with an
+    # outline shell, not a flat triangle with a dark triangle behind it: those, a ring of fine dark wedges, read as the
+    # rays of a sun (the owner, 22 October). How many on top and at the bottom, how long each (top, bottom), half width
+    # at the foot, half thickness, thickness of the outline, how far off the head the foot stands, how far out of the
+    # rim of the face the foot starts (against its size).
+    "TEETH": (8, 6, 0.100, 0.078, 0.046, 0.012, 0.007, 0.040, 1.03),
+    # The fin on top of the head (the main read from above): where its foot starts and ends along the top of the hood
+    # (polar degrees from straight up, towards the back), its height, half thickness at the foot, how far its tip is
+    # swept back. Not drawn by any picture: no picture shows the top of the hood. (A thin thorn 0.105 high until 22
+    # October 2026.)
+    "FIN": (6.0, 100.0, 0.170, 0.040, 0.075),
+    # The snout of the shark's hood (22 October 2026): the hood IS the shark's head, so its top comes forward over the face as a
+    # rounded snout, wider and flatter than the dragon's (same rings as MASCOT["SNOUT"]); the teeth are on the rim under it.
+    "SNOUT": ((-0.05, 0.285, 0.30, 0.105), (-0.15, 0.290, 0.27, 0.100), (-0.23, 0.292, 0.21, 0.088),
+              (-0.29, 0.290, 0.15, 0.072), (-0.325, 0.286, 0.095, 0.052), (-0.345, 0.282, 0.045, 0.030),
+              (-0.352, 0.282, 0.0, 0.0)),
+    "SNOUT_SIDES": 12,
+    # The fin on the back of the body, under the hood (a choice, with the tail fin): points of its edge (how far behind the
+    # surface of the back, height), half thickness.
+    "BACK_FIN": (((-0.020, 0.470), (0.095, 0.420), (0.050, 0.300), (-0.020, 0.200)), 0.020),
+    # The tail fin, behind the body: from the back of the torso (how far back, height) the points of its edge, half thickness.
+    "TAIL_FIN": (((0.000, 0.250), (0.060, 0.330), (0.200, 0.470), (0.140, 0.300), (0.215, 0.120), (0.080, 0.200),
+                  (0.000, 0.150)), 0.020),
+    # The pectoral fin on each side of the body: the pictures draw it low at the side of the body, dark blue, swept
+    # back and down (#116, lower right of the body), nothing on the arms. Its root (height, how far back), its reach
+    # out, back and down, its half thickness. (22 October 2026: at the height of the arms, 0.46, where the owner read it
+    # as wings; now at the hip, behind the arm.)
+    "PECTORAL": (0.30, 0.050, (0.18, 0.13, 0.12), 0.016),
+    # The eyes on the sides of the hood (a choice: no picture shows them, the owner agreed they may help the hood read as a
+    # shark): degrees round from the front, polar degrees, radius.
+    "EYES": (64.0, 66.0, 0.030),
+    # The gills: three short curved lines behind each eye: degrees round from the front, polar degrees from where to where,
+    # half width of a line, how far apart the lines are (degrees round).
+    "GILLS": (108.0, 52.0, 78.0, 0.0065, 5.5),
     # The bandana over the lower face: in the coordinates of the face, its upper corners (to the side,
     # above), its point below the chin, how far off the head, its dots.
     # Its lift runs from its top edge to its point: close to the face under the eyes, over the band of the hood
@@ -2064,55 +2085,126 @@ def add_boots(maker, part, material, larger):
             point.co.z = max(point.co.z, 0.0)
 
 
-def add_shark_teeth(maker, part, numbers):
-    """A row of white teeth in a dark outline all round the edge of the face, pointing in at it: the upper jaw
-    longest, the lower shortest, each a triangle laid on the face between two points of its edge."""
-    head, surface = maker.head, maker.surface
-    count, (side_length, top_length, bottom_length), (dark_size, white_size) = numbers.TEETH
-    edge = [KIT.face_place(head, angle, 1.0) for angle in KIT.face_edge_angles(head, surface, count)]
-    lift_line, lift_tooth = KIT.DRAWN[1], KIT.DRAWN[2]
+def arc_places(head, surface, first, last, count):
+    """"count" angles (of face_place) evenly spaced along the edge of the face, as it lies on the head, between the angles
+    "first" and "last" (radians): the middle of each of "count" equal parts of the arc."""
+    angles = [first + (last - first) * index / 200.0 for index in range(201)]
+    points = [surface.front(*KIT.face_place(head, angle, 1.0), 0.0) for angle in angles]
+    lengths = [0.0]
+    for before, after in zip(points, points[1:]):
+        lengths.append(lengths[-1] + (after - before).length)
+    chosen = []
     for index in range(count):
-        (x1, z1), (x2, z2) = edge[index], edge[(index + 1) % count]
-        middle = ((x1 + x2) * 0.5, (z1 + z2) * 0.5)
-        reach = math.hypot(*middle)
-        inward = (-middle[0] / reach, -middle[1] / reach)
-        high = max(0.0, inward[1] * -1.0)          # 1 on the top teeth (they point down), -1 under the chin
-        length = side_length + (top_length - side_length) * high if inward[1] < 0.0 else \
-            side_length + (bottom_length - side_length) * inward[1]
-        tip = (middle[0] + inward[0] * length, middle[1] + inward[1] * length)
-        corners = [(x1, z1), (x2, z2), tip]
-        centre = (sum(c[0] for c in corners) / 3.0, sum(c[1] for c in corners) / 3.0)
-        # The dark triangle is larger than the tooth, the white one smaller, both about the middle of the triangle: the
-        # dark shows all round the white (a white tooth on the cream face has no other edge).
-        # (The dark foot stays on the edge of the face: scaled out past it, it left the head, where the surface of
-        # the head runs out, and went under the face: only the tips showed.)
-        for material, size, lift in (("ToothEdge", dark_size, lift_line), ("Tooth", white_size, lift_tooth)):
-            points = [(centre[0] + (c[0] - centre[0]) * size, centre[1] + (c[1] - centre[1]) * size) for c in corners]
-            if material == "ToothEdge":
-                points = [corners[0], corners[1],
-                          (tip[0] + (tip[0] - middle[0]) * (size - 1.0), tip[1] + (tip[1] - middle[1]) * (size - 1.0))]
-            # Rows from the tip to the foot: a flat triangle 0.09 long sags 0.004 under the curve of the head, below the face
-            # (the dark one hid under it but for its tip), so each tooth is cut in three bands.
-            rows = [[surface.front(points[2][0], points[2][1], lift)]]
-            for share in (0.35, 0.70, 1.0):
-                rows.append([surface.front(points[2][0] + (side - points[2][0]) * share,
-                                           points[2][1] + (up - points[2][1]) * share, lift) for side, up in points[:2]])
-            full.add_skin(part, surface, rows, part.named(material), around=False)
+        wanted = lengths[-1] * (index + 0.5) / count
+        step = next(step for step in range(len(lengths) - 1) if lengths[step + 1] >= wanted)
+        share = (wanted - lengths[step]) / max(lengths[step + 1] - lengths[step], 1e-12)
+        chosen.append(angles[step] + (angles[step + 1] - angles[step]) * share)
+    return chosen
+
+
+def add_shark_teeth(maker, part, numbers):
+    """The teeth of the shark: a row of white blades on the rim of the opening, the upper ones pointing down, the lower ones
+    pointing up, each with a dark outline shell (see COSTUME["TEETH"])."""
+    head, surface = maker.head, maker.surface
+    up_count, down_count, up_length, down_length, half_wide, half_thick, outline, lift, grown = numbers.TEETH
+    face = surface.front(0.0, 0.0, 0.0)
+    for first, last, count, length in ((20.0, 160.0, up_count, up_length), (200.0, 340.0, down_count, down_length)):
+        for angle in arc_places(head, surface, math.radians(first), math.radians(last), count):
+            root = surface.front(*KIT.face_place(head, angle, grown), lift)
+            around = (surface.front(*KIT.face_place(head, angle + 0.02, 1.0), 0.0)
+                      - surface.front(*KIT.face_place(head, angle - 0.02, 1.0), 0.0)).normalized()
+            out = KIT.egg_normal(surface, root)
+            toward = face - root
+            middle = KIT.along_egg(surface, root, toward, length * 0.5, lift + 0.003)
+            tip = KIT.along_egg(surface, root, toward, length, lift + 0.006)
+            part.shell([(root, around * half_wide, out * half_thick), (middle, around * half_wide * 0.60, out * half_thick * 0.8),
+                        (tip, Vector(), Vector())], 4, part.named("Tooth"), outline)
 
 
 def add_pectoral_fins(maker, numbers):
-    """A flat dark fin on each side of the body, swept back and down."""
+    """A flat dark fin on each side of the body, low, swept back and down: a triangle from the side of the hip."""
     torso, body = maker.parts[0][0], maker.body
     height, back, (out, behind, down), thick = numbers.PECTORAL
     for sign in (1.0, -1.0):
         half_width, half_depth = KIT.torso_section(body, height)
-        root = Vector((sign * half_width * 0.92, back, height))
-        edge = [root + Z * 0.05, root + Vector((sign * out, behind, -down * 0.2)),
-                root + Vector((sign * out * 0.85, behind * 1.25, -down)), root + Vector((sign * out * 0.30, behind * 0.5, -down * 0.8)),
-                root - Z * 0.07]
-        normal = Vector((0.0, -0.6, 1.0)).normalized()
+        root = Vector((sign * half_width * 0.90, back, height))
+        front, rear = root + Vector((0.0, -0.045, 0.035)), root + Vector((0.0, 0.075, -0.030))
+        tip = root + Vector((sign * out, behind, -down))
+        edge = [front, tip + Vector((0.0, -0.030, 0.025)), tip, rear]
+        normal = (edge[1] - edge[0]).cross(edge[3] - edge[0]).normalized()
+        if normal.z < 0.0:
+            normal = -normal
         KIT.add_loops(torso, [[point - normal * thick for point in edge], [point + normal * thick for point in edge]],
                       torso.named("Fin"), numbers.OUTLINE_THICKNESS)
+
+
+def add_tail_fin(maker, numbers):
+    """The tail fin of the shark: a flat crescent standing behind the lower back."""
+    torso = maker.parts[0][0]
+    points, thick = numbers.TAIL_FIN
+    _, depth = KIT.torso_section(maker.body, points[0][1])
+    edge = [Vector((0.0, depth - 0.02 + behind, height)) for behind, height in points]
+    KIT.add_loops(torso, [[point - X * thick for point in edge], [point + X * thick for point in edge]],
+                  torso.named("Fin"), numbers.OUTLINE_THICKNESS)
+
+
+def add_back_fin(maker, numbers):
+    """The small fin on the back of the body, under the hood."""
+    torso = maker.parts[0][0]
+    points, thick = numbers.BACK_FIN
+    _, depth = KIT.torso_section(maker.body, 0.35)
+    edge = [Vector((0.0, depth + behind, height)) for behind, height in points]
+    KIT.add_loops(torso, [[point - X * thick for point in edge], [point + X * thick for point in edge]],
+                  torso.named("Fin"), numbers.OUTLINE_THICKNESS)
+
+
+def add_dorsal_fin(maker, hood, hood_numbers, numbers):
+    """The fin on top of the hood: a swept triangle standing on the middle line of the hood, from near the top to the back."""
+    surface = maker.surface
+    start, stop, height, half_thick, sweep = numbers.FIN
+    angle = math.radians(90.0)
+    size = interpolate(hood_numbers.SIZE, 150.0)
+
+    def foot(degrees):
+        return on_head(surface, angle, math.radians(degrees), size)
+
+    def up(degrees):
+        return head_normal(surface, angle, math.radians(degrees))
+
+    middle = start + (stop - start) * 0.45
+    edge = [foot(start) - up(start) * 0.03, foot(start + (stop - start) * 0.18) + up(start) * height * 0.45,
+            foot(middle) + up(middle) * height + Y * sweep, foot(stop - (stop - start) * 0.28) + up(stop) * height * 0.38,
+            foot(stop) - up(stop) * 0.03]
+    KIT.add_loops(hood, [[point - X * half_thick for point in edge], [point + X * half_thick for point in edge]],
+                  hood.named("Fin"), numbers.OUTLINE_THICKNESS)
+
+
+def add_shark_head(maker, hood, hood_numbers, numbers):
+    """The eyes and the gills on each side of the hood."""
+    surface = maker.surface
+    degrees, polar, radius = numbers.EYES
+    size = interpolate(hood_numbers.SIZE, degrees)
+    for sign in (1.0, -1.0):
+        angle = math.radians(270.0 + sign * degrees)
+        place = on_head(surface, angle, math.radians(polar), size)
+        out = head_normal(surface, angle, math.radians(polar))
+        disc_on(hood, surface, place + out * 0.004, out, radius, hood.named("Eye"), segments=10)
+        # A white glint, so the eye is an eye and not a hole.
+        glint = place + out * 0.0065 + (Z - out * Z.dot(out)).normalized() * radius * 0.35 + X * sign * 0.0
+        disc_on(hood, surface, glint, out, radius * 0.30, hood.named("Tooth"), segments=6)
+    around, low, high, wide, apart = numbers.GILLS
+    size = interpolate(hood_numbers.SIZE, around)
+    for sign in (1.0, -1.0):
+        for line in (-1, 0, 1):
+            angle = math.radians(270.0 + sign * (around + line * apart))
+            rows = [[], []]
+            for share in (0.0, 0.5, 1.0):
+                polar = math.radians(low + (high - low) * share)
+                point = on_head(surface, angle, polar, size) + head_normal(surface, angle, polar) * 0.004
+                along = (on_head(surface, angle + 0.01, polar, 1.0) - on_head(surface, angle - 0.01, polar, 1.0)).normalized()
+                rows[0].append(point - along * wide)
+                rows[1].append(point + along * wide)
+            full.add_skin(hood, surface, rows, hood.named("Gill"), around=False)
 
 
 def build_costume(maker):
@@ -2131,7 +2223,7 @@ def build_costume(maker):
         for index in range(5):
             height = low + (high - low) * index / 4
             wide = half * math.sin(math.pi * (0.15 + 0.7 * index / 4))
-            rows.append([shirt_front(maker, height, side, 0.004) for side in (-wide, -wide * 0.33, wide * 0.33, wide)])
+            rows.append([shirt_front(maker, height, side, 0.010) for side in (-wide, -wide * 0.33, wide * 0.33, wide)])
         full.add_skin(torso, SimpleNamespace(middle=Vector((0.0, 0.0, (low + high) * 0.5))), rows, torso.named("Belly"),
                       around=False)
     build_hood_up(maker)
@@ -2147,20 +2239,12 @@ def build_costume(maker):
     if entry.get("teeth"):
         add_shark_teeth(maker, hood, numbers)
         add_pectoral_fins(maker, numbers)
+        add_tail_fin(maker, numbers)
+        add_back_fin(maker, numbers)
+        add_snout(hood, maker.surface, numbers.SNOUT, numbers.SNOUT_SIDES, hood.named("Hood"), numbers.OUTLINE_THICKNESS)
+        add_shark_head(maker, hood, hood_numbers, numbers)
     if entry.get("fin"):
-        start, end, height, half_thick = numbers.FIN
-        angle = math.radians(90.0)
-        path, wide, thick = [], [], []
-        for index in range(5):
-            share = index / 4
-            polar = math.radians(start + (end - start) * share)
-            out = head_normal(surface, angle, polar)
-            rise = height * math.sin(math.pi * min(1.0, share * 1.25)) ** 0.8 * (1.0 - 0.6 * share)
-            foot = on_head(surface, angle, polar, interpolate(hood_numbers.SIZE, 180.0)) - out * 0.02
-            path.append(foot + out * (rise + 0.02) * 0.5)
-            wide.append(X * half_thick)
-            thick.append(out * (rise + 0.02) * 0.5)
-        slab(hood, path, wide, thick, hood.named("Hood"), numbers.OUTLINE_THICKNESS, sides=4)
+        add_dorsal_fin(maker, hood, hood_numbers, numbers)
     if entry.get("bandana"):
         # A triangle of cloth over the lower face, from below the eyes to a point under the chin, with
         # white dots: it covers the mouth ("HIDES" in "head").
@@ -2610,15 +2694,24 @@ def oval_on(part, middle, centre, out, along, half_long, half_short, material, s
     return full.add_skin(part, SimpleNamespace(middle=middle), [[centre + out * 0.002], edge], material)
 
 
+def add_snout(part, surface, snout, sides, material, outline):
+    """A rounded snout lofted from inside the head forward over the face: "snout" lists rings from the back to the tip (how far
+    ahead of the middle of the head, how high above it, half width, half height), in the axes of the head before it is
+    turned up. Returns its rings (centre, first axis, second axis)."""
+    middle = surface.middle
+    rings = [(middle + Vector((0.0, ahead, up)), X * wide if wide else Vector(), Z * tall if tall else Vector())
+             for ahead, up, wide, tall in snout]
+    part.shell(rings, sides, material, outline)
+    return rings
+
+
 def add_dragon_head(maker, collar, rim, numbers):
     """The head of the dragon on the part of the head (22 October 2026): the snout over the face (the upper jaw, whose
     underside is the upper lip and whose top carries the two nostrils), and the four fangs on the rim of the opening, which
     is the mouth. See MASCOT["SNOUT"]."""
     surface = maker.surface
     middle = surface.middle
-    rings = [(middle + Vector((0.0, ahead, up)), X * wide if wide else Vector(), Z * tall if tall else Vector())
-             for ahead, up, wide, tall in numbers.SNOUT]
-    collar.shell(rings, numbers.SNOUT_SIDES, collar.named("Hood"), numbers.OUTLINE_THICKNESS)
+    rings = add_snout(collar, surface, numbers.SNOUT, numbers.SNOUT_SIDES, collar.named("Hood"), numbers.OUTLINE_THICKNESS)
     # The nostrils, two dark ovals with a fill of the colour of the hood, as the pictures draw them, near the tip.
     side, ring, half_long, half_short = numbers.NOSTRILS
     centre, first, second = rings[ring]
@@ -3157,7 +3250,8 @@ CLOTHES.update({
     # A blue shark: white belly, white teeth all round the face, a fin on the back of the hood.
     "Shark Suit": costume((0.27, 0.71, 0.92), {"Hood": (0.27, 0.71, 0.92), "Rim": (0.23, 0.55, 0.80),
                                                "Belly": (0.92, 0.95, 0.97), "Tooth": (1.0, 1.0, 1.0),
-                                               "ToothEdge": (0.04, 0.07, 0.16), "Fin": (0.16, 0.40, 0.68)},
+                                               "Fin": (0.13, 0.36, 0.66), "Eye": (0.04, 0.06, 0.14),
+                                               "Gill": (0.12, 0.34, 0.62)},
                           teeth=True, fin=True),
     # A whole banana round the whole Chog (build_mascot, 16 October 2026, after the owner saw a hood over a
     # suit twice): its five sides from yellow round the face to orange at the feet, green over the head, its
