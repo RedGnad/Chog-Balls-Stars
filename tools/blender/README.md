@@ -1279,3 +1279,19 @@ Headband #65, #378, #789, #87; Durag #51, #121; Red Bandana #874, #1192; the art
   values: the 65 Genesis build with no leaf crossing.
 - **Checked**: 12 Genesis before | after; 65 headband and 98 durag, bandana, head wrap and wig Genesis build; `--budget`: largest #630 7,991, none over 8,000; library 1,970 Genesis, 0
   failures. Not verified in Unity. The crown above a band is narrower than the art's (the middle pair is gone, the upper pair is turned in).
+
+### 7.4 The Spartan Helmet: the spikes out of its rear edge
+
+Sheet: [costumes-spartan-2026-10-22.jpg](../../research/evidence/costumes-spartan-2026-10-22.jpg) (8 of the 40 Genesis, the art then before | after: front close, three quarter, side, back
+three quarter, game camera behind, hero stage).
+
+- **What the art draws** (#21, #331, #1081, #1536, #1903, #49, #430, #990): a gold helmet with a nose guard and cheek pieces, a red plume; the Chog's spikes come out of the
+  rear edge of the helmet on the far side, three or four stacked, pointing out and back, so the Chog is recognisable.
+- **What was wrong**: the shape's own leaves were replaced by a row planted under the real rim of the shell (`USHANKA_RIM_ROW`), all round the back and pointing down: a
+  collar of spikes hanging at the nape like the legs of a bug (the owner: two spikes pointing down at the back).
+- **Changed** (`SPARTAN["LEAVES"]`, `HEAD_VALUES`): the value takes the leaves of the shape again: the lowest pair (92 degrees, 55 back) and the pair of the back row
+  (80 degrees, 70 back), each 1.45 times a leaf of the crown, their points bending up; the leaf straight back is gone (it hung down the nape whatever its lean, the head being turned
+  up by 20 degrees: no leaf pointing back can clear the rear edge of the shell and point up). Each was tried alone against the shell (`leaf_crossings`): out of the
+  rear edge, none crosses it. `SECTORS` (135, -135) asks a tip to show on each side from above.
+- **Checked**: 8 Genesis before | after; the 40 Spartan Genesis build; `--budget`: largest #630 7,991, none over 8,000; library 1,970 Genesis, 0 failures. Not verified in Unity. From
+  straight behind the leaves still overlap into a fan at the nape (they point back, the head being turned up); the art has no view from behind.

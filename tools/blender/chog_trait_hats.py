@@ -721,10 +721,14 @@ SPARTAN = {
     # Short and narrow, as the points drawn behind the helmet.
     # (They are longer than on a bare head: the helmet stands 0.05 off the head, and the pictures draw them
     # large beside it.)
-    "LEAVES": (GONE, GONE, GONE, leaf(1.60, 118.0, 26.0, 0.0, 0.58), GONE, leaf(1.60, 94.0, 40.0, 0.0, 0.55),
-               leaf(1.30, None, 100.0, 0.0, 0.62)),
+    # (22 October 2026, the owner: two spikes pointed DOWN at the back like a bug, and the sides did not show as the art draws them: 3 or 4
+    # short spikes out of the rear edge of the helmet, pointing out and a little up. The lowest pair was turned to 118 degrees (down) and the back
+    # row to 100 (down), 1.6 and 1.3 times as long as a leaf of the crown. Now two pairs out of the rear edge (92 and 80 degrees, each tried against the shell, leaf_crossings), 1.45 times a leaf of the crown, as long as the pictures draw them beside the shell, the points bending up; the leaf straight back is gone, it hung down the nape whatever its lean, the head being turned up.)
+    "LEAVES": (GONE, GONE, GONE, leaf(1.45, 92.0, 55.0, 0.55, 0.62), GONE, leaf(1.45, 80.0, 70.0, 0.55, 0.58), GONE),
     # The pictures show no teeth of hair on the brow inside the helmet.
     "FRINGE": False,
+    # Where a tip must show from above and from the game camera: the two sides behind the helmet and straight back.
+    "SECTORS": (135, -135),
 }
 
 
@@ -1448,7 +1452,7 @@ BUCKET_RIM_ROW = {"LENGTH": 1.40, "WIDTH": 0.70, "SWEEP_DEG": 30.0}
 # to the jaw, so the row starts behind them, and the check wants it seen behind and three quarters behind.
 # Its second row (make_chog_traits.UNDER_RIM, "EXTRA_ROWS") only behind: the flaps hide the sides, and with a
 # heavy robe or the duck float the whole row went over 8,000 triangles (#766, #1644, 16 October 2026).
-USHANKA_RIM_ROW = {"ANGLES": (94.0, 116.0, 138.0, 160.0, 180.0), "SWEEP_DEG": 18.0, "SECTORS": (135, -135, 180),
+USHANKA_RIM_ROW = {"ANGLES": (94.0, 116.0, 138.0, 160.0, 180.0), "SWEEP_DEG": 18.0, "SECTORS": (135, -135),
                    "EXTRA_ROWS": ({"ANGLES": (127.0, 149.0, 171.0), "BELOW_DEG": 20.0, "DROOP_DEG": 30.0,
                                    "LENGTH": 0.80, "WIDTH": 0.85, "LIFT": 0.12, "SIDES": 4},)}
 
@@ -1544,8 +1548,12 @@ HEAD_VALUES = {
                                   "down to the cheek, larger than under a cap", NO_CROWN, BIG_RIM_ROW),
     ("Durag", "Right"): seen((51, 570, 1001, 1563, 1884), "3 large spikes on the far side, from the height of "
                              "the top of the durag down to the cheek; no point of hair on the brow", NO_CROWN, BIG_RIM_ROW),
+    # (22 October 2026, the owner: the crown's spikes must show at the sides and the back below the helmet, as the art draws them, and two
+    # pointed DOWN at the back like a bug. Until then a row planted under the real rim of the shell all round the back, pointing down: a collar.
+    # Now the leaves of the shape itself: the lowest pair and the back pair brought out beside the helmet, and the leaf straight back.)
     ("Spartan Helmet", "Right"): seen((21, 331, 1081, 1536, 1903), "a full helmet down to the jaw, nose guard, "
-                                      "red plume; 3 or 4 spikes behind it on the far side", NO_CROWN, USHANKA_RIM_ROW),
+                                      "red plume; 3 or 4 spikes out of its rear edge, at the sides and the back, pointing out and a little up",
+                                      SPARTAN["LEAVES"]),
     ("Russian Hat", "Right"): seen((39, 322, 830, 1177, 1785), "tan fur hat, fur flaps; 1 or 2 small spikes on "
                                    "the far side, behind the flap, near the top", NO_CROWN, USHANKA_RIM_ROW),
     ("Russian Hat", "Left"): seen((34, 504, 982, 1518, 1876), "cream fur, dark leather flaps with snaps; " + LEFT_HEAD,
