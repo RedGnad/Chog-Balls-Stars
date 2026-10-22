@@ -446,45 +446,174 @@ namespace Chog.Screens
                     _rankStatus.text = "PLAYER RANK: STILL VERIFYING, CHECK AGAIN FROM HOME";
             }
 
+            // The flight of the points (22 October 2026, the owner: "we should literally see the points
+            // fly into the bar as it fills"): one gold spark a point (grouped past MaxSparks), each
+            // leaving the "+N" in its own arc and landing on the rank bar, where the counter ticks up, the
+            // bar fills to the new value and pulses, and a note sounds up the scale.
+            private const int MaxSparks = 12;
+            private const float SparkFlightSeconds = 0.55f;
+            private const float SparkGapSeconds = 0.09f;
+
             private IEnumerator RevealRank(PlayerRankGain gain, PlayerRank rank)
             {
                 while (_reward != null && _reward.gameObject.activeSelf && !_leaving)
                     yield return null;
                 if (_leaving)
                     yield break;
-                _rankHeading.text = gain.tierAfter != gain.tierBefore
-                    ? (gain.delta > 0 ? "RANK UP!" : "RANK CHANGED") : Won ? "VICTORY REWARD" : "PLAYER RANK";
+                var tierChanged = gain.tierAfter != gain.tierBefore;
+                _rankHeading.text = tierChanged ? (gain.delta > 0 ? "RANK UP!" : "RANK CHANGED") : Won ? "VICTORY REWARD" : "PLAYER RANK";
                 _rankAmount.text = (gain.delta > 0 ? "+" : "") + gain.delta + " PTS";
                 _rankAmount.color = gain.delta >= 0 ? ChogTheme.Gold : ChogTheme.Cream;
-                _rankDetail.text = gain.tierAfter != gain.tierBefore
+                _rankDetail.text = tierChanged
                     ? gain.tierBefore + "  >  " + gain.tierAfter + "   |   " + gain.before + "  >  " + gain.after
                     : gain.before + "  >  " + gain.after + " PLAYER POINTS";
-                _rankMoment.localScale = ChogTheme.ReducedMotion ? Vector3.one : Vector3.one * 0.74f;
+                var reduced = ChogTheme.ReducedMotion;
+                _rankMoment.localScale = reduced ? Vector3.one : Vector3.one * 0.74f;
                 _rankGroup.alpha = 0f;
                 _rankMoment.gameObject.SetActive(true);
-                ChogSounds.Reward(gain.tierAfter != gain.tierBefore ? 2 : 0);
+                ChogSounds.Reward(tierChanged ? 2 : 0);
+
+                // The window pops in, the rank card still at the points of before.
                 var start = Time.unscaledTime;
-                const float duration = 0.70f;
-                while (Time.unscaledTime - start < duration && !_leaving)
+                const float popSeconds = 0.35f;
+                while (Time.unscaledTime - start < popSeconds && !_leaving)
                 {
-                    var t = Mathf.Clamp01((Time.unscaledTime - start) / duration);
+                    var t = Mathf.Clamp01((Time.unscaledTime - start) / popSeconds);
                     _rankGroup.alpha = t;
-                    if (gain.tierAfter == gain.tierBefore)
-                        ShowRank(rank, Mathf.RoundToInt(Mathf.Lerp(gain.before, gain.after, t * t * (3f - 2f * t))));
-                    else if (_rankValue != null)
-                        _rankValue.text = Mathf.RoundToInt(Mathf.Lerp(gain.before, gain.after, t * t * (3f - 2f * t))) + " PLAYER POINTS";
-                    if (!ChogTheme.ReducedMotion)
-                        _rankMoment.localScale = Vector3.one * (t < 0.75f
-                            ? Mathf.Lerp(0.74f, 1.05f, t / 0.75f)
-                            : Mathf.Lerp(1.05f, 1f, (t - 0.75f) / 0.25f));
+                    if (!reduced)
+                        _rankMoment.localScale = Vector3.one * (t < 0.7f ? Mathf.Lerp(0.74f, 1.06f, t / 0.7f) : Mathf.Lerp(1.06f, 1f, (t - 0.7f) / 0.3f));
                     yield return null;
                 }
                 _rankGroup.alpha = 1f;
                 _rankMoment.localScale = Vector3.one;
+                ShowRankPoints(rank, gain.before, tierChanged);
+
+                // The points fly: a gain in sparks, a loss drains the bar without them.
+                if (!reduced && gain.delta > 0 && _rankFill != null)
+                    yield return FlyPoints(gain, rank, tierChanged);
+                else
+                {
+                    const float countSeconds = 0.6f;
+                    start = Time.unscaledTime;
+                    while (Time.unscaledTime - start < countSeconds && !_leaving)
+                    {
+                        var t = Mathf.Clamp01((Time.unscaledTime - start) / countSeconds);
+                        ShowRankPoints(rank, Mathf.RoundToInt(Mathf.Lerp(gain.before, gain.after, t * t * (3f - 2f * t))), tierChanged);
+                        yield return null;
+                    }
+                }
                 ShowRank(rank, gain.after);
                 ClearPendingRank(RankAddress, GameId);
                 yield return new WaitForSecondsRealtime(1.1f);
                 _rankMoment.gameObject.SetActive(false);
+            }
+
+            // The counter and the bar at a number of points between before and after; the tier line is
+            // left to the end when the tier changes (the bar then counts toward the new threshold).
+            private void ShowRankPoints(PlayerRank rank, int points, bool tierChanged)
+            {
+                if (tierChanged)
+                {
+                    if (_rankValue != null)
+                        _rankValue.text = points + " PLAYER POINTS";
+                    if (_rankFill != null && rank.next > 0)
+                        _rankFill.anchorMax = new Vector2(Mathf.Clamp((float)points / rank.next, 0.001f, 1f), 1f);
+                }
+                else
+                    ShowRank(rank, points);
+            }
+
+            private IEnumerator FlyPoints(PlayerRankGain gain, PlayerRank rank, bool tierChanged)
+            {
+                var sparks = Mathf.Min(gain.delta, MaxSparks);
+                var canvas = _rankMoment.GetComponentInParent<Canvas>();
+                var layer = canvas != null ? canvas.transform : _rankMoment.parent;
+                var from = (RectTransform)_rankAmount.transform;
+                var to = _rankFill.parent as RectTransform;
+                var flying = new System.Collections.Generic.List<(RectTransform spark, float born, Vector2 start, Vector2 end, float bend)>();
+                var landed = 0;
+                var launched = 0;
+                var nextLaunch = Time.unscaledTime;
+                while ((launched < sparks || flying.Count > 0) && !_leaving)
+                {
+                    var now = Time.unscaledTime;
+                    if (launched < sparks && now >= nextLaunch)
+                    {
+                        var spark = MakeSpark(layer, launched);
+                        var start = WorldCentre(from, layer, new Vector2(Random.Range(-0.25f, 0.25f), Random.Range(-0.2f, 0.2f)));
+                        // Lands along the bar where the fill will reach for this point.
+                        var share = rank.next > 0 ? Mathf.Clamp01((gain.before + (launched + 1f) * gain.delta / sparks) / rank.next) : 1f;
+                        var end = WorldCentre(to, layer, new Vector2(share - 0.5f, 0f));
+                        spark.anchoredPosition = start;
+                        flying.Add((spark, now, start, end, Random.Range(60f, 140f) * (launched % 2 == 0 ? 1f : -1f)));
+                        launched++;
+                        nextLaunch = now + SparkGapSeconds;
+                    }
+                    for (var i = flying.Count - 1; i >= 0; i--)
+                    {
+                        var (spark, born, start, end, bend) = flying[i];
+                        var t = Mathf.Clamp01((now - born) / SparkFlightSeconds);
+                        var eased = t * t * (3f - 2f * t);
+                        var arc = Mathf.Sin(t * Mathf.PI) * bend;
+                        spark.anchoredPosition = Vector2.Lerp(start, end, eased) + new Vector2(arc * 0.35f, arc);
+                        spark.localScale = Vector3.one * (0.6f + 0.6f * Mathf.Sin(t * Mathf.PI));
+                        if (t >= 1f)
+                        {
+                            Destroy(spark.gameObject);
+                            flying.RemoveAt(i);
+                            landed++;
+                            var points = landed == sparks ? gain.after : gain.before + Mathf.RoundToInt((float)landed * gain.delta / sparks);
+                            ShowRankPoints(rank, points, tierChanged);
+                            ChogSounds.Reward(landed);
+                            StartCoroutine(PulseBar());
+                        }
+                    }
+                    yield return null;
+                }
+                foreach (var (spark, _, _, _, _) in flying)
+                    if (spark != null)
+                        Destroy(spark.gameObject);
+            }
+
+            private static RectTransform MakeSpark(Transform layer, int index)
+            {
+                var spark = ChogUi.Pinned("Spark" + index, layer, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(26f, 26f));
+                var glow = spark.gameObject.AddComponent<Image>();
+                glow.sprite = ChogSprites.Disc(32, 0.55f);
+                glow.color = ChogTheme.Gold;
+                glow.raycastTarget = false;
+                var core = ChogUi.Pinned("Core", spark, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(12f, 12f))
+                    .gameObject.AddComponent<Image>();
+                core.sprite = ChogSprites.Disc(16, 0.1f);
+                core.color = Color.white;
+                core.raycastTarget = false;
+                spark.SetAsLastSibling();
+                return spark;
+            }
+
+            // A point of a rect ("offset" in shares of its size from its centre) as an anchored position in "layer".
+            private static Vector2 WorldCentre(RectTransform rect, Transform layer, Vector2 offset)
+            {
+                var world = rect.TransformPoint(new Vector3(rect.rect.width * offset.x, rect.rect.height * offset.y, 0f) + (Vector3)rect.rect.center);
+                var local = layer.InverseTransformPoint(world);
+                return new Vector2(local.x, local.y);
+            }
+
+            private IEnumerator PulseBar()
+            {
+                var bar = _rankFill != null ? _rankFill.parent as RectTransform : null;
+                if (bar == null)
+                    yield break;
+                var start = Time.unscaledTime;
+                const float seconds = 0.18f;
+                while (Time.unscaledTime - start < seconds && bar != null)
+                {
+                    var t = (Time.unscaledTime - start) / seconds;
+                    bar.localScale = new Vector3(1f, 1f + 0.35f * Mathf.Sin(t * Mathf.PI), 1f);
+                    yield return null;
+                }
+                if (bar != null)
+                    bar.localScale = Vector3.one;
             }
 
             public void BuildReward(Transform card)
