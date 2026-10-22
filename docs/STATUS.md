@@ -1,5 +1,9 @@
 # État courant et décisions
 
+**22 October 2026, 14:20 UTC (lead: eyes batches 3 and 4, clothes batch 2; deployed).**
+- **Deployed:** build `20261022T141558736Z-c653e0d33f9145f4996ad9407543ce1c`, stamp unchanged. Eyes batch 3 (`heroes-eyes-batch3-2026-10-22.jpg`: visor lenses with round ends, Round Eye tall ovals, Closed Eye Crying drooping, Tired) and batch 4 (`heroes-eyes-batch4-2026-10-22.jpg`: on Side Left the near and far eyes are two drawings, Side Eye, Base, Happy, Vertical, Flat, smoother goggles); clothes batch 2 (`clothes-batch2-2026-10-22.jpg`: hibiscus, Chinese toggles, yukata V, CWO and MILF words, Wizard ties).
+- **Verified:** export 1,970 Genesis, 0 failed; 175 view tests; `?heroes=17,121,212,56,30,181` (the Skull #121's polo shows no ribs); a local siege without exception; judge fixtures agree.
+
 **22 October 2026, 14:00 UTC (lead: Radioactive bands, Skull and Radioactive jaws, bones only on bare skin, clothes batch 1; deployed).**
 - **Deployed:** build `20261022T134637493Z-ce78135128e34c6e8cf3f7409383a757`, stamp unchanged (`b8d600c2135da877`). Library format 6: a Radioactive skin runs through the bands of colour the art draws (the Multi Colored green, yellow, orange, pink, white from chest to crown; `ChogPartsLibrary.BandAt`), format 5 still read for the structures. Faces lot 9 (`stream/heroes-faces` 4f28646, `heroes-radioactive-skins`, `heroes-jaws`, `heroes-bones-2026-10-22.jpg`): a lower jaw with its teeth standing out on Skulls, a jaw band on Radioactives, ribs only where the art shows bare skin. Clothes batch 1 (`stream/heroes-hats` ad7ac71, `clothes-batch1-2026-10-22.jpg`): the Jesus scarf, Inmate label, Squid Game triangle, tuxedo V, Kings Robe fur.
 - **Verified:** export 1,970 Genesis, 0 failed; 175 view tests (one asserts the bands: green at the chest, pink at the forehead); `?heroes=140,1187,343,54,1079,47` shows the bands; a local siege with Radioactive and 1:1 bots without exception; judge fixtures agree.
