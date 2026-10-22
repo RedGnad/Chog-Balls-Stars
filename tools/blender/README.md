@@ -1010,3 +1010,29 @@ the radius of Side Right). The light core (5 of 8 sides) stays: the pictures dra
 changed. Chosen by comparing the bust at 0, 15 and 8 degrees with the pictures (0: 30 down, 15: level, art: about 12 down). The beam
 stays short (the game draws the long one when the hero attacks), and the slant in the game itself is that of the attack's beam, not of
 this stub.
+
+## 22 October 2026: the costumes reasoned as objects (stream B), lot 1: the dragon
+
+The owner, seeing the suits in the game: "the work on the costumes is lacking". The method of this series: say what each costume IS
+as a toy, check it on the pictures, then build that object, and judge it in the views of the game: the hero stage (the whole hero,
+three quarters from a little above, close: `render_chog_traits.py --only pedestal` gives `pedestal`, `pedestal_side`,
+`pedestal_back34`, `pedestal_back`), the bust, and the game camera from behind and from the front. Sheet:
+[costumes-dragon-2026-10-22.jpg](../../research/evidence/costumes-dragon-2026-10-22.jpg) (6 dragons, the art, then before | after).
+
+- **What the dragon suit is**: the hood IS a dragon's head and the face looks out of its open mouth. #16, #42, #226: the two dark
+  ovals on top of the hood are the NOSTRILS at the tip of a snout, so the upper jaw comes forward over the face; the four tan pointed
+  things at the corners of the opening are its FANGS (two hang from the upper rim, two point up from the lower rim), not horns (the four
+  blunt horns pointing away from the face, until today, were these misread); a pale belly, dark "w" marks, a small red bat wing behind
+  each shoulder.
+- **Changed** (`MASCOT`, `add_dragon_head`, `build_mascot`): a rounded snout (`SNOUT`, a loft of 7 rings) over the face, its underside the
+  upper lip, higher than the top of the face so it does not hide the eyes from the game camera; the two nostrils on its top (dark
+  outline, hood-coloured fill); four fangs on the rim of the opening, pointing into it (`FANG_PLACES`, `FANG`); the horns are gone. The
+  belly is a plate cut from the points of the volume (`BELLY`: a plate sampled between them sagged under its facets and showed as two
+  patches); bat wings with three scalloped fingers and dark ribs (`WING_EDGE`), tilted back so the game camera sees them from above
+  (upright they were a line); a row of six small plates down the back from the head to the tail (`RIDGE`, a choice: no picture shows
+  the back, it makes the dragon read from behind, which is the match camera). The material `Horn` is now `Fang`.
+- **Checked**: 6 dragons rendered before | after (bust, pedestal, side, back, game camera behind and in front); `--budget`: largest
+  hero #710 7,971, none over 8,000, the dragons 7,536 to 7,756 (the heaviest part, the dragon's body, 2,896 with its head and arms); library
+  1,970 Genesis, 0 failures, 0 lacking a part, 3,650,451 bytes.
+- **Not done / not verified**: nothing is seen in Unity; the hero shader's light on the new wing and ridge (flat colours) is not checked.
+  New in `render_chog_traits.py` (shared): the `pedestal` family of views (`PEDESTAL_VIEWS`).

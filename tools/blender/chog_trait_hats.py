@@ -2224,16 +2224,35 @@ MASCOT = {
     "CUT": 10.0,
     # The stalk of the banana from its top, bending back: way, length and radius, its dark end.
     "STALK": ((0.0, 0.75, 0.66), 0.090, 0.030, 0.016),
-    # The dragon: the light belly (its middle height, half width, half height), the horns round the face
-    # (where round the opening, as on #16, #42 and #773: degrees from the side of its left, counted up;
-    # length, radius), the nostrils on the top of the hood (degrees each side, polar degrees, radius), the
+    # The dragon: the light belly (its middle height, half width, half height); then its head (below); the
     # dark "w" of its scales (where: from a point, a way), wings on its back and its tail.
-    "BELLY": (0.36, 0.22, 0.19),
-    # (Six sharp horns, 0.115 long, until 22 October 2026. The pictures of the 23 dragons draw four small blunt tan horns,
-    # as wide at their foot as long: one at each upper side of the opening, one at each lower side.)
-    "HORN_PLACES": (40.0, 140.0, 205.0, 335.0),
-    "HORN": (0.085, 0.052),
-    "NOSTRILS": (11.0, 22.0, 0.030),
+    # The belly: rows of the volume it covers (a ring of the volume, how many points each side of the front it takes), how far
+    # it stands off the volume. (A fan 0.22 by 0.19 round a point until 22 October 2026.)
+    "BELLY": ((1, 1), (2, 2), (3, 2), (4, 1)),
+    "BELLY_LIFT": 0.026,
+    # The ridge down the back (not drawn by any picture: no picture shows the back, 22 October 2026): the heights of its
+    # plates, from the top of the head down to the tail, their half width at the foot and their length.
+    "RIDGE": (1.10, 1.00, 0.88, 0.74, 0.60, 0.46),
+    "RIDGE_SIZE": (0.034, 0.075),
+    # The head of the dragon (22 October 2026, the owner: "the hood IS a dragon's head, the face looks out of its open mouth,
+    # the yellow bits are teeth"). The pictures (#16, #42, #226): the two dark ovals on top of the hood are the NOSTRILS at
+    # the tip of a snout, so the upper jaw comes forward over the face; the four tan pointed things at the corners of the
+    # opening are its FANGS (two hang down from the upper rim, two point up from the lower rim), not horns; the opening is
+    # the mouth. Until then four blunt tan "horns" pointing away from the face, which were these fangs misread.
+    # SNOUT: the upper jaw, a rounded shell from inside the head forward over the brow: rings from the back to the tip,
+    # (how far ahead of the middle of the head, how high above it, half width, half height); in the axes of the head
+    # before it is turned up. Its underside is the upper lip, over the top of the face. The tip ring is a point.
+    "SNOUT": ((-0.02, 0.245, 0.27, 0.10), (-0.12, 0.255, 0.265, 0.095), (-0.20, 0.262, 0.245, 0.085),
+              (-0.26, 0.268, 0.21, 0.075), (-0.30, 0.272, 0.16, 0.063), (-0.325, 0.272, 0.09, 0.040),
+              (-0.335, 0.272, 0.0, 0.0)),
+    "SNOUT_SIDES": 12,
+    # The fangs: where on the rim of the opening (degrees round the face, 0 its left, 90 its top; the rim has 24 points), which
+    # way they point (-1 down from the upper rim, +1 up from the lower), length, radius at the foot, and how much they lean
+    # in towards the middle of the face (against the up-down way).
+    "FANG_PLACES": ((45.0, -1.0), (135.0, -1.0), (225.0, 1.0), (315.0, 1.0)),
+    "FANG": (0.105, 0.042, 0.55),
+    # The nostrils on the top of the snout: to each side, which ring, half length along the snout, half width.
+    "NOSTRILS": (0.062, 4, 0.034, 0.020),
     "SCALES": (((0.0, 0.0, 0.81), (-0.40, -0.30, 0.86)), ((0.0, 0.0, 0.81), (0.42, -0.26, 0.87)),
                ((0.0, 0.0, 0.81), (0.70, 0.25, 0.67)), ((0.0, 0.0, 0.81), (-0.72, 0.20, 0.66)),
                ((0.0, 0.0, 0.81), (0.05, 0.75, 0.66)), ((0.0, 0.0, 0.40), (-0.86, -0.42, 0.10)),
@@ -2247,10 +2266,10 @@ MASCOT = {
     # (First: out to the back and up, seen edge on from the camera of the game, two red spikes. A bat wing
     # of the pictures shows its face from the front: it spreads to the side, its face turned ahead and up.)
     # (Then: from the sides of the back, most of each wing inside the volume.)
-    "WING_ROOT": (0.14, 0.68),
-    "WING_WAY": (1.00, 0.40, 0.30),
-    "WING_UP": (0.0, 0.30, 0.95),
-    "WING_SIZE": (0.27, 0.19, 0.012),     # (0.46, 0.32 until 22 October 2026: the pictures draw small wings)
+    "WING_ROOT": (0.06, 0.74),
+    "WING_WAY": (1.00, 0.30, 0.40),
+    "WING_UP": (0.0, 0.78, 0.58),   # (0.30, 0.95 until 22 October 2026: the wing stood upright, a line seen from the game camera)
+    "WING_SIZE": (0.40, 0.30, 0.012),     # (0.46, 0.32 until 22 October 2026: the pictures draw small wings)
     # The tail from low on the back: places behind the back (to the side, behind, height), radii.
     # (Then straight back from the bottom: seen end on from behind, a lump.) It curls round to the left of
     # the character and up, so it shows beside the body from the front and from behind.
@@ -2258,7 +2277,12 @@ MASCOT = {
               (0.36, 0.22, 0.42)),
              (0.095, 0.082, 0.066, 0.050, 0.034, 0.0)),
     "CLAWS": (3, 0.045, 0.040, 0.016),    # on each boot: how many, apart, length, radius
-    "RIBS": (1, 3, 5),                    # the points of the edge of a wing its dark ribs run to
+    # The edge of a wing as a bat's: (how far out, how high) as shares of its span and height: the shoulder, the wrist,
+    # three finger tips with a scallop between them, then back to the body (22 October 2026: until then a ragged
+    # seven points). RIBS: the points of it the dark ribs run to.
+    "WING_EDGE": ((0.0, 0.0), (0.40, 0.95), (1.00, 0.78), (0.80, 0.38), (0.98, 0.02), (0.66, 0.00), (0.72, -0.42),
+                  (0.42, -0.14), (0.14, -0.30)),
+    "RIBS": (2, 4, 6),                   # the points of the edge of a wing its dark ribs run to
     "ANKLES": (0.02, 0.16),               # the legs of the suit, from and to these heights
     "OUTLINE_THICKNESS": 0.016,
 }
@@ -2479,26 +2503,37 @@ def build_mascot(maker):
         return
 
     # The dragon.
-    belly_height, belly_wide, belly_tall = numbers.BELLY
-    centre = Vector((0.0, 0.0, belly_height))
-    belly = [[on_volume(centre, -Y, 0.005)[0]]]
-    for ring in (1, 2, 3):
-        loop = []
-        for index in range(16):
-            angle = 2.0 * math.pi * index / 16
-            aim = Vector((belly_wide * ring / 3 * math.cos(angle), -0.30, belly_tall * ring / 3 * math.sin(angle)))
-            loop.append(on_volume(centre, aim, 0.005)[0])
-        belly.append(loop)
-    full.add_skin(torso, SimpleNamespace(middle=centre), belly, torso.named("Belly"))
-    side_deg, polar_deg, radius = numbers.NOSTRILS
-    for sign in (1.0, -1.0):
-        aim = Matrix.Rotation(math.radians(sign * side_deg), 3, "Z") @ Vector(
-            (0.0, -math.sin(math.radians(polar_deg)), math.cos(math.radians(polar_deg))))
-        place, out = on_volume(middle_body, aim, 0.004)
-        disc_on(torso, SimpleNamespace(middle=middle_body), place, out, radius, torso.named("Nostril"), segments=12)
-        # (a dark outline round a fill of the colour of the hood, as the pictures draw them, not a dark blot)
-        disc_on(torso, SimpleNamespace(middle=middle_body), place + out * 0.0015, out, radius * 0.62, torso.named("Main"),
-                segments=12)
+    # The belly: a plate of the pale colour on the front of the volume, cut from its own points (a plate sampled
+    # between them sagged under the facets of the volume: two patches with red between, 22 October 2026).
+    belly_rows = []
+    for ring_index, half in numbers.BELLY:
+        ring, axis = rings[ring_index], middles[ring_index]
+        row = {}
+        for column in range(-half, half + 1):
+            point = ring[column % count]
+            out = Vector((point.x - axis.x, point.y - axis.y, 0.0)).normalized()
+            row[column] = mesh.verts.new(point + out * numbers.BELLY_LIFT)
+        belly_rows.append((half, row))
+    belly_faces = []
+    for (low_half, low), (high_half, high) in zip(belly_rows, belly_rows[1:]):
+        for column in range(-2, 2):
+            corners = [low[max(-low_half, min(low_half, column))], low[max(-low_half, min(low_half, column + 1))],
+                       high[max(-high_half, min(high_half, column + 1))], high[max(-high_half, min(high_half, column))]]
+            corners = [corner for index, corner in enumerate(corners) if corner is not corners[index - 1]]
+            if len(corners) >= 3:
+                belly_faces.append(mesh.faces.new(corners))
+    torso.paint(belly_faces, torso.named("Belly"))
+    for face in belly_faces:
+        face.smooth = True
+    torso.open_faces.extend(belly_faces)
+    # The ridge down the back, from the top of the head to the tail: small plates, each a four sided point on the
+    # surface of the volume, leaning back.
+    ridge_wide, ridge_long = numbers.RIDGE_SIZE
+    for height in numbers.RIDGE:
+        place, out = on_volume(Vector((0.0, 0.05, height)), Y + Z * (0.9 if height > 1.0 else 0.0), 0.0)
+        way = (out + Y * 0.45).normalized()
+        torso.shell(base.tube_rings(place - out * 0.012, way, X, ((0.0, ridge_wide), (ridge_long, 0.0))), 4,
+                    torso.named("Ridge"), numbers.OUTLINE_THICKNESS * 0.6)
     wide, tall, thick = numbers.SCALE
     for origin, aim in numbers.SCALES:
         origin = Vector(origin)
@@ -2529,9 +2564,7 @@ def build_mascot(maker):
         out = Vector((sign * to_side, to_back, to_up)).normalized()
         up = Vector(numbers.WING_UP).normalized()
         up = (up - out * up.dot(out)).normalized()
-        edge = [root, root + out * span + up * wing_tall * 0.6, root + out * span * 0.95,
-                root + out * span * 0.62 + up * wing_tall * 0.05, root + out * span * 0.45 - up * wing_tall * 0.15,
-                root + out * span * 0.28 - up * wing_tall * 0.02, root + out * span * 0.12 - up * wing_tall * 0.22]
+        edge = [root + out * span * across + up * wing_tall * high for across, high in numbers.WING_EDGE]
         normal = out.cross(up).normalized()
         KIT.add_loops(torso, [[point - normal * wing_thick for point in edge], [point + normal * wing_thick for point in edge]],
                       torso.named("Wing"), numbers.OUTLINE_THICKNESS)
@@ -2563,19 +2596,55 @@ def build_mascot(maker):
         for index in range(claws):
             offset = (index - (claws - 1) * 0.5) * apart
             torso.shell(base.tube_rings(front + across * offset - toes * 0.012, toes, Z,
-                                        ((0.0, claw_radius), (claw_length, 0.0))), 5, torso.named("Horn"),
+                                        ((0.0, claw_radius), (claw_length, 0.0))), 5, torso.named("Fang"),
                         numbers.OUTLINE_THICKNESS * 0.5)
-    # The horns round the face, on the collar: from its middle row, out along the volume, away from the face.
-    horn_length, horn_radius = numbers.HORN
-    for degrees in numbers.HORN_PLACES:
-        index = int(round(degrees / 360.0 * points)) % points
-        root = loops[3][index]
-        outer = loops[4][index]
-        lift_way = (root - surface.middle).normalized()
-        way = ((outer - root).normalized() * 0.75 + lift_way * 0.60).normalized()
-        collar.shell(base.tube_rings(root - way * 0.020, way, lift_way.cross(way), (
-            (0.0, horn_radius), (horn_length * 0.5, horn_radius * 0.78), (horn_length * 0.9, horn_radius * 0.42),
-            (horn_length, horn_radius * 0.20))), 8, collar.named("Horn"), numbers.OUTLINE_THICKNESS * 0.8)
+    add_dragon_head(maker, collar, rim, numbers)
+
+
+def oval_on(part, middle, centre, out, along, half_long, half_short, material, segments=10):
+    """A flat oval laid at "centre" facing "out", its long way along "along" (a way near the surface)."""
+    first = (along - out * along.dot(out)).normalized()
+    second = out.cross(first).normalized()
+    edge = [centre + first * half_long * math.cos(2.0 * math.pi * index / segments)
+            + second * half_short * math.sin(2.0 * math.pi * index / segments) for index in range(segments)]
+    return full.add_skin(part, SimpleNamespace(middle=middle), [[centre + out * 0.002], edge], material)
+
+
+def add_dragon_head(maker, collar, rim, numbers):
+    """The head of the dragon on the part of the head (22 October 2026): the snout over the face (the upper jaw, whose
+    underside is the upper lip and whose top carries the two nostrils), and the four fangs on the rim of the opening, which
+    is the mouth. See MASCOT["SNOUT"]."""
+    surface = maker.surface
+    middle = surface.middle
+    rings = [(middle + Vector((0.0, ahead, up)), X * wide if wide else Vector(), Z * tall if tall else Vector())
+             for ahead, up, wide, tall in numbers.SNOUT]
+    collar.shell(rings, numbers.SNOUT_SIDES, collar.named("Hood"), numbers.OUTLINE_THICKNESS)
+    # The nostrils, two dark ovals with a fill of the colour of the hood, as the pictures draw them, near the tip.
+    side, ring, half_long, half_short = numbers.NOSTRILS
+    centre, first, second = rings[ring]
+    wide, tall = first.length, second.length
+    for sign in (1.0, -1.0):
+        x = sign * side
+        z = tall * math.sqrt(max(0.0, 1.0 - (x / wide) ** 2))
+        place = centre + Vector((x, 0.0, z))
+        out = (Vector((x / wide ** 2, 0.0, z / tall ** 2)).normalized() - Y * 0.35).normalized()
+        oval_on(collar, middle, place, out, -Y, half_long, half_short, collar.named("Nostril"))
+        oval_on(collar, middle, place + out * 0.0015, out, -Y, half_long * 0.58, half_short * 0.50, collar.named("Hood"))
+    # The fangs, on the rim of the opening, pointing into it.
+    length, radius, lean = numbers.FANG
+    face = surface.front(0.0, 0.0, 0.0)
+    for degrees, vertical in numbers.FANG_PLACES:
+        index = int(round(degrees / 360.0 * len(rim))) % len(rim)
+        out = head_normal_at(surface, rim[index])
+        root = rim[index] + out * COSTUME_FANG_LIFT
+        inward = Vector((face.x - root.x, 0.0, face.z - root.z)).normalized()
+        way = (Z * vertical + inward * lean + out * 0.30).normalized()
+        collar.shell(base.tube_rings(root - way * 0.02, way, X, ((0.0, radius), (length * 0.55, radius * 0.62),
+                                                                (length, 0.0))), 5, collar.named("Fang"),
+                     numbers.OUTLINE_THICKNESS * 0.8)
+
+
+COSTUME_FANG_LIFT = 0.030
 
 
 def head_normal_at(surface, point):
@@ -3101,9 +3170,10 @@ CLOTHES.update({
     # the face, the nostrils on top, dark scales, wings, a tail and claws; colours measured on #16 (until
     # then a hood with fangs and a snout over a suit).
     "Dragon suit": {**costume((0.96, 0.31, 0.21), {"Hood": (0.96, 0.31, 0.21), "Belly": (1.00, 0.76, 0.52),
-                                                   "Horn": (0.96, 0.82, 0.46), "Wing": (0.74, 0.16, 0.11),
+                                                   "Fang": (0.96, 0.82, 0.46), "Wing": (0.99, 0.40, 0.26),
                                                    "Nostril": (0.30, 0.06, 0.05), "Scale": (0.80, 0.18, 0.12),
-                                                   "Rib": (0.50, 0.08, 0.06)}),
+                                                   "Rib": (0.50, 0.08, 0.06),
+                                                   "Ridge": (0.96, 0.82, 0.46)}),
                     "kind": "Mascot", "shape": "dragon"},
     # The space suit: white, grey stripes down the sleeves, the ring of the helmet around the face. Its
     # glass is not drawn; the pictures show the crown inside it, so the crown stays.
