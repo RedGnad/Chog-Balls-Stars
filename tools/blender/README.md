@@ -1500,3 +1500,10 @@ vest, Yellow and Blue 143 Jersey, White Sleeveless, Brown and Grey Homeless Shir
 - **Judged faithful, unchanged**: the hoodies (hood down or up, drawstrings, logos), the sleeveless tops, the jerseys (143), the vests, the jackets (stripes and sun emblem), Tuxedo, the toad blue suit, Black, Grey, Purple and White Shirt.
 - **Not done**: the words printed on the tees (blue, red, dark and white tee, 49 Genesis: "purple-pilled", HODL, "I'm a Zynner"...): a different word on each picture, and the metadata does not say which.
 - **Checked**: `--budget`: largest #608 7,992, none over 8,000; library 1,970 Genesis, 0 failures. Not verified in Unity.
+
+### Golden Armor, second pass (the coordinator's review of batch 3)
+
+Sheet: [clothes-golden-armor-2026-10-22.jpg](../../research/evidence/clothes-golden-armor-2026-10-22.jpg) (#247, #473, #450, #547; the art, then before (batch 3) | after: torso, back, hero stage, stage side).
+It still read as a striped yellow tee. Now (`ARMOR`, `build_armor`, `ring_strip`, `add_pauldrons`): no stripes; a plain gold-orange shirt with two overlapping bands of breastplate, each edged by a dark seam
+0.017 tall with a lighter top edge and stepped 0.0035 off the shirt; on each shoulder two domed plates (upper 0.250 wide, lower 0.220) that break the outline from the front, the side and behind, with two big
+rivets (0.024) on the upper. Budget: #1742 7,996 (8,184 with three bands, 12 points and 8 sides: cut to two bands, 10 points, 7 sides), none over 8,000. Rivets are small at stage size.

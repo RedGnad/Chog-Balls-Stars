@@ -1928,22 +1928,61 @@ def lay_scifi(torso, maker, colours):
         shirt_band(torso, maker, torso.named("Strap"), places, numbers.STRAP_HALF, 0.012)
 
 
+ARMOR = {
+    # The golden armor (22 October 2026, the coordinator's review of batch 3: "it still reads as a striped yellow tee"). On #247, #473, #450, #501, #547: gold-orange metal,
+    # big domed plates over the shoulders that stand out of the outline (two, the upper larger, with big rivets), a breastplate of overlapping bands each edged by a dark
+    # seam with a light top edge. Seams: the heights of the lower edge of each band; the dark seam's height, the light edge's height, how far each stands off the shirt.
+    "SEAMS": (0.470, 0.350), "SEAM": (0.017, 0.0100), "EDGE": (0.011, 0.0135), "STEP": 0.0035,
+    # The shoulder plates: (centre to the side and up, in the axes of the sleeve), the upper dome's half width, half height, half depth; the lower plate's centre
+    # and size; the rivets on the upper one (turn degrees round its top from the front) and their radius.
+    "UPPER": ((0.060, 0.050), (0.125, 0.078, 0.108)), "LOWER": ((0.092, -0.020), (0.110, 0.060, 0.095)),
+    "RIVETS": (-34.0, 34.0), "RIVET": 0.024,
+}
+
+
+def ring_strip(torso, maker, material, low, high, lift):
+    """A band round the whole torso between two heights, lying "lift" off the shirt."""
+    numbers = maker.numbers(KIT.TEE)
+    rows = []
+    for height in (low, high):
+        half_width, half_depth = KIT.torso_section(maker.body, height)
+        reach = numbers.LIFT + lift
+        rows.append([Vector((math.cos(2.0 * math.pi * index / 10) * (half_width + reach), math.sin(2.0 * math.pi * index / 10) * (half_depth + reach), height))
+                     for index in range(10)])
+    full.add_skin(torso, SimpleNamespace(middle=Vector((0.0, 0.0, (low + high) * 0.5))), rows, material, around=True)
+
+
 def build_armor(maker):
-    """The golden armor: the striped shirt, then the plates on the shoulders (which need the sleeves, made after the decoration of the shirt)."""
+    """The golden armor: a plain gold shirt, the overlapping bands of the breastplate, the domed plates on the shoulders (which need the sleeves, made after the
+    decoration of the shirt)."""
+    entry = maker.entry
+    maker.entry = {**entry, "stripes": False}
     KIT.build_tee(maker)
-    add_pauldrons(maker, maker.entry)
+    maker.entry = entry
+    numbers = SimpleNamespace(**ARMOR)
+    torso = maker.parts[0][0]
+    for index, height in enumerate(numbers.SEAMS):
+        lift = numbers.STEP * (len(numbers.SEAMS) - index)
+        dark_height, dark_lift = numbers.SEAM[0], numbers.SEAM[1]
+        ring_strip(torso, maker, torso.named("Seam"), height, height + dark_height, lift + dark_lift)
+        edge_height, edge_lift = numbers.EDGE
+        ring_strip(torso, maker, torso.named("Edge"), height + dark_height, height + dark_height + edge_height, lift + edge_lift)
+    add_pauldrons(maker, entry)
 
 
 def add_pauldrons(maker, entry):
-    """The round gold plates on the shoulders of the golden armor (22 October 2026, batch 3, #247 and #473: a rounded plate with two rivets over each shoulder)."""
-    body = maker.body
+    """The domed gold plates on the shoulders: an upper and a lower plate on each, three big rivets on the upper."""
+    numbers = SimpleNamespace(**ARMOR)
     for (sleeve, on), side in zip(maker.parts[1:3], (1.0, -1.0)):
-        centre = Vector((side * 0.030, 0.0, 0.030))
-        sleeve.shell(base.ball_rings(centre, Z, X, 0.052, 0.092, 0.080, 3), 8, sleeve.named("Plate"), 0.012)
-        for turn in (-30.0,):
+        for (across, up), (wide, tall, deep), stacks in ((*numbers.UPPER, 3), (*numbers.LOWER, 2)):
+            centre = Vector((side * across, 0.0, up))
+            sleeve.shell(base.ball_rings(centre, Z, X, tall, wide, deep, stacks), 7, sleeve.named("Plate"), 0.012)
+        (across, up), (wide, tall, deep) = numbers.UPPER
+        centre = Vector((side * across, 0.0, up))
+        for turn in numbers.RIVETS:
             angle = math.radians(turn)
-            point = centre + Vector((side * 0.092 * math.sin(angle) * 0.9, -0.080 * math.cos(angle) * 0.9, 0.040))
-            disc_on(sleeve, SimpleNamespace(middle=centre), point, (point - centre).normalized(), 0.011, sleeve.named("Rivet"), segments=6)
+            point = centre + Vector((side * wide * 0.70 * math.sin(angle), -deep * 0.80 * math.cos(angle), tall * 0.80 + 0.012))
+            disc_on(sleeve, SimpleNamespace(middle=centre), point, (point - centre).normalized(), numbers.RIVET, sleeve.named("Rivet"), segments=6)
 
 
 def open_front(torso, maker, half_opening, fur_radius):
@@ -3665,9 +3704,10 @@ CLOTHES.update({
     "toad blue suit": toad((0.33, 0.56, 0.93), (0.62, 0.80, 1.00), (0.62, 0.92, 0.86), (0.36, 0.78, 0.25)),
     "Toad pink suit": toad((0.93, 0.27, 0.53), (0.98, 0.62, 0.78), (0.98, 0.74, 0.86), (0.30, 0.68, 0.95)),
     "Toad green Suit": toad((0.18, 0.74, 0.56), (0.55, 0.92, 0.75), (0.70, 0.95, 0.82), (0.98, 0.50, 0.15)),
-    "Golden Armor": {"kind": "Armor", "colours": {"Main": (0.96, 0.74, 0.22), "Stripe": (0.82, 0.56, 0.12),
-                                                "Collar": (0.70, 0.46, 0.10), "Plate": (0.99, 0.80, 0.28), "Rivet": (0.72, 0.46, 0.10)},
-                     "stripes": True, "numbers": {"STEP": 0.046, "SLEEVE": 0.09}},
+    "Golden Armor": {"kind": "Armor", "colours": {"Main": (0.97, 0.69, 0.16), "Stripe": (0.82, 0.56, 0.12),
+                                                "Collar": (0.70, 0.46, 0.10), "Plate": (0.96, 0.68, 0.18), "Rivet": (0.60, 0.33, 0.05),
+                                                "Seam": (0.55, 0.28, 0.04), "Edge": (1.00, 0.86, 0.42)},
+                     "numbers": {"STEP": 0.076, "SLEEVE": 0.09}},
     # (batch 3: a dark ring with lights at the neck and a harness; the stripe colour (teal) kept for the lights.)
     "Sci Fi": {**track((0.98, 0.62, 0.14), collar=(0.15, 0.15, 0.18)), "scifi": True},
     "White Yukata": {**tee((0.97, 0.95, 0.95), collar=(0.92, 0.64, 0.74), SLEEVE=LONG_SLEEVE), "flowers": ((0.080, 0.500, 0.028), (-0.095, 0.360, 0.028),
