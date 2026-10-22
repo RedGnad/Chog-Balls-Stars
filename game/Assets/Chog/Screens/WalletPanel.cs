@@ -476,7 +476,9 @@ namespace Chog.Screens
             // On a phone browser without a wallet, the same button reopens the game where one is.
             var canOpen = PlayerWallet.CanOpenInWalletBrowser;
             _connectLabel.text = canOpen ? "OPEN IN METAMASK" : state == WalletState.Failed ? "TRY AGAIN" : "CONNECT WALLET";
-            _connect.gameObject.SetActive(!guest && !checkingPass && (canOpen || state == WalletState.Disconnected || state == WalletState.Failed));
+            // The wallet button at the top right of the home connects (22 October 2026: the owner wants that
+            // one only; this card's own CONNECT WALLET repeated it). The card keeps its words.
+            _connect.gameObject.SetActive(false);
             var other = !guest && !checkingPass && canOpen && PlayerWallet.ThroughApp;
             _otherApp.gameObject.SetActive(other);
             var connectArea = (RectTransform)_connect.transform;

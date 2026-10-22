@@ -59,8 +59,17 @@ mergeInto(LibraryManager.library, {
       });
     }
 
-    own.request({ method: prompt ? 'eth_requestAccounts' : 'eth_accounts' }).then(function (accounts) {
-      answer({ address: first(accounts) });
+    // Asked to connect, the wallet is first asked, without opening it, for an address it already shares
+    // with this page (22 October 2026: the owner saw "Answer in your wallet" with no window opening, then
+    // found the page connected after a reload; a wallet that already shares one has nothing to ask).
+    own.request({ method: 'eth_accounts' }).then(function (accounts) {
+      if (!prompt || first(accounts)) {
+        answer({ address: first(accounts) });
+        return;
+      }
+      own.request({ method: 'eth_requestAccounts' }).then(function (asked) {
+        answer({ address: first(asked) });
+      }).catch(refusal);
     }).catch(refusal);
   },
 
