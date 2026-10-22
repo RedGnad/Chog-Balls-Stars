@@ -127,11 +127,12 @@ CLOSED_TEARS = {"FROM": (0.020, -0.010), "TO": -0.172, "WIDTH": (0.034, 0.042), 
 # "Dead": a thick cross on each eye: half the length of a stroke, its thickness, its turn.
 # (THICKNESS 0.022 and HALF 0.044 until 22 October 2026: the strokes of the pictures are a fifth of the width of the
 # cross, ours a seventh.)
-DEAD = {"AT": (0.112, 0.008), "HALF": 0.046, "THICKNESS": 0.030, "TURN_DEG": 4.0}
+DEAD = {"AT": (0.112, 0.008), "HALF": 0.050, "THICKNESS": 0.036, "TURN_DEG": 4.0}   # (0.046 and 0.030 until 22 October 2026: bolder strokes on #117, #257, #289, #9)
 # "Heart": a heart on each eye, its point down: half its width, the width of its dark line, how much
 # its top leans outwards, and its glint (in the axes of the heart: to the side, above, half width,
 # half height).
-HEART = {"AT": (0.112, 0.012), "HALF_WIDTH": 0.060, "LINE": 0.010, "LEAN_DEG": 12.0,
+HEART = {"AT": (0.112, 0.012), "HALF_WIDTH": 0.070,   # 0.060 until 22 October 2026: the hearts of #8, #13, #12, #145 are about 1.2 times larger
+          "LINE": 0.010, "LEAN_DEG": 12.0,
          "GLINT": (-0.026, 0.020, 0.011, 0.008), "SEGMENTS": 28}
 # "Flat" (Side=Left): a short thick dash for each eye.
 FLAT_EYE = {"AT": (0.112, 0.004), "HALF": 0.044, "THICKNESS": 0.017, "SLOPE": 0.04}
@@ -172,6 +173,7 @@ WHITE_EYE = {
     "LOOK": ((0.0, 0.0), (0.0, 0.0)),
     "GLINTS": (),
     "SEGMENTS": 20,
+    "EYES": None,
 }
 # "Angry": a half disc under a straight lid that slopes down towards the nose; a large pupil looks to
 # the right of the picture, cut by the lid.
@@ -182,8 +184,17 @@ VERTICAL = {**WHITE_EYE, "SIZE": (0.060, 0.032), "LINE": 0.011, "PUPIL": (0.011,
             "GLINTS": ((0.0, 0.004, 0.0035, 0.012),)}
 # "Smirk": an almond whose outer end is lower, a thick arched upper lid, the pupil looking to the left
 # of the picture.
-SMIRK = {**WHITE_EYE, "SIZE": (0.058, 0.040), "ARCH": (0.020, 0.008), "TILT": 14.0, "PUPIL": (0.034, 0.038),
-         "LOOK": ((-0.020, -0.004), (-0.020, -0.004)), "GLINTS": ((-0.010, 0.012, 0.010, 0.007),)}
+# (22 October 2026, the owner on the toad #242, strict audit of the eyes: the art draws two DIFFERENT eyes. On #242, #111, #441, #2, #499, #455, #1193
+# the eye at the left of the picture (the near one) is a wide almond, its outer end a point low on the left, its upper lid a thick black arch and its pupil a
+# large black shape filling the left half, white on the right: a smug squint. The other is smaller and rounder, a thin outline, a thick lid, its pupil up on the
+# left with a glint. Both slant the same way and look to the left. Until then two equal almonds with the pupil low on the left. EYES by side: -1 the eye
+# at -X (the near one, on the left of the picture seen from the front), +1 the other.)
+SMIRK = {**WHITE_EYE, "SIZE": (0.034, 0.052), "ARCH": (0.012, 0.012), "TILT": 10.0, "LINE": 0.011, "PUPIL": (0.030, 0.044),
+         "LOOK": ((-0.004, 0.000), (-0.004, 0.000)), "GLINTS": ((-0.010, 0.016, 0.009, 0.011), (-0.006, -0.004, 0.005, 0.006)),
+         "EYES": {
+             -1.0: {"SIZE": (0.082, 0.043), "TILT": -18.0, "ARCH": (0.032, 0.008), "LINE": 0.012, "PUPIL": (0.048, 0.044),
+                    "LOOK": ((-0.030, -0.004), (-0.030, -0.004)),
+                    "GLINTS": ((-0.034, 0.014, 0.014, 0.011), (-0.008, 0.004, 0.007, 0.006)), "AT": (0.122, 0.004)}}}
 # "Frog": a large round white, a wide flat pupil across its middle.
 FROG = {**WHITE_EYE, "SIZE": (0.058, 0.054), "LINE": 0.012, "PUPIL": (0.042, 0.020),
         "GLINTS": ((-0.016, 0.006, 0.009, 0.006),)}
@@ -244,8 +255,14 @@ HEADSET = {
 RETRO_GLASS_NUMBERS = {"RIM": 0.11, "THICKNESS": 0.022, "LENS_BULGE": 0.003, "OUTLINE_THICKNESS": 0.009,
                        "LENS_SEGMENTS": 12,
                        "LENS": (0.128, 0.020, 0.104, 0.074)}
-RETRO_EYES = {"IRIS": (0.008, -0.004, 0.048, 0.052), "PUPIL": (0.030, 0.034), "LID": (0.010, 0.040, -0.12),
-              "GLINTS": ((-0.016, 0.012, 0.012, 0.016), (0.014, -0.020, 0.006, 0.007)), "LIFT": 0.0025}
+# (22 October 2026, the owner on a Retro Glass Genesis with a bubblegum: "the art draws half-closed, bored eyes under the glasses, we draw
+# round open irises". On #35, #282, #632, #1184, #1621, #819, #165 the iris is large, about two thirds of the lens across and nearly its
+# whole height, pale blue with a dark rim, a large dark pupil and big glints, and its top is cut by a heavy lid that slopes down towards
+# the nose: a frown. Until then an iris 0.096 by 0.104 under a thin lid line that rose towards the nose. IRIS: to the side of the middle
+# of the lens, above it, half width, half height; PUPIL: half width, half height; LID: thickness of the lid line, how far above the middle
+# of the iris it cuts the iris and the pupil, how much it rises per unit towards the outer side.)
+RETRO_EYES = {"IRIS": (0.004, -0.008, 0.068, 0.066), "PUPIL": (0.036, 0.042), "LID": (0.013, 0.030, 0.30),
+              "GLINTS": ((-0.020, 0.004, 0.015, 0.019), (0.018, -0.022, 0.007, 0.008)), "LIFT": 0.0025}
 # "3D Glass" (CHOG #361, #379): the lens of "Anime Glass" more square, in a thick light grey frame; the
 # lens over the right eye of the character blue, the one over its left eye red.
 GLASSES_3D_NUMBERS = {"LENS": (0.126, 0.016, 0.100, 0.066), "LENS_SQUARENESS": 4.0, "LENS_TAPER": 0.04,
@@ -301,7 +318,10 @@ COIN = {
     "FROM": (-0.044, -0.078), "TO": (0.090, -0.098), "HALF_TALL": 0.020,
     # (RADIUS 0.046 until 15 October 2026: on the bust the coin was half the size the pictures draw it,
     # about the size of an eye.)
-    "COIN_AT": (-0.022, -0.100), "COIN_OFF": (0.040, 0.020), "RADIUS": 0.058, "COIN_THICKNESS": 0.013,
+    # (22 October 2026, the owner on a Russian Hat Genesis: the coin sits too low. On #34, #790, #1185, #982, #1864, #25 the coin is
+    # held at the left end of the grin, about a third of its width from the left, its middle on the lower line of the teeth. It
+    # was 0.040 under that line (COIN_AT -0.100 and 0.020 down), at the very corner.)
+    "COIN_AT": (-0.006, -0.092), "COIN_OFF": (0.040, 0.008), "RADIUS": 0.058, "COIN_THICKNESS": 0.013,
     # (18 sides and 6 teeth until 15 October 2026; 12 and 4 for the triangle budget of the dressed
     # heroes: the coin covers the middle of the teeth.)
     "COIN_TURN": (-18.0, 28.0), "SIDES": 12, "PRINT": 0.62, "OUTLINE_THICKNESS": 0.008, "TEETH": 4,
@@ -428,11 +448,16 @@ def glints(part, surface, material, middle, table, lift):
         disc(part, surface, material, (middle[0] + to_side, middle[1] + above), wide, tall, lift, 8)
 
 
-def lidded_eyes(part, surface, numbers, dark, glint, lifts):
-    """Both lidded eyes with their lid lines and glints. Returns the middles of the eyes."""
+def lidded_eyes(part, surface, numbers, dark, glint, lifts, seen=None):
+    """Both lidded eyes with their lid lines and glints. Returns the middles of the eyes; "seen", a list, receives the middle of the
+    area of each (what the lid leaves of the oval), where a beam leaves it."""
     middles = []
     for side in (1.0, -1.0):
         middle, lid = lidded_eye(part, surface, dark, numbers, side, lifts[0])
+        if seen is not None:
+            half_width, half_height = numbers.SIZE
+            edge = [(place, min(up, lid(place))) for place, up in HOST.oval(middle, half_width, half_height, numbers.SEGMENTS)]
+            seen.append(HOST.centroid(edge))
         lid_line(part, surface, dark, numbers, middle, lid, side, lifts[1])
         if glint:
             glints(part, surface, glint, middle, numbers.GLINTS, lifts[2])
@@ -711,11 +736,15 @@ def build_socket_eye(maker):
 def build_white_eye(defaults):
     """The builder of a kind of white eye (see WHITE_EYE): dark line, white, pupil, lid, glints."""
     def build(maker):
-        numbers = maker.numbers(defaults)
+        every = maker.numbers(defaults)
         part, surface = maker.part(), maker.surface
-        half_width, half_height = numbers.SIZE
-        line, segments = numbers.LINE, numbers.SEGMENTS
-        for side, look in zip((1.0, -1.0), numbers.LOOK):
+        for side, look in zip((1.0, -1.0), every.LOOK):
+            # "EYES": numbers of one eye only, by its side (+1 the eye at +X, -1 the other), for the values whose pictures draw
+            # the two eyes differently (a smirk: a lidded eye and an open one), put over the numbers of both.
+            numbers = SimpleNamespace(**{**vars(every), **(every.EYES or {}).get(side, {})})
+            look = numbers.LOOK[0] if (every.EYES or {}).get(side, {}).get("LOOK") else look
+            half_width, half_height = numbers.SIZE
+            line, segments = numbers.LINE, numbers.SEGMENTS
             middle = (side * numbers.AT[0], numbers.AT[1])
             turn = -numbers.TILT * side
 
@@ -1020,12 +1049,19 @@ def build_retro_glass(maker):
 
         to_side, above, half_width, half_height = eyes.IRIS
         iris = (to_side, above)
-        lay(part.named("Iris"), oval_edge(iris, half_width, half_height, 14), iris, eyes.LIFT)
-        lay(part.named("Pupil"), oval_edge(iris, *eyes.PUPIL, 12), iris, eyes.LIFT * 2.0)
         thick, lid_above, slope = eyes.LID
+
+        def under_lid(edge):
+            """The edge of a shape cut by the lid: the lid runs level with the iris at "lid_above" above its middle and rises
+            by "slope" per unit towards the outer side (side of the lens)."""
+            return [(place, min(up, above + lid_above + slope * (place - to_side) * side)) for place, up in edge]
+
+        lay(part.named("Iris"), under_lid(oval_edge(iris, half_width, half_height, 16)), iris, eyes.LIFT)
+        lay(part.named("Pupil"), under_lid(oval_edge(iris, *eyes.PUPIL, 12)), iris, eyes.LIFT * 2.0)
         steps = 4
         lid = [(to_side + half_width * 1.15 * (-1.0 + 2.0 * index / steps),
-                above + lid_above + slope * half_width * (-1.0 + 2.0 * index / steps) * side) for index in range(steps + 1)]
+                above + lid_above + thick * 0.4 + slope * half_width * 1.15 * (-1.0 + 2.0 * index / steps) * side)
+               for index in range(steps + 1)]
         for first, second in zip(lid, lid[1:]):
             # A short slab of the lid line between two places, laid on the lens.
             along = Vector((second[0] - first[0], second[1] - first[1], 0.0))
@@ -1049,7 +1085,9 @@ def build_laser(maker):
     numbers = maker.numbers(HOST.LASER)
     part, surface = maker.part(), maker.surface
     eyes = SimpleNamespace(**{**SIDE_EYE, **maker.entry.get("eye_numbers", {})})
-    middles = lidded_eyes(part, surface, eyes, part.named("Dark"), None, LIFT)
+    centres = []
+    lidded_eyes(part, surface, eyes, part.named("Dark"), None, LIFT, centres)
+    middles = centres
     ahead, down = HOST.level_axes(maker.head)
     radius, sides = numbers.BEAM_RADIUS, numbers.BEAM_SIDES
     # The beam turned up from level by BEAM_PITCH_DEG, in the plane of the ahead and up axes of the head.
@@ -1057,7 +1095,7 @@ def build_laser(maker):
     way = ahead * math.cos(pitch) - down * math.sin(pitch)
     across = -(down * math.cos(pitch) + ahead * math.sin(pitch))
     for middle in middles:
-        start = surface.front(middle[0], middle[1] - eyes.SIZE[1] * 0.25, 0.0)
+        start = surface.front(middle[0], middle[1], 0.0)
         stations = ((-numbers.BEAM_SUNK, 0.7), (0.02, 1.0), (numbers.BEAM_LENGTH - 0.03, 1.0), (numbers.BEAM_LENGTH, 0.55))
         loops = [HOST.ring_points(start + way * distance, X * radius * size, across * size * radius, sides)
                  for distance, size in stations]

@@ -1203,3 +1203,31 @@ mouths, the art then before | after (front close, three quarter close, bust, her
   the same small dark oval under the ball as on #195 and #210.
 - **Checked**: 7 Genesis before | after; `--budget`: largest #630 7,991 (it wears the nose; +10 triangles), none over 8,000; library 1,970 Genesis, 0 failures.
   Not verified in Unity.
+
+## 22 October 2026: visible eyes, lasers, glasses and mouths (lot 8, batch 1)
+
+The owner's review of the heroes in the game, and then: "when I talk about eyes I mean the visible ones: many are not exact" (the toad #242, Smirk on Side Left). The audit of
+lot 2 graded 48 of 64 rows faithful; it compared each value against two or three pictures at a glance. It is redone strictly: each eye of a pair is compared by itself (the near and the far
+eye of the pictures are often two different drawings), at the stage view the owner looks at (front close and three quarter close). Batch 1: Smirk Left and the five most worn values (Happy,
+Round, Dead, Normal Eye, Heart, all on Side Right). Sheet, 13 Genesis, the art beside the front close and the three quarter close, before | after:
+[heroes-eyes-batch1-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch1-2026-10-22.jpg).
+
+- **Smirk, Side Left (29 Origin Genesis): wrong, redrawn.** On #242, #111, #441, #2, #499 the two eyes are two drawings: the near one (left of the picture) a wide almond tilted so that its
+  outer end is low, a thick black lid arch and a large black pupil on the left with white on the right, one glint at the top left; the far one a small tall narrow oval, nearly all pupil, two glints.
+  We drew two equal almonds. `WHITE_EYE` takes a new `EYES` table (numbers of one eye by its side, laid over those of both) used by `SMIRK`: near eye 0.082 by 0.043, tilt -18, pupil 0.048 by 0.044;
+  far eye 0.034 by 0.052, tilt 10, pupil 0.030 by 0.044. Graded approximate: the near eye's lower lid curve and the far eye's lean are not exact.
+- **Happy, Round, Dead, Normal Eye, Heart, Side Right: approximate, made closer** (not faithful, said so): the closed arches of Happy are 1.6 times thicker and the eye at +X wider than the other (`HAPPY`
+  `EYE_ARCS` by side); the Round eyes taller ovals (0.058 by 0.070 dark disc, was 0.060 by 0.066: the pictures' are 0.75 as wide as high); the Dead crosses bolder (stroke 0.036, arm 0.050); the
+  Normal Eye larger (0.050 by 0.063, was 0.043 by 0.060) with larger glints; the Heart 1.17 times larger (half width 0.070). What still differs: the near eye of the pictures is smaller than the far one
+  (perspective) and ours are equal; the Normal Eye lid cut is not the slope of the pictures; the dark outline weights are close but not measured.
+- **Retro Glass (and the round red glasses, 56 Genesis)**: the eyes under the glasses were round open irises where the art draws bored, frowning ones: the iris is now larger (0.068 by 0.066), pale blue, cut by a
+  heavy lid that slopes down towards the nose (`RETRO_EYES["LID"]`, `under_lid()`). Not yet audited: Sunset, Plasma and Gradient visors, BTC Glass, 3D Glass, MOG, Chog Viper, VR, Thug (next batches).
+- **Lasers start from the middle of the eye** (`draw_laser_eyes`, `lidded_eyes`): the beam and its hot spot left the middle of the whole oval, but the lid takes the top off, so the visible eye is lower and the beam
+  seemed to leave its inner corner; it now leaves the middle of the area of what is seen (`centroid()`), on Side Right and, with the same rule, on Side Left and the Skull (the Left beam no longer starts 0.25 of the
+  half height lower than the middle).
+- **Mouths centred on the face** (`centre_on_face`, `measure_mouth_centres.py`): measured, the smile, the flat mouth and the others stood 0.040 to 0.052 off the middle line of the face (Side Left `normal smile` +0.048, `Sad` +0.052,
+  Right `Flat` +0.050, `Grit` +0.041, `Smile` +0.040, Bubblegum -0.022 / +0.022), because they were placed where the three quarter pictures draw them against the nose. Each mouth part is now moved so that the middle of its extent
+  lies on the middle line, back on the surface of the head (all 36 Side/value pairs now within 0.004 of the middle). Not done: comparing each mouth's shape with the art beyond the coin.
+- **Coin mouth ("Mon coin", "BTC Coin", Russian Hat #34, #790, #1185, #25)**: the coin held at the left end of the teeth lower than the pictures: `COIN_AT` (-0.006, -0.092), `COIN_OFF` down 0.008 (0.020 before). Still a little low and the grin
+  narrower than the pictures'. Sheet of the lasers, the glasses and the coin: [heroes-lot8-lasers-glasses-coin-2026-10-22.jpg](../../research/evidence/heroes-lot8-lasers-glasses-coin-2026-10-22.jpg).
+- **Checked**: library 1,970 Genesis, 0 failures; `--budget` largest #630 7,991 (unchanged, 9 under the limit), none over 8,000. Not in a Unity build.

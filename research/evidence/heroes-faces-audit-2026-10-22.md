@@ -115,6 +115,25 @@ The owner on the dragon #16: "the eyes do not really match, frowned against oval
 (0.070, 0.064), `EYE_LID` (0.28, 0.40) in `draw_laser_eyes` of `make_chog_traits.py` (the same cut and slope as the lidded eyes of Side Left). The Skull
 Genesis with Right lasers (12) use the same builder. Not exact: the near eye of the pictures is larger than the far one (perspective), ours are equal.
 
+## Strict redo of the eye audit (the owner, 22 October 2026, batch 1)
+
+The 29 "faithful" of the first audit were judged on two or three pictures at a glance. Redone, each eye of a pair by itself, at the hero stage (front close and three quarter close), at least three Genesis per value; "faithful" only when
+the art and the 3D side by side would not show a difference in the shape of an eye. Batch 1 ([sheet](heroes-eyes-batch1-2026-10-22.jpg)):
+
+| Value, Side (Origin Genesis) | Genesis looked at | Strict verdict | What differs |
+| --- | --- | --- | --- |
+| Happy, Right (84) | #163, #226, #19, #89, #67 | approximate (was faithful) | arches were 1.6 times too thin, the two alike; the near eye wider than the far one. Fixed in thickness and width; the slant of each arch is still plainer than the drawing's |
+| Round, Right (76) | #202, #139, #55, #84, #134 | approximate (was approximate) | the eye is a taller oval than we drew (fixed); near eye smaller than the far one in the pictures, ours equal |
+| Dead, Right (74) | #117, #257, #289, #9, #58 | approximate (was approximate) | strokes bolder in the pictures (fixed, 0.036); crosses not exactly mirrored in size |
+| Normal Eye, Right (74) | #75, #80, #177, #197, #5 | approximate (was faithful) | eye smaller and rounder in the pictures, glints larger (fixed); the slope of the brow cut and the pupil/lid contact not exact |
+| Heart, Right (72) | #8, #13, #12, #145, #136 | approximate (was faithful) | hearts about 1.2 times larger (fixed); the near heart is larger and tilts more than the far one |
+| Smirk, Left (29) | #242, #111, #441, #2, #499, #455 | wrong (was faithful), redrawn, now approximate | two different drawings: a wide tilted almond with a large black pupil and a small tall narrow oval; see the README of lot 8 |
+| Retro Glass, Right (56) | #35, #282, #632, #1184, #1621, #819, #165 | wrong (was faithful), redrawn, now approximate | the eyes under the glasses were open round irises; the pictures draw large frowning ones under a heavy lid |
+
+Rows still to redo strictly, most worn first: Round Crying R, Fire laser R, Side Eye R, Round Tear R, Anime Glass R, Green laser R, Purple laser R, Gradient visor R, Round Eye R, Closed Eye Crying R, Retro Glass (the rest), Tired R,
+Teary R, Sunset visor R, Plasma visor R, then Side Eye L, Base L, Happy L, MOG L, Vertical L, Flat L, Frog L, Clown Eye L, Chog Viper L, the lasers of Left, Clown Eye Mix L, Classic VR L, Modern VR L, Retard L, XD L,
+3D Glass L, BTC Glass L, Worried L, Thug L.
+
 ## The 64 Origin rows
 
 <!-- audit table start -->

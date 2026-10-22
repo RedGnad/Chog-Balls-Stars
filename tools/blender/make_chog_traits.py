@@ -549,14 +549,14 @@ ANIME_GLASS = {
 # is cut by a slanted brow, lower towards the nose.
 DARK_EYE = {
     "AT": (0.112, 0.008),        # to the side of the middle of the face, above it
-    "SIZE": (0.043, 0.060),      # half width, half height
+    "SIZE": (0.050, 0.063),      # half width, half height (0.043 by 0.060 until 22 October 2026, strict audit of the eyes: on #75, #80, #177, #197 the eye is rounder and larger)
     "BROW_AT": 0.50,             # where the brow cuts the eye, against its half height
     "BROW_SLOPE": 0.42,
     "BROW": (0.011, 0.016, 0.004),   # thickness of the brow, how far it runs past the eye outwards and inwards
     "SEGMENTS": 14,
     # The glints: each to the side of the middle of the eye (the same side for both eyes: where the
     # light is), above it, half width, half height.
-    "GLINTS": ((-0.012, 0.010, 0.013, 0.017), (-0.016, -0.026, 0.006, 0.007)),
+    "GLINTS": ((-0.014, 0.012, 0.017, 0.021), (-0.018, -0.026, 0.008, 0.009)),
 }
 LASER = {
     # A beam leaves each eye level with the ground, straight ahead: how long, how thick (half), how
@@ -592,18 +592,22 @@ LASER = {
 }
 HAPPY = {
     "AT": (0.110, 0.012),
-    "ARC": (0.050, 0.034, 0.017),    # half width, height of the arch, thickness in its middle
+    # (22 October 2026, strict audit of the eyes, on #163, #226, #19, #89, #67: the pictures draw the closed eyes as thick black arches, about
+    # 1.7 times the thickness of ours, the eye at +X (the near one in the pictures of Side=Right) wider and thicker than the far one.)
+    "ARC": (0.056, 0.036, 0.027),    # half width, height of the arch, thickness in its middle
     "STEPS": 8,
     # An arch of its own for each eye (22 October 2026, Side=Left, read on CHOG #925, #1430, #1207, #1405): {side: (half
     # width, height of the arch, thickness in its middle, how much higher its right end stands than its left)}, side -1 the
     # eye on the left of the picture (the near eye), +1 the other. None: both eyes the same, ARC.
-    "EYE_ARCS": None,
+    "EYE_ARCS": {1.0: (0.062, 0.036, 0.031, 0.0), -1.0: (0.050, 0.032, 0.022, 0.0)},
 }
 ROUND = {
     "AT": (0.112, 0.006),
-    "LINE": (0.060, 0.066),      # half width, half height of the dark disc around the eye
-    "WHITE": (0.049, 0.055),
-    "PUPIL": (0.036, 0.042),     # (0.033, 0.039 until 22 October 2026: the pictures draw the pupil filling the white)
+    # (22 October 2026, strict audit: the eyes of the pictures (#202, #139, #55, #84, #134) are taller ovals, about 0.75 as wide as high against 0.89 for ours, the
+    # white ring thin and the black disc large: 0.058 by 0.070, 0.047 by 0.060, 0.037 by 0.049 where they were 0.060 by 0.066, 0.049 by 0.055, 0.036 by 0.042.)
+    "LINE": (0.058, 0.070),      # half width, half height of the dark disc around the eye
+    "WHITE": (0.047, 0.060),
+    "PUPIL": (0.037, 0.049),
 }
 # The visor: one band that wraps the front of the head from one row of leaves to the other.
 VISOR = {
@@ -879,6 +883,27 @@ def along_egg(surface, start, away, distance, lift):
         return start + normal * lift
     point = surface.towards((start + way.normalized() * distance - surface.middle).normalized())
     return point + egg_normal(surface, point) * lift
+
+
+def centre_on_face(maker, surface):
+    """Moves what a mouth drew across the face so that its middle lies on the middle line of the face, where the nose is (22 October
+    2026, the owner: "some mouths are offset, I do not know why"). The pictures of Side=Right and Side=Left show the face turned, and
+    the mouths were placed where the pictures draw them against the nose: a smile 0.040 to 0.052 off the middle, a flat mouth
+    0.050, which from the front reads as a mouth pushed to one side. Each vertex of each part is moved across by minus the
+    middle of the part (the middle of its extent) and put back on the surface of the head, at the same height off it."""
+    for shapes, on in maker.parts:
+        if on != "Head" or not shapes.mesh.verts:
+            continue
+        xs = [vertex.co.x for vertex in shapes.mesh.verts]
+        shift = -0.5 * (min(xs) + max(xs))
+        if abs(shift) < 0.002:
+            continue
+        for vertex in shapes.mesh.verts:
+            offset = vertex.co - surface.middle
+            lift = offset.length - (surface.towards(offset.normalized()) - surface.middle).length
+            moved = vertex.co + X * shift - surface.middle
+            ground = surface.towards(moved.normalized())
+            vertex.co = ground + (ground - surface.middle).normalized() * lift
 
 
 def face_place(numbers, angle, amount):
@@ -2221,6 +2246,19 @@ def build_normal_eye(maker):
     draw_dark_eyes(part, maker.surface, part.named("Dark"), glint=part.named("Glint"))
 
 
+def centroid(edge):
+    """The middle of the area of a shape given by the places of its edge (to the side, above), in order."""
+    area = cx = cy = 0.0
+    for (x1, y1), (x2, y2) in zip(edge, edge[1:] + edge[:1]):
+        cross = x1 * y2 - x2 * y1
+        area += cross
+        cx += (x1 + x2) * cross
+        cy += (y1 + y2) * cross
+    if abs(area) < 1e-12:
+        return (sum(p[0] for p in edge) / len(edge), sum(p[1] for p in edge) / len(edge))
+    return (cx / (3.0 * area), cy / (3.0 * area))
+
+
 def draw_laser_eyes(part, surface, numbers, dark, glow, core):
     """The eyes a beam leaves (LASER): a whole tall dark oval each, a hot spot of the beam's colours in its
     middle. Returns where the middle of each is: (to the side, above)."""
@@ -2237,9 +2275,13 @@ def draw_laser_eyes(part, surface, numbers, dark, glow, core):
         edge = [(place, min(up, lid(place))) for place, up in oval(middle, half_width, half_height, numbers.EYE_SEGMENTS)]
         inside = (middle[0], (middle[1] - half_height + lid(middle[0])) * 0.5)
         draw_shape(part, surface, dark, edge, DRAWN[0], middle=inside)
-        draw_shape(part, surface, glow, oval(middle, glow_radius, glow_radius, 10), DRAWN[1], middle=middle)
-        draw_shape(part, surface, core, oval(middle, core_radius, core_radius, 8), DRAWN[2], middle=middle)
-        middles.append(middle)
+        # The beam and its hot spot leave the middle of what is seen of the eye, not the middle of the oval the lid cuts: the lid
+        # takes the top off, so the middle of the dark almond lies lower than that of the oval (22 October 2026, the owner: the
+        # beams "sit at the inner corner of each eye, not at its centre").
+        seen = centroid(edge)
+        draw_shape(part, surface, glow, oval(seen, glow_radius, glow_radius, 10), DRAWN[1], middle=seen)
+        draw_shape(part, surface, core, oval(seen, core_radius, core_radius, 8), DRAWN[2], middle=seen)
+        middles.append(seen)
     return middles
 
 
@@ -2824,6 +2866,8 @@ def budget():
             start, _, word, builders = TRAIT_PARTS[trait]
             maker = Maker(f"{start}_{entry[word]}", entry, head_n, body_n, surface)
             builders[entry[word]](maker)
+            if trait == "Mouth":
+                centre_on_face(maker, surface)
             made = trait_materials(maker.prefix, entry["colours"], entry.get("unlit", ()), shared, entry.get("glass", ()))
             total = 0
             for shapes, _ in maker.parts:
@@ -2964,6 +3008,8 @@ def build(traits=None, replaced=None, head_replaced=None):
             entry = {**entry, "numbers": {**entry.get("numbers", {}), **replaced}}
         maker = Maker(f"{start}_{entry[word]}", entry, head_n, body_n, surface)
         builders[entry[word]](maker)
+        if trait == "Mouth":
+            centre_on_face(maker, surface)
         crossing = []
         worn_on_head = [shapes for shapes, on in maker.parts if on == "Head"]
         if trait in ("Head", "Body") and worn_on_head:
