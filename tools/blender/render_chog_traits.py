@@ -89,6 +89,17 @@ TURN_ELEVATION_DEG = 12.0
 TURN_HEIGHT = 0.9
 TURN_FRAME = 0.95
 TURN_SIZE = 360
+# The stage of the home screen (ChogHeroStage.cs, 22 October 2026): a perspective camera of 24 degrees, 10 degrees above the
+# horizon, framed on the whole hero and its pedestal (the model height 1.15 plus 0.55, the pivot at 0.36 of that), the hero
+# turned 42 degrees from the front (222 against the 180 that faces the camera). "stage" is that picture; "stage_close" the
+# same camera brought in on the head, as the owner looks at it on the pedestal. The pedestal is 0.08 high.
+STAGE_FOV_DEG = 24.0
+STAGE_ELEVATION_DEG = 10.0
+STAGE_TURN_DEG = 42.0
+STAGE_FIT = 1.15 + 0.55
+STAGE_TARGET = STAGE_FIT * 0.36 - 0.08
+STAGE_CLOSE = (0.80, 0.82)        # frame, target height of the close picture
+STAGE_SIZE = 420                  # side of the picture unless --size gives more (the studio pictures use 504)
 
 
 def gradient_skin(material, bottom, top, low=0.62, high=1.12):
@@ -178,6 +189,139 @@ def glass_material(name, colour):
     output = nodes.new("ShaderNodeOutputMaterial")
     links.new(mix.outputs["Shader"], output.inputs["Surface"])
     return material
+
+
+# The look of the hero in the game (22 October 2026): ChogHero.shader draws a lit material as a matcap: its colour times a
+# crescent of lavender toward the lower right, plus a rim of warm white on the edges that face the key. The numbers are those of
+# MatchLookTuning.cs. The stage pictures use it, so the sheet shows what the game shows: the cream of the face, which is
+# already light, turns white where the rim is added to it (at its edge near the silhouette).
+GAME_KEY = (-0.4, 0.55, 0.73)             # MatchLookTuning.LightX, LightY, LightZ (view space, z toward the viewer)
+GAME_SHADE = (0xD4 / 255.0, 0xC2 / 255.0, 0xE6 / 255.0)
+GAME_RAMP = (0.5, 0.14)
+GAME_RIM_COLOUR = (1.0, 0xF6 / 255.0, 0xE0 / 255.0)
+GAME_RIM = 0.35
+
+
+def game_look_material(name, colour):
+    """A lit material as ChogHero.shader draws it (Matcap and the rim of its fragment function), in the gamma space the
+    shader computes in; the result is turned to linear for the renderer."""
+    material = bpy.data.materials.new(name)
+    tree = render.node_tree(material)
+    nodes, links = tree.nodes, tree.links
+    nodes.clear()
+
+    def socket_of(value):
+        return value if isinstance(value, bpy.types.NodeSocket) else None
+
+    def number(operation, *values, clamp=False):
+        node = nodes.new("ShaderNodeMath")
+        node.operation = operation
+        node.use_clamp = clamp
+        for index, value in enumerate(values):
+            if socket_of(value) is not None:
+                links.new(value, node.inputs[index])
+            else:
+                node.inputs[index].default_value = value
+        return node.outputs["Value"]
+
+    def vector(operation, *values):
+        node = nodes.new("ShaderNodeVectorMath")
+        node.operation = operation
+        for index, value in enumerate(values):
+            target = 3 if operation == "SCALE" and index == 1 else index
+            if socket_of(value) is not None:
+                links.new(value, node.inputs[target])
+            else:
+                node.inputs[target].default_value = value
+        return node.outputs["Vector"]
+
+    geometry = nodes.new("ShaderNodeNewGeometry")
+    transform = nodes.new("ShaderNodeVectorTransform")
+    transform.vector_type, transform.convert_from, transform.convert_to = "NORMAL", "WORLD", "CAMERA"
+    links.new(geometry.outputs["Normal"], transform.inputs["Vector"])
+    split = nodes.new("ShaderNodeSeparateXYZ")
+    links.new(transform.outputs["Vector"], split.inputs["Vector"])
+    nx, ny, nz = split.outputs["X"], split.outputs["Y"], split.outputs["Z"]
+    length = math.sqrt(sum(value * value for value in GAME_KEY))
+    key_x, key_y, key_z = (value / length for value in GAME_KEY)
+    facing = number("ADD", nz, 0.0, clamp=True)
+    along_key = number("MULTIPLY_ADD", nz, key_z, number("MULTIPLY_ADD", ny, key_y, number("MULTIPLY", nx, key_x)))
+    key = number("MULTIPLY_ADD", along_key, 0.5, 0.5)
+    light = number("MULTIPLY_ADD", key, 0.6, number("MULTIPLY", facing, 0.5))
+    ramp = nodes.new("ShaderNodeMapRange")
+    ramp.interpolation_type = "SMOOTHSTEP"
+    ramp.inputs["From Min"].default_value = GAME_RAMP[0] - GAME_RAMP[1]
+    ramp.inputs["From Max"].default_value = GAME_RAMP[0] + GAME_RAMP[1]
+    links.new(light, ramp.inputs["Value"])
+    shade = number("SUBTRACT", 1.0, ramp.outputs["Result"])
+    # lerp((1, 1, 1), GAME_SHADE, shade)
+    tone = vector("ADD", vector("SCALE", (1.0, 1.0, 1.0), number("SUBTRACT", 1.0, shade)), vector("SCALE", GAME_SHADE, shade))
+    lit = vector("MULTIPLY", tuple(colour), tone)
+    edge = number("SUBTRACT", 1.0, facing)
+    flat = math.hypot(key_x, key_y)
+    toward_key = number("ADD", number("MULTIPLY_ADD", ny, key_y / flat, number("MULTIPLY", nx, key_x / flat)), 0.0, clamp=True)
+    rim = number("MULTIPLY", number("MULTIPLY", number("MULTIPLY", number("MULTIPLY", edge, edge), edge), toward_key), GAME_RIM)
+    rim_light = vector("SCALE", GAME_RIM_COLOUR, rim)
+    if os.environ.get("CHOG_RIM_MODE") == "screen":
+        # A try (22 October 2026): the rim added the way a screen blend does, so it brightens a dark colour and hardly a
+        # light one (the cream of the face no longer turns white at its edge).
+        rim_light = vector("MULTIPLY", rim_light, vector("SUBTRACT", (1.0, 1.0, 1.0), lit))
+    whole = vector("ADD", lit, rim_light)
+    capped = vector("MINIMUM", whole, (1.0, 1.0, 1.0))
+    linear_colour = vector("POWER", capped, (2.2, 2.2, 2.2))
+    emission = nodes.new("ShaderNodeEmission")
+    links.new(linear_colour, emission.inputs["Color"])
+    output = nodes.new("ShaderNodeOutputMaterial")
+    links.new(emission.outputs["Emission"], output.inputs["Surface"])
+    return material
+
+
+def probe_pixel(camera, at):
+    """A debugging aid (CHOG_PROBE="x,y" in pixels from the top left of the stage close picture): prints each surface that
+    covers that pixel, nearest first, with its material and its distance from the camera. It tells what a speck is."""
+    from bpy_extras.object_utils import world_to_camera_view
+    scene = bpy.context.scene
+    size = scene.render.resolution_x
+    target = Vector((at[0] / size, 1.0 - at[1] / size))
+    found = []
+    for thing in bpy.data.objects:
+        if thing.type != "MESH":
+            continue
+        mesh = thing.data
+        screen = [world_to_camera_view(scene, camera, thing.matrix_world @ vertex.co) for vertex in mesh.vertices]
+        for polygon in mesh.polygons:
+            corners = [screen[index] for index in polygon.vertices]
+            if len(corners) != 3:
+                continue
+            (ax, ay, az), (bx, by, bz), (cx, cy, cz) = corners
+            denominator = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy)
+            if abs(denominator) < 1e-12:
+                continue
+            u = ((by - cy) * (target.x - cx) + (cx - bx) * (target.y - cy)) / denominator
+            v = ((cy - ay) * (target.x - cx) + (ax - cx) * (target.y - cy)) / denominator
+            w = 1.0 - u - v
+            if min(u, v, w) >= -0.002:
+                slot = mesh.materials[polygon.material_index]
+                found.append((u * az + v * bz + w * cz, thing.name, slot.name if slot else "?", round(min(u, v, w), 4)))
+    for depth, name, material, edge in sorted(found)[:8]:
+        print(f"CHOG_PROBE {depth:.5f} {name} {material} (inside by {edge})")
+
+
+def game_look(things):
+    """Gives each lit material of the objects (those of a Principled BSDF) the look of the game."""
+    made = {}
+    for thing in things:
+        for index, slot in enumerate(thing.data.materials):
+            if slot is None or slot.node_tree is None:
+                continue
+            shader = slot.node_tree.nodes.get("Principled BSDF")
+            if shader is None:
+                continue
+            if slot.name not in made:
+                linear = shader.inputs["Base Color"].default_value
+                srgb = tuple(max(0.0, min(1.0, value)) ** (1.0 / 2.2) for value in linear[:3])
+                made[slot.name] = game_look_material("ChogGame" + slot.name, srgb)
+            thing.data.materials[index] = made[slot.name]
 
 
 def dress_traits(outline):
@@ -333,7 +477,7 @@ def render_one(name, blend=None, out=None, only=None, colour=None, size=504, bus
         if in_game:
             flat.write_small(path, path[:-4] + "_phone.png", size // shots.PHONE_POINTS)
 
-    families = {"bust", "studio", "game", "towards", "turnaround"}
+    families = {"bust", "studio", "game", "towards", "turnaround", "stage"}
     wanted = set(only.split(",")) if only else {"bust", "studio", "game"}
     if wanted - families:
         raise SystemExit(f"CHOG_RENDER unknown families {sorted(wanted - families)}: use {sorted(families)}")
@@ -369,6 +513,28 @@ def render_one(name, blend=None, out=None, only=None, colour=None, size=504, bus
         for view_name, turn, elevation in turns:
             render.place_camera(camera, lights, (turn, elevation, True, TURN_HEIGHT, TURN_FRAME, False))
             render.render(os.path.join(folder, f"chog_{name}_{view_name}.png"))
+    if "stage" in wanted:
+        ground.hide_render = True
+        for disc in ring:
+            disc.hide_render = True
+        front.hide_render = True
+        lights[0].data.energy = render.KEY_LIGHT
+        sky.inputs["Color"].default_value = grey
+        scene.render.resolution_x = scene.render.resolution_y = max(STAGE_SIZE, size) if size != 504 else STAGE_SIZE
+        game_look([thing for thing in bpy.data.objects if thing.type == "MESH" and thing.name != "ChogRenderGround"])
+        for thing in bpy.data.objects:
+            if hasattr(thing, "visible_shadow"):
+                thing.visible_shadow = False      # the game's hero shader draws no shadow on itself
+        kept = render.LENS_MM
+        render.LENS_MM = 18.0 / math.tan(math.radians(STAGE_FOV_DEG * 0.5))
+        try:
+            for view_name, (frame, target) in (("stage", (STAGE_FIT, STAGE_TARGET)), ("stage_close", (STAGE_CLOSE[0], STAGE_CLOSE[1]))):
+                render.place_camera(camera, lights, (STAGE_TURN_DEG, STAGE_ELEVATION_DEG, False, target, frame, False))
+                render.render(os.path.join(folder, f"chog_{name}_{view_name}.png"))
+                if os.environ.get("CHOG_PROBE") and view_name == "stage_close":
+                    probe_pixel(camera, [float(word) for word in os.environ["CHOG_PROBE"].split(",")])
+        finally:
+            render.LENS_MM = kept
 
 
 if __name__ == "__main__":

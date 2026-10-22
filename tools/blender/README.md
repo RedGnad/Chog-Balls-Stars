@@ -1010,3 +1010,33 @@ the radius of Side Right). The light core (5 of 8 sides) stays: the pictures dra
 changed. Chosen by comparing the bust at 0, 15 and 8 degrees with the pictures (0: 30 down, 15: level, art: about 12 down). The beam
 stays short (the game draws the long one when the hero attacks), and the slant in the game itself is that of the attack's beam, not of
 this stub.
+
+## 22 October 2026: the face on the home stage (lot 5a)
+
+The owner, looking at the recruit on the pedestal (three quarters, close): the bottom of the face does not reach the neck, the forehead is too big,
+"the face is too high", and little white specks on the face features. Sheet, seven heroes (the recruit, #75, #76, #15, the hoodie #23, the cap #85,
+the dragon #143) on the stage of the home screen, bust, side and game camera, before | after, and a close crop of a cheek:
+[heroes-face-fill-stage-2026-10-22.jpg](../../research/evidence/heroes-face-fill-stage-2026-10-22.jpg). New: the stage view of `render_chog_traits.py`
+(families `stage`: the camera of `ChogHeroStage.cs`, 24 degrees of field, 10 above the horizon, the hero turned 42 degrees, full body and close, drawn
+with the look of the game: `game_look_material` emulates the matcap and the rim of `ChogHero.shader` with the numbers of `MatchLookTuning.cs`, and
+no shadow), `render_recruit.py --size`, `make_chog_stage_sheet.py` and `check_face_overlaps.py`.
+
+- **Forehead and chin, from the art.** Measured on the bare Genesis (#76, #75, #112, #237, #432 at 1000 points): from the eyes up to the middle of the hair
+  line is about 0.9 of the distance from the eyes to the mouth, and from the eyes down to the chin about twice that. `FACE_TOP` 0.235 to 0.125 above the
+  middle of the face, the teeth of hair 0.040 long (0.050), `FACE_HALF_HEIGHT` 0.178 to 0.196, which puts the chin 0.246 under the middle of the head, 0.004
+  from the lowest point of the egg: the cream now wraps under the chin down to the neck (the face reaches the bottom of the head, as the art draws it).
+  Hoods and costumes follow the face by construction (`opening_rim`).
+- **The specks inside the cheeks: a layer too close, not a clip of the face with the head.** The cheek is a fan of 12 triangles lying 0.0008 over the face
+  (`FACE_OVER`); its flat triangles sag under the egg between their corners, and those of the face do too, a little differently. Measured on 10,400 points
+  of the two cheeks of #75 (`check_face_overlaps.py --decals`), the cheek stood 0.00014 over the face at its lowest; a pixel here and there of the stage
+  picture showed the cream (found by probing that pixel, `CHOG_PROBE`: the face 0.00017 in front of the cheek). Not a z-fight at 24 bits (the step at the stage
+  distance is 0.000003), a real sag. Now `FACE_OVER` (0.0020, 0.0052) and every layer drawn above 0.0014 higher (`settled()` in `make_chog_traits.py`,
+  `LIFT` in `chog_trait_faces.py`), which keeps the order of the layers: lowest point over the face, cheeks 0.00136, eyes 0.0027, mouth line 0.0034
+  (before 0.00014, 0.0013, 0.0020). Floating: the largest drawn height is 0.0093 over the face for a glint; nothing is seen to float from the side.
+  The head skin never comes through the face (`measure_face_gaps.py`: head pokes 0).
+- **The white along the edge of the face is the rim of the game's shader**, not geometry: it adds a warm white (`FFF6E0` times 0.35, edge cubed) at the
+  edges that face the key, and on the already light cream of the face it saturates to white along the silhouette. Emulated in the stage pictures; tried a
+  rim added as a screen blend (`rim * (1 - colour)`, `CHOG_RIM_MODE=screen`), which removes it. A shader change, not mine: proposed in the report.
+  Meanwhile `FACE_FIT` 0.985 to 0.96 leaves the most grazing part of the face to the skin.
+- **Checked**: 35 Genesis (hoods, costumes, caps, bare heads of both Sides) build with no failure; `--budget` largest #710 7,971, median 7,165, none over
+  8,000; library 1,970 Genesis, 0 failures. Not verified in Unity.
