@@ -2394,10 +2394,11 @@ MASCOT = {
     "STALK": ((0.0, 0.75, 0.66), 0.090, 0.030, 0.016),
     # The dragon: the light belly (its middle height, half width, half height); then its head (below); the
     # dark "w" of its scales (where: from a point, a way), wings on its back and its tail.
-    # The belly: rows of the volume it covers (a ring of the volume, how many points each side of the front it takes), how far
-    # it stands off the volume. (A fan 0.22 by 0.19 round a point until 22 October 2026.)
-    "BELLY": ((1, 1), (2, 2), (3, 2), (4, 1)),
-    "BELLY_LIFT": 0.026,
+    # The belly: the faces of the volume it covers, by row of faces (counted from the bottom ring) and the columns from the front,
+    # (row, first column, last column): the columns are 18 degrees wide, 0 is the first right of the front, -1 the first left of it;
+    # and the faces of the collar under the chin, the first and last point of the rim they run between (the rim has 24 points).
+    "BELLY": ((0, -3, 2),),
+    "BELLY_CHIN": (14, 22),
     # The ridge down the back (not drawn by any picture: no picture shows the back, 22 October 2026): the heights of its
     # plates, from the top of the head down to the tail, their half width at the foot and their length.
     "RIDGE": (1.10, 1.00, 0.88, 0.74, 0.60, 0.46),
@@ -2593,9 +2594,9 @@ def build_mascot(maker):
 
     mesh = torso.mesh
     rows = [[mesh.verts.new(point) for point in ring] for ring in rings]
-    faces, left_open, axes = [], 0, {}
+    faces, left_open, axes, grid = [], 0, {}, {}
     middles = [sum(ring, Vector()) / len(ring) for ring in rings]
-    for (lower, upper), low_middle, high_middle in zip(zip(rows, rows[1:]), middles, middles[1:]):
+    for row_number, ((lower, upper), low_middle, high_middle) in enumerate(zip(zip(rows, rows[1:]), middles, middles[1:])):
         for index in range(count):
             after = (index + 1) % count
             corners = (lower[index], lower[after], upper[after], upper[index])
@@ -2605,6 +2606,7 @@ def build_mascot(maker):
                 continue
             face = mesh.faces.new(corners)
             faces.append(face)
+            grid[(row_number, index)] = face
             axes[face] = (low_middle + high_middle) * 0.5
     faces.append(mesh.faces.new(list(reversed(rows[0]))))
     if top is not None:
@@ -2636,7 +2638,13 @@ def build_mascot(maker):
     loops = [[surface.middle + (point - surface.middle) * numbers.TUCK for point in rim],
              [point + head_normal_at(surface, point) * numbers.LIP for point in rim]]
     for degrees, lift in numbers.COLLAR:
-        loops.append([to_head(on_volume(middle_body, turn @ beyond(point, degrees), lift)[0]) for point in rim])
+        # (The dragon's collar is lower under the chin, where the belly is: 0.011 off the volume, 0.008 at least (flush it fought the volume,
+        # patches of both colours), not 0.028: raised so much it stood off the body as a thin slab once painted in the colour of the belly,
+        # seen from the side, 22 October 2026.)
+        flush = shape == "dragon"
+        loops.append([to_head(on_volume(middle_body, turn @ beyond(point, degrees),
+                                        max(lift * 0.4, 0.008) if flush and numbers.BELLY_CHIN[0] <= index <= numbers.BELLY_CHIN[1] else lift)[0])
+                      for index, point in enumerate(rim)])
     collar_mesh = collar.mesh
     collar_rows = [[collar_mesh.verts.new(point) for point in loop] for loop in loops]
     bands = []
@@ -2677,29 +2685,16 @@ def build_mascot(maker):
         return
 
     # The dragon.
-    # The belly: a plate of the pale colour on the front of the volume, cut from its own points (a plate sampled
-    # between them sagged under the facets of the volume: two patches with red between, 22 October 2026).
-    belly_rows = []
-    for ring_index, half in numbers.BELLY:
-        ring, axis = rings[ring_index], middles[ring_index]
-        row = {}
-        for column in range(-half, half + 1):
-            point = ring[column % count]
-            out = Vector((point.x - axis.x, point.y - axis.y, 0.0)).normalized()
-            row[column] = mesh.verts.new(point + out * numbers.BELLY_LIFT)
-        belly_rows.append((half, row))
-    belly_faces = []
-    for (low_half, low), (high_half, high) in zip(belly_rows, belly_rows[1:]):
-        for column in range(-2, 2):
-            corners = [low[max(-low_half, min(low_half, column))], low[max(-low_half, min(low_half, column + 1))],
-                       high[max(-high_half, min(high_half, column + 1))], high[max(-high_half, min(high_half, column))]]
-            corners = [corner for index, corner in enumerate(corners) if corner is not corners[index - 1]]
-            if len(corners) >= 3:
-                belly_faces.append(mesh.faces.new(corners))
-    torso.paint(belly_faces, torso.named("Belly"))
-    for face in belly_faces:
-        face.smooth = True
-    torso.open_faces.extend(belly_faces)
+    # The belly, painted on the surfaces that are there (22 October 2026, the owner: "the belly plate stands off the body as a separate flat
+    # slab, bugged", seen from the side). The cut of the volume round the face takes in the whole chest under the chin (the rays from the middle of
+    # the head through the face reach it down to 0.2): what closes it is the collar, a slope from the chin down to the volume, so the plate laid on
+    # "the body" floated in front of that slope. Now the faces of the slope under the chin (BELLY_CHIN: the points of the rim, 18 is the middle of the
+    # chin) and the faces of the volume under it (BELLY: row from the bottom, first and last column) take the pale colour: it is the body.
+    for band in bands[1:]:
+        collar.paint([band[index % points] for index in range(numbers.BELLY_CHIN[0], numbers.BELLY_CHIN[1] + 1)], collar.named("Belly"))
+    for row_number, first, last in numbers.BELLY:
+        belly = [grid[(row_number, column % count)] for column in range(first, last + 1) if (row_number, column % count) in grid]
+        torso.paint(belly, torso.named("Belly"))
     # The ridge down the back, from the top of the head to the tail: small plates, each a four sided point on the
     # surface of the volume, leaning back.
     ridge_wide, ridge_long = numbers.RIDGE_SIZE

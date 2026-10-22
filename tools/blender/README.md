@@ -1310,3 +1310,18 @@ before pictures were rendered from a temporary copy of origin/main and not kept)
 - **Fire, Green and Purple laser eyes, Right (194): approximate** (#38, #135, #212, #72, #104, #107, #52): the frowning almond of lot 5b is right in shape and place; nothing changed in this batch. From the front the beam is seen end on as a vertical bar, as in the pictures.
 - **Checked**: library 1,970 Genesis, 0 failures; `--budget` largest #630 7,991 (unchanged, 9 under 8,000), none over. By eye on the sheet only: no measurement of eye sizes against the art beyond the proportions read above; not in a Unity build.
 - **Left to do**: the rest of the strict audit, in the order of `heroes-faces-audit-2026-10-22.md` (Gradient visor, Round Eye, Closed Eye Crying, Tired, Sunset and Plasma visors, then Side Left).
+
+### 7.5 The dragon's belly, from the side
+
+Sheet: [costumes-dragon-belly-2026-10-22.jpg](../../research/evidence/costumes-dragon-belly-2026-10-22.jpg) (6 dragons, the art then before | after: front close, three quarter, side close,
+hero stage side, hero stage, game camera in front).
+
+- **What the owner saw**: from the side the belly was a separate flat slab standing off the body (the thin peach sliver of the "before" columns).
+- **The cause**: the cut of the volume round the face is not the size of the face. The rays from the middle of the head through the face and the chin reach the volume as
+  low as 0.2 (rows 1 to 5 of the volume have 6 to 8 faces of 20 cut out, `left_open` 38). What closes that opening is the collar, a slope from the chin down to the volume. The
+  belly of lot 1 was a plate cut from the points of the rings and laid 0.026 off the volume (the two patches, then the plate of the "before" pictures): it floated in front of the slope.
+- **Changed** (`MASCOT["BELLY"]`, `["BELLY_CHIN"]`, `build_mascot`): no plate any more. The faces of the collar under the chin (rim points 14 to 22) and the faces of the bottom row of
+  the volume (columns -3 to 2) are painted in the colour of the belly: the belly IS the body, flush, and reads from the side as the front of the dragon. Under the chin the collar is lower
+  (0.011 off the volume, 0.008 at least) so that painted it does not stand off as a slab; flush it fought the volume.
+- **Checked**: 6 dragons before | after; `--budget`: largest #630 7,991, none over 8,000; library 1,970 Genesis, 0 failures. Not verified in Unity. The edge of the belly follows the faces
+  of the collar and of the volume (steps, not a smooth outline); the art draws a rounded oval.
