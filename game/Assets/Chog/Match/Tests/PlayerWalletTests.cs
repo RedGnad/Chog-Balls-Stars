@@ -16,6 +16,18 @@ namespace Chog.Match.Tests
         }
 
         [Test]
+        public void OnlyTheOwnersWalletKeepsAGenesisItDoesNotHold()
+        {
+            var owner = "0x981F6E0Ea94f45fDB8ee7680DC862212E3C720e0";
+            Assert.IsTrue(PlayerWallet.IsAdminAddress(owner));
+            Assert.IsFalse(PlayerWallet.IsAdminAddress("0x80fb079237af2a634ba9b95263ba0bd53d20cd64"));
+            Assert.IsFalse(PlayerWallet.IsAdminAddress(""));
+            Assert.AreEqual(1795, PlayerWallet.PickFor(owner, new[] { 3, 4 }, 1795));
+            Assert.AreEqual(3, PlayerWallet.PickFor(owner, new[] { 3, 4 }, 0));
+            Assert.AreEqual(3, PlayerWallet.PickFor("0x80fb079237af2a634ba9b95263ba0bd53d20cd64", new[] { 3, 4 }, 1795));
+        }
+
+        [Test]
         public void AnAddressIsShortenedForDisplay()
         {
             Assert.AreEqual("0x80fb...cd64", PlayerWallet.ShortAddress("0x80fb079237af2a634ba9b95263ba0bd53d20cd64"));

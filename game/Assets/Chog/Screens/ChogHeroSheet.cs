@@ -392,6 +392,8 @@ namespace Chog.Screens
             var owns = ready && Array.IndexOf(PlayerWallet.Tokens, _tokenId) >= 0;
             var playable = (ready && Array.IndexOf(PlayerWallet.Playable, _tokenId) >= 0)
                            || (GuestPass.State == GuestPassState.Valid && GuestPass.TokenId == _tokenId);
+            // The owner's wallet may test any Genesis (PlayerWallet.IsAdmin): its match counts for nothing.
+            var adminOnly = !playable && PlayerWallet.IsAdmin;
             var rentalOpen = GenesisRental.State == RentalState.Open;
             var canRentOut = owns && rentalOpen;
             var canLend = owns && PlayerWallet.SignIn == SignInState.SignedIn && GenesisLoan.CanLend(_tokenId);
@@ -399,10 +401,11 @@ namespace Chog.Screens
             // The wallet rents it: it may add days at the holder's price, beside PLAY IT.
             var rentsIt = ready && !owns && GenesisRental.IsRenting(_tokenId);
             var canAddDays = rentsIt && rentalOpen && offered;
-            var canRent = (!playable && rentalOpen && offered) || canAddDays;
+            var canRent = (!playable && !adminOnly && rentalOpen && offered) || canAddDays;
             var now = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
 
-            _play.gameObject.SetActive(playable);
+            _play.gameObject.SetActive(playable || adminOnly);
+            ChogUi.LabelOf(_play).text = adminOnly ? "ADMIN: PLAY IT" : "PLAY IT";
             _rentOut.gameObject.SetActive(canRentOut);
             _lend.gameObject.SetActive(canLend);
             _rent.gameObject.SetActive(canRent);
@@ -482,7 +485,7 @@ namespace Chog.Screens
         // PLAY IT: this Genesis is chosen, the sheet closes and the match is looked for.
         private void PlayIt()
         {
-            if (Array.IndexOf(PlayerWallet.Playable, _tokenId) >= 0)
+            if (Array.IndexOf(PlayerWallet.Playable, _tokenId) >= 0 || PlayerWallet.IsAdmin)
                 PlayerWallet.Choose(_tokenId);
             Close();
             if (_main != null)

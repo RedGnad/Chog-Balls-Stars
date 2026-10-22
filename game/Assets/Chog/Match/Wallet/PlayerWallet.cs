@@ -68,6 +68,17 @@ namespace Chog.Match
         /// <summary>Token id of the Genesis the player enters matches with; 0 for none.</summary>
         public static int ChosenTokenId { get; private set; }
 
+        /// <summary>
+        /// The owner's wallet, which may choose any Genesis to test it (the hero sheet's ADMIN button). The
+        /// services admit it only once signed in, and count nothing of such a match (server/src/photon.js, isAdmin).
+        /// </summary>
+        public const string AdminAddress = "0x981f6e0ea94f45fdb8ee7680dc862212e3c720e0";
+
+        public static bool IsAdminAddress(string address) => string.Equals(address, AdminAddress, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>Whether the connected wallet is the owner's.</summary>
+        public static bool IsAdmin => State == WalletState.Ready && IsAdminAddress(Address);
+
         public static SignInState SignIn { get; private set; } = SignInState.SignedOut;
 
         /// <summary>The token that proves the sign-in to the services; empty when signed out.</summary>
@@ -365,7 +376,7 @@ namespace Chog.Match
             ChogWalletRequest(HostName, nameof(OnRequestAnswer), id, rpcMethod, parametersJson);
         }
 
-        /// <summary>Chooses the Genesis to play; only one the address holds or rents can be chosen.</summary>
+        /// <summary>Chooses the Genesis to play; only one the address holds or rents can be chosen, any one by the owner's wallet.</summary>
         public static void Choose(int tokenId)
         {
             // A Genesis rented a moment ago may not be in the list yet: nothing says in which
@@ -373,7 +384,8 @@ namespace Chog.Match
             if (State == WalletState.Ready && Array.IndexOf(Playable, tokenId) < 0)
                 Playable = Merge(Tokens, GenesisRental.RentedTokens());
 
-            if (Array.IndexOf(Playable, tokenId) < 0 || tokenId == ChosenTokenId)
+            var allowed = Array.IndexOf(Playable, tokenId) >= 0 || (IsAdmin && tokenId > 0);
+            if (!allowed || tokenId == ChosenTokenId)
                 return;
 
             ChosenTokenId = tokenId;
@@ -424,6 +436,12 @@ namespace Chog.Match
             return Array.IndexOf(held, remembered) >= 0 ? remembered : held[0];
         }
 
+        /// <summary>PickToken, except that the owner's wallet keeps the Genesis it chose last, held or not.</summary>
+        public static int PickFor(string address, int[] playable, int remembered)
+        {
+            return IsAdminAddress(address) && remembered > 0 ? remembered : PickToken(playable, remembered);
+        }
+
         /// <summary>The Genesis an address may play: those it holds, then those it rents and does not hold.</summary>
         public static int[] Merge(int[] held, int[] rented)
         {
@@ -449,7 +467,7 @@ namespace Chog.Match
                 return;
 
             Playable = playable;
-            ChosenTokenId = PickToken(Playable, PlayerPrefs.GetInt(ChosenTokenKey, 0));
+            ChosenTokenId = PickFor(Address, Playable, PlayerPrefs.GetInt(ChosenTokenKey, 0));
             Changed?.Invoke();
         }
 
@@ -614,7 +632,7 @@ namespace Chog.Match
             // Only a list read from the services decides the choice: while it is being read, or
             // after a failure, nothing is chosen and the player enters as a recruit.
             Playable = state == WalletState.Ready ? Merge(tokens, GenesisRental.RentedTokens()) : NoTokens;
-            ChosenTokenId = PickToken(Playable, PlayerPrefs.GetInt(ChosenTokenKey, 0));
+            ChosenTokenId = state == WalletState.Ready ? PickFor(address, Playable, PlayerPrefs.GetInt(ChosenTokenKey, 0)) : 0;
 
             if (addressChanged)
             {

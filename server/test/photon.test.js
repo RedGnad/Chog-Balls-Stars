@@ -4,7 +4,7 @@ import { createApi } from '../src/api.js';
 import { createCareers } from '../src/career.js';
 import { createJudge } from '../src/judge.js';
 import { createMatches, createMemoryStore, parseExact } from '../src/matches.js';
-import { createPhoton } from '../src/photon.js';
+import { ADMIN_ADDRESSES, createPhoton } from '../src/photon.js';
 import { createSessions } from '../src/session.js';
 import { createWallet } from './wallet.js';
 
@@ -127,6 +127,21 @@ test('a holder enters with its Genesis as sent; a wallet that does not hold it e
   const kept = (await matches.get('g1')).admissions;
   assert.deepEqual(kept.map(admission => [admission.right, admission.tokenId, admission.askedToken, admission.address]),
     [['holder', 1795, 1795, HOLDER.address], [null, 0, 1795, STRANGER.address], [null, 0, 1795, null]]);
+});
+
+test('the owner\'s wallet enters with any Genesis, admitted like a stand-in, and no other wallet does', async () => {
+  const { api, matches } = services();
+  const asked = runtimePlayer().replace('"GenesisTokenId":0', '"GenesisTokenId":408');
+  const asOwner = await addPlayer(api, 'g-admin', { address: ADMIN_ADDRESSES[0].toUpperCase().replace('0X', '0x') }, asked);
+  assert.equal(asOwner.text, '{}', 'the Genesis it asked for is kept');
+  const asStranger = await addPlayer(api, 'g-admin', { address: STRANGER.address }, asked, 'other');
+  assert.equal(parseExact(asStranger.text).RuntimePlayer.GenesisTokenId, 0);
+  const visitor = await addPlayer(api, 'g-admin', { visitor: true, address: 'not an address' }, asked, 'third');
+  assert.equal(parseExact(visitor.text).RuntimePlayer.GenesisTokenId, 0);
+
+  const [owner, stranger] = (await matches.get('g-admin')).admissions;
+  assert.deepEqual([owner.right, owner.tokenId, owner.standIn], ['admin', 408, true], 'no career, rank or wager share follows');
+  assert.deepEqual([stranger.right, stranger.tokenId, stranger.standIn], [null, 0, undefined]);
 });
 
 test('a renter and a guest enter with the Genesis they have a right to, and lose it with that right', async () => {

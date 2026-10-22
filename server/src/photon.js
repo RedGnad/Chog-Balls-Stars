@@ -43,6 +43,15 @@ const randomName = prefix => prefix + Array.from(crypto.getRandomValues(new Uint
 const accepted = (body = {}) => ({ status: 200, body });
 const refused = (error, message) => ({ status: 400, body: { Status: 400, Error: error, Message: message } });
 
+// The owner's wallet (the contracts' owner), which may play any Genesis to test it, once signed in. Such a
+// match is admitted like a stand-in's: no career, no rank, no share of a wager (careers-onchain.js,
+// ranks.js, wager.js). The game shows its ADMIN button for the same address (PlayerWallet.IsAdmin).
+export const ADMIN_ADDRESSES = ['0x981f6e0ea94f45fdb8ee7680dc862212e3c720e0'];
+
+export function isAdmin(address) {
+  return isAddress(address) && ADMIN_ADDRESSES.includes(address.toLowerCase());
+}
+
 /**
  * @param {object} options
  * @param {string} options.secret what Photon's dashboard sends with every request, at least 32
@@ -97,13 +106,15 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, s
   }
 
   // How the player behind a cookie may play that Genesis now: 'holder', 'renter', 'guest',
-  // 'stand-in' (standin.js: never counted for a career), or null.
+  // 'stand-in' (standin.js: never counted for a career), 'admin' (the owner's signed-in wallet
+  // trying any Genesis: never counted either), or null.
   async function rightTo(tokenId, cookie) {
     if (!Number.isInteger(tokenId) || tokenId < 1 || tokenId > LAST_TOKEN_ID) return null;
     if (isAddress(cookie?.address)) {
       if ((await chain.holds(cookie.address, tokenId)).holds) return 'holder';
       if (rental && await rental.isRenting(tokenId, cookie.address)) return 'renter';
-      return standIns && await standIns.standsIn(cookie.address, tokenId) ? 'stand-in' : null;
+      if (standIns && await standIns.standsIn(cookie.address, tokenId)) return 'stand-in';
+      return isAdmin(cookie.address) ? 'admin' : null;
     }
     const pass = passOf(cookie);
     if (pass && pass.tokenId === tokenId && isAddress(pass.lender)) {
@@ -168,7 +179,7 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, s
     await matches.admitted(request.GameId, {
       userId: request.UserId, actorNr: numberOf(request.ActorNr), playerSlot: numberOf(request.PlayerSlot),
       address: isAddress(cookie.address) ? cookie.address : null, lender: right === 'guest' ? passOf(cookie).lender : null,
-      right, tokenId, form, askedToken, askedForm, ...(right === 'stand-in' ? { standIn: true } : {}),
+      right, tokenId, form, askedToken, askedForm, ...(right === 'stand-in' || right === 'admin' ? { standIn: true } : {}),
     });
 
     if (!asked || typeof asked !== 'object') return accepted();
