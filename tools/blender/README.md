@@ -913,3 +913,43 @@ Still wrong: the astronaut's glass is an opaque shell (the pictures show the hea
 helmet hides the top of the head; the hose and the flag are small and barely show at the size of the game; the shark's
 teeth read as a zigzag outline at the size of a phone; the dragon's wings still show as dark triangles from behind; no
 picture shows the back of a suit, so the back of each (dorsal fin, pack, wings) is a choice.
+
+## 22 October 2026: the glass of the astronaut helmet (lot 4a)
+
+On the art (the 24 Astro Suit Genesis; twelve looked at, #249, #257, #572, #675, #708, #839, #903, #947, #1062, #1529,
+#1539, #1944, at 400 points) the helmet is a clear bubble: the crown of the Chog (purple, yellow, red, pink or black hair, the skin
+colour) shows through it as a flat zigzag edge, and the face is open inside the grey ring with no glass drawn over it.
+Until this lot the shell behind the ring was opaque white with no crown: from the game camera, a white egg
+([before](../../research/evidence/heroes-costumes-2026-10-22.jpg)). Sheet, the art beside before | after for six
+astronauts (#249, #257, #572, #1529, #675, #708), from the three quarters, the side, the back, above behind and the game
+camera at phone size: [heroes-astro-glass-2026-10-22.jpg](../../research/evidence/heroes-astro-glass-2026-10-22.jpg).
+
+- **The glass is a material** (`Cloth_Astro_Glass`, `"glass": ("Glass",)` in the `Astro Suit` entry, `trait_materials(...,
+  glass=)` in `make_chog_traits.py`): the property `glass` of the Blender material is exported with the light 3
+  (`export_chog_parts.py`, commit b62507b), and the hero shader draws it on a share of the pixels only (0.3 where it faces
+  the camera, 0.9 at its edges, lightened toward the edges). The colour is a pale blue-white, srgb 0.80/0.90/0.98. **The glass
+  has no outline shell** (`add_loops(..., 0.0)`): the dark inside of an outline shell would show through the holes. The
+  ring, the unit, the hose and the suit keep their outline and stay opaque. Not closed over the face: no picture draws a
+  glass there, and the face stays fully readable.
+- **The dome** (`ASTRO["DOME"]` 24 by 6, `DOME_SIZE` 1.32, `DOME_FULL` 55): it starts tucked in the tube of the ring and
+  widens smoothly to 1.32 times the head (1.10 before), so there is room for the crown under it. A bubble this much larger
+  than the head is a choice: the pictures draw a helmet only a little larger than the head, but with the room of a snug one
+  a leaf that stands out of the head at all goes through the glass.
+- **The crown under the glass** (`ASTRO_CROWN`, `LEAF_SIDES` 4, `SECTORS` (180,)): the three lines of leaves lying over the
+  top and the back (lines 4, 5 and 6 of `SPIKES`) are kept, shortened to a share of 0.22, 0.22 and 0.26 of their length
+  (standing out of the head 0.05 to 0.06, with their outline under the glass: `leaf_crossings` passes for all 24 astronauts)
+  and made of four sides. The front star (lines 0 to 3) is taken out: its leaves go through the ring over the brow (tried at 0.22
+  of their length: the build fails). Because the leaves are that short, most of what shows through the
+  glass is the head itself in its skin colour (the hair colour of these pictures); the leaves give the zigzag edge from
+  above. The check of spikes seen all around the head asks only the back sector (180) for this suit, as the glass shows no
+  more.
+- **Triangles**: the 24 astronauts 7,051 to 7,493 (7,141 to 7,363 for the six before: the shell lost its outline, 220
+  triangles, and the leaves took them back). Library: 1,970 Genesis, 0 failures, 0 lacking a part, 3,649,354 bytes;
+  `--budget` on the 1,869 Origin heroes: largest #710 7,971 (unchanged), median 7,157, none over 8,000.
+- **How the sheet shows the glass**: in the renders of `render_chog_traits.py` a material with `glass` is a mix of a
+  transparent shader and its colour (`glass_material`): the same two curves as the game (coverage `0.9 - 0.6 toward^2`,
+  lightening `0.6 (1 - toward)^2` toward white), hashed transparency, so the sheet shows how much of the head shows through.
+  It is the share the game keeps, not the game's screen pattern: the game keeps whole pixels (a third at the middle) with
+  no blending. Not verified in Unity: no build was made for this lot.
+
+Still wrong: the hose and the flag are small at the size of the game (lot 4c).
