@@ -1558,3 +1558,9 @@ Sheet, 6 Genesis (#4, #50, #109 Chog Viper L; #1184, #1621, #312 Retro Glass R),
 [heroes-eyes-batch8-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch8-2026-10-22.jpg).
 - **Chog Viper, Left: approximate, made closer.** A thick white frame round the lens (`RIM` 0.016 all round). Still differs: the art's lens is a deeper, rounder goggle with a gradient from dark blue to white and the CHOG lettering (not drawn), a thick strap.
 - **Retro Glass, Right: approximate.** The half-lidded, frowning eyes of batch 1 read as the art (light blue irises under a heavy lid, red thin frame); the art's iris is a little paler and the glints larger. Nothing changed.
+
+### Batch 4 fixes (coordinator review)
+
+Sheet: [clothes-batch4-fix-2026-10-22.jpg](../../research/evidence/clothes-batch4-fix-2026-10-22.jpg) (#189, #229 Zero THOTS; #474, #556 Guko).
+- **Zero THOTS**: one line 0.058 tall, allowed 0.400 wide so it wraps round the chest as in the art (at 0.300 the line was limited to about 0.040 tall).
+- **Guko**: a white disc of radius 0.052 on the left of the chest with a small black spiky mark (a star) on it.
