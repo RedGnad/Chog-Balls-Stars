@@ -1,5 +1,11 @@
 # État courant et décisions
 
+**22 October 2026, 03:30 UTC (lead: glass astronaut helmet and the last hat impacts deployed).**
+- **Deployed:** build `20261022T032043343Z-b94ee421cd304209abbb0e53ed88bc83`, stamp unchanged (`f4a81f1ddbd919b6`). The hero shader gains a glass way of drawing (light 3, vertex alpha 0.4: a share of the pixels kept in a fixed screen pattern, a third facing the camera, most at the edges, no transparent sorting); lot 4a of `stream/heroes-faces` (72f6e2d) makes the astronaut's dome glass with the crown inside it (sheet `research/evidence/heroes-astro-glass-2026-10-22.jpg`); ram horns, demon/devil/void horns, the taped banana and the 1:1 brain get their own impact (no thrown object keeps the generic pop, tested); the submission draft describes the costume attacks, the player ladder and the balance in dollars.
+- **Verified:** the shader compiled fresh for WebGL with no error; export 1,970 Genesis, 0 failed, largest Origin hero 7,971 triangles; 168 view tests; `?heroes=249,1529,675,708` shows the hair colour through the glass from the game camera; `?impacts=` names the new impacts; a local bot match ran without exception; judge fixtures agree.
+- **Not verified:** the glass on a phone screen (its grain is visible at 1280x720 on desktop); the impact moments themselves were not caught on a capture.
+**Next action:** lots 4b (eight Skull eye values), 4c (shark teeth, astronaut flag and hose at phone size) and 4d (Side=Left face lasers level and thin) on `stream/heroes-faces`, one sheet each.
+
 **22 October 2026, 02:10 UTC (lead: dragon, shark and astronaut suits deployed).**
 - **Deployed:** build `20261022T015853880Z-0955479927304adda8f68a176060d297`, stamp unchanged. Lot 3 of `stream/heroes-faces` (f66276a), from all 72 suited Genesis' art: dragon with four blunt tan horns, smaller wings, no tail spikes, its "w" marks and a larger belly; shark with a full row of 20 teeth round the face and pectoral fins; astronaut rebuilt as a full suit with a round helmet, side unit, hose, flag patch, chest panel and pack (`research/evidence/heroes-costumes-2026-10-22.jpg`). All Origin heroes under 8,000 triangles (largest 7,971).
 - **Verified:** export 1,970 Genesis, 0 failed; 168 view tests; the suits load and throw their objects in `?impacts=`; judge fixtures agree.
