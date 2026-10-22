@@ -213,7 +213,7 @@ def main():
         # Darker and fading towards the far end, as if lit from the clash.
         fade = vertical_gradient(size, (0, 0, 0), (255, 255, 255)).convert("L").point(lambda value: min(255, round(value * 1.6)))
         floor.putalpha(ImageChops.multiply(alpha_of(floor), fade))
-        floor = Image.blend(floor, Image.new("RGBA", size, (40, 14, 60, 0)), 0.35)
+        floor = Image.blend(floor, Image.new("RGBA", size, (40, 14, 60, 0)), 0.18)
         picture.alpha_composite(floor)
     picture.alpha_composite(radial_glow(size, clash, 300 * scale, (255, 220, 170), 0.55))
 
@@ -265,10 +265,10 @@ def main():
     title = outlined_text(size, arguments.title, font("LilitaOne-Regular.ttf", round(150 * scale)), (width * 0.5, height * 0.215),
                           GOLD_TOP, GOLD_BOTTOM, INK, round(11 * scale), (0, round(12 * scale)), tilt=2.0)
     picture.alpha_composite(title)
-    tagline = outlined_text(size, arguments.tagline, font("LilitaOne-Regular.ttf", round(54 * scale)), (width * 0.5, height * 0.765),
+    tagline = outlined_text(size, arguments.tagline, font("LilitaOne-Regular.ttf", round(54 * scale)), (width * 0.5, height * 0.315),
                             (255, 255, 255), (220, 210, 255), INK, round(6 * scale), (0, round(6 * scale)), tilt=2.0)
     picture.alpha_composite(tagline)
-    footer = outlined_text(size, arguments.footer, font("Nunito-Black.ttf", round(34 * scale)), (width * 0.5, height * 0.835),
+    footer = outlined_text(size, arguments.footer, font("Nunito-Black.ttf", round(34 * scale)), (width * 0.5, height * 0.875),
                            (255, 255, 255), (235, 230, 255), INK, round(5 * scale), (0, round(4 * scale)))
     picture.alpha_composite(footer)
 
