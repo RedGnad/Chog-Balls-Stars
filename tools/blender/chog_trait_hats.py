@@ -2191,9 +2191,12 @@ HOODIE = {
 HOOD = {
     "GAP": 0.022,
     "RIM_TAIL": ((110.0, 148.0), (180.0, 156.0)),
-    "SIZE": ((0.0, 1.12), (60.0, 1.20), (180.0, 1.22)),
+    # (1.12, 1.20 and 1.22, and 18 points round the head, until 22 October 2026, evening, the owner: "the right side of the hoods has a
+    # hole". Behind the rim, on one side, the cheek and the eye showed through the hood's wall, which stood too close to the face there;
+    # the gangster's hood, already this size, showed it only with 18 points. Seen gone on both sides of #376 and #537.)
+    "SIZE": ((0.0, 1.14), (60.0, 1.24), (180.0, 1.26)),
     "ROWS": 4,
-    "SIDES": 18,
+    "SIDES": 24,
     "EDGE": (0.034, 74.0),
     "EDGE_STATIONS": 11,
     "OUTLINE_THICKNESS": 0.020,
@@ -3616,7 +3619,10 @@ CLOTHES.update({
                                                "Fin": (0.13, 0.36, 0.66), "Eye": (0.04, 0.06, 0.14),
                                                "Gill": (0.12, 0.34, 0.62)},
                           teeth=True, fin=True,
-                          hood_numbers={"SWELL": (0.085, 0.030, 40.0, 20.0, 26.0), "SIDES": 24}),
+                          # (SIZE as the gangster's hood since 22 October 2026, evening: at 1.20 by the side the cheek showed through
+                          # the hood behind its rim on one side, the owner's "hole".)
+                          hood_numbers={"SWELL": (0.085, 0.030, 40.0, 20.0, 26.0), "SIDES": 24,
+                                        "SIZE": ((0.0, 1.14), (60.0, 1.24), (180.0, 1.26))}),
     # A whole banana round the whole Chog (build_mascot, 16 October 2026, after the owner saw a hood over a
     # suit twice): its five sides from yellow round the face to orange at the feet, green over the head, its
     # stalk at the top; colours measured on #37 (until then a hood with a point over a faceted peel).

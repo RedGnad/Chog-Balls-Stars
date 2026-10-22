@@ -1,5 +1,9 @@
 # État courant et décisions
 
+**22 October 2026, 21:05 UTC (lead: hoods without the hole; deployed).**
+- **Deployed:** build `20261022T210103909Z-cedef602b2444728914d767d8c6f7f3d`, stamp `7e77d8cf4a7c1e99`. The owner: "the right side of the hoods has a hole". Behind the rim, on one side only, the cheek and the eye showed through the hood's wall (#376 shark, #537 gangster, turned around at 1000 points). `HOOD` SIZE 1.14, 1.24, 1.26 (was 1.12, 1.20, 1.22) and 24 points round the head (18); the shark's hood the same size. Sheet `try-hoods.jpg`; both sides checked on the turnaround.
+- **Verified:** export 1,970 Genesis, 0 failed, none over 8,000; 176 view tests; a local siege with the two hooded bots without error; judge fixtures agree.
+
 **22 October 2026, 20:55 UTC (lead: the player profile; deployed).**
 - **Deployed:** build `20261022T204810762Z-0a2072c290e5405fa52f1de5eda02279`, stamp `7e77d8cf4a7c1e99`. The chip at the top left opens a PROFILE (`ChogProfile`): name and CHANGE NAME (the sample's window), the player rank with its tier, points and bar, the verified sieges played and won with the win rate and the last season's tier, the wallet's Genesis (up to eight) with their mastery and matches, the badges they earned. Every number from the services (PlayerRanks, GenesisCareers). Modelled on the profiles of Clash Royale and Brawl Stars (wikis and trackers, not official documents).
 - **Verified:** 176 view tests; the profile with a holder test wallet (not signed in); a local siege without error; judge fixtures agree.
