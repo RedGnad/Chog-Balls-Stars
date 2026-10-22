@@ -7,7 +7,7 @@ import { createCareers } from '../src/career.js';
 import { createMatches, createMemoryStore } from '../src/matches.js';
 import { createReferee, matchKeyOf, resultDigest, ticketDigest, voidDigest } from '../src/referee.js';
 import { createSessions } from '../src/session.js';
-import { createWager, TICKET_SECONDS, wagerNetwork, WEEK_MS, winnerGain } from '../src/wager.js';
+import { createWager, genesisPlayersOf, TICKET_SECONDS, wagerNetwork, WEEK_MS, winnerGain } from '../src/wager.js';
 import { createWallet, hexToBytes } from './wallet.js';
 
 const SECRET = 'a test secret that is long enough to be accepted';
@@ -50,7 +50,7 @@ test('the referee signs the digests the contract computes', () => {
 });
 
 // Services with a wager contract whose stakes the test writes, and a clock the test moves.
-function services({ contractReferee, network = wagerNetwork() } = {}) {
+function services({ contractReferee, network = wagerNetwork(), genesisShare } = {}) {
   const referee = createReferee({ privateKey: REFEREE_KEY, chainId: network.chainId, wager: WAGER });
   // "paid" holds the keys of the matches the contract has settled.
   const state = { clock: 1_790_000_000_000, stakes: new Map(), paid: new Set(), referee: contractReferee ?? referee.address };
@@ -70,7 +70,9 @@ function services({ contractReferee, network = wagerNetwork() } = {}) {
     const staked = state.stakes.get(key) ?? [];
     switch (data.slice(2, 10)) {
       case selector('referee()'): return '0x' + word(state.referee);
-      case selector('burnedShare()'): return '0x' + word(1000);
+      case selector('burnedShare()'): return '0x' + word(genesisShare === undefined ? 1000 : 500);
+      // Version 1 has no genesisShare(): the call fails, which a multicall answers with null.
+      case selector('genesisShare()'): return genesisShare === undefined ? null : '0x' + word(genesisShare);
       case selector('matchOf(bytes32)'):
         return '0x' + word(staked.length > 0 ? (state.paid.has(key) ? 2 : 1) : 0) + word(staked.length > 0 ? 25n * 10n ** 18n : 0) + word(staked.length > 0 ? 1_790_000_000 : 0)
           + word(staked.filter(stake => stake.team === 0).length) + word(staked.filter(stake => stake.team === 1).length);
@@ -125,7 +127,7 @@ test('the game is told where to stake, and nothing when the contract knows anoth
   assert.deepEqual(described, {
     enabled: true, address: WAGER, token: '0x350035555e10d9afaf1566aaebfced5ba6c27777', chainId: 143, chainName: 'Monad',
     rpcUrl: 'https://rpc.monad.xyz', test: false, referee: referee.address,
-    burnedShare: 1000, ticketSeconds: TICKET_SECONDS, refundAfterSeconds: 3600,
+    burnedShare: 1000, genesisShare: 0, version: 1, ticketSeconds: TICKET_SECONDS, refundAfterSeconds: 3600,
   });
   const other = services({ contractReferee: '0x' + 'cc'.repeat(20) });
   assert.equal((await call(other.api, 'GET', '/api/wager')).body.enabled, false);
@@ -235,8 +237,8 @@ test('a ticket that ran out no longer holds the lock back', async () => {
 });
 
 // Both stake, the stakes are locked five seconds after the start, the match is judged.
-async function stakedAndJudged(judged, { lock = true, lateStake = false, lockAfterSeconds = 5 } = {}) {
-  const made = services();
+async function stakedAndJudged(judged, { lock = true, lateStake = false, lockAfterSeconds = 5, genesisShare } = {}) {
+  const made = services({ genesisShare });
   const { api, matches, state } = made;
   await matchOfTwo(matches);
   const alice = await sessionOf(api, ALICE);
@@ -354,4 +356,36 @@ test('a match that is not judged yet counts as pending, and one called off as gi
   // Without a store nothing is noted, and the week is not answered.
   const plain = createWager({ chain: { callMany: async () => [] }, matches, network: wagerNetwork(), referee: createReferee({ privateKey: REFEREE_KEY, chainId: 143, wager: WAGER }) });
   assert.deepEqual(await plain.weekOf({ address: ALICE.address }), { enabled: false });
+});
+
+test('version 2 signs the wallets that played a Genesis with the result, as Solidity encodes them', async () => {
+  // abi.encode(RESULT, 143, wager, keccak256("eu:test"), 1, [0x11..11, 0x22..22]), hashed by cast on 22 October 2026.
+  const matchKey = matchKeyOf('eu:test');
+  const genesisPlayers = ['0x' + '11'.repeat(20), '0x' + '22'.repeat(20)];
+  assert.equal(resultDigest({ chainId: 143, wager: WAGER, matchKey, winnerTeam: 1, genesisPlayers }),
+    '0xff142f94f8dbc90360373c33f68a3c62df7bc94ef60be9c458922e142cf28248');
+  assert.notEqual(resultDigest({ chainId: 143, wager: WAGER, matchKey, winnerTeam: 1, genesisPlayers: [] }),
+    resultDigest({ chainId: 143, wager: WAGER, matchKey, winnerTeam: 1 }), 'an empty list is still a list for version 2');
+  assert.throws(() => resultDigest({ chainId: 143, wager: WAGER, matchKey, winnerTeam: 1, genesisPlayers: Array(7).fill(genesisPlayers[0]) }), /at most six/);
+
+  const { api, result, key, referee } = await stakedAndJudged(verdict(), { genesisShare: 500 });
+  const described = (await call(api, 'GET', '/api/wager')).body;
+  assert.deepEqual([described.version, described.burnedShare, described.genesisShare], [2, 500, 500]);
+  // Alice played the Genesis #1795, Bob the recruit: only Alice is paid the share.
+  assert.deepEqual(result.genesisPlayers, [ALICE.address.toLowerCase()]);
+  assert.equal(signerOf(resultDigest({ chainId: 143, wager: WAGER, matchKey: key, winnerTeam: 1, genesisPlayers: result.genesisPlayers }), result.signature), referee.address);
+});
+
+test('the Genesis players of a match are the wallets the judge saw with their Genesis, a stand-in excepted', () => {
+  const match = {
+    verdict: { players: [{ player: 2, team: 1, tokenId: 9 }, { player: 0, team: 0, tokenId: 1795 }, { player: 1, team: 0, tokenId: 0 }, { player: 3, team: 1, tokenId: 44 }, { player: 4, team: 1, tokenId: 12 }] },
+    admissions: [
+      { player: 0, address: '0xAA' + 'a'.repeat(38), tokenId: 1795 },
+      { player: 1, address: '0x' + 'b'.repeat(40), tokenId: 0 },
+      { player: 2, address: '0x' + 'c'.repeat(40), tokenId: 9, standIn: true },
+      { player: 3, address: null, tokenId: 44 },
+      { player: 4, address: '0x' + 'e'.repeat(40), tokenId: 13 },
+    ],
+  };
+  assert.deepEqual(genesisPlayersOf(match), ['0x' + 'a'.repeat(40)], 'the judged Genesis, a signed-in wallet, not a stand-in, the same Genesis it was let in with');
 });

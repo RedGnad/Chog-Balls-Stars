@@ -64,10 +64,19 @@ export function ticketDigest({ chainId, wager, matchKey, player, team, amount, d
 }
 
 /** What a result signs: this team won this match (0 or 1), or nobody did (2). */
-export function resultDigest({ chainId, wager, matchKey, winnerTeam }) {
-  return digestOf(RESULT, word(chainId, 'chainId'), addressWord(wager, 'wager'), keyWord(matchKey),
-    teamWord(winnerTeam, DRAW, 'winnerTeam'));
+export function resultDigest({ chainId, wager, matchKey, winnerTeam, genesisPlayers }) {
+  const fixed = [RESULT, word(chainId, 'chainId'), addressWord(wager, 'wager'), keyWord(matchKey), teamWord(winnerTeam, DRAW, 'winnerTeam')];
+  // Version 1 of the contract signs the result alone; version 2 (22 October 2026) signs with it the
+  // wallets that played a Genesis, an address[]: abi.encode puts its offset (six words in) among
+  // the fixed words, then its length and its addresses.
+  if (genesisPlayers === undefined) return digestOf(...fixed);
+  if (!Array.isArray(genesisPlayers) || genesisPlayers.length > MAX_GENESIS_PLAYERS) throw new Error('genesisPlayers is a list of at most six addresses');
+  return digestOf(...fixed, word(6 * 32, 'offset'), word(genesisPlayers.length, 'length'),
+    ...genesisPlayers.map(address => addressWord(address, 'genesisPlayers')));
 }
+
+/** A result names no more Genesis players than a match has players (ChogWager.MAX_GENESIS_PLAYERS). */
+export const MAX_GENESIS_PLAYERS = 6;
 
 /** What calling a match off signs. */
 export function voidDigest({ chainId, wager, matchKey }) {
@@ -106,7 +115,8 @@ export function createReferee({ privateKey, chainId, wager }) {
     matchKeyOf,
     /** amount and deadline as decimal digits or BigInt; deadline in seconds, as the chain counts time. */
     signTicket: ({ matchKey, player, team, amount, deadline }) => sign(ticketDigest({ chainId, wager: contract, matchKey, player, team, amount, deadline })),
-    signResult: ({ matchKey, winnerTeam }) => sign(resultDigest({ chainId, wager: contract, matchKey, winnerTeam })),
+    signResult: ({ matchKey, winnerTeam, genesisPlayers }) =>
+      sign(resultDigest({ chainId, wager: contract, matchKey, winnerTeam, genesisPlayers })),
     signVoid: ({ matchKey }) => sign(voidDigest({ chainId, wager: contract, matchKey })),
   };
 }

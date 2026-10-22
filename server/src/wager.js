@@ -23,7 +23,7 @@ import { keccak_256 } from '@noble/hashes/sha3.js';
 import { DEFAULT_RPC_URLS, isAddress } from './chain.js';
 import { folderOf } from './matches.js';
 import { listOf } from './rental.js';
-import { matchKeyOf } from './referee.js';
+import { MAX_GENESIS_PLAYERS, matchKeyOf } from './referee.js';
 import { CHOG_TOKEN } from './shop.js';
 
 // The chains a wager can be on, with the public endpoints the Monad documentation lists for
@@ -80,6 +80,8 @@ const selector = signature => toHex(keccak_256(encoder.encode(signature)).slice(
 
 const REFEREE = selector('referee()');
 const BURNED_SHARE = selector('burnedShare()');
+// Version 2 of the contract only (22 October 2026): a call to version 1 fails, and the services sign as for it.
+const GENESIS_SHARE = selector('genesisShare()');
 const MATCH_OF = selector('matchOf(bytes32)');
 const STAKERS_OF = selector('stakersOf(bytes32)');
 
@@ -91,10 +93,27 @@ const sameBook = (a, b) => a.length === b.length
  * the losers staked, less the burned share, as the contract pays it (settle). Zero when a side
  * has nobody, which the contract refunds.
  */
-export function winnerGain(stakeWei, winners, losers, burnedShare) {
+export function winnerGain(stakeWei, winners, losers, burnedShare, genesisShare = 0) {
   if (winners <= 0 || losers <= 0) return 0n;
   const lost = BigInt(stakeWei) * BigInt(losers);
-  return (lost - lost * BigInt(burnedShare) / BASIS_POINTS) / BigInt(winners);
+  return (lost - lost * BigInt(burnedShare) / BASIS_POINTS - lost * BigInt(genesisShare) / BASIS_POINTS) / BigInt(winners);
+}
+
+/**
+ * The wallets that played a Chog Genesis in a judged match, as version 2 of the contract pays them:
+ * each player the judge saw with a Genesis, whose admission names that Genesis and a signed-in
+ * wallet (owner, renter or guest; a stand-in is a bot), in the order of the players, once each.
+ */
+export function genesisPlayersOf(match) {
+  const found = [];
+  for (const played of [...(match.verdict?.players ?? [])].sort((a, b) => a.player - b.player)) {
+    if (!(played.tokenId > 0)) continue;
+    const admission = match.admissions.findLast(candidate => candidate.player === played.player && Number.isInteger(candidate.player));
+    if (!admission || admission.standIn || admission.tokenId !== played.tokenId || !admission.address) continue;
+    const address = admission.address.toLowerCase();
+    if (!found.includes(address)) found.push(address);
+  }
+  return found.slice(0, MAX_GENESIS_PLAYERS);
 }
 
 /**
@@ -124,18 +143,26 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
   async function describe() {
     if (!contract) return { enabled: false };
     if (!settings || now() - settings.readAt > SETTINGS_KEPT_MS) {
-      const [signer, share] = await chain.callMany([{ to: contract, data: '0x' + REFEREE }, { to: contract, data: '0x' + BURNED_SHARE }]);
+      const [signer, share, genesis] = await chain.callMany([
+        { to: contract, data: '0x' + REFEREE }, { to: contract, data: '0x' + BURNED_SHARE }, { to: contract, data: '0x' + GENESIS_SHARE },
+      ]);
       if (typeof signer !== 'string' || signer.length !== 66 || typeof share !== 'string' || share.length !== 66) {
         throw new Error(`The wager contract ${contract} did not answer referee() and burnedShare()`);
       }
-      settings = { readAt: now(), referee: '0x' + signer.slice(-40).toLowerCase(), burnedShare: Number(BigInt(share)) };
+      // No genesisShare(): version 1, which takes no list of Genesis players with a result.
+      const version2 = typeof genesis === 'string' && genesis.length === 66;
+      settings = {
+        readAt: now(), referee: '0x' + signer.slice(-40).toLowerCase(), burnedShare: Number(BigInt(share)),
+        genesisShare: version2 ? Number(BigInt(genesis)) : null,
+      };
     }
     // The contract only listens to the referee it knows: with another key here no ticket would work.
     if (settings.referee !== referee.address) return { enabled: false, reason: 'the contract knows another referee' };
     return {
       enabled: true, address: contract, token: network.token, chainId: network.chainId, chainName: network.chainName,
       rpcUrl: network.publicRpcUrl, test: network.test, referee: referee.address,
-      burnedShare: settings.burnedShare, ticketSeconds: TICKET_SECONDS, refundAfterSeconds: REFUND_AFTER_SECONDS,
+      burnedShare: settings.burnedShare, genesisShare: settings.genesisShare ?? 0, version: settings.genesisShare === null ? 1 : 2,
+      ticketSeconds: TICKET_SECONDS, refundAfterSeconds: REFUND_AFTER_SECONDS,
     };
   }
 
@@ -286,7 +313,16 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
       if (!played) return calledOff('a staker did not play the match');
       if (played.team !== staker.team) return calledOff('a staker did not play in the team staked on');
     }
-    return { matchKey, winnerTeam: verdict.winnerTeam, signature: referee.signResult({ matchKey, winnerTeam: verdict.winnerTeam }) };
+    if (!settings) await describe();
+    if (settings.genesisShare === null) {
+      return { matchKey, winnerTeam: verdict.winnerTeam, signature: referee.signResult({ matchKey, winnerTeam: verdict.winnerTeam }) };
+    }
+    // Version 2: the wallets that played a Genesis are paid their share with the result, signed with it.
+    const genesisPlayers = genesisPlayersOf(match);
+    return {
+      matchKey, winnerTeam: verdict.winnerTeam, genesisPlayers,
+      signature: referee.signResult({ matchKey, winnerTeam: verdict.winnerTeam, genesisPlayers }),
+    };
   }
 
   /**
