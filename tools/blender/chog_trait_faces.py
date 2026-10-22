@@ -1517,19 +1517,19 @@ EYES_OF_SIDE = {
         # The lasers of Side=Left: lidded eyes, and beams of other colours (CHOG #893, #252, #565, #1658),
         # most of their sides the light core with an edge of the darker colour under it.
         "Purple laser": {
-            "kind": "Laser", "eyes": "lidded",
+            "kind": "Laser", "eyes": "lidded", "eye_numbers": {"EYES": SIDE_LEFT_EYES},
             "colours": {"Dark": DARK, "Beam": (0.36, 0.34, 0.90), "Core": (0.95, 0.62, 0.93)},
             "unlit": ("Dark", "Beam", "Core"),
             "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.019, "BEAM_PITCH_DEG": 8.0},
         },
         "fire laser": {
-            "kind": "Laser", "eyes": "lidded",
+            "kind": "Laser", "eyes": "lidded", "eye_numbers": {"EYES": SIDE_LEFT_EYES},
             "colours": {"Dark": DARK, "Beam": (0.90, 0.16, 0.14), "Core": (0.76, 0.90, 0.28)},
             "unlit": ("Dark", "Beam", "Core"),
             "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.019, "BEAM_PITCH_DEG": 8.0},
         },
         "cyan laser": {
-            "kind": "Laser", "eyes": "lidded",
+            "kind": "Laser", "eyes": "lidded", "eye_numbers": {"EYES": SIDE_LEFT_EYES},
             "colours": {"Dark": DARK, "Beam": (0.14, 0.24, 0.62), "Core": (0.34, 0.84, 0.95)},
             "unlit": ("Dark", "Beam", "Core"),
             "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.019, "BEAM_PITCH_DEG": 8.0},

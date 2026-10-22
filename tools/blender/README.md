@@ -1510,3 +1510,10 @@ Sheet, 10 Genesis, the art beside the front and the three quarter close, before 
 Unlike the bare eyes of batches 4 and 5, these are objects worn over the eyes and the pictures draw them as a pair of equal pieces: no per-eye difference to add. Changed: the headsets (Classic and Modern VR) are taller,
 a rounded visor 0.072 high in the middle (0.064). Approximate, not changed: Modern VR's glossy rim and its curved glint are plainer than the art's; the 3D Glass lenses are a little larger and the frame a little thinner than the art's;
 the BTC coins are a little smaller than the art's; Thug is as drawn.
+
+## 22 October 2026: strict eye audit, batch 7: the Left lasers (lot 8)
+
+Purple, fire and cyan laser on Side Left (68 Origin and 3 Skull Genesis; #127, #137, #252, #36, #25, #28, #418, #1426). Sheet, 5 Genesis, the art beside the front and three quarter close, before | after:
+[heroes-eyes-batch7-lasers-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch7-lasers-2026-10-22.jpg). The beam already started at the middle of the visible eye (lot 8, `centroid`); what was wrong is that the eyes were two equal lidded eyes where the pictures
+draw, as on every Side Left value, a large flat near eye and a small narrow far one: the three Left laser entries now take `SIDE_LEFT_EYES` (`eye_numbers`), and each beam leaves the middle of its own eye. Seen from the front the beam is a coloured patch
+at the middle of the eye, as in the art. Approximate: the beams stay short stubs (the game draws the long beam when the hero attacks), the art's near eye is a little wider.
