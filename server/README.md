@@ -38,6 +38,9 @@ serves the game, the hero page, the portraits and the services from one process
 | `GET /api/rental` | the rental contract, the token, the longest rental in days and the share burned, in hundredths of a percent; `{"enabled": false}` when no rental is set up | anyone |
 | `GET /api/rental/offers` | every Genesis its holder offers for rent now: token id, price a day, holder | anyone |
 | `GET /api/rental/rented?address=0x…` | the Genesis that address rents now, each with the second its rental ends | anyone |
+| `GET /api/rank/me` with `Authorization: Bearer <session>` | the player ladder of that wallet (`rank`: points, tier, last match, last season reset), its hidden rating as a band only (`rating`), the season and its summary (`season`), the state of its latest match; `{"enabled": false}` without the ladder | the signed-in wallet |
+| `GET /api/season` | the ladder season: id, start, end, whether it ended and was closed; `{"enabled": false}` without one | anyone |
+| `GET /api/season/rewards?season=<id>` | once that season was closed here: every wallet that played in it, with its final tier and points, for the $CHOG reward paid elsewhere; 404 before | anyone |
 | `GET /api/wallet` | `{"reownProjectId": "…"}`: what the game page needs to connect a wallet app when the browser has no wallet; an empty text when none is set, and the page then offers no such connection | anyone |
 
 A result sent with a session by an address that does not hold the Genesis is accepted when that

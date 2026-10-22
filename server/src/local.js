@@ -124,7 +124,7 @@ const judge = verifier
   : null;
 const photon = createPhoton({
   secret: await photonSecret(dataFolder, option('--photon-secret')),
-  sessions, careers, chain, shop, rental, matches,
+  sessions, careers, chain, shop, rental, matches, ratingBandOf: address => ranks.bandOf(address),
   onReplayEnded: judge ? async gameId => {
     const verdict = await judge.judge(gameId);
     if (verdict) await ranks.record(gameId, verdict);
@@ -137,6 +137,7 @@ const handle = createApi({
   rental,
   careers,
   ranks,
+  seasons,
   matches,
   sessions,
   photon,

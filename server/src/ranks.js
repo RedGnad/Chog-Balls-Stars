@@ -12,6 +12,7 @@
 // Every event freezes the numbers it was scored with, so a later change alters no past result.
 import { folderOf } from './matches.js';
 import { isAddress } from './chain.js';
+import { RATING, UNRATED_BAND, bandFor, computeRatings } from './rating.js';
 
 export const TIERS = [
   { name: 'BRONZE', at: 0 },
@@ -258,5 +259,45 @@ export function createRanks({ store, matches, now = Date.now }) {
     return resets;
   }
 
-  return { record, eventOf, of, standingOf, timelineOf, allEvents, allResets, wallets, resetSeason };
+  /**
+   * What a wallet did between "startsAt" (inclusive; null for the beginning) and "endsAt"
+   * (inclusive): matches and wins in that window, the best tier it held in it (its tier at the
+   * start counts), and the points and tier it ended on, before any reset at the end.
+   */
+  async function summaryOf(address, { startsAt = null, endsAt }) {
+    const steps = await timelineOf(address, { until: endsAt });
+    let points = 0;
+    let matchesPlayed = 0;
+    let wins = 0;
+    let best = 0;
+    for (const step of steps) {
+      if (startsAt !== null && step.at < startsAt) { points = step.after; continue; }
+      if (step.kind === 'reset') { if (step.at < endsAt) points = step.after; continue; }
+      points = step.after;
+      matchesPlayed++;
+      if (step.outcome === 'win') wins++;
+      best = Math.max(best, points);
+    }
+    const started = startsAt === null ? 0 : (steps.findLast(step => step.at < startsAt)?.after ?? 0);
+    best = Math.max(best, started);
+    return { points, tier: tierFor(points), bestTier: tierFor(best), matches: matchesPlayed, wins };
+  }
+
+  /**
+   * The hidden rating of a wallet (rating.js), computed from every match event where
+   * authenticated humans faced each other; a wallet never rated starts at 1500 with 0 matches.
+   * Never answered to a page as a number: the API gives bandOf.
+   */
+  async function ratingOf(address) {
+    const rated = computeRatings(await allEvents()).get(address.toLowerCase());
+    const rating = rated?.rating ?? RATING.start;
+    return { rating, matches: rated?.matches ?? 0, band: bandFor(rating) };
+  }
+
+  /** The matchmaking band of a wallet: what a room it creates carries, and what it filters on. */
+  async function bandOf(address) {
+    return isAddress(address) ? (await ratingOf(address)).band : UNRATED_BAND;
+  }
+
+  return { record, eventOf, of, standingOf, timelineOf, summaryOf, allEvents, allResets, wallets, resetSeason, ratingOf, bandOf };
 }

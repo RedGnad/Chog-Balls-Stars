@@ -268,6 +268,7 @@ const api = createApi({
   standIns,
   careers,
   ranks,
+  seasons,
   rankStorageStatus,
   matches,
   recentRecords: () => recent,
@@ -275,6 +276,9 @@ const api = createApi({
   photon: createPhoton({
     secret: await photonSecret(dataFolder, environment.PHOTON_SECRET),
     sessions, careers, chain, shop, rental, standIns, matches, build: photonVersion,
+    // The band written on every room created (C0) waits for a check of a public room creation:
+    // a refused shape would block every match, and no page filters on it yet.
+    ratingBandOf: ranks && environment.RATING_BAND_ROOMS === '1' ? address => ranks.bandOf(address) : undefined,
     previewBuilds: (environment.PREVIEW_BUILDS ?? '').trim(),
     onReplayEnded: judge ? gameId => judgeAndRecord(gameId) : undefined,
   }),

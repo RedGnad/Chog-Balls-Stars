@@ -23,6 +23,8 @@ import { buildOf } from './modes.js';
 // Mastery level from which a Genesis plays its second form (GenesisForms.UnlockLevel in the game).
 const SECOND_FORM_MASTERY_LEVEL = 2;
 const NO_ASSET = { Id: { Value: 0 } };
+// The SQL lobby property that carries the creator's matchmaking band (Photon's "C0" to "C9").
+export const RATING_BAND_KEY = 'C0';
 
 const encoder = new TextEncoder();
 
@@ -53,13 +55,16 @@ const refused = (error, message) => ({ status: 400, body: { Status: 400, Error: 
  * @param {ReturnType<import('./matches.js').createMatches>} options.matches
  * @param {(gameId: string) => Promise<void>} [options.onReplayEnded] called once when the last
  *   slice of a match's input history was kept; its failure is logged and changes no answer
+ * @param {(address: string | null) => Promise<number>} [options.ratingBandOf] the matchmaking band
+ *   of a wallet (ranks.js): when given, every room created carries it as the SQL lobby property
+ *   "C0", set here from the creator's cookie so that a page cannot claim another band
  * @param {string | (() => Promise<string>)} [options.build] the build of the game these
  *   services serve and can judge, as that build names itself to Photon (its AppVersion), or a
  *   function that reads it (a site folder can be assembled again while the services run); a
  *   room of another build is refused. Empty when the services do not know what they serve:
  *   every room is then accepted
  */
-export function createPhoton({ secret, sessions, careers, chain, shop, rental, standIns, matches, onReplayEnded, build = '', previewBuilds = '' }) {
+export function createPhoton({ secret, sessions, careers, chain, shop, rental, standIns, matches, onReplayEnded, ratingBandOf, build = '', previewBuilds = '' }) {
   if (typeof secret !== 'string' || secret.length < 32) throw new Error('The Photon secret must be at least 32 characters');
   const servedNow = typeof build === 'function' ? build : async () => build;
 
@@ -189,11 +194,27 @@ export function createPhoton({ secret, sessions, careers, chain, shop, rental, s
         return refused('AnotherBuild', 'this page runs another version of the game than the one served here: load it again');
       }
       const gameId = `${request.GameId}~${randomName('')}`;
+      // The creator's matchmaking band, written on the room by these services (RATING_BAND_KEY),
+      // so that the lobby filter of other pages sees a band the creator cannot choose.
+      const creator = request.AuthCookie?.address;
+      const ratingBand = ratingBandOf ? await ratingBandOf(isAddress(creator) ? creator : null) : null;
       await matches.entered(gameId, {
         how: 'create', userId: request.UserId, authCookie: request.AuthCookie ?? null,
-        app: { appId: request.AppId, appVersion: request.AppVersion, region: request.Region, cloud: request.Cloud, roomName: request.RoomName },
+        app: { appId: request.AppId, appVersion: request.AppVersion, region: request.Region, cloud: request.Cloud, roomName: request.RoomName, ratingBand },
       });
-      return accepted({ GameId: gameId });
+      if (ratingBand === null) return accepted({ GameId: gameId });
+      const asked = request.EnterRoomParams?.RoomOptions ?? {};
+      const listed = Array.isArray(asked.CustomRoomPropertiesForLobby) ? asked.CustomRoomPropertiesForLobby.filter(key => key !== RATING_BAND_KEY) : [];
+      return accepted({
+        GameId: gameId,
+        EnterRoomParams: {
+          RoomOptions: {
+            CustomRoomProperties: { ...(asked.CustomRoomProperties && typeof asked.CustomRoomProperties === 'object' ? asked.CustomRoomProperties : {}), [RATING_BAND_KEY]: ratingBand },
+            // Photon lists at most three properties in a lobby: the band and the first two the page asked for.
+            CustomRoomPropertiesForLobby: [RATING_BAND_KEY, ...listed.slice(0, 2)],
+          },
+        },
+      });
     },
     'game/join': async request => {
       await matches.entered(request.GameId, { how: 'join', userId: request.UserId, authCookie: request.AuthCookie ?? null });
