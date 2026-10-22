@@ -162,7 +162,7 @@ namespace Chog.Screens
             }
 
             var mine = GenesisWager.Outcome == WagerOutcome.Won && GenesisWager.WinnerTeam == GenesisWager.LastTeam;
-            var gain = GenesisWager.WinnerGain(GenesisWager.LastStakeWei, GenesisWager.LastWinners, GenesisWager.LastLosers, GenesisWager.BurnedShare);
+            var gain = GenesisWager.WinnerGain(GenesisWager.LastStakeWei, GenesisWager.LastWinners, GenesisWager.LastLosers, GenesisWager.TakenShare);
             var (line, button) = Describe(GenesisWager.Outcome, GenesisWager.LastChainState, mine, GenesisWager.LastStakeWei, gain,
                 GenesisWager.CalledOffBecause, GenesisWager.CanClaim, GenesisWager.Currency, GenesisWager.IsTest ? 0 : ChogPrice.UsdPerChog);
             _text.text = line;

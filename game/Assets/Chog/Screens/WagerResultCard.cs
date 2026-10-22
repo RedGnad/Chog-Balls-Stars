@@ -116,11 +116,13 @@ namespace Chog.Screens
 
             var outcome = GenesisWager.Outcome;
             var mine = outcome == WagerOutcome.Won && GenesisWager.WinnerTeam == GenesisWager.LastTeam;
-            var gain = GenesisWager.WinnerGain(GenesisWager.LastStakeWei, GenesisWager.LastWinners, GenesisWager.LastLosers, GenesisWager.BurnedShare);
+            var gain = GenesisWager.WinnerGain(GenesisWager.LastStakeWei, GenesisWager.LastWinners, GenesisWager.LastLosers, GenesisWager.TakenShare);
             var usdPerChog = GenesisWager.IsTest ? 0 : ChogPrice.UsdPerChog;
             var (title, amount, detail) = Describe(outcome, mine, GenesisWager.LastStakeWei, gain, GenesisWager.Currency, usdPerChog);
             _title.text = title;
-            _detail.text = detail;
+            // Version 2 of the wager: a wallet that played a Genesis earns its part of the lost stakes, won or lost.
+            var asGenesis = GenesisWager.EarnedAsGenesisPlayer();
+            _detail.text = asGenesis != "0" ? detail + "\nyour Genesis earns +" + ChogPrice.WithUsd(asGenesis, usdPerChog, GenesisWager.Currency) : detail;
             var decided = outcome == WagerOutcome.Won || outcome == WagerOutcome.Draw || outcome == WagerOutcome.CalledOff;
             _amount.color = outcome == WagerOutcome.Won && mine && gain != "0" ? ChogTheme.Hex("FFE27A")
                 : outcome == WagerOutcome.Won && !mine ? ChogTheme.Hex("FF9C8A") : Color.white;

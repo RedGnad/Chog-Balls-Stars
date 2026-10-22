@@ -82,7 +82,8 @@ namespace Chog.Match
     public static class GenesisWager
     {
         private const string StakeSelector = "0x0a621329";  // stake(bytes32,uint8,uint256,uint256,bytes)
-        private const string SettleSelector = "0x99bcbc7f"; // settle(bytes32,uint8,bytes)
+        private const string SettleSelector = "0x99bcbc7f"; // settle(bytes32,uint8,bytes), version 1
+        private const string SettleWithGenesisSelector = "0x061ab97d"; // settle(bytes32,uint8,address[],bytes), version 2
         private const string VoidSelector = "0xe3c01265";   // voidMatch(bytes32,bytes)
         private const string TapSelector = "0x4e71d92d";    // claim() of the test token
 
@@ -123,6 +124,18 @@ namespace Chog.Match
         /// <summary>The share of what the losers staked that is burned, in hundredths of a percent.</summary>
         public static int BurnedShare { get; private set; }
 
+        /// <summary>
+        /// Share of the lost stakes, in basis points, split between the Genesis players of a match:
+        /// version 2 of the contract (22 October 2026); 0 on version 1.
+        /// </summary>
+        public static int GenesisShare { get; private set; }
+
+        /// <summary>The version of the wager contract: 2 pays the Genesis players of a match.</summary>
+        public static int Version { get; private set; } = 1;
+
+        /// <summary>What is taken from the lost stakes before the winners share them: burned, and the Genesis players' share.</summary>
+        public static int TakenShare => BurnedShare + GenesisShare;
+
         /// <summary>Whether the services know the match the signed-in wallet is in.</summary>
         public static bool InMatch { get; private set; }
 
@@ -160,6 +173,8 @@ namespace Chog.Match
 
         private static string s_lastMatchKey = "";
         private static string s_decisionSignature = "";
+        // The wallets the referee signed as the Genesis players of the last match (version 2).
+        private static string[] s_genesisPlayers = Array.Empty<string>();
 
         /// <summary>Whether the week of the signed-in wallet was read (ReadWeek), and for which address.</summary>
         public static bool WeekRead => s_weekOf.Length == 42 && s_weekOf == PlayerWallet.Address;
@@ -185,6 +200,8 @@ namespace Chog.Match
             public string address;
             public string token;
             public int burnedShare;
+            public int genesisShare;
+            public int version;
             public int chainId;
             public string chainName;
             public string rpcUrl;
@@ -261,6 +278,7 @@ namespace Chog.Match
             public bool @void;
             public string why;
             public string signature;
+            public string[] genesisPlayers;
             public StakesAnswer stakes;
         }
 
@@ -297,6 +315,8 @@ namespace Chog.Match
                 Address = answer.address ?? "";
                 Token = answer.token ?? "";
                 BurnedShare = answer.burnedShare;
+                GenesisShare = answer.genesisShare;
+                Version = answer.version >= 2 ? 2 : 1;
                 Chain = chain ?? MonadTransactions.Mainnet;
                 IsTest = answer.test;
                 Debug.Log("CHOG_WAGER " + (State == WagerState.Open ? "open on " + Chain.Name + " (" + Chain.HexId + ")" : "closed"));
@@ -464,6 +484,7 @@ namespace Chog.Match
                     WinnerTeam = answer.winnerTeam;
                     CalledOffBecause = answer.why ?? "";
                     s_decisionSignature = answer.signature ?? "";
+                    s_genesisPlayers = answer.genesisPlayers ?? Array.Empty<string>();
                     LastChainState = answer.stakes != null ? answer.stakes.state ?? "" : "";
                     LastWinners = 0;
                     LastLosers = 0;
@@ -530,7 +551,7 @@ namespace Chog.Match
             var sender = PlayerWallet.Address;
             var data = Outcome == WagerOutcome.CalledOff
                 ? VoidData(s_lastMatchKey, s_decisionSignature)
-                : SettleData(s_lastMatchKey, WinnerTeam, s_decisionSignature);
+                : SettleData(s_lastMatchKey, WinnerTeam, s_decisionSignature, Version >= 2 ? s_genesisPlayers : null);
             SetStep(WagerStep.Switching, WagerAction.Claim, "");
             MonadTransactions.SwitchTo(Chain, () =>
             {
@@ -738,10 +759,45 @@ namespace Chog.Match
                 + MonadTransactions.Word(deadline) + MonadTransactions.Word(5 * 32) + Bytes(signature);
         }
 
-        /// <summary>The call that pays a match on the result the referee signed.</summary>
-        public static string SettleData(string matchKey, int winnerTeam, string signature)
+        /// <summary>
+        /// The call that pays a match on the result the referee signed; on version 2, with the wallets
+        /// that played a Genesis (null for version 1): the list, then the signature, after the head.
+        /// </summary>
+        public static string SettleData(string matchKey, int winnerTeam, string signature, string[] genesisPlayers = null)
         {
-            return SettleSelector + matchKey.Substring(2) + MonadTransactions.Word(winnerTeam) + MonadTransactions.Word(3 * 32) + Bytes(signature);
+            if (genesisPlayers == null)
+                return SettleSelector + matchKey.Substring(2) + MonadTransactions.Word(winnerTeam) + MonadTransactions.Word(3 * 32) + Bytes(signature);
+
+            var list = MonadTransactions.Word(genesisPlayers.Length);
+            foreach (var player in genesisPlayers)
+                list += MonadTransactions.AddressWord(player);
+            return SettleWithGenesisSelector + matchKey.Substring(2) + MonadTransactions.Word(winnerTeam)
+                + MonadTransactions.Word(4 * 32) + MonadTransactions.Word(4 * 32 + 32 * (1 + genesisPlayers.Length))
+                + list + Bytes(signature);
+        }
+
+        /// <summary>
+        /// What one Genesis player of the last match earns, in the smallest unit, when the connected
+        /// wallet is one of them and the match was won by a side ("0" otherwise): an equal part of the
+        /// Genesis share of what the losers staked.
+        /// </summary>
+        public static string EarnedAsGenesisPlayer()
+        {
+            if (Version < 2 || Outcome != WagerOutcome.Won || s_genesisPlayers.Length == 0)
+                return "0";
+            var mine = false;
+            foreach (var player in s_genesisPlayers)
+                mine |= string.Equals(player, PlayerWallet.Address, StringComparison.OrdinalIgnoreCase);
+            return mine ? GenesisPlayerShare(LastStakeWei, LastLosers, GenesisShare, s_genesisPlayers.Length) : "0";
+        }
+
+        /// <summary>One Genesis player's part, as the contract pays it: lost stakes times the share, split equally.</summary>
+        public static string GenesisPlayerShare(string stakeWei, int losers, int genesisShare, int genesisPlayers)
+        {
+            if (!MonadTransactions.IsDigits(stakeWei) || losers <= 0 || genesisPlayers <= 0)
+                return "0";
+            var lost = BigInteger.Parse(stakeWei, CultureInfo.InvariantCulture) * losers;
+            return (lost * Mathf.Clamp(genesisShare, 0, 10000) / 10000 / genesisPlayers).ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>The call that gives every stake of a match back on the referee's signature.</summary>

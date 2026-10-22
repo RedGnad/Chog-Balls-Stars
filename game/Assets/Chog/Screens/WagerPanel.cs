@@ -242,7 +242,7 @@ namespace Chog.Screens
             _status.text = busy
                 ? StepText(GenesisWager.Step, GenesisWager.Doing, GenesisWager.LockWaitSeconds, GenesisWager.Problem, GenesisWager.Chain.Name)
                 : StatusText(signedIn, GenesisWager.InMatch, GenesisWager.Locked, stakers.Count, GenesisWager.StakeWei, stakedTeam,
-                    winners, stakers.Count - winners, GenesisWager.BurnedShare, currency, usdPerChog);
+                    winners, stakers.Count - winners, GenesisWager.TakenShare, currency, usdPerChog);
             var tap = signedIn && stakedTeam < 0 && GenesisWager.CanTakeTestTokens;
             _tap.gameObject.SetActive(tap);
             _status.rectTransform.anchorMax = tap ? StatusMaxBesideTap : StatusMax;

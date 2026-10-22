@@ -62,6 +62,30 @@ namespace Chog.Match.Tests
                 GenesisWager.VoidData(Key, Signature));
         }
 
+        [Test]
+        public void VersionTwoPaysWithTheGenesisPlayersAsTheContractReadsThem()
+        {
+            // cast calldata "settle(bytes32,uint8,address[],bytes)" with these values, 22 October 2026.
+            Assert.AreEqual(
+                "0x061ab97d" + Key.Substring(2) +
+                "0000000000000000000000000000000000000000000000000000000000000001" +
+                "0000000000000000000000000000000000000000000000000000000000000080" +
+                "00000000000000000000000000000000000000000000000000000000000000e0" +
+                "0000000000000000000000000000000000000000000000000000000000000002" +
+                "0000000000000000000000001111111111111111111111111111111111111111" +
+                "0000000000000000000000002222222222222222222222222222222222222222" + SignatureWords,
+                GenesisWager.SettleData(Key, 1, Signature, new[] { "0x1111111111111111111111111111111111111111", "0x2222222222222222222222222222222222222222" }));
+        }
+
+        [TestCase(3, 500, 2, "1875000000000000000", TestName = "Three lost stakes, a twentieth, two Genesis players")]
+        [TestCase(1, 500, 1, "1250000000000000000", TestName = "One lost stake, a twentieth, one Genesis player")]
+        [TestCase(2, 0, 2, "0", TestName = "Version 1: no share")]
+        [TestCase(0, 500, 2, "0", TestName = "Nothing lost: nothing to share")]
+        public void AGenesisPlayerEarnsAnEqualPartOfTheGenesisShare(int losers, int genesisShare, int players, string expected)
+        {
+            Assert.AreEqual(expected, GenesisWager.GenesisPlayerShare(TwentyFiveChog, losers, genesisShare, players));
+        }
+
         [TestCase(1, 1, 1000, "22500000000000000000", TestName = "One a side: the loser's stake less a tenth")]
         [TestCase(3, 3, 1000, "22500000000000000000", TestName = "Three a side: the same for each winner")]
         [TestCase(2, 1, 1000, "11250000000000000000", TestName = "Two winners share one stake")]
