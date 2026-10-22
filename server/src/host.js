@@ -230,6 +230,7 @@ function remember(entry) {
 }
 async function judgeAndRecord(gameId) {
   let verdict;
+  const startedAt = Date.now();
   try {
     verdict = await judge.judge(gameId);
   } catch (error) {
@@ -240,7 +241,14 @@ async function judgeAndRecord(gameId) {
     remember({ gameId, judged: false, why: 'the record of the match is not whole yet' });
     return verdict;
   }
-  const summary = { gameId, judged: true, void: Boolean(verdict.void), why: verdict.why ?? null, winnerTeam: verdict.winnerTeam ?? null, players: verdict.players ?? null };
+  const match = await matches.get(gameId);
+  // How far the record went and how long it took, so that a void match or a slow verdict can be explained from outside.
+  const summary = {
+    gameId, judged: true, void: Boolean(verdict.void), why: verdict.why ?? null, winnerTeam: verdict.winnerTeam ?? null, players: verdict.players ?? null,
+    mode: verdict.mode ?? null, scores: verdict.scores ?? null,
+    ticks: { selectionEnded: verdict.selectionEndedAtTick ?? null, ended: verdict.endedAtTick ?? null, last: verdict.lastTick ?? null, rate: verdict.updateRate ?? null },
+    lastSliceAt: match?.replay?.endedAt ?? null, judgedInSeconds: Math.round((Date.now() - startedAt) / 100) / 10,
+  };
   if (ranks) {
     try {
       const rank = await ranks.record(gameId, verdict);
@@ -254,7 +262,6 @@ async function judgeAndRecord(gameId) {
     return verdict;
   }
   recorded.add(gameId);
-  const match = await matches.get(gameId);
   const admissions = (match?.admissions ?? []).map(({ player, tokenId, right, standIn }) => ({ player, tokenId, right, ...(standIn ? { standIn } : {}) }));
   chainCareers.recordMatch(gameId, verdict, match?.admissions ?? [])
     .then(result => {
@@ -300,7 +307,8 @@ const api = createApi({
   }),
   build,
   photonAuthentication: environment.PHOTON_AUTH === '1',
-  wager: createWager({ chain: wagerChain, referee, matches, network: wagerPlace, store: matchStore, price }),
+  // The sender brings the stakes players sign once (version 3); it is on mainnet, where the wager is when not on the testnet.
+  wager: createWager({ chain: wagerChain, referee, matches, network: wagerPlace, store: matchStore, price, sender: wagerPlace.test ? undefined : sender }),
   price,
   ledger,
   reownProjectId: await reownProjectId(dataFolder, environment.REOWN_PROJECT_ID),

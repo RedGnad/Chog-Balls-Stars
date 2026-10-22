@@ -83,6 +83,14 @@ const BURNED_SHARE = selector('burnedShare()');
 // Version 2 of the contract only (22 October 2026): a call to version 1 fails, and the services sign as for it.
 const GENESIS_SHARE = selector('genesisShare()');
 const MATCH_OF = selector('matchOf(bytes32)');
+// Version 3 (22 October 2026): a stake the player signs once (an EIP-2612 permit) and these services bring to the chain.
+const STAKE_WITH_PERMIT = selector('stakeWithPermit(address,bytes32,uint8,uint256,uint256,bytes,uint256,uint8,bytes32,bytes32)');
+const TOKEN_NAME = selector('name()');
+const TOKEN_NONCES = selector('nonces(address)');
+const TOKEN_DOMAIN_SEPARATOR = selector('DOMAIN_SEPARATOR()');
+const PERMIT_SECONDS = 600;
+const word = value => BigInt(value).toString(16).padStart(64, '0');
+const hexWord = text => text.replace(/^0x/, '').toLowerCase().padStart(64, '0');
 const STAKERS_OF = selector('stakersOf(bytes32)');
 
 const sameBook = (a, b) => a.length === b.length
@@ -127,7 +135,7 @@ export function genesisPlayersOf(match) {
  * @param {ReturnType<import('./price.js').createPrice>} [options.price] the price of $CHOG, for the dollars of a week
  * @param {() => number} [options.now] milliseconds
  */
-export function createWager({ chain, referee, matches, network = wagerNetwork(), store, price, now = Date.now }) {
+export function createWager({ chain, referee, matches, network = wagerNetwork(), store, price, sender, now = Date.now }) {
   const contract = referee?.wager ?? null;
   if (referee && referee.chainId !== network.chainId) {
     throw new Error(`The referee signs for chain ${referee.chainId} and the wager is on chain ${network.chainId}`);
@@ -151,7 +159,11 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
       }
       // No genesisShare(): version 1, which takes no list of Genesis players with a result.
       const version2 = typeof genesis === 'string' && genesis.length === 66;
+      // Version 3 is version 2 with stakeWithPermit: its selector is in the code of the contract (a dispatcher compares it).
+      const code = await chain.rpc?.('eth_getCode', [contract, 'latest']).catch(() => '') ?? '';
+      const version3 = version2 && typeof code === 'string' && code.toLowerCase().includes(STAKE_WITH_PERMIT);
       settings = {
+        version3,
         readAt: now(), referee: '0x' + signer.slice(-40).toLowerCase(), burnedShare: Number(BigInt(share)),
         genesisShare: version2 ? Number(BigInt(genesis)) : null,
       };
@@ -161,7 +173,10 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     return {
       enabled: true, address: contract, token: network.token, chainId: network.chainId, chainName: network.chainName,
       rpcUrl: network.publicRpcUrl, test: network.test, referee: referee.address,
-      burnedShare: settings.burnedShare, genesisShare: settings.genesisShare ?? 0, version: settings.genesisShare === null ? 1 : 2,
+      burnedShare: settings.burnedShare, genesisShare: settings.genesisShare ?? 0,
+      version: settings.genesisShare === null ? 1 : settings.version3 ? 3 : 2,
+      // One signature in the wallet, no gas: these services bring the stake (stakeWithPermit) with the referee's key.
+      relay: Boolean(settings.version3 && sender),
       ticketSeconds: TICKET_SECONDS, refundAfterSeconds: REFUND_AFTER_SECONDS,
     };
   }
@@ -342,6 +357,59 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
    * The decision of a match with where its stakes stand on the chain now, for the page that
    * shows a player what became of a stake: paid, given back, or still to be brought.
    */
+  /**
+   * What a wallet signs so that the contract may take its stake (EIP-2612 permit of the token, version 3): the domain of the
+   * token, checked against its DOMAIN_SEPARATOR, its nonce for that wallet, the spender and how long the permit lasts.
+   */
+  async function permit({ address }) {
+    if (!contract) return { refused: 'no_wager' };
+    if (!settings) await describe();
+    if (!settings.version3 || !sender) return { refused: 'no_relay' };
+    const token = network.token;
+    const [nameAnswer, nonceAnswer, separator] = await chain.callMany([
+      { to: token, data: '0x' + TOKEN_NAME }, { to: token, data: '0x' + TOKEN_NONCES + hexWord(address) },
+      { to: token, data: '0x' + TOKEN_DOMAIN_SEPARATOR },
+    ]);
+    const nameLength = Number(BigInt('0x' + nameAnswer.slice(66, 130)));
+    const name = Buffer.from(nameAnswer.slice(130, 130 + nameLength * 2), 'hex').toString('utf8');
+    const domain = { name, version: '1', chainId: network.chainId, verifyingContract: token };
+    const typeHash = keccak_256(encoder.encode('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'));
+    const parts = [toHex(typeHash), toHex(keccak_256(encoder.encode(name))), toHex(keccak_256(encoder.encode('1'))),
+      word(network.chainId), hexWord(token)];
+    const computed = '0x' + toHex(keccak_256(Uint8Array.from(Buffer.from(parts.join(''), 'hex'))));
+    if (computed !== separator.toLowerCase()) return { refused: 'unknown_permit_domain' };
+    return {
+      domain, spender: contract, nonce: BigInt(nonceAnswer).toString(), deadline: Math.floor(now() / 1000) + PERMIT_SECONDS,
+    };
+  }
+
+  /**
+   * Brings a stake the wallet signed (its ticket, from ticket(), and its permit for exactly the amount) to the contract, with the
+   * referee's key paying the gas. The contract checks both signatures; the sender refuses a transaction that would revert, so a
+   * wrong request costs nothing.
+   */
+  async function relay({ address, matchKey, team, amount, deadline, signature, permitDeadline, v, r, s }) {
+    if (!contract) return { refused: 'no_wager' };
+    if (!settings) await describe();
+    if (!settings.version3 || !sender) return { refused: 'no_relay' };
+    const hex32 = text => typeof text === 'string' && /^0x[0-9a-fA-F]{64}$/.test(text);
+    if (!hex32(matchKey) || !hex32(r) || !hex32(s) || ![27, 28].includes(Number(v)) || ![0, 1].includes(Number(team))
+      || !/^[1-9][0-9]*$/.test(String(amount)) || !Number.isInteger(Number(deadline)) || !Number.isInteger(Number(permitDeadline))
+      || typeof signature !== 'string' || !/^0x[0-9a-fA-F]{130}$/.test(signature)) {
+      return { refused: 'bad_request' };
+    }
+    const ticket = signature.slice(2).toLowerCase();
+    const data = '0x' + STAKE_WITH_PERMIT + hexWord(address) + hexWord(matchKey) + word(team) + word(amount) + word(deadline)
+      + word(10 * 32) + word(permitDeadline) + word(v) + hexWord(r) + hexWord(s)
+      + word(65) + ticket.padEnd(192, '0');
+    try {
+      const sent = await sender.transact({ to: contract, data, purpose: `a stake of ${address} on ${matchKey}` });
+      return sent.ok === false ? { refused: 'reverted', hash: sent.hash } : { hash: sent.hash, done: sent.ok === true };
+    } catch (error) {
+      return { refused: 'refused_by_chain', message: String(error.message).slice(0, 200) };
+    }
+  }
+
   async function outcome(gameId) {
     const decided = await decision(gameId);
     if (decided) return { ...decided, stakes: await onChain(decided.matchKey), refundAfterSeconds: REFUND_AFTER_SECONDS };
@@ -354,5 +422,5 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     return { lost: true, matchKey, stakes, refundAfterSeconds: REFUND_AFTER_SECONDS };
   }
 
-  return { describe, onChain, ticket, lock, mine, decision, outcome, weekOf, address: contract };
+  return { describe, onChain, ticket, lock, mine, decision, outcome, weekOf, permit, relay, address: contract };
 }

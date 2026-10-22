@@ -108,6 +108,63 @@ contract ChogWagerTest is Test {
         wager.stake(matchKey, team, amount, deadline, ticket);
     }
 
+    function _permitFor(uint256 key, uint256 value, uint256 until) private view returns (uint8 v, bytes32 r, bytes32 s) {
+        address signer = vm.addr(key);
+        bytes32 structHash =
+            keccak256(abi.encode(chog.PERMIT_TYPEHASH(), signer, address(wager), value, chog.nonces(signer), until));
+        return vm.sign(key, keccak256(abi.encodePacked("\x19\x01", chog.DOMAIN_SEPARATOR(), structHash)));
+    }
+
+    function test_ARelayerStakesForAPlayerWithItsPermitAndTheTicket() public {
+        uint256 eveKey = 0xE7E;
+        address eve = vm.addr(eveKey);
+        chog.mint(eve, 1000 ether);
+        address relayer = makeAddr("relayer");
+        (uint8 v, bytes32 r, bytes32 s) = _permitFor(eveKey, STAKE, block.timestamp + 10 minutes);
+        bytes memory ticket = _ticket(MATCH, eve, 1, STAKE);
+
+        vm.expectEmit();
+        emit Staked(MATCH, eve, 1, STAKE);
+        vm.prank(relayer);
+        wager.stakeWithPermit(eve, MATCH, 1, STAKE, deadline, ticket, block.timestamp + 10 minutes, v, r, s);
+        (bool staked, uint8 team) = wager.stakeOf(MATCH, eve);
+        assertTrue(staked);
+        assertEq(team, 1);
+        assertEq(chog.balanceOf(eve), 900 ether, "the stake came from the player");
+        assertEq(chog.allowance(eve, address(wager)), 0, "the permit was for exactly the stake");
+        (bool relayerStaked,) = wager.stakeOf(MATCH, relayer);
+        assertFalse(relayerStaked);
+    }
+
+    function test_APermitOfAnotherWalletOrATicketOfAnotherPlayerStakesNothing() public {
+        uint256 eveKey = 0xE7E;
+        address eve = vm.addr(eveKey);
+        chog.mint(eve, 1000 ether);
+        // Signed by another key: no allowance for Eve, the stake cannot be taken.
+        (uint8 v, bytes32 r, bytes32 s) = _permitFor(OTHER_KEY, STAKE, block.timestamp + 10 minutes);
+        bytes memory ticket = _ticket(MATCH, eve, 1, STAKE);
+        vm.expectRevert();
+        wager.stakeWithPermit(eve, MATCH, 1, STAKE, deadline, ticket, block.timestamp + 10 minutes, v, r, s);
+
+        // Eve's permit with a ticket made out to Ana: the referee did not sign that.
+        (v, r, s) = _permitFor(eveKey, STAKE, block.timestamp + 10 minutes);
+        bytes memory anasTicket = _ticket(MATCH, ana, 1, STAKE);
+        vm.expectRevert();
+        wager.stakeWithPermit(eve, MATCH, 1, STAKE, deadline, anasTicket, block.timestamp + 10 minutes, v, r, s);
+        assertEq(chog.balanceOf(eve), 1000 ether);
+    }
+
+    function test_APermitAlreadySubmittedAloneStillLetsTheStakeThrough() public {
+        uint256 eveKey = 0xE7E;
+        address eve = vm.addr(eveKey);
+        chog.mint(eve, 1000 ether);
+        (uint8 v, bytes32 r, bytes32 s) = _permitFor(eveKey, STAKE, block.timestamp + 10 minutes);
+        chog.permit(eve, address(wager), STAKE, block.timestamp + 10 minutes, v, r, s);
+        wager.stakeWithPermit(eve, MATCH, 0, STAKE, deadline, _ticket(MATCH, eve, 0, STAKE), block.timestamp + 10 minutes, v, r, s);
+        (bool staked,) = wager.stakeOf(MATCH, eve);
+        assertTrue(staked);
+    }
+
     // Ana and Bo on team 0, Cy and Dee on team 1.
     function _twoAgainstTwo() private {
         _stake(MATCH, ana, 0, STAKE);

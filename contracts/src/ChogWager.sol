@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-/// @notice What the wager needs from $CHOG: an ERC-20 with burn.
+/// @notice What the wager needs from $CHOG: an ERC-20 with burn, and EIP-2612 permit for a stake signed once (version 3).
 interface IWagerToken {
     function transfer(address to, uint256 amount) external returns (bool);
     function transferFrom(address from, address to, uint256 amount) external returns (bool);
     function burn(uint256 amount) external;
+    function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external;
 }
 
 /// @title ChogWager
@@ -127,11 +128,37 @@ contract ChogWager {
     /// player, this team, this amount and this match, good until `deadline`. The player must have
     /// approved this contract for the amount. The first stake of a match fixes what everyone stakes.
     function stake(bytes32 matchKey, uint8 team, uint256 amount, uint256 deadline, bytes calldata signature) external {
+        _stake(msg.sender, matchKey, team, amount, deadline, signature);
+    }
+
+    /// @notice Stakes for "player" with the EIP-2612 permit that player signed for exactly the stake (version 3, 22 October 2026: one
+    /// signature in the wallet and no gas, where approve then stake asked two transactions). Anyone may bring it, the game's
+    /// services do: the ticket names the player, its team and its amount, and the permit lets this contract take that amount only.
+    /// A permit someone already submitted alone is skipped: what matters is the allowance it left.
+    function stakeWithPermit(
+        address player,
+        bytes32 matchKey,
+        uint8 team,
+        uint256 amount,
+        uint256 deadline,
+        bytes calldata signature,
+        uint256 permitDeadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        try chog.permit(player, address(this), amount, permitDeadline, v, r, s) {} catch {}
+        _stake(player, matchKey, team, amount, deadline, signature);
+    }
+
+    function _stake(address player, bytes32 matchKey, uint8 team, uint256 amount, uint256 deadline, bytes calldata signature)
+        private
+    {
         if (team > 1) revert BadTeam(team);
         if (amount == 0) revert AmountIsZero();
         if (block.timestamp > deadline) revert TicketExpired(deadline);
         _requireReferee(
-            keccak256(abi.encode(TICKET, block.chainid, address(this), matchKey, msg.sender, team, amount, deadline)),
+            keccak256(abi.encode(TICKET, block.chainid, address(this), matchKey, player, team, amount, deadline)),
             signature
         );
 
@@ -145,16 +172,16 @@ contract ChogWager {
         } else if (amount != played.stakeAmount) {
             revert NotTheStakeOfTheMatch(played.stakeAmount);
         }
-        if (_teamPlusOne[matchKey][msg.sender] != 0) revert AlreadyStaked(matchKey);
+        if (_teamPlusOne[matchKey][player] != 0) revert AlreadyStaked(matchKey);
         if (played.players.length == MAX_STAKERS) revert MatchIsFull(matchKey);
 
-        _teamPlusOne[matchKey][msg.sender] = team + 1;
-        played.players.push(msg.sender);
+        _teamPlusOne[matchKey][player] = team + 1;
+        played.players.push(player);
         if (team == 0) ++played.stakersTeam0;
         else ++played.stakersTeam1;
 
-        _pull(msg.sender, amount);
-        emit Staked(matchKey, msg.sender, team, amount);
+        _pull(player, amount);
+        emit Staked(matchKey, player, team, amount);
     }
 
     /// @notice Pays a match out on the result the referee signed: 0 or 1 for the team that won,

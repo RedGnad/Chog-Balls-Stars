@@ -127,7 +127,7 @@ test('the game is told where to stake, and nothing when the contract knows anoth
   assert.deepEqual(described, {
     enabled: true, address: WAGER, token: '0x350035555e10d9afaf1566aaebfced5ba6c27777', chainId: 143, chainName: 'Monad',
     rpcUrl: 'https://rpc.monad.xyz', test: false, referee: referee.address,
-    burnedShare: 1000, genesisShare: 0, version: 1, ticketSeconds: TICKET_SECONDS, refundAfterSeconds: 3600,
+    burnedShare: 1000, genesisShare: 0, version: 1, relay: false, ticketSeconds: TICKET_SECONDS, refundAfterSeconds: 3600,
   });
   const other = services({ contractReferee: '0x' + 'cc'.repeat(20) });
   assert.equal((await call(other.api, 'GET', '/api/wager')).body.enabled, false);
@@ -388,4 +388,34 @@ test('the Genesis players of a match are the wallets the judge saw with their Ge
     ],
   };
   assert.deepEqual(genesisPlayersOf(match), ['0x' + 'a'.repeat(40)], 'the judged Genesis, a signed-in wallet, not a stand-in, the same Genesis it was let in with');
+});
+
+test('a stake signed once is brought by the services with the referee key, its calldata exactly as the contract reads it', async () => {
+  const { createWager } = await import('../src/wager.js');
+  const sent = [];
+  const contract = '0x' + 'c2'.repeat(20);
+  const token = '0x' + '35'.repeat(20);
+  const referee = { address: '0x' + 'aa'.repeat(20), wager: contract, chainId: 143, signTicket: () => '0x' };
+  // referee(), burnedShare(), genesisShare() all answer one word; the code holds the selector of stakeWithPermit.
+  const chain = {
+    rpc: async () => '0x6080' + '471070ff' + '00',
+    callMany: async calls => calls.map(() => '0x' + '0'.repeat(24) + 'aa'.repeat(20)),
+  };
+  const wager = createWager({ chain, referee, matches: {}, network: { token, chainId: 143, chainName: 'Monad' }, store: {},
+    sender: { transact: async request => { sent.push(request); return { hash: '0x' + '11'.repeat(32), ok: true }; } } });
+  const player = '0x' + 'ab'.repeat(20);
+  const request = {
+    address: player, matchKey: '0x' + '01'.repeat(32), team: 1, amount: '100000000000000000000', deadline: 1792700000,
+    signature: '0x' + 'cd'.repeat(65), permitDeadline: 1792700600, v: 27, r: '0x' + '02'.repeat(32), s: '0x' + '03'.repeat(32),
+  };
+  const answer = await wager.relay(request);
+  assert.deepEqual(answer, { hash: '0x' + '11'.repeat(32), done: true });
+  const words = sent[0].data.slice(10).match(/.{64}/g);
+  assert.equal(sent[0].data.slice(0, 10), '0x471070ff');
+  assert.equal(words[0], '0'.repeat(24) + 'ab'.repeat(20), 'the player');
+  assert.equal(BigInt('0x' + words[5]), 320n, 'the ticket after the ten head words');
+  assert.equal(BigInt('0x' + words[10]), 65n, 'a 65 byte ticket');
+  assert.equal(words.length, 14);
+  assert.equal((await wager.relay({ address: player, matchKey: 'nope' })).refused, 'bad_request');
+  assert.equal(sent.length, 1);
 });

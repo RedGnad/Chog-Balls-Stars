@@ -13,6 +13,11 @@ const WEBHOOKS = '/api/photon/hook/';
 // Why a ticket or a lock was refused, in words a player can read.
 const WAGER_REFUSALS = {
   no_wager: 'no match can be staked on here',
+  no_relay: 'this wager cannot take a signed stake: stake with a transaction',
+  unknown_permit_domain: 'the token signs permits in a way the game does not know',
+  bad_request: 'the ticket or the permit is not well formed',
+  reverted: 'the stake was refused on the chain',
+  refused_by_chain: 'the chain refused the stake',
   bad_team: 'team must be 0 or 1',
   bad_amount: 'amount must be a whole number of the smallest unit of $CHOG, as digits',
   not_in_a_match: 'this wallet is not in a match the game server knows',
@@ -355,6 +360,25 @@ export function createApi({ chain, sessions, careers, ranks, seasons, rankStorag
     },
 
     // The referee's ticket to stake on the match the signed-in wallet is in.
+    // Version 3: what the wallet signs (the permit of the token) and the stake these services bring with it.
+    'GET /api/wager/permit': async request => {
+      const address = await signedIn(request);
+      if (!address) return failure(401, 'not_signed_in', 'sign in with the wallet first');
+      const answer = wager ? await wager.permit({ address }) : { refused: 'no_wager' };
+      if (answer.refused) return json(409, { error: answer.refused, message: WAGER_REFUSALS[answer.refused] ?? 'refused' });
+      return json(200, answer);
+    },
+    'POST /api/wager/relay': async request => {
+      const address = await signedIn(request);
+      if (!address) return failure(401, 'not_signed_in', 'sign in with the wallet first');
+      const body = await bodyOf(request);
+      if (!body) return failure(400, 'bad_request', 'expected the ticket and the permit');
+      const answer = wager ? await wager.relay({ ...body, address }) : { refused: 'no_wager' };
+      if (answer.refused) {
+        return json(409, { error: answer.refused, message: answer.message ?? WAGER_REFUSALS[answer.refused] ?? 'refused', hash: answer.hash });
+      }
+      return json(200, answer);
+    },
     'POST /api/wager/ticket': async request => {
       const address = await signedIn(request);
       if (!address) return failure(401, 'not_signed_in', 'sign in with the wallet first');

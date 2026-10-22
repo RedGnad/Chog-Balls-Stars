@@ -4,7 +4,9 @@ pragma solidity 0.8.28;
 import {Script, console2} from "forge-std/Script.sol";
 import {ChogWager} from "../src/ChogWager.sol";
 
-/// Deploys version 2 of the wager alone on Monad mainnet (22 October 2026, decided by the owner): of
+/// Deploys the wager alone on Monad mainnet. Version 3 (22 October 2026, evening, the owner: "go"): stakeWithPermit, a stake the
+/// player signs once (an EIP-2612 permit of $CHOG) and the game services bring with the referee's key, which pays the gas.
+/// Version 2 (22 October 2026, decided by the owner): of
 /// what the losers of a match stake, BURNED_SHARE (in ten thousandths, default 500) is burned and
 /// GENESIS_SHARE (default 500) is split between the wallets that played a Chog Genesis in the match;
 /// version 1 burned a tenth and paid no Genesis share. The winners' gain is the same. The deploying
