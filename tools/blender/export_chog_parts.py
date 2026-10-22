@@ -477,7 +477,16 @@ def main():
         pieces.append({**piece, "name": "Attack_" + key, "on": "Attack", "print": fingerprint(piece, materials)})
 
     def attack_for(found, worn):
-        """The piece a hero's basic attack throws and how it moves (see chog_attack_objects)."""
+        """The piece a hero's basic attack throws and how it moves (see chog_attack_objects): what it holds in
+        its hand, else the rainbow it pukes, else its full costume, its hat, the bone of a skull, the spikes of
+        its crown (22 October 2026, the owner's order)."""
+        held = attacks.ATTACK_OF_HELD.get(found.get("Accessory") or "")
+        if held:
+            part = by_key.get(("trait", "Accessory", found["Accessory"], found.get("Side", "Right")))
+            if part:
+                return part[0], held[0]
+        if found.get("Mouth") == attacks.RAINBOW_MOUTH:
+            return attack_pieces[attacks.RAINBOW_THROWN[0]], attacks.RAINBOW_THROWN[1]
         key, style = attacks.attack_of(found.get("Head"))
         costume = attacks.attack_of_costume(found.get("Head"), found.get("Body"))
         if costume:
@@ -517,7 +526,8 @@ def main():
                        attack_pieces["Leaf"], attacks.TUMBLE)
 
     labels = {number: attacks.label_of(everyone[number].get("Head"), bases.is_skull(everyone[number]),
-                                       everyone[number].get("Body")) if number in everyone else
+                                       everyone[number].get("Body"), everyone[number].get("Accessory"),
+                                       everyone[number].get("Mouth")) if number in everyone else
               "THROWS THE SPIKES OF ITS CROWN" for number in heroes}
     # A 1:1 Genesis says what it throws in its own words (chog_one_of_one.LINES).
     labels.update({number: line for number, line in traits.one.LINES.items() if number in heroes})

@@ -63,6 +63,25 @@ has its own impact: a ram's horns (Red Horn, Purple Horn) butt with chips of hor
 demon, devil and void horns end in a puff of hellfire painted in the colour of the horns (orange, red,
 purple); the taped banana bounces off in bananas; the brain ends in a pink squelch.
 
+## What it holds, then a rainbow (22 October 2026, decided by the owner)
+
+The order a hero's basic attack is chosen in (`export_chog_parts.attack_for`): what it holds in its hand
+(the trait "Accessory"), else the rainbow it pukes (Mouth "Rainbow Puke"), else its full costume, else its
+hat, else the bone of a skull or the spikes of its crown. A held thing is thrown as a hat is: the very part
+the hero holds (`chog_trait_accessories`), its copy leaving the hand while the hand keeps it.
+
+| Held (Genesis) | Moves | What hits |
+| --- | --- | --- |
+| Fwog (28) | end over end | frogs hopping off, a green splash |
+| SB (26), the coffee cup | end over end | hot coffee and steam, a ring |
+| Coin (26) | flat, spinning | a gold coin popping into sparkles |
+| Cigar (25) | end over end | cigar smoke and embers |
+| Green Candle (23), Red Candle (18) | end over end | small candles and sparks of their colour |
+| Heart (18) | flat, spinning | little pink hearts |
+| Knife (18) | end over end | a slash of steel sparks |
+| PEPE (13) | end over end | frogs hopping off, a green splash |
+| Rainbow Puke (145, the mouth) | end over end | the ball of rainbow of the Rainbow Wig, every colour |
+
 ## Full costumes (22 October 2026)
 
 `chog_attack_objects.ATTACK_OF_BODY`, read from the art of three Genesis per costume:

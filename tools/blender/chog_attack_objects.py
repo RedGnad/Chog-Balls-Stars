@@ -75,6 +75,26 @@ ATTACK_OF_BODY = {
     "Gangster suit": ("MoneyBag", TUMBLE),
 }
 
+# What a Genesis holds in its hand (the trait "Accessory": 195 Genesis, all of them on Side=Left) is what it throws
+# before anything else (22 October 2026, decided by the owner: "if a character has something in its hand, that is
+# what it should throw"): the very part it holds (chog_trait_accessories), thrown as a hat is. The value of
+# "Accessory" -> (how it moves, what a player reads).
+ATTACK_OF_HELD = {
+    "Green Candle": (TUMBLE, "GREEN CANDLES"),
+    "Red Candle": (TUMBLE, "RED CANDLES"),
+    "Cigar": (TUMBLE, "CIGARS"),
+    "SB": (TUMBLE, "HOT COFFEE"),
+    "Coin": (SPIN, "COINS"),
+    "Knife": (TUMBLE, "KNIVES"),
+    "Heart": (SPIN, "HEARTS"),
+    "Fwog": (TUMBLE, "FWOGS"),
+    "PEPE": (TUMBLE, "PEPES"),
+}
+# Then the rainbow it pukes (the trait "Mouth", 145 Genesis), before its costume, its hat or its crown (the owner,
+# the same day): the ball of rainbow the Rainbow Wig throws.
+RAINBOW_MOUTH = "Rainbow Puke"
+RAINBOW_THROWN = ("RainbowBall", TUMBLE)
+
 
 # What a player reads under the hero: the object, in words.
 WORDS = {
@@ -89,8 +109,12 @@ WORDS = {
 }
 
 
-def label_of(head_value, skull=False, body_value=None):
-    """The line under a hero: what it throws, and from which trait."""
+def label_of(head_value, skull=False, body_value=None, held_value=None, mouth_value=None):
+    """The line under a hero: what it throws, and from which trait (in the order attack_for chooses)."""
+    if held_value in ATTACK_OF_HELD:
+        return "THROWS " + ATTACK_OF_HELD[held_value][1] + " FROM ITS HAND"
+    if mouth_value == RAINBOW_MOUTH:
+        return "THROWS " + WORDS[RAINBOW_THROWN[0]] + " FROM ITS MOUTH"
     if not head_value and body_value in ATTACK_OF_BODY:
         return "THROWS " + WORDS[ATTACK_OF_BODY[body_value][0]] + " FROM ITS " + body_value.upper()
     key, _ = attack_of(head_value)

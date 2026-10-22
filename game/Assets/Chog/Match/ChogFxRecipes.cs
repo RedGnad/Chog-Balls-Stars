@@ -155,6 +155,12 @@ namespace Chog.Match
         private static readonly Color RoyalLight = new Color(0.45f, 0.62f, 1f);
         private static readonly Color Flame = new Color(1f, 0.55f, 0.15f);
         private static readonly Color SeaWater = new Color(0.40f, 0.72f, 1f);
+        private static readonly Color Coffee = new Color(0.50f, 0.32f, 0.18f);
+        private static readonly Color Steam = new Color(0.92f, 0.90f, 0.88f);
+        private static readonly Color CigarSmoke = new Color(0.72f, 0.70f, 0.74f);
+        private static readonly Color Ember = new Color(1f, 0.42f, 0.12f);
+        private static readonly Color HeartPink = new Color(1f, 0.55f, 0.72f);
+        private static readonly Color FrogGreen = new Color(0.36f, 0.78f, 0.30f);
 
         /// <summary>The impact of a basic attack that throws this piece of the library ("Attack_Snowball", "Hat_Cap").</summary>
         /// <summary>
@@ -263,6 +269,40 @@ namespace Chog.Match
                 case "Bone":
                     return Recipe("bones and dust", ImpactPieces.Copies, 5, 0.24f, 0.9f,
                         FxLayer.Of(ChogFx.Smoke, 0.35f, FxColour.Painted), default, 0.5f, 0);
+                // What a Genesis holds in its hand, thrown first (chog_attack_objects.ATTACK_OF_HELD, 22 October 2026).
+                // A candle of the chart bursts into small candles and sparks of its own colour, green or red.
+                case "Candle":
+                    return Recipe("candles of the chart bursting into sparks of their colour", ImpactPieces.Copies, 5, 0.22f, 1.3f,
+                        FxLayer.Of(ChogFx.Sparks, 0.55f, FxColour.Tinted), FxLayer.Of(ChogFx.Light, 0.45f, FxColour.Tinted), 1f, 6);
+                case "Cigar":
+                {
+                    var cigar = Recipe("a puff of cigar smoke and embers", ImpactPieces.Diamonds, 6, 0.11f, 1f,
+                        FxLayer.Of(ChogFx.Smoke, 0.55f, FxColour.Painted, CigarSmoke), FxLayer.Of(ChogFx.Fire, 0.3f), 0.7f, 4, Ember);
+                    cigar.PieceColour = Ember;
+                    return cigar;
+                }
+                case "Cup":
+                {
+                    var coffee = WithRing(Recipe("a splash of hot coffee and steam", ImpactPieces.Diamonds, 8, 0.11f, 0.9f,
+                        FxLayer.Of(ChogFx.Splash, 0.5f, FxColour.Painted, Coffee), FxLayer.Of(ChogFx.Smoke, 0.4f, FxColour.Painted, Steam),
+                        0.5f, 0), 1.2f);
+                    coffee.PieceColour = Coffee;
+                    return coffee;
+                }
+                case "Coin":
+                    return Recipe("a gold coin popping into sparkles", ImpactPieces.Copies, 6, 0.24f, 1.5f,
+                        FxLayer.Of(ChogFx.Light, 0.55f, FxColour.Tinted, Gold), FxLayer.Of(ChogFx.MagicStars, 0.5f, FxColour.Tinted, Gold),
+                        1.2f, 8, Gold);
+                case "Knife":
+                    return Recipe("a slash of steel sparks", ImpactPieces.Diamonds, 6, 0.10f, 1.1f,
+                        FxLayer.Of(ChogFx.SparksAhead, 0.6f), FxLayer.Of(ChogFx.Hit, 0.45f, FxColour.Tinted), 0.9f, 6, White);
+                case "Heart":
+                    return Recipe("little hearts popping in pink", ImpactPieces.Copies, 6, 0.24f, 1.2f,
+                        FxLayer.Of(ChogFx.LightSoft, 0.5f, FxColour.Tinted, HeartPink), default, 1f, 8, HeartPink);
+                case "Fwog":
+                case "Pepe":
+                    return Recipe("frogs hopping off and a green splash", ImpactPieces.Copies, 4, 0.24f, 1.3f,
+                        FxLayer.Of(ChogFx.Splash, 0.45f, FxColour.Painted, FrogGreen), FxLayer.Of(ChogFx.Hit, 0.4f, FxColour.Tinted), 0.6f, 0);
                 // Full costumes (chog_attack_objects.ATTACK_OF_BODY).
                 case "Fireball":
                     return Recipe("the fireball bursts into flames", ImpactPieces.Diamonds, 7, 0.13f, 1.1f,
