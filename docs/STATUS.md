@@ -1,5 +1,10 @@
 # État courant et décisions
 
+**22 October 2026, 12:00 UTC (lead: headbands, Spartan helmet, eyes batch 2, basic attack words by class; deployed).**
+- **Deployed:** build `20261022T114221166Z-6ae2d94d6ad14dba84e240239af24f50`, stamp unchanged. Headbands, durag and bandana on the brow with no hair through them (`costumes-headbands-2026-10-22.jpg`); Spartan helmet spikes out of its rear edge, none pointing down (`costumes-spartan-2026-10-22.jpg`); eyes batch 2 (Round Crying, Round Tear, Teary as tall ovals, Side Eye, Anime Glass) and Smirk Left's near eye a heavy-lidded almond (`heroes-eyes-batch2-2026-10-22.jpg`). The basic attack is said in the class's words: the hero sheet's row is CLOSE STRIKE, LONG SHOT or LOBBED ZONE over "Shoots SNOWBALLS from its RUSSIAN HAT, fast, from a distance."; the result screen and the reveal use the class's verb (LOBS, SHOOTS, STRIKES WITH).
+- **Verified:** export 1,970 Genesis, 0 failed; 175 view tests; `?heroes=12,65,21,242,6,51`; a local siege without exception (a tower fell); judge fixtures agree.
+- **In progress, not deployed (worktree `lead/specials`):** a radioactive special for every Radioactive Genesis (catalog 0.4.0: the Epic tier gives the nova whatever the Eyes, drawn as the sign of radioactivity in its glow) and the 1:1 super attack (the inversion delivery: three at once at full strength, in three directions for a shape that aims). It changes the simulation: a new Photon version, judge fixtures to re-check.
+
 **22 October 2026, 10:45 UTC (lead: session paused on its usage limit; open work).**
 - **Live:** build `20261022T102129035Z-ddb46fd0faf2491da81b7eb454778963` (faces batch 1, ushanka, clown nose), wager version 2.
 - **Accepted, on branches, not merged:** `stream/heroes-hats` 8282f74 headbands on the brow with no hair through (`costumes-headbands-2026-10-22.jpg`), 469e583 Spartan helmet spikes out at the sides, none down (`costumes-spartan-2026-10-22.jpg`). `stream/heroes-faces`: eyes batch 2 and Smirk's second pass, pushed but not reviewed.
