@@ -1,5 +1,11 @@
 # État courant et décisions
 
+**22 October 2026, 02:10 UTC (lead: dragon, shark and astronaut suits deployed).**
+- **Deployed:** build `20261022T015853880Z-0955479927304adda8f68a176060d297`, stamp unchanged. Lot 3 of `stream/heroes-faces` (f66276a), from all 72 suited Genesis' art: dragon with four blunt tan horns, smaller wings, no tail spikes, its "w" marks and a larger belly; shark with a full row of 20 teeth round the face and pectoral fins; astronaut rebuilt as a full suit with a round helmet, side unit, hose, flag patch, chest panel and pack (`research/evidence/heroes-costumes-2026-10-22.jpg`). All Origin heroes under 8,000 triangles (largest 7,971).
+- **Verified:** export 1,970 Genesis, 0 failed; 168 view tests; the suits load and throw their objects in `?impacts=`; judge fixtures agree.
+- **Still open:** the astronaut glass is opaque (the art shows the hair through it); hose, flag and teeth are small at phone size; the backs of the suits are not in any picture.
+**Next action:** owner review of the three lots in a match (sheets in `research/evidence/heroes-*-2026-10-22.jpg`).
+
 **22 October 2026, 01:45 UTC (lead: eyes and mouths lot deployed).**
 - **Deployed:** build `20261022T013733208Z-4f2e75ac4a1a42adbc50bc44b8a3350c`, stamp unchanged. Lot 2 of `stream/heroes-faces` (6af4e6d): audit of the 64 Origin eye and mouth rows against the art (`research/evidence/heroes-faces-audit-2026-10-22.md`: 48 faithful, 16 approximate, none wrong; Round, Round Eye and Dead fixed); the 17 Radioactive eye values drawn with the ink of their variant as the art does, Round Eye without pupil, the third eye as a white almond (`research/evidence/heroes-faces-fix-2026-10-22.jpg`). Skull: 17 of 25 eye values looked at.
 - **Verified:** export 1,970 Genesis, 0 failed; 168 view tests (the type-check tool now finds the Editor's renamed compile folder); heroes load in `?impacts=`; judge fixtures agree.
