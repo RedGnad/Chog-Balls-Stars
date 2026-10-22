@@ -1042,10 +1042,14 @@ def build_laser(maker):
     middles = lidded_eyes(part, surface, eyes, part.named("Dark"), None, LIFT)
     ahead, down = HOST.level_axes(maker.head)
     radius, sides = numbers.BEAM_RADIUS, numbers.BEAM_SIDES
+    # The beam turned up from level by BEAM_PITCH_DEG, in the plane of the ahead and up axes of the head.
+    pitch = math.radians(numbers.BEAM_PITCH_DEG)
+    way = ahead * math.cos(pitch) - down * math.sin(pitch)
+    across = -(down * math.cos(pitch) + ahead * math.sin(pitch))
     for middle in middles:
         start = surface.front(middle[0], middle[1] - eyes.SIZE[1] * 0.25, 0.0)
         stations = ((-numbers.BEAM_SUNK, 0.7), (0.02, 1.0), (numbers.BEAM_LENGTH - 0.03, 1.0), (numbers.BEAM_LENGTH, 0.55))
-        loops = [HOST.ring_points(start + ahead * distance, X * radius * size, -down * radius * size, sides)
+        loops = [HOST.ring_points(start + way * distance, X * radius * size, across * size * radius, sides)
                  for distance, size in stations]
         shares = [(0.0,) * sides] + [(1.0,) * sides] * (len(stations) - 1)
         bands, ends = HOST.add_loops(part, loops, part.named("Beam"), numbers.OUTLINE_THICKNESS, shares=shares)
@@ -1388,19 +1392,19 @@ EYES_OF_SIDE = {
             "kind": "Laser", "eyes": "lidded",
             "colours": {"Dark": DARK, "Beam": (0.36, 0.34, 0.90), "Core": (0.95, 0.62, 0.93)},
             "unlit": ("Dark", "Beam", "Core"),
-            "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.021},
+            "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.019, "BEAM_PITCH_DEG": 8.0},
         },
         "fire laser": {
             "kind": "Laser", "eyes": "lidded",
             "colours": {"Dark": DARK, "Beam": (0.90, 0.16, 0.14), "Core": (0.76, 0.90, 0.28)},
             "unlit": ("Dark", "Beam", "Core"),
-            "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.021},
+            "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.019, "BEAM_PITCH_DEG": 8.0},
         },
         "cyan laser": {
             "kind": "Laser", "eyes": "lidded",
             "colours": {"Dark": DARK, "Beam": (0.14, 0.24, 0.62), "Core": (0.34, 0.84, 0.95)},
             "unlit": ("Dark", "Beam", "Core"),
-            "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.021},
+            "numbers": {"BEAM_CORE": (0, 1, 2, 3, 4), "BEAM_RADIUS": 0.019, "BEAM_PITCH_DEG": 8.0},
         },
     },
     "Right": {

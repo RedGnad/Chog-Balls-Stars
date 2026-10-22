@@ -538,6 +538,9 @@ LASER = {
     # two are what shows, the beam was a pale pink stick; on the pictures it is purple with a thin
     # light line along it.)
     "BEAM_SIDES": 8,
+    # How far the beam is turned up from level, degrees (22 October 2026, only the lasers of Side=Left use it, see
+    # build_laser of chog_trait_faces.py).
+    "BEAM_PITCH_DEG": 0.0,
     "BEAM_CORE": (1,),           # which of its sides is the light core: up, towards the left
     "OUTLINE_THICKNESS": 0.010,
     # The eye a beam leaves, as the pictures of Side=Right draw it (CHOG #38, #41, #65, #212 fire; #107, #126,

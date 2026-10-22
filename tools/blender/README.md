@@ -997,3 +997,16 @@ and the arms are under it.
 Not done: no change makes the flag or the hose clearly readable from the game camera at the phone size, because they are the
 size of a few pixels and partly hidden by design; the shark's teeth are a clear improvement from the front and at 2x, a small
 one at 1x.
+
+## 22 October 2026: the face lasers on Side Left (lot 4d)
+
+The lasers of Side=Left (`Purple laser`, `fire laser`, `cyan laser`: 68 Origin Genesis and 3 Skull) were thick and slanted down
+where the pictures draw two thin beams, level or sinking a little: [sheet](../../research/evidence/heroes-lasers-left-2026-10-22.jpg)
+(12 Genesis, each beside two more pictures of its value, bust, three quarters, side, game camera, before | after; verdicts in
+[the audit](../../research/evidence/heroes-faces-audit-2026-10-22.md)). The model's beam is level with the ground and the head is turned
+up 20 degrees for the game camera, so from the front it slanted about 30 degrees. `LASER["BEAM_PITCH_DEG"]` (new, 0 by default) turns
+the beam up from level in `build_laser` of `chog_trait_faces.py`; the three Left entries set it to 8 and `BEAM_RADIUS` to 0.019 (0.021;
+the radius of Side Right). The light core (5 of 8 sides) stays: the pictures draw most of the beam in the light colour. Side Right is not
+changed. Chosen by comparing the bust at 0, 15 and 8 degrees with the pictures (0: 30 down, 15: level, art: about 12 down). The beam
+stays short (the game draws the long one when the hero attacks), and the slant in the game itself is that of the attack's beam, not of
+this stub.

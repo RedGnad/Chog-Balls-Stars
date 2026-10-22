@@ -91,9 +91,21 @@ have dark sockets, already audited).
 | Round, Right | #1045 | faithful | dark disc in a white ring, no pupil, as the pictures; a little smaller than the near eye of the picture |
 | Side Eye, Left | #1107 | approximate | half lid and glint right; the far eye of the picture has a pink iris, ours is dark (small) |
 | Happy, Left | #1207, #1405 (and Origin #925, #1430, 33 Genesis) | wrong shape, fixed | two equal tall arches; the pictures draw a long flat stroke, its right end higher, on the near eye and a short arch on the far one: `EYES_OF_SIDE["Left"]["Happy"]`, `HAPPY["EYE_ARCS"]` (near eye half width 0.066, arch 0.026, rise 0.034; far 0.032, 0.032, 0.013) |
-| Purple laser, Left; cyan laser, Left | #418, #1647; #1426 | approximate | beams thick, short, slanting down where the pictures draw them level, a thin core: lot 4d |
+| Purple laser, Left; cyan laser, Left | #418, #1647; #1426 | approximate, fixed in lot 4d | beams thick, short, slanting down where the pictures draw them level: now thinner and turned up 8 degrees (below) |
 
-None was wrong enough to change beyond Happy (Left). Still approximate, listed: Side Eye (far eye iris), the lasers (lot 4d).
+None was wrong enough to change beyond Happy (Left). Still approximate, listed: Side Eye (far eye iris).
+
+## The lasers on Side Left, Origin and Skull (lot 4d, 22 October 2026)
+
+Looked at on #127, #137, #214 (Purple), #252, #36, #308 (fire), #25, #28, #565 (cyan) and the Skull #418, #1647, #1426, each
+beside two other pictures of its value: [heroes-lasers-left-2026-10-22.jpg](heroes-lasers-left-2026-10-22.jpg). The pictures draw
+two thin beams that leave the eyes level or sinking a little towards the edge of the picture (about 10 to 15 degrees). The model
+leaves the eyes level with the ground, but its head is turned up by 20 degrees for the game camera, so from the front the beams
+slanted down by about 30 degrees, and they were thicker (0.021) with a wide light core. Fix (`BEAM_PITCH_DEG` 8 and `BEAM_RADIUS`
+0.019, the radius of Side Right, in the three `EYES_OF_SIDE["Left"]` laser entries, `build_laser` of `chog_trait_faces.py`): the
+beam is turned up 8 degrees from level, which brings the slant to the pictures'. The core (5 of the 8 sides) is kept: the
+pictures draw most of the beam in the light colour with an edge of the darker one. Still short by design (the game draws the long
+beam when the hero attacks), and Side Right is untouched. The Skull Left lasers (3 Genesis) use the same entries.
 
 ## The 64 Origin rows
 
@@ -133,9 +145,9 @@ None was wrong enough to change beyond Happy (Left). Still approximate, listed: 
 | 29 | Clown Eye | Left | 27 / 27 (#178, #760, #142) | Eyes_Clown | faithful |  |
 | 30 | Frog | Left | 27 / 29 (#15, #1055, #1271) | Eyes_Frog | approximate | round where the picture draws a wide oval under a lid |
 | 31 | Chog Viper | Left | 26 / 26 (#4, #50, #109) | Eyes_Goggles | approximate | light frame and strap narrower than the picture's, its lettering not drawn |
-| 32 | Purple laser | Left | 26 / 28 (#1237, #127, #137) | Eyes_Laser | approximate | beams short, thick and slanting down where the picture's run straight; eyes as drawn |
+| 32 | Purple laser | Left | 26 / 28 (#1237, #127, #137) | Eyes_Laser | approximate | beams short, thick and slanting down where the picture's run straight; eyes as drawn (fixed 22 Oct, lot 4d: thinner, turned up 8 degrees; still short by design) |
 | 33 | Clown Eye Mix | Left | 25 / 25 (#770, #1623, #1666) | Eyes_Clown | faithful |  |
-| 34 | fire laser | Left | 25 / 25 (#522, #36, #279) | Eyes_Laser | approximate | same beams as Purple laser Left; colours read on the beams of #893, #252, #565, #1658 |
+| 34 | fire laser | Left | 25 / 25 (#522, #36, #279) | Eyes_Laser | approximate | same beams as Purple laser Left (fixed 22 Oct, lot 4d); colours read on the beams of #893, #252, #565, #1658 |
 | 35 | Classic VR | Left | 24 / 25 (#1083, #46, #124) | Eyes_Headset | faithful |  |
 | 36 | Modern VR | Left | 24 / 26 (#491, #219, #227) | Eyes_Headset | faithful | glowing rim a little thinner than drawn |
 | 37 | Retard | Left | 23 / 24 (#32, #1249, #182) | Eyes_Retard | faithful |  |
@@ -143,7 +155,7 @@ None was wrong enough to change beyond Happy (Left). Still approximate, listed: 
 | 39 | 3D Glass | Left | 22 / 22 (#361, #419, #424) | Eyes_Glasses3D | faithful |  |
 | 40 | BTC Glass | Left | 19 / 19 (#189, #288, #510) | Eyes_CoinGlass | approximate | coins a little smaller than the lenses of the picture |
 | 41 | Worried | Left | 18 / 22 (#192, #247, #349) | Eyes_WorriedEye | faithful |  |
-| 42 | cyan laser | Left | 17 / 18 (#25, #1142, #1151) | Eyes_Laser | approximate | same beams as Purple laser Left |
+| 42 | cyan laser | Left | 17 / 18 (#25, #1142, #1151) | Eyes_Laser | approximate | same beams as Purple laser Left (fixed 22 Oct, lot 4d) |
 | 43 | Thug | Left | 15 / 17 (#141, #203, #250) | Eyes_PixelShades | faithful |  |
 
 Rows: approximate 15 (663 Genesis), faithful 28 (1206 Genesis).
