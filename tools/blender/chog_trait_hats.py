@@ -1989,11 +1989,19 @@ def build_hoodie(maker):
 COSTUME = {
     # The belly in another colour (shark): half its width, its lower and upper edge.
     "BELLY": (0.085, 0.300, 0.540),
-    # The teeth of the shark along the edge of the hood: how many, from how far round on each side
-    # (degrees from the front), how long, how wide at their foot (degrees).
-    "TEETH": (11, 70.0, 0.050, 6.0),
-    # The fin on the back of the hood: polar degrees where it starts and ends, its height, half thickness.
-    "FIN": (24.0, 96.0, 0.150, 0.016),
+    # The teeth of the shark: a full row of white triangles in a dark outline all round the opening, the upper jaw
+    # and the lower (22 October 2026, from the 25 pictures, which draw about 24 round the face: nine on top, four
+    # on each side, seven under the chin; until then eleven small ones along the top of the rim, nearly
+    # invisible). How many, how long (on the sides, at the top of the opening, at its bottom), how large the dark triangle is
+    # and the white one inside it, against the triangle between two points of the edge and the tip (the dark one shows
+    # all round the white as the outline the pictures draw).
+    "TEETH": (20, (0.066, 0.082, 0.056), (1.10, 0.74)),
+    # The fin on the back of the hood (not drawn by any picture: the hood is out of the frame): polar degrees where
+    # it starts and ends, its height, half thickness. (0.150 and 0.016 until 22 October 2026: a thin thorn.)
+    "FIN": (24.0, 96.0, 0.105, 0.026),
+    # The pectoral fin on each side of the body (the pictures draw it low at the side, dark blue, swept back and
+    # down, with three lines): its root (height, how far back), its reach out, back and down, its half thickness.
+    "PECTORAL": (0.46, 0.02, (0.17, 0.12, 0.12), 0.014),
     # The bandana over the lower face: in the coordinates of the face, its upper corners (to the side,
     # above), its point below the chin, how far off the head, its dots.
     # Its lift runs from its top edge to its point: close to the face under the eyes, over the band of the hood
@@ -2053,6 +2061,57 @@ def add_boots(maker, part, material, larger):
             point.co.z = max(point.co.z, 0.0)
 
 
+def add_shark_teeth(maker, part, numbers):
+    """A row of white teeth in a dark outline all round the edge of the face, pointing in at it: the upper jaw
+    longest, the lower shortest, each a triangle laid on the face between two points of its edge."""
+    head, surface = maker.head, maker.surface
+    count, (side_length, top_length, bottom_length), (dark_size, white_size) = numbers.TEETH
+    edge = [KIT.face_place(head, angle, 1.0) for angle in KIT.face_edge_angles(head, surface, count)]
+    lift_line, lift_tooth = KIT.DRAWN[1], KIT.DRAWN[2]
+    for index in range(count):
+        (x1, z1), (x2, z2) = edge[index], edge[(index + 1) % count]
+        middle = ((x1 + x2) * 0.5, (z1 + z2) * 0.5)
+        reach = math.hypot(*middle)
+        inward = (-middle[0] / reach, -middle[1] / reach)
+        high = max(0.0, inward[1] * -1.0)          # 1 on the top teeth (they point down), -1 under the chin
+        length = side_length + (top_length - side_length) * high if inward[1] < 0.0 else \
+            side_length + (bottom_length - side_length) * inward[1]
+        tip = (middle[0] + inward[0] * length, middle[1] + inward[1] * length)
+        corners = [(x1, z1), (x2, z2), tip]
+        centre = (sum(c[0] for c in corners) / 3.0, sum(c[1] for c in corners) / 3.0)
+        # The dark triangle is larger than the tooth, the white one smaller, both about the middle of the triangle: the
+        # dark shows all round the white (a white tooth on the cream face has no other edge).
+        # (The dark foot stays on the edge of the face: scaled out past it, it left the head, where the surface of
+        # the head runs out, and went under the face: only the tips showed.)
+        for material, size, lift in (("ToothEdge", dark_size, lift_line), ("Tooth", white_size, lift_tooth)):
+            points = [(centre[0] + (c[0] - centre[0]) * size, centre[1] + (c[1] - centre[1]) * size) for c in corners]
+            if material == "ToothEdge":
+                points = [corners[0], corners[1],
+                          (tip[0] + (tip[0] - middle[0]) * (size - 1.0), tip[1] + (tip[1] - middle[1]) * (size - 1.0))]
+            # Rows from the tip to the foot: a flat triangle 0.09 long sags 0.004 under the curve of the head, below the face
+            # (the dark one hid under it but for its tip), so each tooth is cut in three bands.
+            rows = [[surface.front(points[2][0], points[2][1], lift)]]
+            for share in (0.35, 0.70, 1.0):
+                rows.append([surface.front(points[2][0] + (side - points[2][0]) * share,
+                                           points[2][1] + (up - points[2][1]) * share, lift) for side, up in points[:2]])
+            full.add_skin(part, surface, rows, part.named(material), around=False)
+
+
+def add_pectoral_fins(maker, numbers):
+    """A flat dark fin on each side of the body, swept back and down."""
+    torso, body = maker.parts[0][0], maker.body
+    height, back, (out, behind, down), thick = numbers.PECTORAL
+    for sign in (1.0, -1.0):
+        half_width, half_depth = KIT.torso_section(body, height)
+        root = Vector((sign * half_width * 0.92, back, height))
+        edge = [root + Z * 0.05, root + Vector((sign * out, behind, -down * 0.2)),
+                root + Vector((sign * out * 0.85, behind * 1.25, -down)), root + Vector((sign * out * 0.30, behind * 0.5, -down * 0.8)),
+                root - Z * 0.07]
+        normal = Vector((0.0, -0.6, 1.0)).normalized()
+        KIT.add_loops(torso, [[point - normal * thick for point in edge], [point + normal * thick for point in edge]],
+                      torso.named("Fin"), numbers.OUTLINE_THICKNESS)
+
+
 def build_costume(maker):
     """A costume with a hood up: the suit ("Track" with long sleeves), its belly, the hood over the head,
     and what the entry adds ("teeth", "fin", "bandana"). The banana and the dragon are whole costumes since
@@ -2083,18 +2142,8 @@ def build_costume(maker):
                      for degrees in [-around + 2.0 * around * index / 8 for index in range(9)]])
     full.add_skin(hood, surface, rows, hood.named("Hood"), around=False)
     if entry.get("teeth"):
-        count, around, length, half_deg = numbers.TEETH
-        for index in range(count):
-            degrees = -around + 2.0 * around * index / (count - 1)
-            angle = math.radians(270.0 + degrees)
-            polar = math.radians(interpolate(hood_numbers.RIM, abs(degrees)))
-            size = interpolate(hood_numbers.SIZE, abs(degrees))
-            corners = [on_head(surface, angle + math.radians(turn), polar, size * 0.99) for turn in (-half_deg, half_deg)]
-            # The point of a tooth: towards the middle of the face, along the head.
-            middle_of_face = surface.front(0.0, 0.0, 0.0)
-            foot = (corners[0] + corners[1]) * 0.5
-            tip = foot + (middle_of_face - foot).normalized() * length + head_normal(surface, angle, polar) * 0.004
-            full.add_skin(hood, surface, [[tip], corners], hood.named("Tooth"), around=False)
+        add_shark_teeth(maker, hood, numbers)
+        add_pectoral_fins(maker, numbers)
     if entry.get("fin"):
         start, end, height, half_thick = numbers.FIN
         angle = math.radians(90.0)
@@ -2162,7 +2211,10 @@ MASCOT = {
     # collar from inside the head ("TUCK" of its size), out of it at "LIP" off the face, then over the
     # volume: degrees further from the middle of the face than the opening, how far off the volume. The
     # volume itself is open where the collar covers it: "CUT" degrees beyond the opening.
-    "OPENING": (0.6, 24),
+    # (OPENING 0.6 until 22 October 2026: the rim stood 0.011 outside the edge of the face, which reaches the side of the
+# head now, and a strip of the skin of the head showed in the slit beside it, yellow on #16. -0.3: the rim 0.005 inside
+# the edge of the face, the collar over its dark line.)
+    "OPENING": (-0.3, 24),
     "TUCK": 0.86,
     "LIP": 0.020,
     "COLLAR": ((4.0, 0.028), (14.0, 0.028), (26.0, 0.006)),
@@ -2173,15 +2225,20 @@ MASCOT = {
     # (where round the opening, as on #16, #42 and #773: degrees from the side of its left, counted up;
     # length, radius), the nostrils on the top of the hood (degrees each side, polar degrees, radius), the
     # dark "w" of its scales (where: from a point, a way), wings on its back and its tail.
-    "BELLY": (0.34, 0.20, 0.17),
-    "HORN_PLACES": (30.0, 150.0, 205.0, 335.0, 250.0, 290.0),
-    "HORN": (0.115, 0.040),
-    "NOSTRILS": (11.0, 24.0, 0.026),
+    "BELLY": (0.36, 0.22, 0.19),
+    # (Six sharp horns, 0.115 long, until 22 October 2026. The pictures of the 23 dragons draw four small blunt tan horns,
+    # as wide at their foot as long: one at each upper side of the opening, one at each lower side.)
+    "HORN_PLACES": (40.0, 140.0, 205.0, 335.0),
+    "HORN": (0.085, 0.052),
+    "NOSTRILS": (11.0, 22.0, 0.030),
     "SCALES": (((0.0, 0.0, 0.81), (-0.40, -0.30, 0.86)), ((0.0, 0.0, 0.81), (0.42, -0.26, 0.87)),
                ((0.0, 0.0, 0.81), (0.70, 0.25, 0.67)), ((0.0, 0.0, 0.81), (-0.72, 0.20, 0.66)),
                ((0.0, 0.0, 0.81), (0.05, 0.75, 0.66)), ((0.0, 0.0, 0.40), (-0.86, -0.42, 0.10)),
-               ((0.0, 0.0, 0.40), (0.88, -0.38, -0.05)), ((0.0, 0.0, 0.30), (0.30, 0.95, 0.10))),
-    "SCALE": (0.034, 0.024, 0.006),
+               ((0.0, 0.0, 0.40), (0.88, -0.38, -0.05)), ((0.0, 0.0, 0.30), (0.30, 0.95, 0.10)),
+               # (22 October 2026: the pictures scatter the dark "w" over the hood and the chest)
+               ((0.0, 0.0, 0.81), (-0.30, -0.22, 0.93)), ((0.0, 0.0, 0.81), (0.32, -0.20, 0.93)),
+               ((0.0, 0.0, 0.81), (-0.62, 0.05, 0.78)), ((0.0, 0.0, 0.81), (0.64, 0.02, 0.77))),
+    "SCALE": (0.050, 0.034, 0.008),
     # The wings: where they leave the back (to the side, height), their way out (to the side, back, up),
     # span, height, thickness.
     # (First: out to the back and up, seen edge on from the camera of the game, two red spikes. A bat wing
@@ -2190,7 +2247,7 @@ MASCOT = {
     "WING_ROOT": (0.14, 0.68),
     "WING_WAY": (1.00, 0.40, 0.30),
     "WING_UP": (0.0, 0.30, 0.95),
-    "WING_SIZE": (0.46, 0.32, 0.012),
+    "WING_SIZE": (0.27, 0.19, 0.012),     # (0.46, 0.32 until 22 October 2026: the pictures draw small wings)
     # The tail from low on the back: places behind the back (to the side, behind, height), radii.
     # (Then straight back from the bottom: seen end on from behind, a lump.) It curls round to the left of
     # the character and up, so it shows beside the body from the front and from behind.
@@ -2435,7 +2492,10 @@ def build_mascot(maker):
         aim = Matrix.Rotation(math.radians(sign * side_deg), 3, "Z") @ Vector(
             (0.0, -math.sin(math.radians(polar_deg)), math.cos(math.radians(polar_deg))))
         place, out = on_volume(middle_body, aim, 0.004)
-        disc_on(torso, SimpleNamespace(middle=middle_body), place, out, radius, torso.named("Nostril"), segments=10)
+        disc_on(torso, SimpleNamespace(middle=middle_body), place, out, radius, torso.named("Nostril"), segments=12)
+        # (a dark outline round a fill of the colour of the hood, as the pictures draw them, not a dark blot)
+        disc_on(torso, SimpleNamespace(middle=middle_body), place + out * 0.0015, out, radius * 0.62, torso.named("Main"),
+                segments=12)
     wide, tall, thick = numbers.SCALE
     for origin, aim in numbers.SCALES:
         origin = Vector(origin)
@@ -2448,12 +2508,15 @@ def build_mascot(maker):
         for step_side, step_up in ((-1.0, 1.0), (-0.5, -1.0), (0.0, 0.25), (0.5, -1.0), (1.0, 1.0)):
             target = place + along * wide * step_side + up * tall * step_up * 0.5
             path.append(on_volume(origin, target - origin, 0.006)[0])
-        widths, depths = [], []
+        # A flat stroke on the volume (a strip of four quads, 8 triangles; a closed tube of four sides was 40 and the
+        # fourteen marks of the pictures did not fit under the limit of 8,000).
+        lower, upper = [], []
         for index, point in enumerate(path):
             ahead = path[min(index + 1, 4)] - path[max(index - 1, 0)]
-            widths.append(out.cross(ahead).normalized() * thick)
-            depths.append(out * 0.003)
-        slab(torso, path, widths, depths, torso.named("Scale"), 0.0, sides=4)
+            across = out.cross(ahead).normalized() * thick
+            lower.append(point - across)
+            upper.append(point + across)
+        full.add_skin(torso, SimpleNamespace(middle=origin), [lower, upper], torso.named("Scale"), around=False)
     side_at, height = numbers.WING_ROOT
     to_side, to_back, to_up = numbers.WING_WAY
     span, wing_tall, wing_thick = numbers.WING_SIZE
@@ -2484,10 +2547,8 @@ def build_mascot(maker):
         tail_rings.append((point, across_first * tail_radius, across_second * tail_radius) if tail_radius > 0.0
                           else (point, Vector(), Vector()))
     torso.shell(tail_rings, 7, torso.named("Main"), numbers.OUTLINE_THICKNESS)
-    for index in (1, 2, 3, 4):
-        point, tail_radius = tail_points[index], radii[index]
-        torso.shell(base.tube_rings(point + Z * tail_radius * 0.7, Vector((0.0, -0.3, 1.0)), X,
-                                    ((0.0, 0.032), (0.070, 0.0))), 4, torso.named("Horn"), numbers.OUTLINE_THICKNESS * 0.6)
+    # (Four spikes along the tail until 22 October 2026: no picture draws a tail, nor spikes on it; taken out for the
+    # triangle budget the four horns, the nostrils and the scales of the pictures needed.)
     claws, apart, claw_length, claw_radius = numbers.CLAWS
     body = maker.body
     for sign in (1.0, -1.0):
@@ -2510,8 +2571,8 @@ def build_mascot(maker):
         lift_way = (root - surface.middle).normalized()
         way = ((outer - root).normalized() * 0.75 + lift_way * 0.60).normalized()
         collar.shell(base.tube_rings(root - way * 0.020, way, lift_way.cross(way), (
-            (0.0, horn_radius), (horn_length * 0.55, horn_radius * 0.70), (horn_length, horn_radius * 0.12))), 6,
-            collar.named("Horn"), numbers.OUTLINE_THICKNESS * 0.8)
+            (0.0, horn_radius), (horn_length * 0.5, horn_radius * 0.78), (horn_length * 0.9, horn_radius * 0.42),
+            (horn_length, horn_radius * 0.20))), 8, collar.named("Horn"), numbers.OUTLINE_THICKNESS * 0.8)
 
 
 def head_normal_at(surface, point):
@@ -2524,15 +2585,27 @@ def head_normal_at(surface, point):
 ASTRO = {
     # The ring of the helmet around the face: how much larger than the head, its radius (its opening, polar
     # degrees by degrees from the front, goes all round the face).
-    # (Since 22 October 2026 the opening follows the edge of the face, make_chog_traits.opening_rim: the ring
-    # stands "RING_GAP" off it, and "RING_TAIL" closes it under the chin and behind. Typed in by hand until
-    # then, for a face 0.25 wide: (0, 50), (45, 66), (75, 110), (110, 160), (180, 170).)
-    "RING_GAP": 0.040,
-    "RING_TAIL": ((110.0, 160.0), (180.0, 170.0)),
+    # (Until 22 October 2026 the ring followed the edge of the face over the brow and the sides, with the crown of
+    # leaves coming out of it: a sunflower. Now a round ring across the way the face looks, a shell behind it.)
     "RING_SIZE": 1.12,
-    "RING_RADIUS": 0.040,
-    "RING_STATIONS": 18,
-    "RING_AROUND_DEG": 118.0,
+    "RING_RADIUS": 0.046,
+    "RING_STATIONS": 28,
+    # The helmet (22 October 2026, from the 24 pictures, which draw a round glass helmet round the whole head, the
+    # crown and the face inside it, and none of the spikes outside): a shell as large as the ring over the back and the
+    # top of the head, closed (sides, rows), in its own colour. The crown of the head stays inside it: no leaf.
+    "DOME": (22, 5),
+    # The ribbed unit at the side of the helmet, on the right of the character (the left of the pictures): where
+    # (to the side, behind the middle of the head, height above its middle), then its stations (along, radius).
+    "VENT_AT": (-0.318, 0.035, 0.015),
+    "VENT": ((0.0, 0.046), (0.020, 0.064), (0.038, 0.050), (0.056, 0.064), (0.074, 0.050), (0.092, 0.064), (0.112, 0.050)),
+    # The hose from under the helmet to the chest, on the right of the character: (to the side, height) points of its
+    # way over the front of the chest, its radius. The flag patch on the chest: its middle (to the side, height), its half
+    # width and half height. The chest box: half width, from and to what height. The pack on the back: half width, half
+    # depth, from and to what height.
+    "HOSE": (((-0.205, 0.600), (-0.248, 0.568), (-0.258, 0.530), (-0.238, 0.490), (-0.200, 0.462)), 0.020),
+    "FLAG": ((-0.105, 0.535), 0.040, 0.026),
+    "CHEST_BOX": (0.105, 0.500, 0.390),
+    "PACK": (0.125, 0.052, 0.560, 0.360),
     # The collar of the suit around the neck: height, how far it stands out, its radius.
     "COLLAR": (0.585, 0.030, 0.034),
     "OUTLINE_THICKNESS": 0.016,
@@ -2540,11 +2613,12 @@ ASTRO = {
 
 
 def build_astro(maker):
-    """The space suit: white suit with long sleeves (grey stripes down them), a thick collar, and the
-    ring of the helmet around the face. The glass of the helmet is not drawn: the face and the crown
-    show as through it."""
+    """The space suit of the pictures (22 October 2026): a white suit with long sleeves (grey stripes down them), a thick
+    collar, the flag patch on the right of the chest, a box on the chest, the ribbed hose from the helmet down the
+    chest, a pack on the back; and a round helmet: a thick ring round the face and a closed shell over the rest of the
+    head, a ribbed unit at its right side. The glass is not drawn: the face and the skin of the head show through the
+    ring, the crown is inside the shell (its leaves are taken out, none comes through it)."""
     numbers = SimpleNamespace(**ASTRO)
-    numbers.RING = KIT.opening_rim(maker.head, lambda degrees: numbers.RING_SIZE, numbers.RING_GAP, numbers.RING_TAIL)
     build_track(maker)
     torso, body = maker.parts[0][0], maker.body
     height, out_by, radius = numbers.COLLAR
@@ -2557,21 +2631,83 @@ def build_astro(maker):
         wide.append(outward * radius)
         thick.append(Z * radius)
     slab(torso, path, wide, thick, torso.named("Ring"), numbers.OUTLINE_THICKNESS, sides=6)
+
+    # The flag patch: a blue field and stripes, flat on the chest.
+    (flag_side, flag_height), flag_wide, flag_tall = numbers.FLAG
+    chest = SimpleNamespace(middle=Vector((0.0, 0.0, flag_height)))
+    stripes = 5
+    for index in range(stripes):
+        top = flag_height + flag_tall - 2.0 * flag_tall * index / stripes
+        bottom = flag_height + flag_tall - 2.0 * flag_tall * (index + 1) / stripes
+        rows = [[shirt_front(maker, level, flag_side + edge, 0.003) for edge in (-flag_wide, flag_wide)]
+                for level in (top, bottom)]
+        full.add_skin(torso, chest, rows, torso.named("FlagRed" if index % 2 == 0 else "FlagWhite"), around=False)
+    rows = [[shirt_front(maker, level, flag_side + edge, 0.0045) for edge in (-flag_wide, -flag_wide * 0.1)]
+            for level in (flag_height + flag_tall, flag_height + flag_tall * 0.1)]
+    full.add_skin(torso, chest, rows, torso.named("FlagBlue"), around=False)
+
+    # The box on the chest and the pack on the back.
+    box_wide, box_top, box_foot = numbers.CHEST_BOX
+    middle_height = (box_top + box_foot) * 0.5
+    _, depth = KIT.torso_section(body, middle_height)
+    slab(torso, [Vector((0.0, -depth - 0.012, box_top)), Vector((0.0, -depth - 0.012, box_foot))],
+         [X * box_wide] * 2, [Y * 0.016] * 2, torso.named("Panel"), numbers.OUTLINE_THICKNESS, sides=4)
+    pack_wide, pack_deep, pack_top, pack_foot = numbers.PACK
+    _, depth = KIT.torso_section(body, (pack_top + pack_foot) * 0.5)
+    slab(torso, [Vector((0.0, depth + pack_deep * 0.8, pack_top)), Vector((0.0, depth + pack_deep * 0.8, pack_foot))],
+         [X * pack_wide] * 2, [Y * pack_deep] * 2, torso.named("Ring"), numbers.OUTLINE_THICKNESS, sides=4)
+
+    # The hose: a ribbed tube over the front of the chest, from the collar down.
+    points, hose_radius = numbers.HOSE
+    way = [shirt_front(maker, level, side, hose_radius + 0.004) for side, level in points]
+    across, through = [], []
+    for index, point in enumerate(way):
+        ahead = way[min(index + 1, len(way) - 1)] - way[max(index - 1, 0)]
+        first, second = base.frame_across(ahead, Y)
+        swell = 1.0 + 0.22 * (index % 2)
+        across.append(first * hose_radius * swell)
+        through.append(second * hose_radius * swell)
+    slab(torso, way, across, through, torso.named("Hose"), numbers.OUTLINE_THICKNESS * 0.7, sides=6)
+
+    # The helmet: a round ring round the face (an ellipse a little larger than the head, in the plane across the way the
+    # face looks), the shell over the whole back half of the head behind it, the ribbed unit at the right side.
     ring = maker.part(on="Head")
     surface = maker.surface
-    path, wide, thick = [], [], []
-    for index in range(numbers.RING_STATIONS + 1):
-        degrees = -numbers.RING_AROUND_DEG + 2.0 * numbers.RING_AROUND_DEG * index / numbers.RING_STATIONS
-        angle = math.radians(270.0 + degrees)
-        polar = math.radians(interpolate(numbers.RING, abs(degrees)))
-        out = head_normal(surface, angle, polar)
-        point = on_head(surface, angle, polar, numbers.RING_SIZE)
-        ahead = on_head(surface, angle + 0.01, polar, numbers.RING_SIZE) - on_head(surface, angle - 0.01, polar,
-                                                                                    numbers.RING_SIZE)
-        path.append(point)
-        wide.append(out.cross(ahead.normalized()).normalized() * numbers.RING_RADIUS)
-        thick.append(out * numbers.RING_RADIUS)
+    middle, half = surface.middle, surface.half
+    looking = (surface.front(0.0, 0.0, 0.0) - middle).normalized()
+    up_way = (Z - looking * Z.dot(looking)).normalized()
+    side_way = (X - looking * X.dot(looking) - up_way * X.dot(up_way)).normalized()
+    size = numbers.RING_SIZE
+
+    def on_shell(psi, turn, scale):
+        """A point of the shell larger than the head by "scale": "psi" degrees from the way straight behind the face,
+        "turn" round it."""
+        way = (-looking * math.cos(math.radians(psi))
+               + (side_way * math.cos(turn) + up_way * math.sin(turn)) * math.sin(math.radians(psi)))
+        return middle + Vector((half.x * scale * way.x, half.y * scale * way.y, half.z * scale * way.z))
+
+    stations = numbers.RING_STATIONS
+    turns = [2.0 * math.pi * index / stations for index in range(stations + 1)]
+    path = [on_shell(90.0, turn, size) for turn in turns]
+    wide, thick = [], []
+    for index, point in enumerate(path):
+        radial = (point - middle - looking * (point - middle).dot(looking)).normalized()
+        wide.append(radial * numbers.RING_RADIUS)
+        thick.append(looking * numbers.RING_RADIUS)
     slab(ring, path, wide, thick, ring.named("Ring"), numbers.OUTLINE_THICKNESS, sides=6)
+    sides, rows = numbers.DOME
+    angles = [2.0 * math.pi * index / sides for index in range(sides)]
+    loops = [[on_shell(90.0, angle, size * 0.90) for angle in angles]]
+    for row in range(rows):
+        psi = 90.0 * (1.0 - row / rows)
+        loops.append([on_shell(psi, angle, size * 0.985) for angle in angles])
+    loops.append([on_shell(0.0, 0.0, size * 0.985)])
+    shares = [(0.0,) * sides] + [(1.0,) * sides] * rows + [(1.0,)]
+    KIT.add_loops(ring, loops, ring.named("Shell"), numbers.OUTLINE_THICKNESS, shares=shares)
+    side, behind, up = numbers.VENT_AT
+    start = surface.middle + Vector((side, behind, up))
+    ring.shell(base.tube_rings(start, Vector((-1.0, 0.0, 0.0)), Y, numbers.VENT), 8, ring.named("Vent"),
+               numbers.OUTLINE_THICKNESS * 0.8)
 
 
 DUCK = {
@@ -2893,7 +3029,8 @@ CLOTHES.update({
                              hood_numbers={"SIZE": ((0.0, 1.14), (60.0, 1.24), (180.0, 1.26))}),
     # A blue shark: white belly, white teeth all round the face, a fin on the back of the hood.
     "Shark Suit": costume((0.27, 0.71, 0.92), {"Hood": (0.27, 0.71, 0.92), "Rim": (0.23, 0.55, 0.80),
-                                               "Belly": (0.92, 0.95, 0.97), "Tooth": (0.97, 0.97, 0.97)},
+                                               "Belly": (0.92, 0.95, 0.97), "Tooth": (1.0, 1.0, 1.0),
+                                               "ToothEdge": (0.04, 0.07, 0.16), "Fin": (0.16, 0.40, 0.68)},
                           teeth=True, fin=True),
     # A whole banana round the whole Chog (build_mascot, 16 October 2026, after the owner saw a hood over a
     # suit twice): its five sides from yellow round the face to orange at the feet, green over the head, its
@@ -2913,12 +3050,16 @@ CLOTHES.update({
     # The space suit: white, grey stripes down the sleeves, the ring of the helmet around the face. Its
     # glass is not drawn; the pictures show the crown inside it, so the crown stays.
     "Astro Suit": {"kind": "Astro", "colours": {"Main": (0.90, 0.88, 0.84), "Collar": (0.70, 0.70, 0.72),
-                                                "Stripe": (0.52, 0.56, 0.69), "Ring": (0.72, 0.73, 0.76)},
+                                                "Stripe": (0.52, 0.56, 0.69), "Ring": (0.72, 0.73, 0.76),
+                                                "Shell": (0.86, 0.88, 0.93), "Vent": (0.64, 0.65, 0.70),
+                                                "Panel": (0.52, 0.55, 0.70), "Hose": (0.60, 0.61, 0.66),
+                                                "FlagRed": (0.80, 0.14, 0.20), "FlagWhite": (0.96, 0.96, 0.97),
+                                                "FlagBlue": (0.16, 0.22, 0.58)},
                    "numbers": {"STEP": 0.076, "SLEEVE": LONG_SLEEVE},
-                   # The ring passes beside the face where the lowest pair of leaves grows: that pair is
-                   # removed (the pictures show the spikes of the top inside the helmet).
-                   "head": {"LEAVES": (WHOLE, WHOLE, WHOLE, GONE, WHOLE, WHOLE, WHOLE)},
-                   "print_missing": "the glass of the helmet and the flag patch"},
+                   # The pictures draw the crown inside a round glass helmet, none outside it: the leaves are
+                   # taken out (until 22 October 2026 the star came out of the ring like a sunflower).
+                   "head": {"LEAVES": NO_CROWN},
+                   "print_missing": "the glass of the helmet (the shell is opaque)"},
     "Duck Float": {"kind": "DuckFloat", "colours": {"Duck": (0.93, 0.68, 0.20), "Beak": (0.92, 0.48, 0.12),
                                                     "Eye": (0.10, 0.07, 0.04)}},
 })
