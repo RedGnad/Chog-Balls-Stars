@@ -4,7 +4,7 @@
 //
 //   node server/src/local.js [--port 8090] [--data .artifacts/services]
 //                            [--pretend-holder 0xaddress=408,1795]
-//                            [--shop 0xaddress] [--rental 0xaddress]
+//                            [--shop 0xaddress] [--rental 0xaddress [--rental-logs-rpc <url> --rental-from-block <n>]]
 //                            [--rpc http://127.0.0.1:8545]
 //                            [--wager 0xaddress --referee-key-file <file>
 //                             [--wager-network testnet --wager-token 0xaddress] [--wager-rpc <url>]]
@@ -17,7 +17,10 @@
 // whatever the chain says, so the signed path can be run with a throwaway key. Never use it on
 // a server that players reach.
 // --shop is the deployed shop contract; without it nothing is sold. --rental is the deployed
-// rental contract; without it nothing is rented. --rpc reads the chain from another endpoint,
+// rental contract; without it nothing is rented; what each Genesis earned by being rented is
+// read from its events on --rental-logs-rpc (an endpoint serving 10,000-block windows of
+// eth_getLogs, "none" to read nothing; default rpc2.monad.xyz) from --rental-from-block (default
+// the mainnet contract's deployment block). --rpc reads the chain from another endpoint,
 // for instance a local copy of Monad mainnet on which the contracts were deployed for a test.
 // --wager is the deployed wager contract and --referee-key-file a file that holds its
 // referee's key (64 hex digits): without both, no match is staked on. The wager is on the chain
@@ -45,6 +48,7 @@ import { createPhoton } from './photon.js';
 import { createPrice } from './price.js';
 import { createReferee } from './referee.js';
 import { createRental } from './rental.js';
+import { createRentalLedger, LOGS_RPC_URLS, RENTAL_DEPLOYED_AT_BLOCK } from './rental-ledger.js';
 import { createRanks } from './ranks.js';
 import { createSeasons, seasonFrom } from './seasons.js';
 import { createSessions } from './session.js';
@@ -69,6 +73,14 @@ const shop = createShop({ chain, address: option('--shop', '') });
 // The price of $CHOG in dollars is read from the same public sources as in production.
 const price = createPrice();
 const rental = createRental({ chain, address: option('--rental', ''), price });
+const logsRpc = option('--rental-logs-rpc', '');
+const ledger = rental.address && logsRpc !== 'none'
+  ? createRentalLedger({
+    address: rental.address, rpcUrls: logsRpc ? [logsRpc] : LOGS_RPC_URLS,
+    fromBlock: Number(option('--rental-from-block', '') || RENTAL_DEPLOYED_AT_BLOCK),
+  })
+  : undefined;
+ledger?.start();
 const pretend = option('--pretend-holder');
 if (pretend) {
   const [address, list] = pretend.split('=');
@@ -144,6 +156,7 @@ const handle = createApi({
   photonAuthentication: process.argv.includes('--photon-auth'),
   wager: createWager({ chain: wagerChain, referee, matches, network: wagerPlace, store: matchStore, price }),
   price,
+  ledger,
   reownProjectId: await reownProjectId(dataFolder, option('--reown-project-id')),
 });
 

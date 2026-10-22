@@ -57,6 +57,8 @@ async function bodyOf(request) {
  * @param {ReturnType<import('./wager.js').createWager>} [services.wager] absent when no match is staked on
  * @param {ReturnType<import('./price.js').createPrice>} [services.price] the price of $CHOG in dollars;
  *   absent when the game shows amounts in $CHOG only
+ * @param {ReturnType<import('./rental-ledger.js').createRentalLedger>} [services.ledger] what each
+ *   Genesis earned by being rented, from the rental's events; absent when that is not read
  * @param {string} [services.publicOrigin] origin of the game page, for example "https://game.example";
  *   when absent it is taken from the request, which is only right behind a proxy we control
  * @param {string} [services.reownProjectId] the Reown project id of this deployment; without it
@@ -65,7 +67,7 @@ async function bodyOf(request) {
  *   beside these services, or a function that reads it; empty when they do not know
  * @returns {(request: Request) => Promise<Response>}
  */
-export function createApi({ chain, sessions, careers, ranks, seasons, rankStorageStatus = 'not_configured', matches, recentRecords, shop, rental, standIns, photon, photonAuthentication = false, wager, price, publicOrigin, reownProjectId = '', build = '' }) {
+export function createApi({ chain, sessions, careers, ranks, seasons, rankStorageStatus = 'not_configured', matches, recentRecords, shop, rental, standIns, photon, photonAuthentication = false, wager, price, ledger, publicOrigin, reownProjectId = '', build = '' }) {
   // The page a wallet is asked to trust: it is written in the message the player signs.
   function pageOf(request, url) {
     const origin = publicOrigin
@@ -220,6 +222,28 @@ export function createApi({ chain, sessions, careers, ranks, seasons, rankStorag
     // Every Genesis its holder offers for rent now, with the price a day, read on the chain.
     'GET /api/rental/offers': async () => json(200, { offers: rental ? await rental.offers() : [] }),
 
+    // The cheapest Genesis for rent now (three unless "limit" says otherwise), each with the
+    // dollars of a day when the price is known: what a player without a Genesis is shown first.
+    'GET /api/rental/cheapest': async (request, url) => {
+      const limit = Number(url.searchParams.get('limit') ?? 3);
+      if (!Number.isInteger(limit) || limit < 1 || limit > MAX_TOKENS_PER_READ) {
+        return failure(400, 'bad_limit', `limit must be 1 to ${MAX_TOKENS_PER_READ}`);
+      }
+      return json(200, rental ? await rental.cheapest(limit) : { offers: [], offered: 0 });
+    },
+
+    // What these Genesis earned their holders by being rented, and how often, from the rental's
+    // events as read so far (rental-ledger.js): public, like the chain. {enabled: false} when
+    // the events are not read.
+    'GET /api/rental/earned': async (request, url) => {
+      const tokens = (url.searchParams.get('tokens') ?? '').split(',').filter(Boolean).map(Number);
+      if (tokens.length === 0 || tokens.length > MAX_TOKENS_PER_READ
+        || tokens.some(token => !Number.isInteger(token) || token < 1 || token > LAST_TOKEN_ID)) {
+        return failure(400, 'bad_tokens', `tokens must be 1 to ${MAX_TOKENS_PER_READ} token ids separated by commas`);
+      }
+      return json(200, ledger ? ledger.earnedOf(tokens) : { enabled: false });
+    },
+
     // The Genesis an address rents now. A public read, like what an address holds.
     'GET /api/rental/rented': async (request, url) => {
       const address = url.searchParams.get('address');
@@ -320,6 +344,14 @@ export function createApi({ chain, sessions, careers, ranks, seasons, rankStorag
       const address = await signedIn(request);
       if (!address) return failure(401, 'not_signed_in', 'sign in with the wallet first');
       return json(200, wager ? await wager.mine({ address }) : { enabled: false });
+    },
+
+    // What the signed-in wallet won and lost on its stakes of the last seven days, on the
+    // referee's decisions, with the dollars of it when the price is known.
+    'GET /api/wager/week': async request => {
+      const address = await signedIn(request);
+      if (!address) return failure(401, 'not_signed_in', 'sign in with the wallet first');
+      return json(200, wager ? await wager.weekOf({ address }) : { enabled: false });
     },
 
     // The referee's ticket to stake on the match the signed-in wallet is in.

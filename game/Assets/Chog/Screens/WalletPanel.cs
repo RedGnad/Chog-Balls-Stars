@@ -89,6 +89,8 @@ namespace Chog.Screens
         private TextMeshProUGUI _posterKicker;
         private TextMeshProUGUI _posterExampleLabel;
         private bool _posterPortraitRequested;
+        // In place of the example, when holders offer Genesis for rent: the three cheapest.
+        private RentalOffersCard _offers;
 
         // With a Genesis to play: its mastery road, then the Genesis of the wallet.
         private MasteryRoad _road;
@@ -359,6 +361,9 @@ namespace Chog.Screens
                 TextAlignmentOptions.Left, ChogTheme.Purple, false);
             _posterExampleLabel = ChogUi.Body("ExampleLabel", _poster, new Vector2(0.59f, 0.10f), new Vector2(0.96f, 0.22f),
                 19f, TextAlignmentOptions.Center, ChogTheme.Purple);
+            // The right half of the card: the three cheapest Genesis for rent, in place of the example.
+            _offers = RentalOffersCard.Create(_poster, new Vector2(0.56f, 0.05f), new Vector2(0.97f, 0.80f));
+            _offers.gameObject.SetActive(false);
         }
 
         // Laid over the menu while a Genesis is being lent; it takes the taps of what it covers.
@@ -529,7 +534,7 @@ namespace Chog.Screens
 
             _rosterTitle.text = guest ? "LENT TO YOU" : PlayerWallet.Tokens.Length > 0 ? "YOUR GENESIS" : "YOUR RENTED GENESIS";
             _rosterInfo.text = guest ? "by " + PlayerWallet.ShortAddress(GuestPass.Lender) + ", " + GuestPass.TimeLeft(GuestPass.ExpiresAtMs, NowMs()) + " left"
-                : rents ? "rented, " + GenesisRental.TimeLeft(GenesisRental.RentedUntilSeconds(played), NowMs() / 1000) + " left"
+                : rents ? RentedInfo(GenesisRental.RentedUntilSeconds(played), NowMs() / 1000)
                 : tokens.Length > 1 ? (pages > 1 ? (_page + 1) + " / " + pages + "   " : "") + "tap one to play it"
                 : "";
 
@@ -612,6 +617,11 @@ namespace Chog.Screens
 
             _posterKicker.text = "1,969 CHOG GENESIS HEROES";
             _posterExampleLabel.text = "COLLECTION EXAMPLE #1078";
+            // Real Genesis for rent take the place of the example whenever holders offer some.
+            var offered = GenesisRental.State == RentalState.Open && GenesisRental.Cheapest(1).Count > 0;
+            _offers.gameObject.SetActive(offered);
+            _posterPortrait.gameObject.SetActive(!offered);
+            _posterExampleLabel.gameObject.SetActive(!offered);
             if (_posterPortraitRequested)
                 return;
             _posterPortraitRequested = true;
@@ -689,6 +699,19 @@ namespace Chog.Screens
         }
 
         private static long NowMs() => (long)(DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
+
+        /// <summary>
+        /// The line under the roster for a rented Genesis: the time left, and, under twelve hours,
+        /// a reminder in the problem colour to add days (RENT), as the references put a timer on
+        /// what runs out (the offers of Brawl Stars' shop, the chests of Clash Royale).
+        /// </summary>
+        public static string RentedInfo(long untilSeconds, long nowSeconds)
+        {
+            var left = GenesisRental.TimeLeft(untilSeconds, nowSeconds);
+            return GenesisRental.EndsSoon(untilSeconds, nowSeconds)
+                ? "<color=" + ProblemColor + ">rental ends in " + left + ": add days in RENT</color>"
+                : "rented, " + left + " left";
+        }
 
         // "CHOG #1287" for a token id; "this Genesis" when the roster does not know it.
         private string NameOf(int tokenId)

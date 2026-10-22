@@ -21,6 +21,7 @@
 
 import { keccak_256 } from '@noble/hashes/sha3.js';
 import { DEFAULT_RPC_URLS, isAddress } from './chain.js';
+import { folderOf } from './matches.js';
 import { listOf } from './rental.js';
 import { matchKeyOf } from './referee.js';
 import { CHOG_TOKEN } from './shop.js';
@@ -68,6 +69,10 @@ const REFUND_AFTER_SECONDS = 3600;
 const STATES = ['none', 'open', 'settled', 'refunded'];
 const SETTINGS_KEPT_MS = 60000;
 const UINT128 = 2n ** 128n;
+const BASIS_POINTS = 10000n;
+// The week of "won this week", and how long one wallet's week is answered without reading the chain again.
+export const WEEK_MS = 7 * 24 * 3600 * 1000;
+const WEEK_KEPT_MS = 30000;
 
 const encoder = new TextEncoder();
 const toHex = bytes => Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
@@ -82,19 +87,38 @@ const sameBook = (a, b) => a.length === b.length
   && a.every(one => b.some(other => other.address === one.address && other.team === one.team));
 
 /**
+ * What one staker gains on top of their stake when their team wins: an equal share of what
+ * the losers staked, less the burned share, as the contract pays it (settle). Zero when a side
+ * has nobody, which the contract refunds.
+ */
+export function winnerGain(stakeWei, winners, losers, burnedShare) {
+  if (winners <= 0 || losers <= 0) return 0n;
+  const lost = BigInt(stakeWei) * BigInt(losers);
+  return (lost - lost * BigInt(burnedShare) / BASIS_POINTS) / BigInt(winners);
+}
+
+/**
  * @param {object} options
  * @param {ReturnType<import('./chain.js').createChain>} options.chain the chain the wager is on
  * @param {ReturnType<import('./referee.js').createReferee>} [options.referee] without it there is no wager
  * @param {ReturnType<import('./matches.js').createMatches>} options.matches
  * @param {ReturnType<typeof wagerNetwork>} [options.network] where the wager is; mainnet by default
+ * @param {{get: Function, set: Function, list: Function}} [options.store] where the matches each
+ *   wallet staked on are noted (the store of the matches); without it "won this week" is not answered
+ * @param {ReturnType<import('./price.js').createPrice>} [options.price] the price of $CHOG, for the dollars of a week
  * @param {() => number} [options.now] milliseconds
  */
-export function createWager({ chain, referee, matches, network = wagerNetwork(), now = Date.now }) {
+export function createWager({ chain, referee, matches, network = wagerNetwork(), store, price, now = Date.now }) {
   const contract = referee?.wager ?? null;
   if (referee && referee.chainId !== network.chainId) {
     throw new Error(`The referee signs for chain ${referee.chainId} and the wager is on chain ${network.chainId}`);
   }
   let settings = null;
+  // One wallet's week, kept a short time: it reads the chain once per match of the week.
+  const weeks = new Map();
+
+  // Where the matches a wallet staked on are noted: one key per wallet and match.
+  const stakedKey = (address, gameId) => `staked-${address.toLowerCase()}/${folderOf(gameId)}`;
 
   /** What a game page needs to stake; {enabled: false} when there is no wager or it is set up wrong. */
   async function describe() {
@@ -164,7 +188,73 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     const match = await matches.currentOf(address);
     if (!match) return { refused: 'not_in_a_match' };
     const { stakers } = await onChain(matchKeyOf(match.gameId));
-    return matches.lock(match.gameId, { stakers, nowSeconds: Math.floor(now() / 1000), marginSeconds: CLOCK_MARGIN_SECONDS });
+    const locked = await matches.lock(match.gameId, { stakers, nowSeconds: Math.floor(now() / 1000), marginSeconds: CLOCK_MARGIN_SECONDS });
+    // The book is fixed now: each staker's week will find this match.
+    if (locked.locked && store && Array.isArray(locked.book)) {
+      for (const staker of locked.book) {
+        if (isAddress(staker.address)) await store.set(stakedKey(staker.address, match.gameId), JSON.stringify({ gameId: match.gameId, at: locked.lockedAt }));
+      }
+    }
+    return locked;
+  }
+
+  // What one match of a wallet's week came to: its stake, what was won or lost on the
+  // referee's decision, and whether the chain has paid it yet.
+  async function matchOfWeek(address, gameId) {
+    const matchKey = matchKeyOf(gameId);
+    const [decided, stakes] = await Promise.all([decision(gameId), onChain(matchKey)]);
+    const who = address.toLowerCase();
+    const mine = stakes.stakers.find(staker => staker.address.toLowerCase() === who);
+    if (!mine) return null;
+    const entry = { gameId, matchKey, stake: stakes.amount, team: mine.team, state: stakes.state, won: '0', lost: '0', outcome: 'pending' };
+    if (!decided || decided.pending) return entry;
+    const refunded = decided.void || decided.winnerTeam === 2;
+    const winners = refunded ? 0 : stakes.stakers.filter(staker => staker.team === decided.winnerTeam).length;
+    const losers = stakes.stakers.length - winners;
+    if (refunded || winners === 0 || losers === 0) return { ...entry, outcome: decided.void ? 'called_off' : 'refunded' };
+    if (mine.team === decided.winnerTeam) {
+      return { ...entry, outcome: 'won', won: winnerGain(stakes.amount, winners, losers, settings?.burnedShare ?? 0).toString() };
+    }
+    return { ...entry, outcome: 'lost', lost: stakes.amount };
+  }
+
+  /**
+   * What a wallet won and lost on its stakes of the last seven days, on the referee's
+   * decisions, with where each match's stakes stand on the chain ("settled" once paid). The
+   * matches counted are those whose stakes were locked with this wallet in the book since the
+   * services started noting them; {enabled: false} without a wager or without a store.
+   */
+  async function weekOf({ address }) {
+    if (!contract || !store) return { enabled: false };
+    const who = address.toLowerCase();
+    const kept = weeks.get(who);
+    if (kept && now() - kept.readAt < WEEK_KEPT_MS) return kept.week;
+    await describe();
+    const since = now() - WEEK_MS;
+    const noted = [];
+    for (const key of await store.list(`staked-${who}/`)) {
+      const text = await store.get(key);
+      if (text === null) continue;
+      const note = JSON.parse(text);
+      if (Date.parse(note.at) >= since) noted.push(note);
+    }
+    noted.sort((a, b) => b.at.localeCompare(a.at));
+    const entries = (await Promise.all(noted.map(note => matchOfWeek(who, note.gameId).catch(() => null)))).filter(Boolean);
+    const sum = field => entries.reduce((total, entry) => total + BigInt(entry[field]), 0n);
+    const won = sum('won');
+    const lost = sum('lost');
+    const usd = price ? await price.usdOfWei(won.toString()) : null;
+    const week = {
+      enabled: true, address: who, since: new Date(since).toISOString(), token: network.token,
+      matches: entries.length,
+      pending: entries.filter(entry => entry.outcome === 'pending').length,
+      unpaid: entries.filter(entry => entry.outcome !== 'pending' && entry.state === 'open').length,
+      won: won.toString(), lost: lost.toString(), net: (won - lost).toString(),
+      wonUsd: usd, netUsd: usd === null ? null : usd - (await price.usdOfWei(lost.toString()) ?? 0),
+      entries,
+    };
+    weeks.set(who, { readAt: now(), week });
+    return week;
   }
 
   /** What the page of a wallet shows of the stakes of the match it is in; {inMatch: false} when it is in none. */
@@ -221,5 +311,5 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     return decided && { ...decided, stakes: await onChain(decided.matchKey) };
   }
 
-  return { describe, onChain, ticket, lock, mine, decision, outcome, address: contract };
+  return { describe, onChain, ticket, lock, mine, decision, outcome, weekOf, address: contract };
 }

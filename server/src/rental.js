@@ -53,9 +53,10 @@ export function listOf(answer, position) {
  * @param {object} options
  * @param {ReturnType<import('./chain.js').createChain>} options.chain
  * @param {string} [options.address] the deployed rental contract; without it there is no rental
+ * @param {ReturnType<import('./price.js').createPrice>} [options.price] the price of $CHOG, for the dollars of an offer
  * @param {() => number} [options.now] milliseconds
  */
-export function createRental({ chain, address, now = Date.now }) {
+export function createRental({ chain, address, price, now = Date.now }) {
   if (address !== undefined && address !== '' && !isAddress(address)) throw new Error('The rental address must be 0x followed by 40 hex digits');
   const rental = address ? address.toLowerCase() : null;
   let burnedShare = null;
@@ -99,6 +100,21 @@ export function createRental({ chain, address, now = Date.now }) {
         .sort((a, b) => a.tokenId - b.tokenId),
     };
     return listed.offers;
+  }
+
+  /**
+   * The cheapest Genesis for rent now, by price a day then token id, at most "limit" of them,
+   * each with the dollars of a day when the price is known: what a player without a Genesis is
+   * shown first. "offered" is how many stand in all.
+   */
+  async function cheapest(limit = 3) {
+    const all = await offers();
+    const byPrice = [...all].sort((a, b) => {
+      const difference = BigInt(a.pricePerDay) - BigInt(b.pricePerDay);
+      return difference < 0n ? -1 : difference > 0n ? 1 : a.tokenId - b.tokenId;
+    }).slice(0, Math.max(0, limit));
+    const dollars = await Promise.all(byPrice.map(offer => (price ? price.usdOfWei(offer.pricePerDay) : null)));
+    return { offers: byPrice.map((offer, index) => ({ ...offer, usdPerDay: dollars[index] ?? null })), offered: all.length };
   }
 
   /** The Genesis an address may play as their renter now, each with the second its rental ends. */
@@ -213,5 +229,5 @@ export function createRental({ chain, address, now = Date.now }) {
     return closed;
   }
 
-  return { describe, offers, rentedBy, isRenting, records, account, closeSold, address: rental };
+  return { describe, offers, cheapest, rentedBy, isRenting, records, account, closeSold, address: rental };
 }

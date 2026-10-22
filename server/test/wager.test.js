@@ -7,7 +7,7 @@ import { createCareers } from '../src/career.js';
 import { createMatches, createMemoryStore } from '../src/matches.js';
 import { createReferee, matchKeyOf, resultDigest, ticketDigest, voidDigest } from '../src/referee.js';
 import { createSessions } from '../src/session.js';
-import { createWager, TICKET_SECONDS, wagerNetwork } from '../src/wager.js';
+import { createWager, TICKET_SECONDS, wagerNetwork, WEEK_MS, winnerGain } from '../src/wager.js';
 import { createWallet, hexToBytes } from './wallet.js';
 
 const SECRET = 'a test secret that is long enough to be accepted';
@@ -52,7 +52,8 @@ test('the referee signs the digests the contract computes', () => {
 // Services with a wager contract whose stakes the test writes, and a clock the test moves.
 function services({ contractReferee, network = wagerNetwork() } = {}) {
   const referee = createReferee({ privateKey: REFEREE_KEY, chainId: network.chainId, wager: WAGER });
-  const state = { clock: 1_790_000_000_000, stakes: new Map(), referee: contractReferee ?? referee.address };
+  // "paid" holds the keys of the matches the contract has settled.
+  const state = { clock: 1_790_000_000_000, stakes: new Map(), paid: new Set(), referee: contractReferee ?? referee.address };
   const pack = (...lists) => {
     let heads = '';
     let tails = '';
@@ -71,7 +72,7 @@ function services({ contractReferee, network = wagerNetwork() } = {}) {
       case selector('referee()'): return '0x' + word(state.referee);
       case selector('burnedShare()'): return '0x' + word(1000);
       case selector('matchOf(bytes32)'):
-        return '0x' + word(staked.length > 0 ? 1 : 0) + word(staked.length > 0 ? 25n * 10n ** 18n : 0) + word(staked.length > 0 ? 1_790_000_000 : 0)
+        return '0x' + word(staked.length > 0 ? (state.paid.has(key) ? 2 : 1) : 0) + word(staked.length > 0 ? 25n * 10n ** 18n : 0) + word(staked.length > 0 ? 1_790_000_000 : 0)
           + word(staked.filter(stake => stake.team === 0).length) + word(staked.filter(stake => stake.team === 1).length);
       case selector('stakersOf(bytes32)'): return pack(staked.map(stake => stake.address), staked.map(stake => stake.team));
       default: throw new Error('unexpected call ' + data.slice(0, 10));
@@ -79,13 +80,16 @@ function services({ contractReferee, network = wagerNetwork() } = {}) {
   };
   const chain = { callMany: async calls => calls.map(answer), holds: async () => ({ holds: false }) };
   const now = () => state.clock;
-  const matches = createMatches({ store: createMemoryStore(), now });
+  const store = createMemoryStore();
+  const matches = createMatches({ store, now });
   const sessions = createSessions({ secret: SECRET, now });
   let saved = null;
   const careers = createCareers({ load: async () => saved, save: async value => { saved = value; } });
-  const wager = createWager({ chain, referee, matches, network, now });
+  // A $CHOG at 0.0015 USD, as on 21 October 2026.
+  const price = { usdOfWei: async wei => Number(BigInt(wei) / 10n ** 12n) / 1e6 * 0.0015 };
+  const wager = createWager({ chain, referee, matches, network, now, store, price });
   const api = createApi({ chain, sessions, careers, wager, publicOrigin: ORIGIN });
-  return { state, api, matches, wager, referee };
+  return { state, api, matches, wager, referee, store };
 }
 
 async function sessionOf(api, wallet) {
@@ -284,4 +288,70 @@ test('every doubt calls the match off, which gives each stake back', async () =>
   await calledOff(verdict(), { lockAfterSeconds: 30 }, /began before the stakes were locked/);
   await calledOff(verdict({ players: [{ player: 0, team: 1, tokenId: 1795 }, { player: 1, team: 1, tokenId: 0 }] }), {}, /team staked on/);
   await calledOff(verdict({ players: [{ player: 1, team: 1, tokenId: 0 }] }), {}, /did not play the match/);
+});
+
+test('what a winner gains is what the contract pays: an equal share of what was lost, less the burned share', () => {
+  assert.equal(winnerGain(AMOUNT, 1, 1, 1000), 22_500_000_000_000_000_000n);
+  assert.equal(winnerGain(AMOUNT, 3, 3, 1000), 22_500_000_000_000_000_000n);
+  assert.equal(winnerGain(AMOUNT, 2, 1, 1000), 11_250_000_000_000_000_000n);
+  assert.equal(winnerGain(AMOUNT, 1, 3, 0), 75_000_000_000_000_000_000n);
+  assert.equal(winnerGain(AMOUNT, 1, 0, 1000), 0n);
+  assert.equal(winnerGain(AMOUNT, 0, 2, 1000), 0n);
+});
+
+test('a wallet reads what it won and lost on the stakes of its week, on the referee\'s decisions', async () => {
+  const { api, key, state, store } = await stakedAndJudged(verdict());
+  assert.equal((await call(api, 'GET', '/api/wager/week')).status, 401, 'signed in only');
+  const bob = await sessionOf(api, BOB);
+  const alice = await sessionOf(api, ALICE);
+
+  // Bob was in the team that won: he gains Alice's stake less the burned tenth; the chain has not paid yet.
+  const won = (await call(api, 'GET', '/api/wager/week', bob)).body;
+  assert.equal(won.enabled, true);
+  assert.equal(won.address, BOB.address);
+  assert.deepEqual([won.matches, won.pending, won.unpaid], [1, 0, 1]);
+  assert.deepEqual([won.won, won.lost, won.net], ['22500000000000000000', '0', '22500000000000000000']);
+  assert.ok(Math.abs(won.wonUsd - 0.03375) < 1e-9);
+  assert.equal(won.entries[0].outcome, 'won');
+  assert.equal(won.entries[0].gameId, 'game');
+  assert.equal(won.since, new Date(state.clock - WEEK_MS).toISOString());
+
+  const lost = (await call(api, 'GET', '/api/wager/week', alice)).body;
+  assert.deepEqual([lost.won, lost.lost, lost.net], ['0', '25000000000000000000', '-25000000000000000000']);
+  assert.ok(Math.abs(lost.netUsd + 0.0375) < 1e-9);
+
+  // Once the contract paid, the match is no longer unpaid (read again after the short time).
+  state.paid.add(key);
+  state.clock += 31_000;
+  assert.equal((await call(api, 'GET', '/api/wager/week', bob)).body.unpaid, 0);
+
+  // A stranger who never staked has an empty week; a week older than seven days is not counted.
+  const nobody = (await call(api, 'GET', '/api/wager/week', await sessionOf(api, createWallet()))).body;
+  assert.deepEqual([nobody.matches, nobody.won, nobody.lost], [0, '0', '0']);
+  state.clock += WEEK_MS;
+  assert.equal((await call(api, 'GET', '/api/wager/week', await sessionOf(api, BOB))).body.matches, 0, 'a week later (a new session: the old one ran out)');
+  assert.equal((await store.list('staked-' + BOB.address + '/')).length, 1, 'the note of the match stays');
+});
+
+test('a match that is not judged yet counts as pending, and one called off as given back', async () => {
+  const { api, matches, state } = services();
+  await matchOfTwo(matches);
+  const alice = await sessionOf(api, ALICE);
+  const bob = await sessionOf(api, BOB);
+  const key = matchKeyOf('game');
+  await call(api, 'POST', '/api/wager/ticket', alice, { team: 0, amount: AMOUNT });
+  await call(api, 'POST', '/api/wager/ticket', bob, { team: 1, amount: AMOUNT });
+  state.stakes.set(key, [{ address: ALICE.address, team: 0 }, { address: BOB.address, team: 1 }]);
+  assert.equal((await call(api, 'POST', '/api/wager/lock', alice)).body.locked, true);
+  const pending = (await call(api, 'GET', '/api/wager/week', alice)).body;
+  assert.deepEqual([pending.matches, pending.pending, pending.won, pending.lost], [1, 1, '0', '0']);
+
+  await matches.setVerdict('game', { void: true, why: 'the match did not reach its end' });
+  state.clock += 31_000;
+  const off = (await call(api, 'GET', '/api/wager/week', alice)).body;
+  assert.deepEqual([off.pending, off.won, off.lost, off.entries[0].outcome], [0, '0', '0', 'called_off']);
+
+  // Without a store nothing is noted, and the week is not answered.
+  const plain = createWager({ chain: { callMany: async () => [] }, matches, network: wagerNetwork(), referee: createReferee({ privateKey: REFEREE_KEY, chainId: 143, wager: WAGER }) });
+  assert.deepEqual(await plain.weekOf({ address: ALICE.address }), { enabled: false });
 });

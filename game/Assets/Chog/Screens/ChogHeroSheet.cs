@@ -51,6 +51,9 @@ namespace Chog.Screens
         private Button _form;
         private TextMeshProUGUI _formLabel;
         private readonly TextMeshProUGUI[] _stats = new TextMeshProUGUI[StatNames.Length];
+        // Under the career: what the Genesis earned its holders by being rented, or the renter's time left.
+        private TextMeshProUGUI _rentalLine;
+        private int _earningsAskedFor;
         private Button _play;
         private Button _rentOut;
         private TextMeshProUGUI _rentOutLabel;
@@ -176,10 +179,11 @@ namespace Chog.Screens
             ChogUi.Title("Career", card, new Vector2(0.04f, 0.33f), new Vector2(0.50f, 0.39f), 32f, TextAlignmentOptions.Left).text = "CAREER ON MONAD";
             ChogUi.Body("Follows", card, new Vector2(0.48f, 0.33f), new Vector2(0.96f, 0.39f), 22f, TextAlignmentOptions.Right, Gold).text =
                 "it follows the NFT to its next holder";
+            _rentalLine = ChogUi.Body("Rental", card, new Vector2(0.04f, 0.152f), new Vector2(0.96f, 0.19f), 21f, TextAlignmentOptions.Left, Gold);
             for (var i = 0; i < StatNames.Length; i++)
             {
                 var left = 0.04f + i * 0.186f;
-                var cell = ChogUi.Area("Stat" + i, card, new Vector2(left, 0.175f), new Vector2(left + 0.172f, 0.32f));
+                var cell = ChogUi.Area("Stat" + i, card, new Vector2(left, 0.195f), new Vector2(left + 0.172f, 0.32f));
                 var plate = cell.gameObject.AddComponent<Image>();
                 plate.sprite = ChogSprites.Rounded(14, 0, Color.clear, RowFill);
                 plate.type = Image.Type.Sliced;
@@ -390,7 +394,11 @@ namespace Chog.Screens
             var canRentOut = owns && rentalOpen;
             var canLend = owns && PlayerWallet.SignIn == SignInState.SignedIn && GenesisLoan.CanLend(_tokenId);
             var offered = GenesisRental.TryGetOffer(_tokenId, out var offer);
-            var canRent = !playable && rentalOpen && offered;
+            // The wallet rents it: it may add days at the holder's price, beside PLAY IT.
+            var rentsIt = ready && !owns && GenesisRental.IsRenting(_tokenId);
+            var canAddDays = rentsIt && rentalOpen && offered;
+            var canRent = (!playable && rentalOpen && offered) || canAddDays;
+            var now = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
 
             _play.gameObject.SetActive(playable);
             _rentOut.gameObject.SetActive(canRentOut);
@@ -399,21 +407,74 @@ namespace Chog.Screens
 
             // PLAY IT takes the whole row when nothing else is offered.
             var playArea = (RectTransform)_play.transform;
-            playArea.anchorMax = new Vector2(canRentOut ? 0.46f : canLend ? 0.75f : 0.96f, 0.15f);
+            playArea.anchorMax = new Vector2(canRentOut || canAddDays ? 0.46f : canLend ? 0.75f : 0.96f, 0.15f);
             var rentOutArea = (RectTransform)_rentOut.transform;
             rentOutArea.anchorMax = new Vector2(canLend ? 0.75f : 0.96f, 0.15f);
+            var rentArea = (RectTransform)_rent.transform;
+            rentArea.anchorMin = new Vector2(canAddDays ? 0.48f : 0.04f, 0.03f);
 
             if (canRentOut)
             {
                 var lentUntil = GenesisRental.LentUntilSeconds(_tokenId);
-                var now = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
                 _rentOutLabel.text = lentUntil > 0
                     ? "<size=60%>RENTED FOR</size>\n" + GenesisRental.TimeLeft(lentUntil, now).ToUpperInvariant()
                     : offered ? "<size=60%>RENTED OUT AT</size>\n" + ChogPrice.WithUsd(offer.PricePerDayWei) + " A DAY"
                     : "RENT OUT";
             }
-            if (canRent)
+            if (canAddDays)
+            {
+                var until = GenesisRental.RentedUntilSeconds(_tokenId);
+                _rentLabel.text = "<size=60%>" + (GenesisRental.EndsSoon(until, now) ? "ENDS IN " + GenesisRental.TimeLeft(until, now).ToUpperInvariant() + ", ADD DAYS" : "ADD DAYS")
+                                  + "</size>\n" + ChogPrice.WithUsd(offer.PricePerDayWei) + " A DAY";
+            }
+            else if (canRent)
+            {
                 _rentLabel.text = "RENT IT, " + ChogPrice.WithUsd(offer.PricePerDayWei) + " A DAY";
+            }
+
+            RefreshRentalLine(owns, rentsIt, rentalOpen, now);
+        }
+
+        // Under the career: for the holder, what the Genesis earned by being rented (the rental's
+        // events, read by the services); for its renter, the time left.
+        private void RefreshRentalLine(bool owns, bool rentsIt, bool rentalOpen, long now)
+        {
+            if (rentsIt)
+            {
+                _rentalLine.text = RenterLine(GenesisRental.RentedUntilSeconds(_tokenId), now);
+                return;
+            }
+            if (!owns || !rentalOpen)
+            {
+                _rentalLine.text = "";
+                return;
+            }
+            if (_earningsAskedFor != _tokenId)
+            {
+                _earningsAskedFor = _tokenId;
+                GenesisRental.ReadEarnings(new[] { _tokenId });
+            }
+            _rentalLine.text = GenesisRental.TryGetEarnings(_tokenId, out var earnings)
+                ? EarningsLine(earnings, GenesisRental.EarningsCaughtUp, ChogPrice.UsdPerChog)
+                : "";
+        }
+
+        /// <summary>"Earned by renting it out: 30 $CHOG ($0.05) over 3 rentals", or "never rented out yet"; "so far" while the services are still reading the events.</summary>
+        public static string EarningsLine(RentalEarnings earnings, bool caughtUp, double usdPerChog)
+        {
+            if (earnings.Rentals == 0 && earnings.EarnedWei == "0")
+                return caughtUp ? "Never rented out yet: offer it with RENT OUT and earn $CHOG while you keep it." : "";
+            var rentals = earnings.Rentals == 1 ? "1 rental" : earnings.Rentals + " rentals";
+            return "Earned by renting it out: " + ChogPrice.WithUsd(earnings.EarnedWei, usdPerChog) + " over " + rentals + (caughtUp ? "" : " so far");
+        }
+
+        /// <summary>"You rent it: 2 d 5 h left", or the reminder to add days under twelve hours.</summary>
+        public static string RenterLine(long untilSeconds, long nowSeconds)
+        {
+            var left = GenesisRental.TimeLeft(untilSeconds, nowSeconds);
+            return GenesisRental.EndsSoon(untilSeconds, nowSeconds)
+                ? "<color=#FF9C8A>Your rental ends in " + left + ": add days before it does.</color>"
+                : "You rent it: " + left + " left.";
         }
 
         // PLAY IT: this Genesis is chosen, the sheet closes and the match is looked for.
