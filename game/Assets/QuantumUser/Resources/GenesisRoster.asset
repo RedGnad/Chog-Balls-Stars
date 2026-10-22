@@ -16,8 +16,8 @@ MonoBehaviour:
     Path: QuantumUser/Resources/GenesisRoster
     Guid:
       Value: 456939936113794333
-  RulesetVersion: genesis-0.3.0
-  CatalogHash: e9d98fbfd883e08a97d8a45da08108777169a56e738f8788ceb355cdef5c191a
+  RulesetVersion: genesis-0.4.0
+  CatalogHash: b21488636d09b681fd07167cb183d4497061e6c9a288718eb3758c5f217b6ae7
   RoleIds:
   - brute
   - ranger
@@ -275,7 +275,7 @@ MonoBehaviour:
   - fires twice, half a second apart, 60% each
   - goes out at 60%, then comes back to you at 80%
   - hits at 50%, then leaves a zone for 3 s
-  - not built yet, plays like a direct hit
+  - 'a super attack: three at once at full strength, in three directions'
   RolePrototypes:
   - Id:
       Value: 3101334269603457031
@@ -685,105 +685,105 @@ MonoBehaviour:
   - Id:
       Value: 462200857079632835
   - Id:
-      Value: 0
+      Value: 483680937923070932
   - Id:
-      Value: 0
+      Value: 411331993244224754
   - Id:
-      Value: 0
+      Value: 289408076756609902
   - Id:
-      Value: 0
+      Value: 440337469310977010
   - Id:
-      Value: 0
+      Value: 491462303646246211
   - Id:
-      Value: 0
+      Value: 396867557095527778
   - Id:
-      Value: 0
+      Value: 475839457580246699
   - Id:
-      Value: 0
+      Value: 526148787020903014
   - Id:
-      Value: 0
+      Value: 496492935758154060
   - Id:
-      Value: 0
+      Value: 439469818903787621
   - Id:
-      Value: 0
+      Value: 487097654816509412
   - Id:
-      Value: 0
+      Value: 351785547478592336
   - Id:
-      Value: 0
+      Value: 403030482289091209
   - Id:
-      Value: 0
+      Value: 320327451578390888
   - Id:
-      Value: 0
+      Value: 530471823945476481
   - Id:
-      Value: 0
+      Value: 477549006924107823
   - Id:
-      Value: 0
+      Value: 535298940086682237
   - Id:
-      Value: 0
+      Value: 358264947587257664
   - Id:
-      Value: 0
+      Value: 379771498998037418
   - Id:
-      Value: 0
+      Value: 286305435029135449
   - Id:
-      Value: 0
+      Value: 299379198736138653
   - Id:
-      Value: 0
+      Value: 367677653979843393
   - Id:
-      Value: 0
+      Value: 498449582512854129
   - Id:
-      Value: 0
+      Value: 405326944802669794
   - Id:
-      Value: 0
+      Value: 271148555059330051
   - Id:
-      Value: 0
+      Value: 427482632133492266
   - Id:
-      Value: 0
+      Value: 459910065794947170
   - Id:
-      Value: 0
+      Value: 300324809540246360
   - Id:
-      Value: 0
+      Value: 304483096419767251
   - Id:
-      Value: 0
+      Value: 314143418143393146
   - Id:
-      Value: 0
+      Value: 319507075938083537
   - Id:
-      Value: 0
+      Value: 292714451796266061
   - Id:
-      Value: 0
+      Value: 427318485112678193
   - Id:
-      Value: 0
+      Value: 501960851442583409
   - Id:
-      Value: 0
+      Value: 490051452780720266
   - Id:
-      Value: 0
+      Value: 272425822572105525
   - Id:
-      Value: 0
+      Value: 416810972333879726
   - Id:
-      Value: 0
+      Value: 390050562270824497
   - Id:
-      Value: 0
+      Value: 480316356640705743
   - Id:
-      Value: 0
+      Value: 305437896002542898
   - Id:
-      Value: 0
+      Value: 351265863488668199
   - Id:
-      Value: 0
+      Value: 305030625127391038
   - Id:
-      Value: 0
+      Value: 292035570505732750
   - Id:
-      Value: 0
+      Value: 320864097306059817
   - Id:
-      Value: 0
+      Value: 369976376154246758
   - Id:
-      Value: 0
+      Value: 352194543156589213
   - Id:
-      Value: 0
+      Value: 472108818173801042
   - Id:
-      Value: 0
+      Value: 344362811778534778
   - Id:
-      Value: 0
+      Value: 363522793759168272
   - Id:
-      Value: 0
+      Value: 466288358577826539
   - Id:
       Value: 426394707525308363
   - Id:
@@ -1185,105 +1185,105 @@ MonoBehaviour:
   - Id:
       Value: 322818357707315542
   - Id:
-      Value: 0
+      Value: 516173437570972907
   - Id:
-      Value: 0
+      Value: 429815914539046324
   - Id:
-      Value: 0
+      Value: 429119587210207612
   - Id:
-      Value: 0
+      Value: 473188709571204324
   - Id:
-      Value: 0
+      Value: 422705088612188458
   - Id:
-      Value: 0
+      Value: 461767971244254867
   - Id:
-      Value: 0
+      Value: 522216924717622703
   - Id:
-      Value: 0
+      Value: 312172276075826623
   - Id:
-      Value: 0
+      Value: 494503567074191223
   - Id:
-      Value: 0
+      Value: 436286917892272093
   - Id:
-      Value: 0
+      Value: 534135651729140607
   - Id:
-      Value: 0
+      Value: 344146607739856410
   - Id:
-      Value: 0
+      Value: 366291675368119260
   - Id:
-      Value: 0
+      Value: 378863572916453087
   - Id:
-      Value: 0
+      Value: 483402827243285107
   - Id:
-      Value: 0
+      Value: 336596320854912548
   - Id:
-      Value: 0
+      Value: 492099564928251076
   - Id:
-      Value: 0
+      Value: 296062458930452750
   - Id:
-      Value: 0
+      Value: 285391042364294697
   - Id:
-      Value: 0
+      Value: 311324155090121062
   - Id:
-      Value: 0
+      Value: 279718818454880520
   - Id:
-      Value: 0
+      Value: 422393667252036013
   - Id:
-      Value: 0
+      Value: 317275203009275856
   - Id:
-      Value: 0
+      Value: 351451875360111288
   - Id:
-      Value: 0
+      Value: 514061718739106980
   - Id:
-      Value: 0
+      Value: 456911361133412780
   - Id:
-      Value: 0
+      Value: 414316970882031478
   - Id:
-      Value: 0
+      Value: 322866017760590812
   - Id:
-      Value: 0
+      Value: 386922451789839393
   - Id:
-      Value: 0
+      Value: 472504989242268997
   - Id:
-      Value: 0
+      Value: 513067575989339247
   - Id:
-      Value: 0
+      Value: 314927796214192763
   - Id:
-      Value: 0
+      Value: 329637193034579453
   - Id:
-      Value: 0
+      Value: 382581884895313622
   - Id:
-      Value: 0
+      Value: 480526890653553879
   - Id:
-      Value: 0
+      Value: 371234253780802836
   - Id:
-      Value: 0
+      Value: 385400217518966560
   - Id:
-      Value: 0
+      Value: 530991282567366658
   - Id:
-      Value: 0
+      Value: 419930497679655073
   - Id:
-      Value: 0
+      Value: 533016955528641171
   - Id:
-      Value: 0
+      Value: 292182175794142621
   - Id:
-      Value: 0
+      Value: 517611952315519322
   - Id:
-      Value: 0
+      Value: 420924138663077486
   - Id:
-      Value: 0
+      Value: 317315284968619913
   - Id:
-      Value: 0
+      Value: 334037865622797648
   - Id:
-      Value: 0
+      Value: 373500639166045772
   - Id:
-      Value: 0
+      Value: 418381987310147883
   - Id:
-      Value: 0
+      Value: 367921863416068818
   - Id:
-      Value: 0
+      Value: 318622694217864492
   - Id:
-      Value: 0
+      Value: 364948291701758274
   SecondFormNames:
   - broad beam
   - wide flash
@@ -1703,6 +1703,13 @@ MonoBehaviour:
       Other: {r: 0, g: 0, b: 0, a: 0}
       Glyph: 0
     Skin: {r: 0.9, g: 0.3, b: 0.35, a: 1}
+  RadioactiveLook:
+    Outline: {r: 0.08, g: 0.08, b: 0.1, a: 1}
+    Outer: {r: 0.1, g: 0.12, b: 0.06, a: 1}
+    Core: {r: 0.85, g: 1, b: 0.25, a: 1}
+    Other: {r: 0, g: 0, b: 0, a: 0}
+    Glyph: 14
+  RadioactiveSkin: {r: 0.55, g: 0.95, b: 0.2, a: 1}
   Entries:
   - TokenId: 1
     MetadataId: 1462
@@ -2536,7 +2543,7 @@ MonoBehaviour:
     MetadataId: 1531
     Name: CHOG #1531
     Role: 0
-    Shape: 3
+    Shape: 4
     Effect: 8
     Expression: 3
     Tier: 3
@@ -5920,7 +5927,7 @@ MonoBehaviour:
     MetadataId: 1813
     Name: CHOG #1813
     Role: 1
-    Shape: 3
+    Shape: 4
     Effect: 8
     Expression: 3
     Tier: 3
@@ -6352,7 +6359,7 @@ MonoBehaviour:
     MetadataId: 1849
     Name: CHOG #1849
     Role: 1
-    Shape: 3
+    Shape: 4
     Effect: 4
     Expression: 3
     Tier: 3
@@ -9472,7 +9479,7 @@ MonoBehaviour:
     MetadataId: 140
     Name: CHOG #140
     Role: 1
-    Shape: 3
+    Shape: 4
     Effect: 4
     Expression: 3
     Tier: 3
@@ -11092,7 +11099,7 @@ MonoBehaviour:
     MetadataId: 275
     Name: CHOG #275
     Role: 0
-    Shape: 3
+    Shape: 4
     Effect: 7
     Expression: 3
     Tier: 3
@@ -13468,7 +13475,7 @@ MonoBehaviour:
     MetadataId: 473
     Name: CHOG #473
     Role: 0
-    Shape: 3
+    Shape: 4
     Effect: 8
     Expression: 3
     Tier: 3
@@ -14968,7 +14975,7 @@ MonoBehaviour:
     MetadataId: 598
     Name: CHOG #598
     Role: 1
-    Shape: 3
+    Shape: 4
     Effect: 2
     Expression: 3
     Tier: 3
@@ -15292,7 +15299,7 @@ MonoBehaviour:
     MetadataId: 625
     Name: CHOG #625
     Role: 1
-    Shape: 3
+    Shape: 4
     Effect: 7
     Expression: 3
     Tier: 3
@@ -17056,7 +17063,7 @@ MonoBehaviour:
     MetadataId: 772
     Name: CHOG #772
     Role: 1
-    Shape: 3
+    Shape: 4
     Effect: 8
     Expression: 3
     Tier: 3
@@ -18280,7 +18287,7 @@ MonoBehaviour:
     MetadataId: 874
     Name: CHOG #874
     Role: 1
-    Shape: 3
+    Shape: 4
     Effect: 7
     Expression: 3
     Tier: 3
@@ -20992,7 +20999,7 @@ MonoBehaviour:
     MetadataId: 1100
     Name: CHOG #1100
     Role: 1
-    Shape: 3
+    Shape: 4
     Effect: 4
     Expression: 3
     Tier: 3
@@ -22456,7 +22463,7 @@ MonoBehaviour:
     MetadataId: 1222
     Name: CHOG #1222
     Role: 1
-    Shape: 3
+    Shape: 4
     Effect: 1
     Expression: 3
     Tier: 3
@@ -22492,7 +22499,7 @@ MonoBehaviour:
     MetadataId: 1225
     Name: CHOG #1225
     Role: 1
-    Shape: 3
+    Shape: 4
     Effect: 2
     Expression: 3
     Tier: 3
@@ -23164,7 +23171,7 @@ MonoBehaviour:
     MetadataId: 1281
     Name: CHOG #1281
     Role: 0
-    Shape: 3
+    Shape: 4
     Effect: 8
     Expression: 3
     Tier: 3

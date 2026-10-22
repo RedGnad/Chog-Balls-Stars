@@ -399,8 +399,8 @@ how that attack is delivered:
 | Common (1,279 Genesis) | direct | one hit at full strength |
 | Uncommon (590) | echo | fires twice, half a second apart, each at 60% of the damage; the second one leaves from where the hero then stands and faces |
 | Rare Skull (60) | return | goes out at 60%, then a second strike comes back at 80%: an attack that travels returns from where it ended towards where the hero then stands, over walls; one that does not travel strikes again 0.8 s later where the hero then stands |
-| Epic Radioactive (30) | persistent-zone | hits at 50%, then leaves a zone where it ended for 3 s (500 per tick before the Aura's share, radius at least 2.2), green when the Aura has no colour |
-| Legendary 1:1 (10) | inversion | **not built**, plays like a direct hit |
+| Epic Radioactive (30) | persistent-zone | since 22 October 2026 every Radioactive Genesis fires the radioactive burst (the nova, whatever its Eyes, drawn as the sign of radioactivity in the glow of radiation): it hits at 50%, then leaves a zone where it ended for 3 s (500 per tick before the Aura's share, radius at least 2.2), green when the Aura has no colour |
+| Legendary 1:1 (10) | inversion | since 22 October 2026 a super attack: three at once at full strength, turned 120 degrees apart for a shape that aims (beam, flash, wave), three strikes 0.35 s apart for the nova and the lobbed puddle |
 
 180 signatures are authored: the fifty pairs of shape and effect direct and as an echo, and
 the forty pairs without the puddle as a return and as a persistent zone (no Genesis has the
@@ -496,7 +496,7 @@ its token (`GenesisSignatureImporter.Uniques`, read by `GenesisRoster.LookOf`): 
 glowing yellow eyes on orange, Burning Skully stares with black sockets on bone, Midas opens a
 gold fan, Redd fires a red laser, Grim a grey one, and so on; their heroes take that colour.
 Three of the ten were captured (Blaze, Midas, Burning Skully). Their rarity's delivery,
-`inversion`, is still not built.
+`inversion`, is their super attack (table above).
 
 **The hero is its Genesis.** `GenesisAppearance` puts the real image of the Genesis on the
 head of its character (a round image that always faces the camera, in place of the model's

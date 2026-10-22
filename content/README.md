@@ -2,7 +2,7 @@
 
 `hero-catalog.prototype.json` is the single source of the rules that turn a Genesis into a
 hero. The traits come from the public metadata; **which trait decides what is a design
-decision of this project**. Ruleset `genesis-0.3.0`, schema 2.
+decision of this project**. Ruleset `genesis-0.4.0`, schema 2 (0.4.0, 22 October 2026: a tier may fix the shape, `shapeId`, which the Epic Radioactive tier does).
 
 ## One visible trait decides one thing
 
@@ -11,7 +11,7 @@ decision of this project**. Ruleset `genesis-0.3.0`, schema 2.
 | Body | the class | `brute`, `ranger`, `controller`; a Genesis without Body is a `brute` |
 | Eyes | the shape of the signature | `beam` (lasers), `flash` (visors and glasses), `puddle` (tears), `wave` (hard stares), `nova` (soft eyes) |
 | Aura | the effect of the signature | `burn`, `chill`, `hex`, `mend`, `purify`, `rally`, `haste`, `veil`, `toxin`; no Aura is `raw` |
-| Base and Tier | how the signature is delivered | Common `direct`, Uncommon `echo`, Rare Skull `return`, Epic Radioactive `persistent-zone`, Legendary 1:1 `inversion` |
+| Base and Tier | how the signature is delivered | Common `direct`, Uncommon `echo`, Rare Skull `return`, Epic Radioactive `persistent-zone` (and the shape `nova` whatever the Eyes: the radioactive burst, ruleset 0.4.0), Legendary 1:1 `inversion` (the super attack) |
 
 Head, Mouth, Skin, Background, Side and Accessory are cosmetic in this ruleset. Each 1:1 has its
 own entry under `uniqueHeroes`, keyed by canonical token id and metadata id.
