@@ -54,25 +54,22 @@ SKULL_SKINS = {
 # rise); a tooth is outlined by LINE, GAP apart.
 SKULL_FACE = {
     "Right": {
-        # (22 October 2026, the owner: the jaw of the skulls "rises as a single line where the art draws a real horizontal jaw, a row of teeth
-        # across". On #54, #1079, #1313, #1642, #1776 the skull has a lower jaw of its own, a wide rounded wedge standing out under the cranium
-        # with its own outline, and a row of big square teeth on it under a row on the cranium: the two rows were drawn as little beads on the
-        # surface of the ball of the head. Now ONE row of seven big teeth on the cranium (0.024 half height), the nose above it, and the
-        # jaw is a volume (JAW_VOLUME, add_mandible) carrying the lower row.)
-        "ROWS": ((-0.064, 0.140, 0.024, 7, 0.005),),
+        # The two rows are little rounded beads, not a large, square monster grin. (The jaw volume and big teeth of 22 October 2026,
+        # afternoon, were taken back the same evening: the owner found the teeth of the morning better.)
+        "ROWS": ((-0.096, 0.132, 0.0145, 7, 0.010), (-0.123, 0.112, 0.011, 6, 0.009)),
         "MOUTH": None,
         "CRACK": ((0.172, -0.128), (0.190, -0.104), (0.204, -0.078), (0.212, -0.056)),
         "CRACK_THICK": (0.014, 0.011, 0.007, 0.003),
-        "NOSE": (-0.022, 0.030, 0.024),
+        "NOSE": (-0.040, 0.030, 0.024),
         "CHEEK": (0.168, -0.040, 0.040, 0.027),
     },
     "Left": {
-        "ROWS": ((-0.070, 0.130, 0.023, 6, 0.006),),
+        "ROWS": ((-0.112, 0.118, 0.018, 6, 0.012),),
         # The open mouth under the row: middle height, half width, half height.
-        "MOUTH": (-0.108, 0.090, 0.012),
+        "MOUTH": (-0.151, 0.070, 0.013),
         "CRACK": (),
         "CRACK_THICK": (),
-        "NOSE": (-0.026, 0.022, 0.019),
+        "NOSE": (-0.046, 0.022, 0.019),
         "CHEEK": (0.168, -0.040, 0.040, 0.027),
     },
 }
@@ -92,19 +89,16 @@ TEETH = {
     # #1134, #140). Row: middle height, half width, half height, count, how far its ends rise.
     # The Genesis art uses six small, almost round teeth, then a short shallow chin curve: it is the skull
     # seen through the glow, not a rectangular grill across the whole mouth.
-    # (22 October 2026, the owner: the jaw of the Radioactive "rises as a single line where the art draws a real horizontal jaw, a row of teeth
-    # across". On #140, #275, #1187, #1281, #1531 under the cheeks there is a dark cavity, a mouth, a band as wide as the jaw; under it a
-    # row of big teeth along the top of a jaw whose lower edge runs flat across the chin and turns up at the sides: a box, not a U. Row
-    # 0.128 half width, teeth 0.020 half height, nearly level (rise 0.004; 0.112, 0.0145 and 0.012 before); the jaw line flat across the
-    # bottom and 0.20 wide; the mouth a band over the teeth, MOUTH: its middle height, half its width, half its height.)
-    "GLOW_ROW": (-0.146, 0.128, 0.020, 6, 0.004),
+    # (The mouth band, big teeth and box jaw of 22 October 2026, afternoon, were taken back the same evening: the owner found the teeth of
+    # the morning better, and what they had asked was to remove the vertical strokes on either side of the jaw, the cheekbones: CHEEKBONE
+    # is now empty.)
+    "GLOW_ROW": (-0.136, 0.112, 0.0145, 6, 0.012),
     "GLOW_LINE": 0.0038,
-    "MOUTH": (-0.108, 0.150, 0.016),
-    "JAW_LINE": ((-0.205, -0.098), (-0.196, -0.138), (-0.160, -0.172), (-0.100, -0.184), (0.0, -0.186), (0.100, -0.184),
-                 (0.160, -0.172), (0.196, -0.138), (0.205, -0.098)),
-    "JAW_THICK": 0.007,
-    "CHEEKBONE": ((0.198, -0.028), (0.185, -0.070), (0.153, -0.106), (0.117, -0.122)),
-    "CHEEKBONE_THICK": (0.004, 0.006, 0.006, 0.004),
+    "JAW_LINE": ((-0.158, -0.104), (-0.140, -0.138), (-0.086, -0.163), (0.0, -0.171), (0.086, -0.163),
+                 (0.140, -0.138), (0.158, -0.104)),
+    "JAW_THICK": 0.006,
+    "CHEEKBONE": (),
+    "CHEEKBONE_THICK": (),
 }
 NOSE = {"UP": -0.040, "HALF_WIDTH": 0.026, "HALF_HEIGHT": 0.021}
 
@@ -314,13 +308,10 @@ def add_skull_face(part, numbers, surface, full, draw_shape, oval, SKIN, EYE, BL
         # A radioactive Chog: the skull seen through the skin, in the deeper tone of the face's material.
         up, half_w, half_h = NOSE["UP"], NOSE["HALF_WIDTH"], NOSE["HALF_HEIGHT"]
         draw_shape(part, surface, FACE, upside_down_heart((0.0, up), half_w, half_h), dark_lift, middle=(0.0, up))
-        mouth_up, mouth_half_wide, mouth_half_tall = TEETH["MOUTH"]
-        draw_shape(part, surface, FACE, rounded((0.0, mouth_up), mouth_half_wide, mouth_half_tall, 16, 2.4), dark_lift,
-                   middle=(0.0, mouth_up))
         tooth_row(part, surface, draw_shape, TEETH["GLOW_ROW"], TEETH["GLOW_LINE"], SKIN, FACE, (dark_lift, bone_lift))
         jaw = list(TEETH["JAW_LINE"])
         traits_module.draw_line(part, surface, FACE, jaw, [TEETH["JAW_THICK"]] * len(jaw), dark_lift)
-        for sign in (1.0, -1.0):
+        for sign in (1.0, -1.0) if TEETH["CHEEKBONE"] else ():
             bone = [(sign * x, y) for x, y in TEETH["CHEEKBONE"]]
             traits_module.draw_line(part, surface, FACE, bone, list(TEETH["CHEEKBONE_THICK"]), dark_lift)
 

@@ -1462,6 +1462,8 @@ def seen(looked_at, art, leaves, under_rim=None, **numbers):
 # top leaf clears it; the upper pair clears it turned in to 24 degrees from straight up (it was 38); the middle pair cannot (gone); the lowest
 # pair clears it brought out below at 130 degrees; the top of the back row cannot at its own lean, leaning 36 degrees; the pair of
 # the back row at 125 degrees and 40 back; the leaf straight back leaning to 104. No leaf crosses the band now (THROUGH is off).
+# (22 October 2026, evening: the owner found the crown of the headbands worse with BAND_CROWN, a dome with flaps down the sides; the two
+# headbands wear FULL_CROWN again, the band itself staying on the brow.)
 BAND_CROWN = (WHOLE, leaf(1.0, 24.0), GONE, leaf(1.2, 130.0, None, 0.35), leaf(1.0, None, 36.0), leaf(1.2, 125.0, 40.0, 0.35),
               leaf(1.2, None, 104.0, 0.35))
 
@@ -1590,9 +1592,9 @@ HEAD_VALUES = {
     # A headband is tied around the spiky head: the whole crown stays and the band passes under the spikes
     # (16 October 2026, the owner: no reason to leave room for a band; the crossings are kept, not refused).
     ("Red Headband", "Right"): seen((12, 686, 1014, 1790, 1957), "the whole crown above the band and down the far "
-                                    "side; a darker line along its lower edge", BAND_CROWN, THROUGH=False),
+                                    "side; a darker line along its lower edge", FULL_CROWN),
     ("Japan Headband", "Right"): seen((65, 523, 891, 1435, 1962), "the whole crown above the white band, a red "
-                                      "sun on its front", BAND_CROWN, THROUGH=False),
+                                      "sun on its front", FULL_CROWN),
     ("Bob Hair", "Right"): seen((43, 48, 159, 470, 482, 1137, 1380), "yellow curly hair, a red band with waving "
                                 "edges tied over the brow; the tip of one spike above the band, far side",
                                 NO_CROWN),

@@ -1,5 +1,11 @@
 # État courant et décisions
 
+**22 October 2026, 18:35 UTC (lead: the day's eye and jaw work taken back; deployed).**
+- **Why:** the owner found many heroes worse than before: eyes deformed (the strict audit's two different eyes on Side Left, batches 4 to 8), closed crying eyes upside down, a smirk that is no smirk, the Skull and Radioactive jaw worse while the vertical strokes they had pointed at stayed, the crown of the headbands turned into a dome with flaps.
+- **Deployed:** build `20261022T182550395Z-b45bf7b9d3184018a9bf2ae7f57ebe2f`, stamp unchanged. `chog_trait_faces.py` back to batch 1 (70ab510) with the morning's smirk: kept the Retro Glass frown, the coin raised in the grin, centred mouths, beams leaving the middle of the eye. `make_chog_traits.py`: batches 2 to 4 reversed, batch 1's eye sizes (DARK_EYE, HAPPY, ROUND) back, mouth centring and beam start kept, no lower jaw volume. `chog_trait_bases.py`: the morning's teeth rows and Radioactive jaw line, no mouth band, no cheekbones (the vertical strokes). Headbands: FULL_CROWN again, band kept on the brow. Kept: ribs only on bare skin, Radioactive bands, every clothes, armour, costume, 1:1 and attack change. Also: the signature asked of any connected wallet without a session, sessions of 30 days, the BASIC row titled with what it throws.
+- **Verified:** export 1,970 Genesis, 0 failed; `?heroes=17,27,2,7,45,43` and `12,121,42,91,26,44` on the build (sound shapes, #12's crown back); judge fixtures agree.
+- **Open, one at a time against the live model:** the Retro Glass iris circle (the art: a black eye), a real smirk, the Russian hat, the Spartan side spikes, the dragon belly colours, the hair through the red headband of #43.
+
 **22 October 2026, 17:55 UTC (lead: the public address moves to chogtanks; deployed).**
 - **Done:** the owner set `PUBLIC_ORIGIN` to `https://chogtanks.vercel.app` on Render and allowed the domain at Reown; the sign-in message now reads "chogtanks.vercel.app wants you to sign in". `chogarena.vercel.app` sends a page to `https://chogtanks.vercel.app/chog-balls-stars/` (seen in the browser: the game loads there, no error). SUBMISSION, HANDOFF, DEPLOY and render.yaml name the new address.
 - **Not verified:** a wallet connection through Reown's QR on the new address; MetaMask's verdict after more traffic (NONE at 17:40 UTC).

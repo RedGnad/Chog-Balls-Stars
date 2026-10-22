@@ -549,14 +549,14 @@ ANIME_GLASS = {
 # is cut by a slanted brow, lower towards the nose.
 DARK_EYE = {
     "AT": (0.112, 0.008),        # to the side of the middle of the face, above it
-    "SIZE": (0.050, 0.063),      # half width, half height (0.043 by 0.060 until 22 October 2026, strict audit of the eyes: on #75, #80, #177, #197 the eye is rounder and larger)
+    "SIZE": (0.043, 0.060),      # half width, half height (the strict audit's 0.050 by 0.063 was taken back on 22 October 2026, evening)
     "BROW_AT": 0.50,             # where the brow cuts the eye, against its half height
     "BROW_SLOPE": 0.42,
     "BROW": (0.011, 0.016, 0.004),   # thickness of the brow, how far it runs past the eye outwards and inwards
     "SEGMENTS": 14,
     # The glints: each to the side of the middle of the eye (the same side for both eyes: where the
     # light is), above it, half width, half height.
-    "GLINTS": ((-0.014, 0.012, 0.017, 0.021), (-0.018, -0.026, 0.008, 0.009)),
+    "GLINTS": ((-0.012, 0.010, 0.013, 0.017), (-0.016, -0.026, 0.006, 0.007)),
 }
 LASER = {
     # A beam leaves each eye level with the ground, straight ahead: how long, how thick (half), how
@@ -592,33 +592,23 @@ LASER = {
 }
 HAPPY = {
     "AT": (0.110, 0.012),
-    # (22 October 2026, strict audit of the eyes, on #163, #226, #19, #89, #67: the pictures draw the closed eyes as thick black arches, about
-    # 1.7 times the thickness of ours, the eye at +X (the near one in the pictures of Side=Right) wider and thicker than the far one.)
-    "ARC": (0.056, 0.036, 0.027),    # half width, height of the arch, thickness in its middle
+    "ARC": (0.050, 0.034, 0.017),    # half width, height of the arch, thickness in its middle
     "STEPS": 8,
     # An arch of its own for each eye (22 October 2026, Side=Left, read on CHOG #925, #1430, #1207, #1405): {side: (half
     # width, height of the arch, thickness in its middle, how much higher its right end stands than its left)}, side -1 the
     # eye on the left of the picture (the near eye), +1 the other. None: both eyes the same, ARC.
-    "EYE_ARCS": {1.0: (0.062, 0.036, 0.031, 0.0), -1.0: (0.050, 0.032, 0.022, 0.0)},
+    "EYE_ARCS": None,
 }
 ROUND = {
     "AT": (0.112, 0.006),
-    # (22 October 2026, strict audit: the eyes of the pictures (#202, #139, #55, #84, #134) are taller ovals, about 0.75 as wide as high against 0.89 for ours, the
-    # white ring thin and the black disc large: 0.058 by 0.070, 0.047 by 0.060, 0.037 by 0.049 where they were 0.060 by 0.066, 0.049 by 0.055, 0.036 by 0.042.)
-    "LINE": (0.058, 0.070),      # half width, half height of the dark disc around the eye
-    "WHITE": (0.047, 0.060),
-    "PUPIL": (0.037, 0.049),
+    "LINE": (0.060, 0.066),      # half width, half height of the dark disc around the eye
+    "WHITE": (0.049, 0.055),
+    "PUPIL": (0.036, 0.042),     # (0.033, 0.039 until 22 October 2026: the pictures draw the pupil filling the white)
 }
 # The visor: one band that wraps the front of the head from one row of leaves to the other.
 VISOR = {
     "UP": 0.020,                 # its middle, above the middle of the face
-    # (22 October 2026, strict audit of the eyes, batch 3, on #1, #30, #100, #105 gradient; #60, #62, #82 plasma; #11, #83, #147 sunset: the visor of the pictures is
-    # a lens, an almond with round ends, taller in the middle than a band (0.076 against 0.056) and lower at its ends (0.036 against 0.042), its
-    # colours running smoothly where ours stepped in ten flat stripes. HALF_HEIGHT is the middle and the end; ROUND how round the ends are (1 a parabola,
-    # less rounder); SMOOTH how many pieces each stripe of PIECES is cut into, their colours run between the stripes (smooth_visors).)
-    "HALF_HEIGHT": (0.076, 0.036),   # in the middle of the front, at its ends
-    "ROUND": 0.55,
-    "SMOOTH": 2,
+    "HALF_HEIGHT": (0.056, 0.042),   # in the middle of the front, at its ends
     "HALF_WIDTH": 0.338,         # the oval it follows seen from above: half width, half depth
     "HALF_DEPTH": 0.306,
     "AROUND_DEG": 80.0,
@@ -636,9 +626,6 @@ EYES = {
             "Lens": (0.96, 0.96, 0.96),
         },
         "unlit": ("Lens",),      # drawn in its colour whatever the light: the glare of the lenses
-        # (22 October 2026, strict audit, batch 2, on #3, #98, #157, #236, #199: the lenses are rounder and taller, about as high as wide, where ours were 1.4 times
-        # as wide as high, and tilted; LENS_SQUARENESS 2.6 (3.2): rounded, not rectangles.)
-        "numbers": {"LENS": (0.126, 0.016, 0.092, 0.090), "LENS_SQUARENESS": 2.6},
     },
     "Normal Eye": {
         "kind": "NormalEye",
@@ -2364,7 +2351,7 @@ def build_visor(maker):
         here = surface.middle + Vector((numbers.HALF_WIDTH * math.sin(angle), -numbers.HALF_DEPTH * math.cos(angle),
                                         height))
         out = Vector((math.sin(angle) / numbers.HALF_WIDTH, -math.cos(angle) / numbers.HALF_DEPTH, 0.0)).normalized()
-        tall = end_tall + (middle_tall - end_tall) * max(1.0 - across * across, 0.0) ** numbers.ROUND
+        tall = middle_tall + (end_tall - middle_tall) * across * across
         back = here - out * numbers.THICKNESS
         loops.append([here + Z * tall, here + out * numbers.BULGE, here - Z * tall,
                       back - Z * tall * 0.96, back + Z * tall * 0.96])
@@ -2691,39 +2678,11 @@ MOUTH_KINDS = {"GoldTooth": build_gold_tooth, "Smile": build_smile, "Drool": bui
 CLOTH_KINDS = {"Tee": build_tee, **hats_and_clothes.CLOTH_KINDS}
 # trait of the collection: (start of the name of its part, its table, the word that names the
 # builder in an entry, the builders). Clothing comes first: it is under everything else.
-def smooth_visors(table):
-    """Every entry of the table that is a visor, with its stripes cut into VISOR["SMOOTH"] pieces each whose colour runs between the colours of the stripes
-    (linearly from the middle of one stripe to the middle of the next): the visors of the pictures run smoothly (22 October 2026)."""
-    made = {}
-    for name, entry in table.items():
-        if not isinstance(entry, dict) or entry.get("kind") not in ("Visor", "Goggles"):
-            made[name] = entry
-            continue
-        goggles = entry["kind"] == "Goggles"
-        numbers = {**(faces.GOGGLES if goggles else VISOR), **entry.get("numbers", {})}
-        pieces, steps = numbers["PIECES"], numbers.get("SMOOTH", 2)
-        count = len(pieces) * steps
-        colours, names = {}, []
-        for index in range(count):
-            position = (index + 0.5) / steps - 0.5                    # in stripes, the middle of the first at 0
-            low = min(max(int(math.floor(position)), 0), len(pieces) - 1)
-            high = min(low + 1, len(pieces) - 1)
-            share = min(max(position - low, 0.0), 1.0)
-            first, second = entry["colours"][pieces[low]], entry["colours"][pieces[high]]
-            key = f"S{index}"
-            colours[key] = tuple(round(a + (b - a) * share, 4) for a, b in zip(first, second))
-            names.append(key)
-        kept = {key: value for key, value in entry["colours"].items() if key not in pieces}
-        made[name] = {**entry, "colours": {**kept, **colours}, "numbers": {**entry.get("numbers", {}), "PIECES": tuple(names)},
-                      "unlit": (tuple(key for key in entry.get("unlit", ()) if key in kept) + tuple(names)) if goggles else ()}
-    return made
-
-
 OF_SIDE = {"Mouth": faces.by_side(MOUTHS_OF_SIDE, faces.MOUTHS_OF_SIDE), "Eyes": faces.EYES_OF_SIDE}
 TRAIT_PARTS = {
     "Body": ("Cloth", CLOTHES, "kind", CLOTH_KINDS),
     "Head": ("Hat", HATS, "shape", HAT_SHAPES),
-    "Eyes": ("Eyes", smooth_visors({**EYES, **faces.EYES, **bases.radioactive_eyes({**EYES, **faces.EYES})}), "kind", EYE_KINDS),
+    "Eyes": ("Eyes", {**EYES, **faces.EYES, **bases.radioactive_eyes({**EYES, **faces.EYES})}, "kind", EYE_KINDS),
     "Mouth": ("Mouth", {**MOUTHS, **faces.MOUTHS}, "kind", MOUTH_KINDS),
     # What a Genesis holds in its right hand (chog_trait_accessories.py, 17 October 2026).
     "Accessory": ("Accessory", accessories.ACCESSORIES, "kind", accessories.ACCESSORY_KINDS),
@@ -2978,7 +2937,6 @@ def build(traits=None, replaced=None, head_replaced=None):
         bases.add_skull_face(head, head_n, surface, full, draw_shape, oval, SKIN, full.EYE, full.BLUSH, full.FACE,
                              side=side)
         bases.narrow_jaw(head, head_n, side)
-        bases.add_mandible(head, head_n, full, draw_shape, SKIN, full.EYE, head_n.OUTLINE_THICKNESS)
     elif bases.is_radioactive(traits):
         # A radioactive Chog: the crown its hat leaves (all of it under horns), no cream face, the skull's
         # teeth and nose showing, no cheek.
