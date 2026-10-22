@@ -1130,3 +1130,23 @@ magnitudes laid on the outer side of each eye, mirrored (the light streak of a w
 8 Genesis (#321, #6, #39, #92, #27, #21, #18, #76) on the stage, close, bust, side and game camera, before | after beside the art:
 [heroes-tears-2026-10-22.jpg](../../research/evidence/heroes-tears-2026-10-22.jpg). Checked: library 1,970 Genesis, 0 failures; `--budget` largest #630 7,981, none over 8,000 (no
 triangle changed). The pictures themselves draw the tears on the left of the picture for both eyes: ours follow the owner's rule, not the three quarter drawing.
+
+## 22 October 2026: the face takes the room it needs, to the sides and to the chin (lot 6)
+
+The owner on #76 seen from the front on the stage: the forehead is good, but at the sides and at the bottom the face does not take all the room. The pictures
+(#76 at 1000 points, #75, #112, #237, #432) fill almost the whole front of the head with the cream: the skin shows only as the zigzag on top and a thin band at the
+sides, the cheeks sit near the outline and the chin is the bottom of the head. The cause was the shape of the edge: a rounded square cut its width with the same squareness
+as its height (`FACE_SQUARENESS` 4), so below the cheeks the edge left the outline of the egg and left a triangle of skin in each lower corner (from the front, a band of
+skin about a fifth of the head wide beside the cheeks and under the face). `face_place` (`make_chog_traits.py`) now gives the width its own squareness,
+`FACE_SQUARENESS_X` 20, which makes the edge follow the outline of the egg all down the sides to the chin; `FACE_FIT` 0.96 to 0.99, `FACE_HALF_HEIGHT` 0.196 to 0.198 (the chin 0.248
+under the middle of the head, 0.002 from its lowest point), seven teeth of hair 0.080 wide (five of 0.088) so that the fringe still covers the brow, which is wider. The forehead
+(`FACE_TOP` 0.125) and the eyes and mouths, placed from the middle of the face, are untouched. New: the `stage_front` picture (the stage camera from straight in front) in
+`render_chog_traits.py`, `--views` in `make_chog_stage_sheet.py`, `--head-set` in `measure_face_gaps.py`. Sheet, 9 heroes (the bare #76, #75, #112, #237, #432, the hoodie #23, the shark #116, the dragon
+#16, the astronaut #249), the front view, three quarters, the stage, the bust and the game camera, before | after beside the art:
+[heroes-face-wide-2026-10-22.jpg](../../research/evidence/heroes-face-wide-2026-10-22.jpg). The hoods, the shark's teeth, the dragon's opening and the astronaut ring follow the edge of the
+face by construction (`opening_rim`) and still close around it on the sheet.
+
+- **Checked**: 37 Genesis (hoods, costumes, caps, bare heads) build with no failure; library 1,970 Genesis, 0 failures; `--budget` largest #630 7,991 (7,981 before: the two more teeth of
+  hair), median 7,175, none over 8,000, **9 triangles under the limit**. `check_face_overlaps.py --specks` on #76: the face is nowhere in front of a drawn thing. `measure_face_gaps.py` on #76:
+  the head still pokes through the face at 41 of 3,240 points along its top edge (0 before this lot) whatever the lift (0.0046, 0.0065) or the number of points (24, 32): under the teeth of hair, no
+  skin is seen in the cream in the pictures at the stage or in the bust; not understood, left open.
