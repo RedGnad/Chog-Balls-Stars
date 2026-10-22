@@ -1,5 +1,12 @@
 # État courant et décisions
 
+**22 October 2026, 10:45 UTC (lead: session paused on its usage limit; open work).**
+- **Live:** build `20261022T102129035Z-ddb46fd0faf2491da81b7eb454778963` (faces batch 1, ushanka, clown nose), wager version 2.
+- **Accepted, on branches, not merged:** `stream/heroes-hats` 8282f74 headbands on the brow with no hair through (`costumes-headbands-2026-10-22.jpg`), 469e583 Spartan helmet spikes out at the sides, none down (`costumes-spartan-2026-10-22.jpg`). `stream/heroes-faces`: eyes batch 2 and Smirk's second pass, pushed but not reviewed.
+- **Still to do from the owner's review:** dragon belly from the side, balaclava rebuilt, clothes and their motifs audited against the art, the strict eye audit down the frequency list then visors and glasses.
+- **New requests (owner, 10:40):** Radioactive skins with more colours in their gradient as the art; Radioactive and Skull jaws drawn horizontally as the art, not a line going up; no skeleton lines over a T-shirt on Radioactive and Skull bodies; the ten 1:1 heroes worked as much as the art; a radioactive special attack for Radioactive Genesis instead of their eyes' one, and a special super attack for each 1:1 (simulation and view: specials are in the simulation, a Photon version); the basic attack line under a hero reworked: short, says the attack type of its class (brute, ranger, controller) and what it throws, with a clear text design.
+**Next action:** merge both branches and deploy after review; then the new requests, the special attacks batched as one simulation change.
+
 **22 October 2026, 10:30 UTC (lead: owner's hero review, first lots deployed).**
 - **Deployed:** build `20261022T102129035Z-ddb46fd0faf2491da81b7eb454778963`, stamp unchanged. Faces lot 8 batch 1 (`stream/heroes-faces` 70ab510, `heroes-eyes-batch1-2026-10-22.jpg`, `heroes-lot8-lasers-glasses-coin-2026-10-22.jpg`): a strict eye audit (Smirk Left, Retro Glass were wrongly graded faithful; Happy, Round, Dead, Normal Eye, Heart closer), laser beams from the visible eye, every mouth centred on the face's middle line, the Mon coin raised. Costumes (`stream/heroes-hats` 5b536f7): the ushanka tall with its fur roll and flaps (`costumes-ushanka-2026-10-22.jpg`), the clown nose a little out (`costumes-clown-nose-out-2026-10-22.jpg`).
 - **Verified:** export 1,970 Genesis, 0 failed; budget largest #630 7,991, none over 8,000; 175 view tests; `?heroes=39,34,210,549,35,242`; a local siege without exception; judge fixtures agree.
