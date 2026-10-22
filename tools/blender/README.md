@@ -1342,3 +1342,29 @@ three quarter, game camera behind, hero stage).
   through the knit (`THROUGH`).
 - **Triangles**: the mask 1,312 (1,040), the base 280 less (two leaves fewer): #630 7,983, the heaviest Robber; `--budget` largest #630 7,983, none over 8,000.
 - **Not verified in Unity.** The pairs of leaves at both sides are larger than the few spikes the art shows on its far side; the lower edge has no cuff, the art draws a thick rolled edge.
+
+### 7.7 The ten 1:1 Genesis, brought to their 1000 px art
+
+Sheet: [heroes-one-of-one-2026-10-22.jpg](../../research/evidence/heroes-one-of-one-2026-10-22.jpg), each Genesis beside its picture at 1000 points (fetched from the addresses of
+`.artifacts/genesis-art/manifest.jsonl`; `make_chog_one_of_one_sheet.py --art-folder`), then before | after: bust, hero stage, side of the stage, back three quarter, game camera. The owner:
+"the ten 1:1 are not worked enough". Each was read on its 1000 px picture for what makes it recognisable and the pieces missing were built (`chog_one_of_one.py`), within the 8,000 triangles:
+
+| # | What the picture shows that the 3D lacked | Added |
+| --- | --- | --- |
+| 53 Flame | a thick brown collar with a round gold clasp, a red cape wide over the shoulders | collar 0.075 tall (0.040), clasp 0.040 (0.026), wider round the neck, cape from 150 degrees (120) |
+| 392 Skull | a great sheet of flames streaming from the back of the head, tall as the skull | nine tongues 0.30 to 0.52 long (0.20 to 0.30), 0.085 wide, over 240 degrees |
+| 434 The Scream | the hands pressed to the cheeks, big cream eyes with a small pupil, a tall open mouth | `ScreamHands` (two pink hands on the head), `1:1 Scream Eye`, `1:1 Scream Mouth` |
+| 494 Zombie | the brain large, spilling over the brow, blood running from it, green slime hanging from the mouth, blood speckles | brain 1.45 times larger, three blood drips, two strands of slime, five speckles |
+| 973 Pepe | the huge pink-red frown, the ruff of yellow-green points round the neck of the suit | lips on the face (`PEPE`), 13 points round the neck |
+| 1006 Manga | the angry thick brows, the grey shading under the eyes, big eyes in a thick line | `MangaBrows`, `1:1 Manga Eye` |
+| 1159 Angel | a large thick halo, large layered wings, a thick white brow | halo 0.27 by 0.036 (0.20 by 0.024), five feathers 0.42 to 0.76 long, 0.14 wide (four, 0.36 to 0.56, 0.075), white brows |
+| 1290 Warrior | a gold Y helmet (a band and a stem down the face), a red gem in a gold setting, red stripes of war paint, large shiny eyes, a collar of fur | stem, setting and kite gem, two stripes, glints, `WarriorTee` (15 points of fur) |
+| 1373 Gold | the light running along the polished gold, tall almond eyes with a glint | `GoldShine` (two streaks, glints), taller eyes |
+| 1376 Devil | glossy red drop horns, large glossy eyes, dark red bat wings and a tail with an arrow tip | `DevilHorns` (0.235 tall), wings and tail on the suit, larger eyes with a glint |
+
+- **What they throw is unchanged**: the strokes on the face (brows, blood, slime, war paint, stem) are on a part of their own, so the halo, the brain and the helmet that #1159, #494 and #1290 throw stay
+  the object; the Scream, the manga page and the gold Chog now wear a value of "Head" (hands, brows, shine) and still throw a spike of their crown (`ATTACK_OF_HEAD`, `LINES`). Read back
+  from the exported library: #434, #1006, #1373, #53 throw `Attack_Leaf`, #494 `Hat_Brain` (864 triangles), #1159 `Hat_Halo` (320), #1290 `Hat_GoldHelmet` (280), #1376 `Attack_Trident`.
+- **Checked**: the ten build, 6,287 to 7,789 triangles; `--budget`: largest hero #630 7,983, none over 8,000; library 1,970 Genesis, 0 failures.
+- **Not done / not verified in Unity**: the painted brushwork of #434, the screentone and the streaming hair of #1006, the glow and the white-yellow outline of #1373 and #53 (the outline material is shared by every hero), the
+  cracks of the skull of #392, the ragged edge of the face of #494, the pose of the arms (the game moves them). The skull and the zombie faces are the faces agent's.
