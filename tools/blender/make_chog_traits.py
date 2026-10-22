@@ -2696,11 +2696,12 @@ def smooth_visors(table):
     (linearly from the middle of one stripe to the middle of the next): the visors of the pictures run smoothly (22 October 2026)."""
     made = {}
     for name, entry in table.items():
-        if not isinstance(entry, dict) or entry.get("kind") != "Visor":
+        if not isinstance(entry, dict) or entry.get("kind") not in ("Visor", "Goggles"):
             made[name] = entry
             continue
-        numbers = {**VISOR, **entry.get("numbers", {})}
-        pieces, steps = numbers["PIECES"], numbers["SMOOTH"]
+        goggles = entry["kind"] == "Goggles"
+        numbers = {**(faces.GOGGLES if goggles else VISOR), **entry.get("numbers", {})}
+        pieces, steps = numbers["PIECES"], numbers.get("SMOOTH", 2)
         count = len(pieces) * steps
         colours, names = {}, []
         for index in range(count):
@@ -2712,8 +2713,9 @@ def smooth_visors(table):
             key = f"S{index}"
             colours[key] = tuple(round(a + (b - a) * share, 4) for a, b in zip(first, second))
             names.append(key)
-        made[name] = {**entry, "colours": colours, "numbers": {**entry.get("numbers", {}), "PIECES": tuple(names)},
-                      "unlit": ()}
+        kept = {key: value for key, value in entry["colours"].items() if key not in pieces}
+        made[name] = {**entry, "colours": {**kept, **colours}, "numbers": {**entry.get("numbers", {}), "PIECES": tuple(names)},
+                      "unlit": (tuple(key for key in entry.get("unlit", ()) if key in kept) + tuple(names)) if goggles else ()}
     return made
 
 
