@@ -110,8 +110,6 @@ namespace Chog.Match
         private const float FadeSeconds = 1.2f;
         // The music under the sounds, before the player's setting.
         private const float MusicLevel = 0.55f;
-        // The name of the scene a match is played in.
-        private const string MatchScene = "Gameplay";
 
         private static ChogSounds s_instance;
         private static float s_musicVolume = -1f;
@@ -310,7 +308,12 @@ namespace Chog.Match
         // keeps it for that whole match. The next match chooses another entry when one is available.
         private void OnScenes()
         {
-            var inMatch = SceneManager.GetSceneByName(MatchScene).isLoaded;
+            var inMatch = false;
+            for (var i = 0; i < SceneManager.sceneCount; i++)
+            {
+                var scene = SceneManager.GetSceneAt(i);
+                inMatch |= scene.isLoaded && ArenaScenes.IsArena(scene.name);
+            }
             if (inMatch && !_wasInMatch)
                 _selectedMatchMusic = PickMatchMusic();
             else if (!inMatch && _wasInMatch)

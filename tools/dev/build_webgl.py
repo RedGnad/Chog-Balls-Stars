@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Ask the open Unity Editor for a WebGL build, wait for it and print the outcome.
 
-  python3 tools/dev/build_webgl.py [build | refresh] [seconds to wait, default 540]
+  python3 tools/dev/build_webgl.py [build | refresh | siege-map] [seconds to wait, default 540]
 
 "build" compiles, imports the Genesis roster and builds (about four minutes); "refresh" only
-compiles and imports (about thirty seconds; use it after adding a .qtn file). The Editor must
+compiles and imports (about thirty seconds; use it after adding a .qtn file); "siege-map"
+compiles, imports and builds the siege's map from content/maps/ (Chog.Editor.SiegeMapBuilder:
+the scene GameplaySiege, the Quantum map SiegeMap and its navmesh), then writes
+.artifacts/unity/siege-map/ (the exported simulation assets, the navmesh, a summary). The Editor must
 be open on game/: its watcher (Assets/Chog/Editor/BuildRequestWatcher.cs) picks the request up
 from .artifacts/unity/webgl-build-request and writes webgl-build-status.json next to it. It
 waits while Play Mode is active. Exit code 0 when the final state is "succeeded" or
@@ -23,7 +26,7 @@ FINAL = {"succeeded", "failed", "refreshed"}
 words = [a for a in sys.argv[1:] if not a.isdigit()]
 numbers = [a for a in sys.argv[1:] if a.isdigit()]
 kind = words[0] if words else "build"
-if kind not in ("build", "refresh"):
+if kind not in ("build", "refresh", "siege-map"):
     sys.exit(__doc__)
 
 ARTIFACTS.mkdir(parents=True, exist_ok=True)

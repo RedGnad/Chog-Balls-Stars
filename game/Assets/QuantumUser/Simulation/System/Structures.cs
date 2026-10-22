@@ -14,7 +14,10 @@ namespace Quantum
 		public static readonly FP TowerHealth = 8000;
 		public static readonly FP CoreHealth = 12000;
 		public static readonly FP TowerRadius = FP._0_50 + FP._0_10;
-		public static readonly FP CoreRadius = FP._0_75;
+		// The core is drawn 1.5 times its model (StructureViews.CoreScale): its plinth is 1.60 wide at the
+		// ground (research/evidence/siege-map-layouts-2026-10-17). With 1.5 a hero stops with its body
+		// touching the plinth instead of walking into it.
+		public static readonly FP CoreRadius = FP._1 + FP._0_50;
 		public static readonly FP TowerRange = 5;
 		public static readonly FP TowerDamage = 500;
 		public static readonly FP TowerInterval = 1;
@@ -96,7 +99,7 @@ namespace Quantum
 
 		/// <summary>
 		/// A tower's turn: when its time has come, it hurts the nearest living hero of the other
-		/// team within its range. Returns that hero, or none.
+		/// team within its range that it can see (TowerTarget). Returns that hero, or none.
 		/// </summary>
 		public static EntityRef Shoot(Frame frame, EntityRef entity, Structure* structure, Transform2D* transform, TeamInfo* team, Health* health)
 		{
@@ -106,29 +109,7 @@ namespace Quantum
 				return default;
 			}
 
-			EntityRef target = default;
-			FP nearest = structure->Range * structure->Range;
-			var heroes = frame.Filter<Character, Transform2D, TeamInfo, Health>();
-			while (heroes.NextUnsafe(out EntityRef hero, out Character* character, out Transform2D* heroTransform, out TeamInfo* heroTeam, out Health* heroHealth))
-			{
-				if (heroTeam->Index == team->Index || heroHealth->IsDead)
-				{
-					continue;
-				}
-
-				FP distance = FPVector2.DistanceSquared(transform->Position, heroTransform->Position);
-				if (distance <= nearest)
-				{
-					// At equal distance the first hero found is kept: the order of a filter is
-					// the same on every machine.
-					if (distance < nearest || target == default)
-					{
-						nearest = distance;
-						target = hero;
-					}
-				}
-			}
-
+			EntityRef target = TowerTarget(frame, team->Index, transform->Position, structure->Range);
 			if (target == default)
 			{
 				return default;
@@ -137,6 +118,44 @@ namespace Quantum
 			structure->NextShotTime = now + structure->Interval;
 			AttributesHelper.ChangeAttribute(frame, target, EAttributeType.Health, EModifierAppliance.OneTime, EModifierOperation.Subtract, structure->Damage, 0);
 			frame.Events.StructureShot(entity, target, structure->Damage);
+			return target;
+		}
+
+		/// <summary>
+		/// The hero a tower of "team" standing at "from" shoots: the nearest living hero of another team
+		/// within "range" whose centre the tower sees, no block of the map (the Static layer) standing
+		/// between them; at equal distance the first found, the order of a filter being the same on
+		/// every machine. A hero behind cover is safe from the tower, as it is from a straight shot.
+		/// One ray for each hero nearer than the best found so far, so at most one per enemy hero.
+		/// The views turn a tower's head with the same rule (Chog.Match.StructureViews).
+		/// </summary>
+		public static EntityRef TowerTarget(Frame frame, int team, FPVector2 from, FP range)
+		{
+			EntityRef target = default;
+			FP nearest = range * range;
+			var heroes = frame.Filter<Character, Transform2D, TeamInfo, Health>();
+			while (heroes.NextUnsafe(out EntityRef hero, out Character* character, out Transform2D* heroTransform, out TeamInfo* heroTeam, out Health* heroHealth))
+			{
+				if (heroTeam->Index == team || heroHealth->IsDead)
+				{
+					continue;
+				}
+
+				FP distance = FPVector2.DistanceSquared(from, heroTransform->Position);
+				if (distance > nearest || (distance == nearest && target != default))
+				{
+					continue;
+				}
+
+				if (LineOfSightHelper.HasLineOfSight(frame, from, heroTransform->Position) == false)
+				{
+					continue;
+				}
+
+				nearest = distance;
+				target = hero;
+			}
+
 			return target;
 		}
 

@@ -362,7 +362,10 @@ internal static unsafe class Program
         });
 
         Test("a tower hurts the nearest enemy hero within its range, once per interval, and nobody else", () => {
-            InFrame(new AssetObject[0], new RuntimeConfig(), frame => {
+            // A tower looks for blocks between it and a hero (Structures.TowerTarget): its frame needs a
+            // map; this one has none, so every hero in range is seen. That a block hides a hero is
+            // checked on the real siege map (tools/quantum/check_tower_sight.py).
+            InMapFrame(frame => {
                 Structures.Build(frame);
                 var tower = StructureOf(frame, 0, EStructureKind.Tower);
                 var at = frame.Get<Transform2D>(tower).Position;
@@ -385,6 +388,17 @@ internal static unsafe class Program
                 frame.Unsafe.GetPointer<Health>(tower)->IsDead = true;
                 Require(Fire(frame, tower) == default, "A destroyed tower still shoots");
                 Require(Fire(frame, StructureOf(frame, 0, EStructureKind.Core)) == default, "A core shot");
+            });
+        });
+
+        Test("a core stops heroes at the edge of its drawn plinth, a circle of 1.5", () => {
+            InFrame(new AssetObject[0], new RuntimeConfig(), frame => {
+                Structures.Build(frame);
+                Require(Structures.CoreRadius == FP._1 + FP._0_50, "The core's collision radius is not 1.5");
+                for (int team = 0; team < 2; team++) {
+                    var shape = frame.Get<PhysicsCollider2D>(StructureOf(frame, team, EStructureKind.Core)).Shape;
+                    Require(shape.Type == Shape2DType.Circle && shape.Circle.Radius == Structures.CoreRadius, "A core's collider is not a circle of CoreRadius");
+                }
             });
         });
 
@@ -725,7 +739,7 @@ internal static unsafe class Program
     private static bool engineReady;
 
     // Runs the body in a real Quantum Frame that can find the given assets.
-    private static unsafe void InFrame(AssetObject[] assets, RuntimeConfig config, Action<Frame> body)
+    private static unsafe void InFrame(AssetObject[] assets, RuntimeConfig config, Action<Frame> body, Action<string[]> nameLayers = null)
     {
         if (!engineReady) {
             FPLut.Init(Path.Combine(root, "game/Assets/Photon/Quantum/Resources/LUT"));
@@ -743,6 +757,7 @@ internal static unsafe class Program
             simulation.Physics.Layers[i] = "TestLayer" + i;
             simulation.Physics.LayerMatrix[i] = -1;
         }
+        nameLayers?.Invoke(simulation.Physics.Layers);
         var platform = DotNetRunnerFactory.CreatePlatformInfo();
         platform.CoreCount = 1;
         using var resources = new ResourceManagerStatic(assets, DotNetRunnerFactory.CreateNativeAllocator());
@@ -750,7 +765,9 @@ internal static unsafe class Program
             PlatformInfo = platform,
             HeapConfig = new Heap.Config(15, 64, 1), ResourceManager = resources,
             PhysicsConfig = simulation.Physics, NavigationConfig = simulation.Navigation,
-            IsLocalPlayer = player => true
+            IsLocalPlayer = player => true,
+            // A tower looks for blocks with a ray (Structures.TowerTarget), as in a match.
+            UsePhysics2D = true,
         });
         var frame = new Frame(context, Array.Empty<SystemBase>(), Array.Empty<SystemBase>(),
             new DeterministicSessionConfig { PlayerCount = 6, UpdateFPS = 60 },
@@ -760,6 +777,29 @@ internal static unsafe class Program
             body(frame);
         }
         finally { frame.Free(); }
+    }
+
+    // Runs the body in a real Quantum Frame that has a map, an empty one, and the layers of the game
+    // (6 Static, 7 Character): what a ray of the physics needs. The static colliders of a map only
+    // reach a frame's physics through the engine's physics update, which these frames do not run,
+    // so a block is tested on the real map instead (tools/quantum/check_tower_sight.py).
+    private static unsafe void InMapFrame(Action<Frame> body)
+    {
+        var map = new Map {
+            Identifier = new AssetObjectIdentifier { Guid = new AssetGuid(0x5E1E_7E57), Path = "Tests/EmptyMap" },
+            WorldSize = 64, BucketsCount = 4, BucketsSubdivisions = 2,
+            GridSizeX = 16, GridSizeY = 16, GridNodeSize = 4,
+            StaticColliders2D = new MapStaticCollider2D[0],
+            StaticColliders3D = new MapStaticCollider3D[0],
+            MapEntities = new ComponentPrototypeSet[0],
+        };
+        InFrame(new AssetObject[] { map }, new RuntimeConfig { Map = new AssetRef<Map>(map.Guid) }, frame => {
+            frame.Physics2D.Init();
+            body(frame);
+        }, layers => {
+            layers[6] = "Static";
+            layers[7] = "Character";
+        });
     }
 
     private static void Test(string name, Action action)

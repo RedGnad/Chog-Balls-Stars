@@ -11,7 +11,8 @@ namespace Chog.Editor
     /// Editor then refreshes assets (compiling changed scripts), imports the Genesis roster,
     /// builds the enabled scenes and writes ".artifacts/unity/webgl-build-status.json".
     /// A request file whose content is "refresh" stops before the build: it only compiles and
-    /// imports. Nothing happens during Play Mode.
+    /// imports; "siege-map" builds the siege's map instead (SiegeMapBuilder). Nothing happens
+    /// during Play Mode.
     /// </summary>
     public static class BuildRequestWatcher
     {
@@ -25,6 +26,10 @@ namespace Chog.Editor
         }
 
         private const double PollSeconds = 1.0;
+
+        // A request file whose content is this word builds the siege's map (SiegeMapBuilder) instead of
+        // the game, after the same refresh and import.
+        private const string SiegeMapWord = "siege-map";
 
         private static double _nextPoll;
         private static string _lastWaitingReason;
@@ -99,12 +104,28 @@ namespace Chog.Editor
                 return;
             }
 
-            // Step 3: build, unless the request only asked for a refresh.
-            var request = File.ReadAllText(RequestPath).Trim();
-            var refreshOnly = request == "refresh";
+            // Step 3: build, unless the request only asked for a refresh or for the siege map.
+            var word = File.ReadAllText(RequestPath).Trim();
+            var refreshOnly = word == "refresh";
             // "clean": the same build from an empty build cache (a stale IL2CPP output fails to link).
-            var clean = request == "clean";
+            var clean = word == "clean";
             var imported = File.ReadAllText(ImportedPath);
+            if (word == SiegeMapWord)
+            {
+                // The state is written before the request goes, so tooling never reads the last final state.
+                Write("mapping", "Building the siege map (SiegeMapBuilder). " + imported, null);
+                Finish();
+                try
+                {
+                    Write("succeeded", "Siege map built: " + SiegeMapBuilder.Build(), null);
+                }
+                catch (Exception exception)
+                {
+                    Write("failed", "Siege map: " + exception.GetType().Name + ": " + exception.Message, null);
+                    Debug.LogException(exception);
+                }
+                return;
+            }
             Finish();
             if (refreshOnly)
             {

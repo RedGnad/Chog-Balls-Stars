@@ -19,8 +19,6 @@ namespace Chog.Screens
     /// </summary>
     public static class ChogArenaSkin
     {
-        /// <summary>The scene of the arena; the menu has none of these materials, but is left alone anyway.</summary>
-        public const string ArenaScene = "Gameplay";
 
         public const string ArenaShaderResource = "ChogArena";
 
@@ -35,7 +33,9 @@ namespace Chog.Screens
         {
             if (!scene.IsValid())
                 return;
-            if (scene.name != ArenaScene)
+            // Both arenas (Gameplay, GameplaySiege) have the same materials; the menu has none of them,
+            // but is left alone anyway.
+            if (!ArenaScenes.IsArena(scene.name))
             {
                 ChogMatchLook.LeaveArena();
                 return;

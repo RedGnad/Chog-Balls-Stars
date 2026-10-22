@@ -1,7 +1,7 @@
 {
   "name": "Chog.Editor",
   "rootNamespace": "Chog.Editor",
-  "references": ["UnityEditor.TestRunner", "Quantum.Simulation", "Quantum.Unity", "Quantum.Unity.Editor", "Quantum.TwinStickShooter", "Chog.Match", "Unity.TextMeshPro"],
+  "references": ["UnityEditor.TestRunner", "Quantum.Simulation", "Quantum.Unity", "Quantum.Unity.Editor", "Quantum.TwinStickShooter", "Chog.Match", "Unity.TextMeshPro", "Unity.AI.Navigation"],
   "includePlatforms": ["Editor"],
   "autoReferenced": false
 }

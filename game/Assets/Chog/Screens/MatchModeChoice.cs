@@ -83,14 +83,25 @@ namespace Chog.Screens
             return null;
         }
 
-        /// <summary>Writes the chosen mode into the configs the menu starts matches with.</summary>
+        /// <summary>
+        /// Writes the chosen mode, and the map it plays on (ArenaScenes: the siege's own map, or the sample's
+        /// for the coins), into the configs the menu starts matches with. Quantum loads the scene of that map.
+        /// </summary>
         private static void Apply()
         {
             // In the Editor these assets are the project files themselves: leave them untouched.
             if (Application.isEditor)
                 return;
+            var mapPath = ArenaScenes.MapPathOf(Chosen);
+            var map = Quantum.QuantumUnityDB.GetGlobalAssetGuid(mapPath);
+            if (!map.IsValid)
+                Debug.LogWarning("CHOG_MODE the map " + mapPath + " is not in this build: the match keeps the map of its scene");
             foreach (var scene in Resources.LoadAll<QuantumMenuSceneInfo>(""))
+            {
                 scene.RuntimeConfig.Mode = Chosen;
+                if (map.IsValid)
+                    scene.RuntimeConfig.Map = new Quantum.AssetRef<Quantum.Map>(map);
+            }
         }
 
         private static void Choose(EMatchMode mode)

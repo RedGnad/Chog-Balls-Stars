@@ -35,9 +35,16 @@ internal static unsafe class Verifier
         // "--test-all-bots 1" hands the heroes of the recorded players to bots when the match
         // begins, as the game does for a player who left: six bots, three against three.
         // "--test-mode Siege" replays the record with the rules of another mode (MatchMode.qtn).
+        // "--test-map QuantumUser/Resources/SiegeMap" (or the map's id) replays it on another map of the
+        // asset database: with "--test-all-bots 1", a quick way to watch bots on a new map.
+        // "--test-sight 0.5,-8.5>-4,-7.5;0.5,-8.5>0.5,-5" says, once the match has begun, whether a ray
+        // from each first point reaches the second without crossing a block of the map
+        // (LineOfSightHelper, what a tower looks through): a check of the map's blocks, in the report.
         (int team, int tick)? coreFalls = null;
         int? seed = null;
         EMatchMode? mode = null;
+        string mapAsked = null;
+        string sightAsked = null;
         var allBots = false;
         var usage = args.Length < 4 || args.Length % 2 != 0;
         for (var i = 4; i + 1 < args.Length && !usage; i += 2)
@@ -53,12 +60,16 @@ internal static unsafe class Verifier
                 allBots = true;
             else if (args[i] == "--test-mode" && Enum.TryParse<EMatchMode>(args[i + 1], true, out var asked))
                 mode = asked;
+            else if (args[i] == "--test-map")
+                mapAsked = args[i + 1];
+            else if (args[i] == "--test-sight")
+                sightAsked = args[i + 1];
             else
                 usage = true;
         }
         if (usage)
         {
-            Console.Error.WriteLine("usage: Chog.Quantum.Verifier <replay.json | folder of a match> <asset database.json> <LUT folder> <report.json> [--test-core-falls <team>@<tick>] [--test-seed <number>] [--test-all-bots 1] [--test-mode TowersAndCoins|Siege|Coins]");
+            Console.Error.WriteLine("usage: Chog.Quantum.Verifier <replay.json | folder of a match> <asset database.json> <LUT folder> <report.json> [--test-core-falls <team>@<tick>] [--test-seed <number>] [--test-all-bots 1] [--test-mode TowersAndCoins|Siege|Coins] [--test-map <path or id of a map>] [--test-sight x,y>x,y;...]");
             return 2;
         }
 
@@ -81,14 +92,30 @@ internal static unsafe class Verifier
         // assembly; here they are part of the simulation (tools/quantum/headless.py), and the
         // assets that name them are read accordingly.
         var database = File.ReadAllText(databasePath).Replace(", Assembly-CSharp\"", ", Quantum.Simulation\"");
-        using var resources = new ResourceManagerStatic(serializer.AssetsFromByteArray(System.Text.Encoding.UTF8.GetBytes(database)),
-            DotNetRunnerFactory.CreateNativeAllocator());
+        var assets = serializer.AssetsFromByteArray(System.Text.Encoding.UTF8.GetBytes(database));
+        using var resources = new ResourceManagerStatic(assets, DotNetRunnerFactory.CreateNativeAllocator());
         var runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.RuntimeConfigData.Decode(), compressed: true);
-        var testedRules = seed != null || mode != null;
+        var testedRules = seed != null || mode != null || mapAsked != null || sightAsked != null;
         if (seed != null)
             runtimeConfig.Seed = seed.Value;
         if (mode != null)
             runtimeConfig.Mode = mode.Value;
+        if (mapAsked != null)
+        {
+            var map = assets.OfType<Map>().FirstOrDefault(m => m.Path == mapAsked || m.Guid.Value.ToString() == mapAsked);
+            if (map == null)
+            {
+                Console.Error.WriteLine("no map " + mapAsked + " in " + databasePath + ": " + string.Join(", ", assets.OfType<Map>().Select(m => m.Path + " " + m.Guid.Value)));
+                return 2;
+            }
+            runtimeConfig.Map = new AssetRef<Map>(map.Guid);
+        }
+        var sights = (sightAsked ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries).Select(pair =>
+        {
+            var ends = pair.Split('>').Select(end => end.Split(',').Select(v => FP.FromString(v.Trim())).ToArray()).ToArray();
+            return (from: new FPVector2(ends[0][0], ends[0][1]), to: new FPVector2(ends[1][0], ends[1][1]));
+        }).ToList();
+        List<object> sightSeen = null;
 
         // What the simulation says while it is replayed: the same events the game's own screens
         // react to. The match begins when the selection of characters ends, and from then on
@@ -138,6 +165,16 @@ internal static unsafe class Verifier
             runner.Service(1.0f);
             if (playersAtStart == null && selectionEndedAtTick != null && game.Frames.Verified != null)
                 playersAtStart = PlayersOf(game.Frames.Verified);
+            if (sightSeen == null && sights.Count > 0 && selectionEndedAtTick != null && game.Frames.Verified != null)
+            {
+                var now = game.Frames.Verified;
+                sightSeen = sights.Select(s => (object)new
+                {
+                    from = new[] { s.from.X.AsFloat, s.from.Y.AsFloat },
+                    to = new[] { s.to.X.AsFloat, s.to.Y.AsFloat },
+                    clear = LineOfSightHelper.HasLineOfSight(now, s.from, s.to),
+                }).ToList();
+            }
             if (allBots && selectionEndedAtTick != null && game.Frames.Verified != null)
             {
                 var now = game.Frames.Verified;
@@ -175,6 +212,10 @@ internal static unsafe class Verifier
             // The rules the match was played with: the coins picked up are the scores, or in a siege
             // the damage done to the other team's structures, in hundreds of health.
             mode = runtimeConfig.Mode.ToString(),
+            // The map it was played on (its path in the asset database).
+            map = assets.OfType<Map>().FirstOrDefault(m => m.Guid == runtimeConfig.Map.Id)?.Path,
+            // With --test-sight: whether each ray reached its end without crossing a block.
+            sight = sightSeen,
             scores = new[] { teams[0].Score, teams[1].Score },
             // The team whose core was destroyed, which ends a match whatever the scores; null
             // when both cores stood to the end.
