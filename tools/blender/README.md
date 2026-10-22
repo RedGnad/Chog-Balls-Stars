@@ -1507,3 +1507,30 @@ Sheet: [clothes-golden-armor-2026-10-22.jpg](../../research/evidence/clothes-gol
 It still read as a striped yellow tee. Now (`ARMOR`, `build_armor`, `ring_strip`, `add_pauldrons`): no stripes; a plain gold-orange shirt with two overlapping bands of breastplate, each edged by a dark seam
 0.017 tall with a lighter top edge and stepped 0.0035 off the shirt; on each shoulder two domed plates (upper 0.250 wide, lower 0.220) that break the outline from the front, the side and behind, with two big
 rivets (0.024) on the upper. Budget: #1742 7,996 (8,184 with three bands, 12 points and 8 sides: cut to two bands, 10 points, 7 sides), none over 8,000. Rivets are small at stage size.
+## 22 October 2026: strict eye audit, batch 5: Side Left, the rest of the white and clown eyes (lot 8), and the ribs
+
+Frog L (27 Origin Genesis), Clown Eye L (27), Clown Eye Mix L (25), Retard L (23), XD L (23), Worried L (18), Angry L (27), 3 to 5 Genesis each (#7, #15, #74, #131, #144; #178, #206, #224, #245, #142; #57, #70, #790, #942; #32, #182, #216, #217; #85, #180, #273,
+#342; #192, #247, #349; #29, #91, #103, #276, #410). Sheet, 13 Genesis, the art beside the front close and the three quarter close, before | after:
+[heroes-eyes-batch5-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch5-2026-10-22.jpg). As in batch 4 the two eyes of a pair are two drawings; `EYES` (numbers of one eye by its side) is now also in
+`FROG`, `RETARD`, `WORRIED_EYE`, `ANGRY`, `CLOWN` and `XD`.
+
+- **Frog L: wrong, redrawn, now approximate.** Near eye a tall oval 0.050 by 0.072 under a thick outline with a wide black pupil in its lower half and a large glint; far eye 0.030 by 0.056 with the pupil in its middle.
+- **Retard L: wrong, redrawn, now approximate.** Near eye a big white oval (0.062 by 0.064) with a pupil low at its left; far eye a narrow oval 0.032 by 0.064 with the pupil in its middle.
+- **Clown Eye and Clown Eye Mix L: wrong, redrawn, now approximate.** Near eye a large flat lidded eye under a tall kite-shaped mark (0.130 above, 0.060 below), far eye a narrow oval under a narrower mark (0.100 above).
+- **XD L: approximate, made closer.** A large near chevron (0.062 by 0.058, stroke 0.022) and a narrow far one (0.022 by 0.046).
+- **Worried L: approximate, made closer.** Near eye larger (0.064 by 0.062), far eye a narrow oval under the same lid.
+- **Angry L: wrong, redrawn, now approximate.** Near eye a wide half moon under a flat lid, far eye a narrow tall oval under no lid (the far eye of the art has no angry brow).
+- **Still differs on all of them**: the art's near eye has a thicker, wobbling outline; the far eye is drawn to a slightly different tilt on each Genesis.
+- **The ribs of #121 and #1214** ([sheet](../../research/evidence/heroes-bones-121-1214-2026-10-22.jpg), the real library files of origin/main and of this branch, stage close and front): neither has rib bands, under the Hawaiian Polo or under the Jesus Robe,
+  in either file. `check_bone_bodies.py` builds all 124 Skull and Radioactive Genesis and counts the rib faces of their Body part: none under any shirt, polo, stripe shirt, robe (Jesus), hoodie, vest, jacket or armour; present for no body, the Wizard Cape,
+  the Kings Robe, Mummy wraps and the Duck Float; 0 wrong. The costumes agent's sheet (`clothes-batch2`, row #121) shows the bands: their tree must have been built before lot 9 (the code with `BONES_SHOW`, 4f28646) reached it.
+- **Checked**: library export builds all 1,970 Genesis under 8,000 triangles; by eye on the sheet only; not in a Unity build.
+- **Left to do**: Left: Chog Viper (shape), Classic VR, Modern VR, 3D Glass, BTC Glass, Thug and the lasers of Left; Right: the rest of Retro Glass.
+
+## 22 October 2026: strict eye audit, batch 6: Side Left glasses and headsets (lot 8)
+
+Classic VR (24 Origin Genesis), Modern VR (24), 3D Glass (22), BTC Glass (19), Thug (15), 2 to 5 Genesis each (#46, #124; #491, #219, #227; #361, #419, #424; #189, #288, #510; #141, #203, #250).
+Sheet, 10 Genesis, the art beside the front and the three quarter close, before | after: [heroes-eyes-batch6-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch6-2026-10-22.jpg).
+Unlike the bare eyes of batches 4 and 5, these are objects worn over the eyes and the pictures draw them as a pair of equal pieces: no per-eye difference to add. Changed: the headsets (Classic and Modern VR) are taller,
+a rounded visor 0.072 high in the middle (0.064). Approximate, not changed: Modern VR's glossy rim and its curved glint are plainer than the art's; the 3D Glass lenses are a little larger and the frame a little thinner than the art's;
+the BTC coins are a little smaller than the art's; Thug is as drawn.
