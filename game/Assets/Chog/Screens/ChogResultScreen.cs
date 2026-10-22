@@ -46,6 +46,16 @@ namespace Chog.Screens
             private IEnumerator Start()
             {
                 yield return new WaitForSecondsRealtime(3f);
+                if (RankPreview)
+                {
+                    if (!Show(0, 0, ChogHeroModel.Recruit))
+                        yield break;
+                    var rankResult = GameObject.Find(ObjectName);
+                    ChogUi.Body("PreviewMark", rankResult.transform, new Vector2(0.56f, 0.75f), new Vector2(0.95f, 0.80f), 26f,
+                        TextAlignmentOptions.Center, ChogTheme.Cream).text = "LOCAL DESIGN PREVIEW, NO RANK WRITE";
+                    rankResult.GetComponent<ResultControls>().PreviewRank();
+                    yield break;
+                }
                 var roster = Resources.Load<GenesisRoster>("GenesisRoster");
                 var index = roster != null ? roster.IndexOf(1795) : -1;
                 if (index < 0)
@@ -55,17 +65,35 @@ namespace Chog.Screens
                     yield break;
                 var result = GameObject.Find(ObjectName);
                 ChogUi.Body("PreviewMark", result.transform, new Vector2(0.56f, 0.75f), new Vector2(0.95f, 0.80f), 26f,
-                    TextAlignmentOptions.Center, ChogTheme.Cream).text = RankPreview
-                        ? "LOCAL DESIGN PREVIEW, NO RANK WRITE" : "LOCAL DESIGN PREVIEW, NO CAREER WRITE";
-                if (RankPreview)
-                    result.GetComponent<ResultControls>().PreviewRank();
-                else
-                    result.GetComponent<ResultControls>().Preview();
+                    TextAlignmentOptions.Center, ChogTheme.Cream).text = "LOCAL DESIGN PREVIEW, NO CAREER WRITE";
+                result.GetComponent<ResultControls>().Preview();
             }
         }
 
         /// <summary>Whether the end of a match is on screen.</summary>
         public static bool IsShown => GameObject.Find(ObjectName) != null;
+
+        private static string PendingKey(string address) => "chog.rank.pending." + address.ToLowerInvariant();
+
+        public static string PendingRankGameId(string address) => string.IsNullOrEmpty(address)
+            ? "" : PlayerPrefs.GetString(PendingKey(address), "");
+
+        public static void ClearPendingRank(string address, string gameId)
+        {
+            if (!string.IsNullOrEmpty(gameId) && PendingRankGameId(address) == gameId)
+            {
+                PlayerPrefs.DeleteKey(PendingKey(address));
+                PlayerPrefs.Save();
+            }
+        }
+
+        private static void RememberPendingRank(string address, string gameId)
+        {
+            if (string.IsNullOrEmpty(address) || string.IsNullOrEmpty(gameId))
+                return;
+            PlayerPrefs.SetString(PendingKey(address), gameId);
+            PlayerPrefs.Save();
+        }
 
         /// <summary>
         /// Shows the screen for the local player of "localTeam" (below 0 for a spectator), the team that
@@ -173,13 +201,7 @@ namespace Chog.Screens
             }
             else
             {
-                var text = ChogUi.Body("Career", card.transform, new Vector2(0.06f, 0.1f), new Vector2(0.94f, 0.9f), 42f, TextAlignmentOptions.Center);
-                controls.Career = text;
-                var rank = PlayerRanks.Current?.rank;
-                text.text = PlayerWallet.SignIn == SignInState.SignedIn && rank != null
-                    ? "PLAYER RANK\n<size=150%><color=#FFE27A>" + rank.tier + " " + rank.points +
-                      "</color></size>\n<size=65%>Every verified Siege counts, even as a Recruit.</size>"
-                    : "A recruit has no Genesis career.\nSign in to earn player rank points, or play a Genesis for its own career.";
+                controls.BuildRecruitRank(card.transform);
             }
 
             if (playing)
@@ -268,10 +290,14 @@ namespace Chog.Screens
             public bool WaitingForRecord;
             public bool Won;
             public bool RankEligible;
+            public string RankAddress;
             public TextMeshProUGUI VictoryTitle;
             public Image VictoryGlow;
             private TextMeshProUGUI _rankStatus;
-            private Image _rankShade;
+            private TextMeshProUGUI _rankTier;
+            private TextMeshProUGUI _rankValue;
+            private TextMeshProUGUI _rankNext;
+            private RectTransform _rankFill;
             private RectTransform _rankMoment;
             private CanvasGroup _rankGroup;
             private TextMeshProUGUI _rankHeading;
@@ -288,33 +314,73 @@ namespace Chog.Screens
             private Task _disconnectTask;
             private QuantumMenuUIController _menuController;
 
+            public void BuildRecruitRank(Transform card)
+            {
+                _rankTier = ChogUi.Title("RankTier", card, new Vector2(0.06f, 0.70f), new Vector2(0.94f, 0.90f), 64f);
+                _rankTier.color = ChogTheme.Gold;
+                _rankValue = ChogUi.Title("RankPoints", card, new Vector2(0.06f, 0.47f), new Vector2(0.94f, 0.68f), 45f);
+                var track = ChogUi.Plate("RankTrack", card, new Vector2(0.10f, 0.34f), new Vector2(0.90f, 0.42f), ChogTheme.Night, 14);
+                _rankFill = ChogUi.Area("RankFill", track.transform, Vector2.zero, new Vector2(0.001f, 1f));
+                var fill = _rankFill.gameObject.AddComponent<Image>();
+                fill.sprite = ChogSprites.Rounded(18, 3, ChogTheme.Ink, ChogTheme.Gold);
+                fill.type = Image.Type.Sliced;
+                fill.raycastTarget = false;
+                _rankNext = ChogUi.Body("NextRank", card, new Vector2(0.06f, 0.21f), new Vector2(0.94f, 0.32f),
+                    27f, TextAlignmentOptions.Center, ChogTheme.Cream);
+                Career = ChogUi.Body("Career", card, new Vector2(0.06f, 0.06f), new Vector2(0.94f, 0.18f),
+                    25f, TextAlignmentOptions.Center, ChogTheme.Cream);
+                if (PlayerWallet.SignIn == SignInState.SignedIn && PlayerRanks.Current?.rank != null)
+                    ShowRank(PlayerRanks.Current.rank, PlayerRanks.Current.rank.points);
+                else
+                {
+                    _rankTier.text = "PLAYER RANK";
+                    _rankValue.text = PlayerWallet.SignIn == SignInState.SignedIn ? "RANK LOADING" : "SIGN IN TO EARN";
+                    _rankNext.text = "";
+                    Career.text = "Recruit has no Genesis mastery. Siege can earn player points.";
+                }
+            }
+
+            private void ShowRank(PlayerRank rank, int displayedPoints)
+            {
+                if (_rankTier == null || rank == null)
+                    return;
+                _rankTier.text = rank.tier;
+                _rankValue.text = displayedPoints + " PLAYER POINTS";
+                _rankNext.text = rank.next > 0 ? "NEXT RANK AT " + rank.next + " POINTS" : "TOP RANK";
+                _rankFill.anchorMax = new Vector2(rank.next > 0
+                    ? Mathf.Clamp((float)displayedPoints / rank.next, 0.001f, 1f) : 1f, 1f);
+                Career.text = rank.matches + " VERIFIED SIEGE MATCHES";
+            }
+
             public void BuildRank(Transform screen)
             {
                 var strip = ChogUi.Plate("RankStatus", screen, new Vector2(0.545f, 0.22f), new Vector2(0.97f, 0.258f),
                     ChogTheme.Night, 10);
                 _rankStatus = ChogUi.Body("Words", strip.transform, new Vector2(0.02f, 0.02f), new Vector2(0.98f, 0.98f),
                     22f, TextAlignmentOptions.Center, ChogTheme.Cream);
-                _rankStatus.text = PlayerWallet.SignIn == SignInState.SignedIn &&
-                    RankEligible && !BuildIdentity.PhotonVersion.Contains(BuildIdentity.PreviewSuffix)
-                    ? (Won ? "RANK REWARD INCOMING" : "UPDATING PLAYER RANK") : "PLAYER RANK: CASUAL MATCH";
+                var signedMatch = PlayerWallet.SignIn == SignInState.SignedIn && RankEligible &&
+                    !BuildIdentity.PhotonVersion.Contains(BuildIdentity.PreviewSuffix);
+                _rankStatus.text = signedMatch ? "RANK CHECKING IN BACKGROUND. PLAY AGAIN" : "PLAYER RANK: CASUAL MATCH";
+                if (signedMatch)
+                {
+                    RankAddress = PlayerWallet.Address;
+                    RememberPendingRank(RankAddress, GameId);
+                }
 
-                _rankShade = ChogUi.Area("RankShade", screen, Vector2.zero, Vector2.one).gameObject.AddComponent<Image>();
-                _rankShade.color = new Color(ChogTheme.Ink.r, ChogTheme.Ink.g, ChogTheme.Ink.b, 0.60f);
-                _rankShade.raycastTarget = false;
-                _rankShade.gameObject.SetActive(false);
                 _rankMoment = ChogUi.Area("RankMoment", screen, new Vector2(0.25f, 0.28f), new Vector2(0.75f, 0.76f));
                 var plate = _rankMoment.gameObject.AddComponent<Image>();
                 plate.sprite = ChogSprites.Rounded(26, 4, ChogTheme.Ink, ChogTheme.CardRaised);
                 plate.type = Image.Type.Sliced;
+                plate.raycastTarget = false;
                 _rankGroup = _rankMoment.gameObject.AddComponent<CanvasGroup>();
+                _rankGroup.blocksRaycasts = false;
                 _rankHeading = ChogUi.Title("Heading", _rankMoment, new Vector2(0.05f, 0.77f), new Vector2(0.95f, 0.96f), 38f);
                 _rankHeading.color = ChogTheme.PurpleSoft;
                 _rankAmount = ChogUi.Title("Amount", _rankMoment, new Vector2(0.04f, 0.27f), new Vector2(0.96f, 0.80f), 130f);
                 _rankDetail = ChogUi.Body("Detail", _rankMoment, new Vector2(0.05f, 0.07f), new Vector2(0.95f, 0.28f),
                     30f, TextAlignmentOptions.Center, ChogTheme.Cream);
                 _rankMoment.gameObject.SetActive(false);
-                if (PlayerWallet.SignIn == SignInState.SignedIn && RankEligible &&
-                    !BuildIdentity.PhotonVersion.Contains(BuildIdentity.PreviewSuffix))
+                if (signedMatch)
                     StartCoroutine(PollRank());
             }
 
@@ -323,12 +389,19 @@ namespace Chog.Screens
                 var failures = 0;
                 for (var attempt = 0; attempt < 90 && !_leaving; attempt++)
                 {
+                    if (PlayerWallet.SignIn != SignInState.SignedIn ||
+                        !string.Equals(RankAddress, PlayerWallet.Address, System.StringComparison.OrdinalIgnoreCase))
+                        yield break;
                     PlayerRankAnswer answer = null;
                     var returned = false;
                     PlayerRanks.Read(value => { answer = value; returned = true; });
-                    while (!returned && !_leaving)
+                    var deadline = Time.realtimeSinceStartup + 10f;
+                    while (!returned && !_leaving && Time.realtimeSinceStartup < deadline)
                         yield return null;
                     if (_leaving)
+                        yield break;
+                    if (PlayerWallet.SignIn != SignInState.SignedIn ||
+                        !string.Equals(RankAddress, PlayerWallet.Address, System.StringComparison.OrdinalIgnoreCase))
                         yield break;
                     if (answer == null && ++failures >= 3)
                     {
@@ -338,6 +411,7 @@ namespace Chog.Screens
                     if (answer != null && !answer.enabled)
                     {
                         _rankStatus.text = "PLAYER RANK: NOT AVAILABLE YET";
+                        ClearPendingRank(RankAddress, GameId);
                         yield break;
                     }
                     var match = answer?.latestMatch;
@@ -347,18 +421,23 @@ namespace Chog.Screens
                         var gain = answer.rank.last;
                         _rankStatus.text = "PLAYER RANK  " + answer.rank.tier + "  " + answer.rank.points +
                             " PTS  (" + (gain.delta >= 0 ? "+" : "") + gain.delta + ")";
-                        if (TokenId == 0 && Career != null)
-                            Career.text = "PLAYER RANK\n<size=150%><color=#FFE27A>" + answer.rank.tier + " " +
-                                answer.rank.points + "</color></size>\n<size=65%>" + answer.rank.matches +
-                                " VERIFIED SIEGE MATCHES</size>";
                         if (gain.delta != 0 || gain.tierAfter != gain.tierBefore)
-                            yield return RevealRank(gain);
+                            yield return RevealRank(gain, answer.rank);
+                        else
+                            ShowRank(answer.rank, answer.rank.points);
+                        if (!_leaving)
+                            ClearPendingRank(RankAddress, GameId);
                         yield break;
                     }
                     if (match != null && match.gameId == GameId &&
                         match.status != "verifying" && match.status != "preparing")
                     {
-                        _rankStatus.text = "CASUAL MATCH: NO RANK POINTS  |  " + answer.rank.tier + " " + answer.rank.points + " PTS";
+                        _rankStatus.text = answer.rank != null
+                            ? "NO RANK POINTS  |  " + answer.rank.tier + " " + answer.rank.points + " PTS"
+                            : "NO RANK POINTS FOR THIS MATCH";
+                        if (answer.rank != null)
+                            ShowRank(answer.rank, answer.rank.points);
+                        ClearPendingRank(RankAddress, GameId);
                         yield break;
                     }
                     yield return new WaitForSecondsRealtime(4f);
@@ -367,28 +446,33 @@ namespace Chog.Screens
                     _rankStatus.text = "PLAYER RANK: STILL VERIFYING, CHECK AGAIN FROM HOME";
             }
 
-            private IEnumerator RevealRank(PlayerRankGain gain)
+            private IEnumerator RevealRank(PlayerRankGain gain, PlayerRank rank)
             {
                 while (_reward != null && _reward.gameObject.activeSelf && !_leaving)
                     yield return null;
                 if (_leaving)
                     yield break;
-                _rankHeading.text = gain.tierAfter != gain.tierBefore ? "RANK UP!" : Won ? "VICTORY REWARD" : "PLAYER RANK";
-                _rankAmount.text = gain.tierAfter != gain.tierBefore ? gain.tierAfter :
-                    (gain.delta > 0 ? "+" : "") + gain.delta + " PTS";
+                _rankHeading.text = gain.tierAfter != gain.tierBefore
+                    ? (gain.delta > 0 ? "RANK UP!" : "RANK CHANGED") : Won ? "VICTORY REWARD" : "PLAYER RANK";
+                _rankAmount.text = (gain.delta > 0 ? "+" : "") + gain.delta + " PTS";
                 _rankAmount.color = gain.delta >= 0 ? ChogTheme.Gold : ChogTheme.Cream;
-                _rankDetail.text = gain.before + "  >  " + gain.after + " PLAYER POINTS";
+                _rankDetail.text = gain.tierAfter != gain.tierBefore
+                    ? gain.tierBefore + "  >  " + gain.tierAfter + "   |   " + gain.before + "  >  " + gain.after
+                    : gain.before + "  >  " + gain.after + " PLAYER POINTS";
                 _rankMoment.localScale = ChogTheme.ReducedMotion ? Vector3.one : Vector3.one * 0.74f;
                 _rankGroup.alpha = 0f;
-                _rankShade.gameObject.SetActive(true);
                 _rankMoment.gameObject.SetActive(true);
                 ChogSounds.Reward(gain.tierAfter != gain.tierBefore ? 2 : 0);
                 var start = Time.unscaledTime;
-                const float duration = 0.52f;
+                const float duration = 0.70f;
                 while (Time.unscaledTime - start < duration && !_leaving)
                 {
                     var t = Mathf.Clamp01((Time.unscaledTime - start) / duration);
                     _rankGroup.alpha = t;
+                    if (gain.tierAfter == gain.tierBefore)
+                        ShowRank(rank, Mathf.RoundToInt(Mathf.Lerp(gain.before, gain.after, t * t * (3f - 2f * t))));
+                    else if (_rankValue != null)
+                        _rankValue.text = Mathf.RoundToInt(Mathf.Lerp(gain.before, gain.after, t * t * (3f - 2f * t))) + " PLAYER POINTS";
                     if (!ChogTheme.ReducedMotion)
                         _rankMoment.localScale = Vector3.one * (t < 0.75f
                             ? Mathf.Lerp(0.74f, 1.05f, t / 0.75f)
@@ -397,9 +481,10 @@ namespace Chog.Screens
                 }
                 _rankGroup.alpha = 1f;
                 _rankMoment.localScale = Vector3.one;
-                yield return new WaitForSecondsRealtime(2.4f);
+                ShowRank(rank, gain.after);
+                ClearPendingRank(RankAddress, GameId);
+                yield return new WaitForSecondsRealtime(1.1f);
                 _rankMoment.gameObject.SetActive(false);
-                _rankShade.gameObject.SetActive(false);
             }
 
             public void BuildReward(Transform card)
@@ -511,11 +596,12 @@ namespace Chog.Screens
                 if (_rankStatus == null)
                     return;
                 _rankStatus.text = "LOCAL DESIGN PREVIEW: SILVER 100 PTS";
+                ShowRank(new PlayerRank { tier = "BRONZE", points = 75, next = 100, matches = 0 }, 75);
                 StartCoroutine(RevealRank(new PlayerRankGain
                 {
                     before = 75, after = 100, delta = 25,
                     tierBefore = "BRONZE", tierAfter = "SILVER"
-                }));
+                }, new PlayerRank { tier = "SILVER", points = 100, next = 250, matches = 1 }));
             }
 
             private void OnRecorded(GenesisCareer career, bool credited)
