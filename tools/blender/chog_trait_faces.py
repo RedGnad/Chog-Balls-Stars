@@ -100,10 +100,14 @@ CLOWN = {
 # tears of "Round Tear" and "Round Crying"). Half sizes; glints as in SIDE_EYE.
 GLOSSY = {
     "AT": (0.112, 0.006),
-    "RING": (0.064, 0.068),
-    "WHITE": (0.054, 0.058),
-    "PUPIL": (0.042, 0.046),
-    "GLINTS": ((-0.014, 0.016, 0.013, 0.015), (0.016, -0.018, 0.006, 0.006)),
+    # (22 October 2026, strict audit of the eyes, batch 2, on #6, #39, #125, #92, #213, #260 and the tears of the pictures: the shiny eyes are TALL
+    # ovals, about 0.7 as wide as high where ours were 0.94, the white a thin ring round a black pupil that fills nearly all of it; one large
+    # oval glint up from the middle and a small one low on the other side, where ours were round discs: 0.060 by 0.082, 0.050 by 0.073, pupil 0.045
+    # by 0.067. It is the eye of Teary, Round Tear and Round Crying: 188 Genesis.)
+    "RING": (0.060, 0.082),
+    "WHITE": (0.050, 0.073),
+    "PUPIL": (0.045, 0.067),
+    "GLINTS": ((0.000, 0.026, 0.011, 0.020), (0.016, -0.026, 0.006, 0.008)),
     "SEGMENTS": 16,
 }
 # A tear: where it leaves the eye (against the middle of the eye), where it ends (height on the face),
@@ -192,9 +196,12 @@ VERTICAL = {**WHITE_EYE, "SIZE": (0.060, 0.032), "LINE": 0.011, "PUPIL": (0.011,
 SMIRK = {**WHITE_EYE, "SIZE": (0.034, 0.052), "ARCH": (0.012, 0.012), "TILT": 10.0, "LINE": 0.011, "PUPIL": (0.030, 0.044),
          "LOOK": ((-0.004, 0.000), (-0.004, 0.000)), "GLINTS": ((-0.010, 0.016, 0.009, 0.011), (-0.006, -0.004, 0.005, 0.006)),
          "EYES": {
-             -1.0: {"SIZE": (0.082, 0.043), "TILT": -18.0, "ARCH": (0.032, 0.008), "LINE": 0.012, "PUPIL": (0.048, 0.044),
-                    "LOOK": ((-0.030, -0.004), (-0.030, -0.004)),
-                    "GLINTS": ((-0.034, 0.014, 0.014, 0.011), (-0.008, 0.004, 0.007, 0.006)), "AT": (0.122, 0.004)}}}
+             # The near eye (#242, #111, #441 at 1000 points): a long flat almond, about 2.4 times as wide as high, its outer end a point low on the
+             # left and its inner end rising, nearly all black (the pupil fills it), only a crescent of white at the top right under a heavy lid; one large
+             # glint at the top left and a small one below it (22 October 2026, second pass: it was a round almond with a pupil that left a third white).
+             -1.0: {"SIZE": (0.088, 0.037), "TILT": 12.0, "ARCH": (0.034, 0.014), "LINE": 0.013, "PUPIL": (0.078, 0.036),
+                    "LOOK": ((-0.012, -0.002), (-0.012, -0.002)),
+                    "GLINTS": ((-0.030, 0.012, 0.016, 0.011), (-0.026, -0.008, 0.007, 0.005)), "AT": (0.124, 0.002)}}}
 # "Frog": a large round white, a wide flat pupil across its middle.
 FROG = {**WHITE_EYE, "SIZE": (0.058, 0.054), "LINE": 0.012, "PUPIL": (0.042, 0.020),
         "GLINTS": ((-0.016, 0.006, 0.009, 0.006),)}
@@ -1300,6 +1307,9 @@ EYES = {
         "kind": "SideEye",
         "colours": {"Dark": DARK, "Glint": WHITE},
         "unlit": ("Dark", "Glint"),
+        # (22 October 2026, strict audit, batch 2, on #97, #179, #258, #47, #86: the eyes of the pictures are larger and taller, 0.060 by 0.066, under a lid that
+        # cuts them at 0.30 of their height, and carry one large upright glint, not two small ones; the Tired, clown and Side Left eyes keep SIDE_EYE.)
+        "numbers": {"SIZE": (0.060, 0.066), "CUT": 0.30, "GLINTS": ((-0.016, 0.010, 0.010, 0.020),)},
     },
     "Tired": {
         "kind": "Tired",

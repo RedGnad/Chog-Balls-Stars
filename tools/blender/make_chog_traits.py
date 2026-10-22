@@ -630,6 +630,9 @@ EYES = {
             "Lens": (0.96, 0.96, 0.96),
         },
         "unlit": ("Lens",),      # drawn in its colour whatever the light: the glare of the lenses
+        # (22 October 2026, strict audit, batch 2, on #3, #98, #157, #236, #199: the lenses are rounder and taller, about as high as wide, where ours were 1.4 times
+        # as wide as high, and tilted; LENS_SQUARENESS 2.6 (3.2): rounded, not rectangles.)
+        "numbers": {"LENS": (0.126, 0.016, 0.092, 0.090), "LENS_SQUARENESS": 2.6},
     },
     "Normal Eye": {
         "kind": "NormalEye",

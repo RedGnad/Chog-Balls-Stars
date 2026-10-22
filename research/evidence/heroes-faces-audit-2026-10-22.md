@@ -130,7 +130,19 @@ the art and the 3D side by side would not show a difference in the shape of an e
 | Smirk, Left (29) | #242, #111, #441, #2, #499, #455 | wrong (was faithful), redrawn, now approximate | two different drawings: a wide tilted almond with a large black pupil and a small tall narrow oval; see the README of lot 8 |
 | Retro Glass, Right (56) | #35, #282, #632, #1184, #1621, #819, #165 | wrong (was faithful), redrawn, now approximate | the eyes under the glasses were open round irises; the pictures draw large frowning ones under a heavy lid |
 
-Rows still to redo strictly, most worn first: Round Crying R, Fire laser R, Side Eye R, Round Tear R, Anime Glass R, Green laser R, Purple laser R, Gradient visor R, Round Eye R, Closed Eye Crying R, Retro Glass (the rest), Tired R,
+Batch 2 ([sheet](heroes-eyes-batch2-2026-10-22.jpg)), same rule:
+
+| Value, Side (Origin Genesis) | Genesis looked at | Strict verdict | What differs |
+| --- | --- | --- | --- |
+| Smirk, Left (29), second pass | #242, #111, #441 | approximate | the near eye is now a long flat heavy-lidded almond; its lower lid line is simpler than the drawing's |
+| Round Crying, Right (69) | #6, #39, #125, #87, #183 | wrong (was faithful), redrawn, now approximate | the eyes were round; the pictures draw tall ovals with a thin ring, a pupil filling the white and one large oval glint; near eye smaller than the far one in the pictures |
+| Round Tear, Right (65) | #92, #213, #260, #27, #150 | wrong (was faithful), redrawn, now approximate | same eye as Round Crying; the thin tear and its drop are as drawn |
+| Teary, Right (54) | same eye | wrong (was faithful), redrawn, now approximate | same eye |
+| Side Eye, Right (66) | #97, #179, #258, #47, #86 | approximate (was faithful) | the eyes were smaller with two glints; now larger under a lid at 0.30 with one large glint; the slope of the lid is plainer than the drawing's |
+| Anime Glass, Right (64) | #3, #98, #157, #236, #199 | approximate (was faithful) | lenses were rectangles 1.4 times as wide as high; now rounder and as high as wide; the frame weight and the tilt of each lens not exact |
+| Fire, Green, Purple laser, Right (67, 64, 63) | #38, #135, #212, #72, #104, #107, #52 | approximate | frowning almond and beam from its middle as drawn (lots 5b, 8); the almond is a little larger than the drawing's |
+
+Rows still to redo strictly, most worn first: Gradient visor R, Round Eye R, Closed Eye Crying R, Retro Glass (the rest), Tired R,
 Teary R, Sunset visor R, Plasma visor R, then Side Eye L, Base L, Happy L, MOG L, Vertical L, Flat L, Frog L, Clown Eye L, Chog Viper L, the lasers of Left, Clown Eye Mix L, Classic VR L, Modern VR L, Retard L, XD L,
 3D Glass L, BTC Glass L, Worried L, Thug L.
 
