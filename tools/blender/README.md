@@ -1259,3 +1259,23 @@ close, three quarter, side, hero stage).
 
 [costumes-clown-nose-out-2026-10-22.jpg](../../research/evidence/costumes-clown-nose-out-2026-10-22.jpg) (#210, #248, #195, before | after): the owner liked the sunk ball of
 lot 6 and asked for it to stick out a tiny bit more: its middle is 0.014 off the face (0.004), the radius, the glint and the outline patch unchanged.
+
+### 7.3 and 7.8 The headbands: on the art's brow line, and nothing through them
+
+Sheet (both items, one lot): [costumes-headbands-2026-10-22.jpg](../../research/evidence/costumes-headbands-2026-10-22.jpg) (Red Headband #12, #984, #416, #1170; Japan
+Headband #65, #378, #789, #87; Durag #51, #121; Red Bandana #874, #1192; the art then before | after: front close, three quarter, side, hero stage).
+
+- **The art** (34 Red Headband, 31 Japan Headband Genesis, #12, #416, #984, #1170, #65, #87, #378, #789): the band crosses the brow with its lower edge on the top of the eyes, the
+  crown of spikes standing above it. The face was lowered on 22 October (its top 0.29 above the neck, 0.40 before) and the bands, tuned on the old face,
+  stayed: a strip of face between the band and the eyes, the band riding up into the hair.
+- **Lowered** (`HEADBAND["LOWER"]`, `["UPPER"]`): lower edge 87 degrees at the front (82), 85 at the sides, 81 behind; upper edge 58 (50) at the front. The Red Bandana
+  (#874, #1192, the band of `build_headband` and its knot) follows. The Durag (50 Genesis, and the bandana-like cloth): its front edge was on the old brow (66 degrees),
+  leaving a strip of forehead and the teeth of hair above the eyes; the art draws it just above the eyes: 82 degrees at the front and the middle, and the points
+  of hair that came out under it are off (`DURAG["RIM"]`, `HAIR_POINTS`).
+- **Nothing through the band**: until now the whole crown stood and its crossings with the band were only noted (`THROUGH`): the upper pair, the
+  middle pair, the lowest pair and the back row all went through it (#12: leaves 1 to 6). Each line was tried alone against the new band (`leaf_crossings`): the top
+  leaf clears it; the upper pair clears it at 24 degrees from straight up (38); the middle pair cannot (gone); the lowest pair clears it at 130 degrees, brought out
+  below; the top of the back row at a lean of 36; the pair of the back row at 125 degrees and 40 back; the leaf straight back at 104 (`BAND_CROWN`). `THROUGH` is off for both
+  values: the 65 Genesis build with no leaf crossing.
+- **Checked**: 12 Genesis before | after; 65 headband and 98 durag, bandana, head wrap and wig Genesis build; `--budget`: largest #630 7,991, none over 8,000; library 1,970 Genesis, 0
+  failures. Not verified in Unity. The crown above a band is narrower than the art's (the middle pair is gone, the upper pair is turned in).
