@@ -164,7 +164,9 @@ def shared_keys_of(genesis_traits):
                 else ("head", "Radioactive", genesis_traits.get("Head")))
         # A skeleton's hands are bone (bases.bone_hands): its arms are its own.
         arms = ("Skull",) if base_name == "Skull" else ()
-        keys = {("rest", "Body", base_name), ("rest", "armLeft") + arms, ("rest", "armRight") + arms, head}
+        # (The ribs show only on a bare body, an open cape, a robe or wraps, bases.BONES_SHOW, 22 October 2026: two bodies.)
+        ribs = genesis_traits.get("Body") in bases.BONES_SHOW
+        keys = {("rest", "Body", base_name, ribs), ("rest", "armLeft") + arms, ("rest", "armRight") + arms, head}
         for trait in traits.TRAIT_PARTS:
             value = genesis_traits.get(trait)
             if value is not None and isinstance(traits.entry_for(trait, genesis_traits), dict):
@@ -199,7 +201,7 @@ def shared_key_of_object(thing, genesis_traits):
         if thing.name == "Head":
             return next(key for key in shared_keys_of(genesis_traits) if key[0] == "head")
         if thing.name == "Body" and (bases.is_skull(genesis_traits) or bases.is_radioactive(genesis_traits)):
-            return ("rest", "Body", genesis_traits["Base"])
+            return ("rest", "Body", genesis_traits["Base"], genesis_traits.get("Body") in bases.BONES_SHOW)
         if thing.name in ("armLeft", "armRight") and bases.is_skull(genesis_traits):
             return ("rest", thing.name, "Skull")
         return ("rest", thing.name)
