@@ -107,6 +107,14 @@ beam is turned up 8 degrees from level, which brings the slant to the pictures'.
 pictures draw most of the beam in the light colour with an edge of the darker one. Still short by design (the game draws the long
 beam when the hero attacks), and Side Right is untouched. The Skull Left lasers (3 Genesis) use the same entries.
 
+## The laser eyes on Side Right (lot 5b, 22 October 2026)
+
+The owner on the dragon #16: "the eyes do not really match, frowned against ovals". Looked at on #52, #102, #107, #41, #72, #38, #16, #42 and the Skull #121,
+#373: [heroes-lasers-right-2026-10-22.jpg](heroes-lasers-right-2026-10-22.jpg). Each eye is a dark almond a little wider than high (about 0.14 by 0.13 against
+0.090 by 0.128 drawn before), its top cut by a flat lid that slopes down towards the nose (a frown), the beam leaving its middle. Now `LASER["EYE_SIZE"]`
+(0.070, 0.064), `EYE_LID` (0.28, 0.40) in `draw_laser_eyes` of `make_chog_traits.py` (the same cut and slope as the lidded eyes of Side Left). The Skull
+Genesis with Right lasers (12) use the same builder. Not exact: the near eye of the pictures is larger than the far one (perspective), ours are equal.
+
 ## The 64 Origin rows
 
 <!-- audit table start -->
@@ -120,12 +128,12 @@ beam when the hero attacks), and Side Right is untouched. The Skull Left lasers 
 | 4 | Normal Eye | Right | 74 / 74 (#75, #5, #10) | Eyes_NormalEye | faithful |  |
 | 5 | Heart | Right | 72 / 72 (#1043, #8, #13) | Eyes_Heart | faithful |  |
 | 6 | Round Crying | Right | 69 / 69 (#6, #39, #87) | Eyes_RoundCrying | faithful |  |
-| 7 | fire laser | Right | 67 / 70 (#38, #41, #65) | Eyes_Laser | approximate | short beam by design (the game draws the long one); dark oval and glow as drawn |
+| 7 | fire laser | Right | 67 / 70 (#38, #41, #65) | Eyes_Laser | approximate | short beam by design (the game draws the long one); eye a frowning almond since 22 Oct (lot 5b), glow as drawn |
 | 8 | Side Eye | Right | 66 / 66 (#1197, #47, #48) | Eyes_SideEye | faithful |  |
 | 9 | Round Tear | Right | 65 / 65 (#1434, #92, #150) | none | faithful |  |
 | 10 | Anime Glass | Right | 64 / 64 (#1387, #3, #44) | Eyes_AnimeGlass | faithful |  |
-| 11 | Green laser | Right | 64 / 68 (#72, #77, #104) | none | approximate | short beam by design; eyes as drawn |
-| 12 | Purple laser | Right | 63 / 68 (#52, #102, #107) | none | approximate | short beam by design; eyes as drawn |
+| 11 | Green laser | Right | 64 / 68 (#72, #77, #104) | none | approximate | short beam by design; eye a frowning almond since 22 Oct (lot 5b) |
+| 12 | Purple laser | Right | 63 / 68 (#52, #102, #107) | none | approximate | short beam by design; eye a frowning almond since 22 Oct (lot 5b) |
 | 13 | Gradient visor | Right | 61 / 61 (#30, #100, #305) | Eyes_Visor | faithful |  |
 | 14 | Round Eye | Right | 61 / 61 (#237, #885, #953) | Eyes_Round | approximate | pupil too small, as Round (fixed 22 Oct: pupil 0.030/0.035 to 0.034/0.039) |
 | 15 | Closed Eye Crying | Right | 57 / 57 (#24, #263, #277) | Eyes_ClosedEyeCrying | faithful |  |

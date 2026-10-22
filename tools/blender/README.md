@@ -1065,3 +1065,13 @@ no shadow), `render_recruit.py --size`, `make_chog_stage_sheet.py` and `check_fa
   Meanwhile `FACE_FIT` 0.985 to 0.96 leaves the most grazing part of the face to the skin.
 - **Checked**: 35 Genesis (hoods, costumes, caps, bare heads of both Sides) build with no failure; `--budget` largest #710 7,971, median 7,165, none over
   8,000; library 1,970 Genesis, 0 failures. Not verified in Unity.
+
+## 22 October 2026: the laser eyes on Side Right, frowning almonds (lot 5b)
+
+The pictures of Side=Right lasers (#52, #102, #107, #41, #72, #16, #42, the Skull #121, #373) draw each eye as a dark almond a little wider than high whose top is cut
+by a flat lid sloping down towards the nose, the beam leaving its middle; the builder drew a whole tall oval (0.090 by 0.128). `draw_laser_eyes`
+(`make_chog_traits.py`) now cuts the oval by a lid: `LASER["EYE_SIZE"]` (0.070, 0.064), new `EYE_LID` (0.28, 0.40: where the lid cuts, against the half height, and how much
+it rises per unit outwards), 20 segments (14), eye middle 0.006 above the middle of the face (0.010). 450 Origin Genesis and 12 Skull Genesis wear them. Sheet, 8 Genesis,
+stage, stage close, bust, side and game camera, before | after beside the art: [heroes-lasers-right-2026-10-22.jpg](../../research/evidence/heroes-lasers-right-2026-10-22.jpg).
+Checked: library 1,970 Genesis, 0 failures; `--budget` largest #630 7,981 (was 7,969), none over 8,000. Not exact: the near eye of the pictures is larger than the far one
+(perspective); ours are equal. The beam still hides most of the lower part of the eye from the front, as it does on the pictures.
