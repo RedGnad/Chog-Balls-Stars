@@ -133,7 +133,11 @@ Shader "Chog/Hero"
                     half rim;
                     half3 matcap = Matcap(normalize(i.viewNormal) * side, rim);
                     half3 key = _ChogKey.a > 0.5 ? _ChogKey.rgb : half3(1, 1, 1);
-                    colour = i.color.rgb * matcap * key + rim * _ChogHeroRim.rgb;
+                    // The rim as a screen over the shaded colour (22 October 2026): added plainly it
+                    // turned the cream of the faces to pure white along their edge; a screen lights a dark
+                    // colour as before and can never pass white.
+                    half3 shaded = i.color.rgb * matcap * key;
+                    colour = shaded + rim * _ChogHeroRim.rgb * (1 - shaded);
                 }
                 else if (i.color.a < 0.3)
                     colour = max(i.color.rgb * 0.35, _ChogHeroOutline.rgb);
