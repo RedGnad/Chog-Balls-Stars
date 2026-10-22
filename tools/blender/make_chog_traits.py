@@ -146,13 +146,24 @@ POLISH = {
     # 0.985 to 0.96: at the very edge the face turns away from the camera and the rim of the game's shader (a warm white
     # added at the edges that face the key) turns its cream white, a sliver along the outline that was a skin ring
     # before the face filled the head; 0.96 keeps most of the fill and leaves the grazing part to the skin.)
-    "FACE_FIT": 0.96,
-    "FACE_HALF_HEIGHT": 0.196,
+    # (Lot 6, 22 October 2026, the owner on #76 from the front on the stage: "on the sides and at the bottom the face still
+    # does not take all the room". The pictures (#76 at 1000 points, #75, #112, #237, #432) fill almost the whole front of the
+    # head with the cream: the skin shows only as the zigzag on top and a thin band at the sides, the cheeks sit near the
+    # outline and the chin is the bottom of the head. The edge was a rounded square whose width was cut by the same squareness
+    # as its height, which left a triangle of skin in each lower corner (from the front, a band of skin about a fifth of the
+    # head wide beside the cheeks and under the face): the width has its own squareness now, 20, which makes the edge follow the
+    # outline of the egg down its sides; FACE_FIT 0.96 to 0.99, the chin at 0.248 under the middle of the head, 0.002 from its
+    # lowest point (0.246 before), and seven teeth of hair 0.080 wide (five of 0.088) so the fringe still covers the brow, which
+    # is wider.)
+    "FACE_FIT": 0.99,
+    "FACE_SQUARENESS_X": 20.0,
+    "FRINGE_TEETH": 7,
+    "FACE_HALF_HEIGHT": 0.198,
     "FRINGE_DROP": 0.040,
     "FACE_TOP": 0.125,
     "FACE_SQUARENESS": 4.0,
     "CHEEK": (0.180, -0.062, 0.046, 0.032),
-    "FRINGE_WIDTH": 0.088,
+    "FRINGE_WIDTH": 0.080,
     # The face lies on the head (18 October 2026, see add_settled_face): it stands FACE_LIFT off the egg of
     # the head (0.012 until then), in five rings evenly spaced over the head and 24 points round its edge
     # evenly spaced along it, so that each triangle of the face keeps above the head.
@@ -877,7 +888,9 @@ def face_place(numbers, angle, amount):
     z = (numbers.FACE_TOP if sine >= 0.0 else numbers.FACE_HALF_HEIGHT) * power(sine, numbers.FACE_SQUARENESS)
     height = numbers.FACE_MIDDLE[1] + z * amount
     room = numbers.HEAD_HALF_WIDTH * math.sqrt(max(1.0 - (height / numbers.HEAD_HALF_HEIGHT) ** 2, 0.0))
-    return numbers.FACE_FIT * room * power(cosine, numbers.FACE_SQUARENESS) * amount, z * amount
+    # (22 October 2026: the width has its own squareness, FACE_SQUARENESS_X, so that the edge of the face follows the outline of
+    # the egg all down its sides, instead of cutting the lower corners off with the rounded square.)
+    return numbers.FACE_FIT * room * power(cosine, getattr(numbers, "FACE_SQUARENESS_X", numbers.FACE_SQUARENESS)) * amount, z * amount
 
 
 def opening_rim(numbers, size, margin, tail, step=3.0):
@@ -890,7 +903,8 @@ def opening_rim(numbers, size, margin, tail, step=3.0):
     hood). Past the last degree at which the shell meets the face (its side), "tail" (the same kind of table)
     takes over: the hood closes down to the jaw and the back."""
     key = (tuple(numbers.FACE_MIDDLE), numbers.FACE_FIT, numbers.FACE_TOP, numbers.FACE_HALF_HEIGHT,
-           numbers.FACE_SQUARENESS, numbers.HEAD_HALF_WIDTH, numbers.HEAD_HALF_HEIGHT, margin, step, tuple(tail),
+           numbers.FACE_SQUARENESS, getattr(numbers, "FACE_SQUARENESS_X", 0.0), numbers.HEAD_HALF_WIDTH, numbers.HEAD_HALF_HEIGHT,
+           margin, step, tuple(tail),
            tuple(size(degrees) for degrees in range(0, 181, 10)))
     if key in OPENING_RIMS:
         return OPENING_RIMS[key]

@@ -20,7 +20,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPOSITORY = os.path.normpath(os.path.join(HERE, "..", ".."))
 ART = os.path.join(REPOSITORY, ".artifacts", "genesis-art", "256")
 
-VIEWS = (("stage", "stage"), ("stage close", "stage_close"), ("bust", "bust"), ("side", "turn_090"),
+GLOBAL_VIEWS = (("stage", "stage"), ("stage close", "stage_close"), ("bust", "bust"), ("side", "turn_090"),
          ("game camera", "game_front_phone"))
 
 
@@ -41,7 +41,10 @@ def main():
     parser.add_argument("--cheek", default=None, help="name of a large stage picture (chog_<name>_stage_close.png)")
     parser.add_argument("--cheek-box", default="0.22,0.45,0.62,0.78", help="the crop of that picture, as shares of its side")
     parser.add_argument("--title", default="Face on the home stage: the art, then before | after")
+    parser.add_argument("--views", default=None, help="caption:picture name pairs separated by commas (default: stage, stage close, "
+                        "bust, side, game camera at phone size)")
     arguments = parser.parse_args()
+    VIEWS = tuple(tuple(pair.split(":", 1)) for pair in arguments.views.split(",")) if arguments.views else GLOBAL_VIEWS
     size, label = arguments.size, 110
     heroes = [word.strip() for word in arguments.heroes.split(",") if word.strip()]
     columns = 1 + 2 * len(VIEWS)

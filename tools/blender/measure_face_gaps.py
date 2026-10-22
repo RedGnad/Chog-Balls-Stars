@@ -44,8 +44,10 @@ def main():
     parser = argparse.ArgumentParser(description="Measures how far what is drawn on a head stands off it.")
     parser.add_argument("--genesis", required=True, help="numbers shown in the names, separated by commas")
     parser.add_argument("--into", default=None, help="a folder of built Genesis to read instead of building")
+    parser.add_argument("--head-set", action="append", default=[], metavar="NAME=VALUE", help="a number of the head put in place "
+                        "of its own, to try (22 October 2026), for instance FACE_LIFT=0.0065")
     arguments = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
-    numbers = traits.head_numbers()
+    numbers = traits.head_numbers(traits.numbers_given(arguments.head_set) or None)
     middle = Vector((0.0, 0.0, numbers.HEAD_MIDDLE))
     half = Vector((numbers.HEAD_HALF_WIDTH, numbers.HEAD_HALF_DEPTH, numbers.HEAD_HALF_HEIGHT))
     untilt = Matrix.Rotation(math.radians(numbers.HEAD_PITCH_DEG), 3, "X")
@@ -64,7 +66,7 @@ def main():
         if arguments.into:
             bpy.ops.wm.open_mainfile(filepath=os.path.join(arguments.into, number, "ChogBody.blend"))
         else:
-            traits.build(traits.traits_of(number))
+            traits.build(traits.traits_of(number), None, traits.numbers_given(arguments.head_set) or None)
         head = bpy.data.objects["Head"]
         head_faces, drawn = [], []
         for thing in [head] + [child for child in bpy.data.objects if child.parent == head and child.type == "MESH"]:
@@ -110,6 +112,8 @@ def main():
                         seen["sum"] += hit[3]
                     if head_tree.ray_cast(point, out, 0.05)[0] is not None:
                         seen["head"] += 1
+                        if label == "Head:ChogFace" and seen["head"] <= 6:
+                            print(f"GAPS #{number} head pokes the face at {tuple(round(c, 3) for c in point)} (head axes before turning up)")
                     if face_tree is not None and on_face:
                         if face_tree.ray_cast(point, out, 0.05)[0] is not None:
                             seen["face"] += 1

@@ -104,7 +104,7 @@ shots.VIEWS.update(PEDESTAL_VIEWS)
 # The stage of the home screen (ChogHeroStage.cs, 22 October 2026): a perspective camera of 24 degrees, 10 degrees above the
 # horizon, framed on the whole hero and its pedestal (the model height 1.15 plus 0.55, the pivot at 0.36 of that), the hero
 # turned 42 degrees from the front (222 against the 180 that faces the camera). "stage" is that picture; "stage_close" the
-# same camera brought in on the head, as the owner looks at it on the pedestal. The pedestal is 0.08 high.
+# same camera brought in on the head, as the owner looks at it on the pedestal; "stage_front" the same from straight in front. The pedestal is 0.08 high.
 STAGE_FOV_DEG = 24.0
 STAGE_ELEVATION_DEG = 10.0
 STAGE_TURN_DEG = 42.0
@@ -543,8 +543,10 @@ def render_one(name, blend=None, out=None, only=None, colour=None, size=504, bus
         kept = render.LENS_MM
         render.LENS_MM = 18.0 / math.tan(math.radians(STAGE_FOV_DEG * 0.5))
         try:
-            for view_name, (frame, target) in (("stage", (STAGE_FIT, STAGE_TARGET)), ("stage_close", (STAGE_CLOSE[0], STAGE_CLOSE[1]))):
-                render.place_camera(camera, lights, (STAGE_TURN_DEG, STAGE_ELEVATION_DEG, False, target, frame, False))
+            for view_name, turn, frame, target in (("stage", STAGE_TURN_DEG, STAGE_FIT, STAGE_TARGET),
+                                                   ("stage_close", STAGE_TURN_DEG, STAGE_CLOSE[0], STAGE_CLOSE[1]),
+                                                   ("stage_front", 0.0, STAGE_CLOSE[0], STAGE_CLOSE[1])):
+                render.place_camera(camera, lights, (turn, STAGE_ELEVATION_DEG, False, target, frame, False))
                 render.render(os.path.join(folder, f"chog_{name}_{view_name}.png"))
                 if os.environ.get("CHOG_PROBE") and view_name == "stage_close":
                     probe_pixel(camera, [float(word) for word in os.environ["CHOG_PROBE"].split(",")])
