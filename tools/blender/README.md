@@ -1186,3 +1186,20 @@ over the brow is rounded off more than at the cheeks (20 stays below the cheeks,
 same on every one of them), and 0 of 49,896 face points on #76 and #23 with the new `--dense 20`. Sheet, the recruit, #76, #75, #112, #23, #116, #16, #249, front close, three quarter close, stage and bust, before | after,
 and an enlarged crop of the forehead of the recruit and of #76: [heroes-face-top-2026-10-22.jpg](../../research/evidence/heroes-face-top-2026-10-22.jpg). Library 1,970 Genesis, 0 failures; `--budget` largest #630 7,991
 (unchanged), none over 8,000.
+
+## 22 October 2026: lot 6, the clown nose
+
+Owner on the hero stage (a pink Genesis with heart eyes, #210): "the red nose looks weird, like a button". Sheet, 7 Genesis with different eyes and
+mouths, the art then before | after (front close, three quarter close, bust, hero stage, game camera behind and in front):
+[costumes-clown-nose-2026-10-22.jpg](../../research/evidence/costumes-clown-nose-2026-10-22.jpg).
+
+- **The art** (#210, #248, #246, #195, #640, #741, #920, #1431, #1677, #1797, #1806, #1807): a round red ball with a dark outline and a white glint,
+  ON the nose of the face, nothing flat around it. With the mouth "wo" the small dark mouth sits right under the ball, touching it.
+- **The cause**: the ball stood 0.022 off the face with an outline shell; from the side the shell showed as a dark crescent and a thin ring on the face,
+  a button's rim, and the shell of a ball that is not on the face cannot be a uniform outline.
+- **Changed** (`CLOWN_NOSE`, `build_clown_nose`): the ball is half sunk (its middle 0.004 off the face, radius 0.052, 12 by 6), no outline shell; the
+  outline is a dark patch of the shape of the face laid under it, 0.0075 wider than the ball (`Edge`, the layer of the drawn dark lines), so the ball
+  meets the face with one clean dark line all round; the glint is kept. The mouth is NOT hidden or moved: the art draws it there; at the stage it is
+  the same small dark oval under the ball as on #195 and #210.
+- **Checked**: 7 Genesis before | after; `--budget`: largest #630 7,991 (it wears the nose; +10 triangles), none over 8,000; library 1,970 Genesis, 0 failures.
+  Not verified in Unity.
