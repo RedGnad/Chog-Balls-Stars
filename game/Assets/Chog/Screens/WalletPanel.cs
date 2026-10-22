@@ -85,6 +85,7 @@ namespace Chog.Screens
         // Before wallet selection, the card shows a labelled example from the real Genesis collection.
         // It never presents the example as a hero the visitor owns.
         private RectTransform _poster;
+        private static readonly Vector2 MedallionSize = new Vector2(210f, 210f);
         private RawImage _posterPortrait;
         private TextMeshProUGUI _posterKicker;
         private TextMeshProUGUI _posterExampleLabel;
@@ -288,12 +289,12 @@ namespace Chog.Screens
             BuildPoster();
 
             // Without a Genesis to play: what to do to play one.
-            _title = Text("Title", new Vector2(0.075f, 0.61f), new Vector2(0.56f, 0.79f), TextAlignmentOptions.Left, ChogTheme.Ink, 38f);
-            ChogTheme.AsTitle(_title, outlined: false);
+            _title = Text("Title", new Vector2(0.075f, 0.61f), new Vector2(0.56f, 0.79f), TextAlignmentOptions.Left, ChogTheme.Text, 38f);
+            ChogTheme.AsTitle(_title);
             _address = Text("Address", new Vector2(0.075f, 0.36f), new Vector2(0.56f, 0.43f), TextAlignmentOptions.Left,
                 ChogTheme.Purple, 22f);
-            _message = Text("Message", new Vector2(0.075f, 0.40f), new Vector2(0.56f, 0.60f), TextAlignmentOptions.TopLeft,
-                ChogTheme.Hex("3B2F72"), 25f);
+            _message = Text("Message", new Vector2(0.075f, 0.30f), new Vector2(0.56f, 0.60f), TextAlignmentOptions.TopLeft,
+                ChogTheme.Muted, 25f);
 
             _connect = MakeButton("Connect", ConnectMin, ConnectMax, out _connectLabel, kind: ChogTheme.ButtonKind.Secondary);
             _connect.onClick.AddListener(OnMainButton);
@@ -345,22 +346,34 @@ namespace Chog.Screens
         }
 
         // The card has one outline and functional text. The portrait is real collection art, clearly
-        // labelled as an example until a wallet has chosen its own Genesis.
+        // labelled as an example until a wallet has chosen its own Genesis. (22 October 2026: the cream
+        // paper the owner found out of place became a raised card of the theme, as the other cards of the
+        // home, the portrait a round medallion in a gold rim, as the $CHOG coin.)
         private void BuildPoster()
         {
             _poster = Child("GenesisCard", transform, new Vector2(0.01f, 0.18f), new Vector2(0.99f, 0.99f));
-            ChogUi.Plate("Paper", _poster, Vector2.zero, Vector2.one, ChogTheme.Cream, 12);
+            ChogUi.Plate("Card", _poster, Vector2.zero, Vector2.one, ChogTheme.CardRaised, 12);
 
-            _posterPortrait = Child("CollectionExample", _poster, new Vector2(0.60f, 0.25f), new Vector2(0.94f, 0.75f))
+            // A fixed circle at the middle of the card's right half (an aspect fitter grew it over the text).
+            var medallion = ChogUi.Pinned("Medallion", _poster, new Vector2(0.77f, 0.52f), new Vector2(0.5f, 0.5f), Vector2.zero, MedallionSize);
+            var rim = medallion.gameObject.AddComponent<Image>();
+            rim.sprite = ChogSprites.Disc(128, 0.02f);
+            rim.color = ChogTheme.Ink;
+            rim.raycastTarget = false;
+            var gold = Child("Rim", medallion, new Vector2(0.025f, 0.025f), new Vector2(0.975f, 0.975f)).gameObject.AddComponent<Image>();
+            gold.sprite = ChogSprites.Disc(128, 0.02f);
+            gold.color = ChogTheme.Action;
+            gold.raycastTarget = false;
+            _posterPortrait = Child("CollectionExample", medallion, new Vector2(0.09f, 0.09f), new Vector2(0.91f, 0.91f))
                 .gameObject.AddComponent<RawImage>();
             _posterPortrait.texture = GenesisArt.Disc();
             _posterPortrait.color = WaitingColor;
             _posterPortrait.raycastTarget = false;
 
             _posterKicker = ChogUi.Number("Kicker", _poster, new Vector2(0.065f, 0.82f), new Vector2(0.55f, 0.92f), 22f,
-                TextAlignmentOptions.Left, ChogTheme.Purple, false);
+                TextAlignmentOptions.Left, ChogTheme.Action, false);
             _posterExampleLabel = ChogUi.Body("ExampleLabel", _poster, new Vector2(0.59f, 0.10f), new Vector2(0.96f, 0.22f),
-                19f, TextAlignmentOptions.Center, ChogTheme.Purple);
+                19f, TextAlignmentOptions.Center, ChogTheme.PurpleSoft);
             // The right half of the card: the three cheapest Genesis for rent, in place of the example.
             _offers = RentalOffersCard.Create(_poster, new Vector2(0.56f, 0.05f), new Vector2(0.97f, 0.80f));
             _offers.gameObject.SetActive(false);
@@ -467,7 +480,8 @@ namespace Chog.Screens
             _road.gameObject.SetActive(playing);
             _rosterArea.gameObject.SetActive(playing);
             _title.gameObject.SetActive(!playing);
-            _address.gameObject.SetActive(!playing);
+            // The address is on the wallet button at the top right already.
+            _address.gameObject.SetActive(false);
             _message.gameObject.SetActive(!playing);
 
             _title.text = checkingPass ? "ONE MOMENT" : state == WalletState.Ready ? "NO GENESIS HERE" : "PLAY YOUR GENESIS";
@@ -622,7 +636,7 @@ namespace Chog.Screens
                 return;
 
             _posterKicker.text = "1,969 CHOG GENESIS HEROES";
-            _posterExampleLabel.text = "COLLECTION EXAMPLE #1078";
+            _posterExampleLabel.text = "EXAMPLE: CHOG #1078";
             // Real Genesis for rent take the place of the example whenever holders offer some.
             var offered = GenesisRental.State == RentalState.Open && GenesisRental.Cheapest(1).Count > 0;
             _offers.gameObject.SetActive(offered);

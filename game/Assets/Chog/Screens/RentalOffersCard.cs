@@ -54,14 +54,14 @@ namespace Chog.Screens
         private void Build(RectTransform area)
         {
             _roster = Resources.Load<GenesisRoster>(RosterResource);
-            _title = ChogUi.Number("Title", area, new Vector2(0f, 0.86f), new Vector2(1f, 1f), 22f, TextAlignmentOptions.Left, ChogTheme.Purple, false);
+            _title = ChogUi.Number("Title", area, new Vector2(0f, 0.86f), new Vector2(1f, 1f), 22f, TextAlignmentOptions.Left, ChogTheme.Action, false);
             _title.text = "RENT A GENESIS FOR 1 DAY";
             for (var i = 0; i < Shown; i++)
             {
                 var top = 0.84f - i * 0.28f;
                 var row = ChogUi.Area("Offer" + i, area, new Vector2(0f, top - 0.26f), new Vector2(1f, top));
                 var plate = row.gameObject.AddComponent<Image>();
-                plate.sprite = ChogSprites.Rounded(14, 2, ChogTheme.Line, new Color(0.08f, 0.06f, 0.14f, 0.12f));
+                plate.sprite = ChogSprites.Rounded(14, 2, ChogTheme.Line, ChogTheme.CardFill);
                 plate.type = Image.Type.Sliced;
                 var button = row.gameObject.AddComponent<Button>();
                 button.targetGraphic = plate;
@@ -76,10 +76,10 @@ namespace Chog.Screens
                 var fitter = made.Portrait.gameObject.AddComponent<AspectRatioFitter>();
                 fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
                 fitter.aspectRatio = 1f;
-                made.Name = ChogUi.Title("Name", row, new Vector2(0.30f, 0.50f), new Vector2(0.98f, 0.94f), 26f, TextAlignmentOptions.Left, ChogTheme.Ink);
+                made.Name = ChogUi.Title("Name", row, new Vector2(0.30f, 0.50f), new Vector2(0.98f, 0.94f), 26f, TextAlignmentOptions.Left, ChogTheme.Text);
                 ChogTheme.AsTitle(made.Name, outlined: false);
                 made.Name.textWrappingMode = TextWrappingModes.NoWrap;
-                made.Price = ChogUi.Body("Price", row, new Vector2(0.30f, 0.06f), new Vector2(0.98f, 0.50f), 22f, TextAlignmentOptions.Left, ChogTheme.Purple);
+                made.Price = ChogUi.Body("Price", row, new Vector2(0.30f, 0.06f), new Vector2(0.98f, 0.50f), 22f, TextAlignmentOptions.Left, ChogTheme.PurpleSoft);
                 _rows[i] = made;
             }
             Refresh();

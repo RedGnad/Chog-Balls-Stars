@@ -31,6 +31,11 @@ namespace Chog.Screens
         private TextMeshProUGUI _caption;
         private GameObject _clockPlate;
         private TMP_Text _coinTimer;
+        // The sample's banner at the start of a match, "Coin Grab" over "Collect 10 coins and survive!":
+        // told the mode played (22 October 2026: a siege showed the coins' words).
+        private TMP_Text _bannerTitle;
+        private TMP_Text _bannerLine;
+        private int _bannerMode = -1;
         private bool _siegeShown = true;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -75,6 +80,13 @@ namespace Chog.Screens
                 if (part.name == "Timer")
                     _coinTimer = part.GetComponentInChildren<TMP_Text>(true);
             }
+            foreach (var text in coins.GetComponentsInChildren<TMP_Text>(true))
+            {
+                if (text.text == "Coin Grab")
+                    _bannerTitle = text;
+                else if (text.text.StartsWith("Collect ", System.StringComparison.Ordinal))
+                    _bannerLine = text;
+            }
             if (_coinTimer != null)
                 _coinTimer.enabled = false;
             StructureViews.ClockDrawnElsewhere = true;
@@ -111,6 +123,8 @@ namespace Chog.Screens
             var game = QuantumRunner.Default != null ? QuantumRunner.Default.Game : null;
             var frame = game != null && game.Frames != null ? game.Frames.Predicted : null;
             var playing = frame != null && frame.Global->State == GameState.Playing;
+            if (frame != null)
+                TellBanner(MatchModes.IsSiege(frame));
             // Nothing to count during the team preparation, nor once the end screen is up.
             var shown = playing && !ChogResultScreen.IsShown;
             for (var i = 0; i < transform.childCount; i++)
@@ -163,6 +177,19 @@ namespace Chog.Screens
                 _clock.color = left <= ShortSeconds ? ShortColour : ChogTheme.Cream;
             }
             _caption.text = siege ? "DAMAGE TO TOWERS" : running ? "COINS, THE CLOCK RUNS" : "COINS";
+        }
+
+        // The banner's words for the mode played, once per change; the coins keep the sample's line.
+        private void TellBanner(bool siege)
+        {
+            var mode = siege ? 1 : 0;
+            if (mode == _bannerMode)
+                return;
+            _bannerMode = mode;
+            if (_bannerTitle != null)
+                _bannerTitle.text = siege ? "Siege" : "Coins";
+            if (_bannerLine != null)
+                _bannerLine.text = siege ? "Bring down their tower and their core!" : "Collect 10 coins and survive!";
         }
 
         // The team of the local player's character; 0 for a spectator.
