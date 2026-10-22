@@ -446,16 +446,25 @@ namespace Chog.Screens
             var tokens = PlayerWallet.Playable;
             // A Genesis the owner's wallet picked with ADMIN (ChogHeroSheet) is shown and played like one it holds.
             var adminPick = PlayerWallet.IsAdmin && PlayerWallet.ChosenTokenId > 0 && Array.IndexOf(tokens, PlayerWallet.ChosenTokenId) < 0;
-            var holds = state == WalletState.Ready && (tokens.Length > 0 || adminPick);
+            // The owner sees the home exactly as a holder of that Genesis does (22 October 2026: no admin wording on it).
+            if (adminPick)
+            {
+                var withPick = new int[tokens.Length + 1];
+                Array.Copy(tokens, withPick, tokens.Length);
+                withPick[tokens.Length] = PlayerWallet.ChosenTokenId;
+                tokens = withPick;
+            }
+            var holds = state == WalletState.Ready && tokens.Length > 0;
             // A Genesis of the player's own wallet, held or rented, wins over one that was lent.
             var guest = !holds && GuestPass.State == GuestPassState.Valid;
             var checkingPass = !holds && GuestPass.State == GuestPassState.Checking;
             var played = holds ? PlayerWallet.ChosenTokenId : guest ? GuestPass.TokenId : 0;
-            var owns = holds && Array.IndexOf(PlayerWallet.Tokens, played) >= 0;
-            var rents = holds && !owns && played > 0 && !adminPick;
+            var owns = holds && (Array.IndexOf(PlayerWallet.Tokens, played) >= 0 || adminPick);
+            var rents = holds && !owns && played > 0;
 
             // Careers are read once it is known which Genesis the panel shows, and again when a rental adds one.
-            var careersOf = holds ? PlayerWallet.Address + " with " + tokens.Length : guest ? "guest of " + GuestPass.TokenId : "";
+            var careersOf = holds ? PlayerWallet.Address + " with " + tokens.Length + (adminPick ? " picking " + played : "")
+                : guest ? "guest of " + GuestPass.TokenId : "";
             if (careersOf.Length > 0 && _careersOf != careersOf)
             {
                 _careersOf = careersOf;
@@ -554,10 +563,8 @@ namespace Chog.Screens
             if (playing)
                 ShowKit(played, playedIndex);
 
-            _rosterTitle.text = guest ? "LENT TO YOU" : adminPick && PlayerWallet.Tokens.Length == 0 ? "ADMIN TEST"
-                : PlayerWallet.Tokens.Length > 0 ? "YOUR GENESIS" : "YOUR RENTED GENESIS";
+            _rosterTitle.text = guest ? "LENT TO YOU" : PlayerWallet.Tokens.Length > 0 || adminPick ? "YOUR GENESIS" : "YOUR RENTED GENESIS";
             _rosterInfo.text = guest ? "by " + PlayerWallet.ShortAddress(GuestPass.Lender) + ", " + GuestPass.TimeLeft(GuestPass.ExpiresAtMs, NowMs()) + " left"
-                : adminPick ? "BACK TO RECRUIT on its hero sheet"
                 : rents ? RentedInfo(GenesisRental.RentedUntilSeconds(played), NowMs() / 1000)
                 : tokens.Length > 1 ? (pages > 1 ? (_page + 1) + " / " + pages + "   " : "") + "tap one to play it"
                 : "";

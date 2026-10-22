@@ -1444,7 +1444,9 @@ EYES_OF_SIDE = {
         # Side=Right.
         "Happy": {
             "kind": "Happy", "colours": {"Dark": DARK}, "unlit": ("Dark",),
-            "numbers": {"EYE_ARCS": {-1.0: (0.066, 0.026, 0.019, 0.034), 1.0: (0.032, 0.032, 0.013, 0.0)}},
+            # (22 October 2026, evening, the owner on #26: "there are still deformed eyes". A long flat stroke beside a short arch read as a
+            # broken face from the front. Two equal arches, a little thicker, as on Side=Right.)
+            "numbers": {"EYE_ARCS": None, "ARC": (0.052, 0.034, 0.020)},
         },
         # The lasers of Side=Left: lidded eyes, and beams of other colours (CHOG #893, #252, #565, #1658),
         # most of their sides the light core with an edge of the darker colour under it.
