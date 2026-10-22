@@ -27,7 +27,8 @@ The skin, the cream of the face and the pink of the cheeks are those kept in the
 make_chog_traits.py for a Genesis; the base takes the red and the face colours of
 render_chog_full.py, so it can be set beside the pictures of H3. A trait part is drawn in the colours
 of its materials; a material marked "unlit" (the white lenses, and everything that is drawn on the
-face: eyes, mouths) is drawn in its colour whatever the light, and a trait part casts no shadow.
+face: eyes, mouths) is drawn in its colour whatever the light, a material marked "glass" (the helmet of the
+astronaut) is drawn semi-transparent (glass_material), and a trait part casts no shadow.
 Those two are choices of these pictures: a game shader would have to do the same for the game to
 look like them. What is not the game is also what render_chog_full.py says: the floor, the green
 disc, the light and the size of the phone pictures (the model drawn 1.5 times larger than the game
@@ -123,6 +124,62 @@ def unlit_material(name, colour):
     return material
 
 
+def glass_material(name, colour):
+    """The glass of a helmet as the game draws it (22 October 2026): the game keeps the pixels of a "glass" material
+    that a fixed screen pattern lets through, from 0.3 of them where it faces the camera to 0.9 at its edges
+    (coverage = lerp(0.9, 0.3, toward^2), toward being how much it faces the camera), and lightens its colour toward its
+    edges (a share 0.6 * (1 - toward)^2 of white). Here the same two curves are a mix between a transparent shader and
+    the colour, so the sheet shows how much of the head shows through the glass; hashed (dithered) transparency, so
+    the two sides of the shell need no sorting. Only the renders do this: the game has no transparency."""
+    material = bpy.data.materials.new(name)
+    material.surface_render_method = "DITHERED"
+    tree = render.node_tree(material)
+    nodes, links = tree.nodes, tree.links
+    nodes.clear()
+    # Layer Weight "Facing" is 1 - |n . v| at a blend of 0.5: 0 face on, 1 at the edge. toward = 1 - facing.
+    layer = nodes.new("ShaderNodeLayerWeight")
+    layer.inputs["Blend"].default_value = 0.5
+    edge = layer.outputs["Facing"]
+    toward = nodes.new("ShaderNodeMath")
+    toward.operation = "SUBTRACT"
+    toward.inputs[0].default_value = 1.0
+    links.new(edge, toward.inputs[1])
+    squared = nodes.new("ShaderNodeMath")
+    squared.operation = "MULTIPLY"
+    links.new(toward.outputs["Value"], squared.inputs[0])
+    links.new(toward.outputs["Value"], squared.inputs[1])
+    # coverage = 0.9 - 0.6 * toward^2
+    scaled = nodes.new("ShaderNodeMath")
+    scaled.operation = "MULTIPLY_ADD"
+    scaled.inputs[1].default_value = -0.6
+    scaled.inputs[2].default_value = 0.9
+    links.new(squared.outputs["Value"], scaled.inputs[0])
+    # lightening = 0.6 * edge^2, towards white
+    edge_squared = nodes.new("ShaderNodeMath")
+    edge_squared.operation = "MULTIPLY"
+    links.new(edge, edge_squared.inputs[0])
+    links.new(edge, edge_squared.inputs[1])
+    lighten = nodes.new("ShaderNodeMath")
+    lighten.operation = "MULTIPLY"
+    lighten.inputs[1].default_value = 0.6
+    links.new(edge_squared.outputs["Value"], lighten.inputs[0])
+    tint = nodes.new("ShaderNodeMix")
+    tint.data_type = "RGBA"
+    tint.inputs[6].default_value = render.linear(colour)
+    tint.inputs[7].default_value = (1.0, 1.0, 1.0, 1.0)
+    links.new(lighten.outputs["Value"], tint.inputs["Factor"])
+    emission = nodes.new("ShaderNodeEmission")
+    links.new(tint.outputs[2], emission.inputs["Color"])
+    clear = nodes.new("ShaderNodeBsdfTransparent")
+    mix = nodes.new("ShaderNodeMixShader")
+    links.new(scaled.outputs["Value"], mix.inputs["Fac"])
+    links.new(clear.outputs["BSDF"], mix.inputs[1])
+    links.new(emission.outputs["Emission"], mix.inputs[2])
+    output = nodes.new("ShaderNodeOutputMaterial")
+    links.new(mix.outputs["Shader"], output.inputs["Surface"])
+    return material
+
+
 def dress_traits(outline):
     """Gives every trait part (the objects make_chog_traits.py marked with their trait) materials for
     the renders, in the colours its own materials keep. Returns the parts."""
@@ -138,7 +195,9 @@ def dress_traits(outline):
             name = materials[index].name
             if name not in made:
                 colour = tuple(materials[index]["srgb"])
-                if materials[index].get("unlit"):
+                if materials[index].get("glass"):
+                    made[name] = glass_material("ChogRender" + name, colour)
+                elif materials[index].get("unlit"):
                     made[name] = unlit_material("ChogRender" + name, colour)
                 else:
                     made[name] = render.plain_material("ChogRender" + name, colour, 0.75)

@@ -2582,6 +2582,11 @@ def head_normal_at(surface, point):
     return Vector((local.x / half.x ** 2, local.y / half.y ** 2, local.z / half.z ** 2)).normalized()
 
 
+# The crown under the glass of the astronaut helmet (22 October 2026): each line of SPIKES, shortened so that the point
+# of a leaf (with its outline) stays inside the glass (leaf_crossings fails the build otherwise).
+ASTRO_CROWN = (GONE, GONE, GONE, GONE, leaf(0.22), leaf(0.22), leaf(0.26))
+
+
 ASTRO = {
     # The ring of the helmet around the face: how much larger than the head, its radius (its opening, polar
     # degrees by degrees from the front, goes all round the face).
@@ -2591,9 +2596,18 @@ ASTRO = {
     "RING_RADIUS": 0.046,
     "RING_STATIONS": 28,
     # The helmet (22 October 2026, from the 24 pictures, which draw a round glass helmet round the whole head, the
-    # crown and the face inside it, and none of the spikes outside): a shell as large as the ring over the back and the
-    # top of the head, closed (sides, rows), in its own colour. The crown of the head stays inside it: no leaf.
-    "DOME": (22, 5),
+    # crown and the face inside it, and none of the spikes outside): a shell over the back and the top of the head,
+    # closed (sides, rows), in a glass material (drawn on a share of the pixels, with no outline of its own: the dark
+    # inside of an outline shell would show through the holes). The crown of the head stays inside it, as short
+    # leaves lying under the glass (the pictures draw the hair flat against the helmet, as a zigzag edge).
+    # (Until the afternoon of 22 October 2026 an opaque shell as large as the ring, 1.10 times the head, with no
+    # crown: from the game camera a white egg.)
+    # DOME: points round it, rows from the ring up to the top. DOME_SIZE: how many times the head it is at the top
+    # (the room the hair needs under it); it starts at the ring and is that large from DOME_FULL polar degrees
+    # (from straight behind the face) up.
+    "DOME": (24, 6),
+    "DOME_SIZE": 1.32,
+    "DOME_FULL": 55.0,
     # The ribbed unit at the side of the helmet, on the right of the character (the left of the pictures): where
     # (to the side, behind the middle of the head, height above its middle), then its stations (along, radius).
     "VENT_AT": (-0.318, 0.035, 0.015),
@@ -2615,9 +2629,9 @@ ASTRO = {
 def build_astro(maker):
     """The space suit of the pictures (22 October 2026): a white suit with long sleeves (grey stripes down them), a thick
     collar, the flag patch on the right of the chest, a box on the chest, the ribbed hose from the helmet down the
-    chest, a pack on the back; and a round helmet: a thick ring round the face and a closed shell over the rest of the
-    head, a ribbed unit at its right side. The glass is not drawn: the face and the skin of the head show through the
-    ring, the crown is inside the shell (its leaves are taken out, none comes through it)."""
+    chest, a pack on the back; and a round helmet: a thick ring round the face and a glass dome over the rest of the
+    head (a material drawn on a share of the pixels, with no outline), a ribbed unit at its right side. The face is open
+    in the ring, as the pictures draw it; the crown of the head is under the glass as short leaves, none comes through."""
     numbers = SimpleNamespace(**ASTRO)
     build_track(maker)
     torso, body = maker.parts[0][0], maker.body
@@ -2695,15 +2709,21 @@ def build_astro(maker):
         wide.append(radial * numbers.RING_RADIUS)
         thick.append(looking * numbers.RING_RADIUS)
     slab(ring, path, wide, thick, ring.named("Ring"), numbers.OUTLINE_THICKNESS, sides=6)
+    # The glass: from the ring (tucked into its tube, as the shell was) to the top, widening smoothly to DOME_SIZE.
     sides, rows = numbers.DOME
     angles = [2.0 * math.pi * index / sides for index in range(sides)]
-    loops = [[on_shell(90.0, angle, size * 0.90) for angle in angles]]
-    for row in range(rows):
+
+    def dome_scale(psi):
+        grow = min(1.0, max(0.0, (90.0 - psi) / max(90.0 - numbers.DOME_FULL, 1e-6)))
+        grow = grow * grow * (3.0 - 2.0 * grow)
+        return size * 0.90 + (numbers.DOME_SIZE - size * 0.90) * grow
+
+    loops = [[on_shell(90.0, angle, dome_scale(90.0)) for angle in angles]]
+    for row in range(1, rows + 1):
         psi = 90.0 * (1.0 - row / rows)
-        loops.append([on_shell(psi, angle, size * 0.985) for angle in angles])
-    loops.append([on_shell(0.0, 0.0, size * 0.985)])
-    shares = [(0.0,) * sides] + [(1.0,) * sides] * rows + [(1.0,)]
-    KIT.add_loops(ring, loops, ring.named("Shell"), numbers.OUTLINE_THICKNESS, shares=shares)
+        loops.append([on_shell(psi, angle, dome_scale(psi)) for angle in angles])
+    loops[-1] = [on_shell(0.0, 0.0, dome_scale(0.0))]
+    KIT.add_loops(ring, loops, ring.named("Glass"), 0.0)
     side, behind, up = numbers.VENT_AT
     start = surface.middle + Vector((side, behind, up))
     ring.shell(base.tube_rings(start, Vector((-1.0, 0.0, 0.0)), Y, numbers.VENT), 8, ring.named("Vent"),
@@ -3051,15 +3071,18 @@ CLOTHES.update({
     # glass is not drawn; the pictures show the crown inside it, so the crown stays.
     "Astro Suit": {"kind": "Astro", "colours": {"Main": (0.90, 0.88, 0.84), "Collar": (0.70, 0.70, 0.72),
                                                 "Stripe": (0.52, 0.56, 0.69), "Ring": (0.72, 0.73, 0.76),
-                                                "Shell": (0.86, 0.88, 0.93), "Vent": (0.64, 0.65, 0.70),
+                                                "Glass": (0.80, 0.90, 0.98), "Vent": (0.64, 0.65, 0.70),
                                                 "Panel": (0.52, 0.55, 0.70), "Hose": (0.60, 0.61, 0.66),
                                                 "FlagRed": (0.80, 0.14, 0.20), "FlagWhite": (0.96, 0.96, 0.97),
                                                 "FlagBlue": (0.16, 0.22, 0.58)},
                    "numbers": {"STEP": 0.076, "SLEEVE": LONG_SLEEVE},
-                   # The pictures draw the crown inside a round glass helmet, none outside it: the leaves are
-                   # taken out (until 22 October 2026 the star came out of the ring like a sunflower).
-                   "head": {"LEAVES": NO_CROWN},
-                   "print_missing": "the glass of the helmet (the shell is opaque)"},
+                   # The helmet's glass is drawn on a share of the pixels (light 3 of the library, "glass").
+                   "glass": ("Glass",),
+                   # The pictures draw the crown inside a round glass helmet, none outside it: the leaves stay,
+                   # short, under the glass (until 22 October 2026 the star came out of the ring like a sunflower,
+                   # then no leaf at all under an opaque shell).
+                   "head": {"LEAVES": ASTRO_CROWN, "LEAF_SIDES": 4, "SECTORS": (180,)},
+                   "print_missing": "the glass over the face (the pictures draw none: the face is open in the ring)"},
     "Duck Float": {"kind": "DuckFloat", "colours": {"Duck": (0.93, 0.68, 0.20), "Beak": (0.92, 0.48, 0.12),
                                                     "Eye": (0.10, 0.07, 0.04)}},
 })

@@ -1009,10 +1009,12 @@ def add_settled_face(part, numbers, surface):
             ], SKIN, around=False)
 
 
-def add_leaf_crown(part, numbers, surface, leaves=FULL_CROWN):
+def add_leaf_crown(part, numbers, surface, leaves=FULL_CROWN, sides=None):
     """The crown of add_crown of make_chog_full.py, blade for blade, each one a leaf, as "leaves" (one
     item per line of SPIKES, see leaf()) leaves it. Returns each leaf built, for leaf_crossings(): its
-    name and its rings (middle, half width, half thickness), from inside the head to its point."""
+    name and its rings (middle, half width, half thickness), from inside the head to its point. "sides": points
+    around a leaf in place of LEAF_SIDES (the short leaves under the glass of the astronaut, 22 October 2026: four
+    keep the hero under the triangle limit)."""
     if len(leaves) != len(numbers.SPIKES):
         raise SystemExit(f"CHOG_TRAITS LEAVES has {len(leaves)} items for {len(numbers.SPIKES)} lines of SPIKES")
     built = []
@@ -1052,7 +1054,7 @@ def add_leaf_crown(part, numbers, surface, leaves=FULL_CROWN):
                 rings.append((root + away * length * along + curl * along * along, wide * half_wide * wider,
                               thick * half_thick * thicker))
             rings.append((root + away * length + curl, NOWHERE, NOWHERE))
-            part.shell(rings, numbers.LEAF_SIDES, SKIN, numbers.OUTLINE_THICKNESS)
+            part.shell(rings, sides or numbers.LEAF_SIDES, SKIN, numbers.OUTLINE_THICKNESS)
             where = "" if not mirrored else (" left" if side > 0.0 else " right")
             built.append((f"leaf {line}{where}", rings))
     return built
@@ -1441,9 +1443,11 @@ class TraitShapes(variants.PartShapes):
         return f"{self.prefix}_{key}"
 
 
-def trait_materials(prefix, colours, unlit, shared):
+def trait_materials(prefix, colours, unlit, shared, glass=()):
     """The materials of a trait, in the colours of its colour set. "srgb" keeps the colour as it was
-    given, for the renders; "unlit" says it is drawn in that colour whatever the light."""
+    given, for the renders; "unlit" says it is drawn in that colour whatever the light; "glass" (22 October 2026,
+    the helmet of the astronaut) says it is drawn on a share of the pixels only, so what is inside shows through
+    (export_chog_parts.py gives it the light 3; render_chog_traits.py draws it semi-transparent)."""
     materials = {OUTLINE: shared[OUTLINE]}
     for key, colour in colours.items():
         material = bpy.data.materials.new(f"{prefix}_{key}")
@@ -1455,6 +1459,7 @@ def trait_materials(prefix, colours, unlit, shared):
             shader.inputs["Metallic"].default_value = 0.0
         material["srgb"] = list(colour)
         material["unlit"] = key in unlit
+        material["glass"] = key in glass
         materials[f"{prefix}_{key}"] = material
     return materials
 
@@ -2722,11 +2727,11 @@ def budget():
         entry = head_entry(traits)
         rim = id(entry) if entry is not None and entry.get("under_rim") is not None else None
         key = (hat_numbers.get("LEAVES", FULL_CROWN), hat_numbers.get("HAIR_POINTS"), hat_numbers.get("FRINGE", True),
-               rim)
+               rim, hat_numbers.get("LEAF_SIDES"))
         if key not in heads:
             head = variants.PartShapes(full.MATERIAL_ORDER)
             full.add_head(head, head_n)
-            add_leaf_crown(head, head_n, surface, key[0])
+            add_leaf_crown(head, head_n, surface, key[0], key[4])
             rim_leaves_for(head, traits, None, head_n, body_n, surface)
             if key[1]:
                 hats_and_clothes.add_hair_points(head, surface, key[1], SKIN)
@@ -2744,7 +2749,7 @@ def budget():
             start, _, word, builders = TRAIT_PARTS[trait]
             maker = Maker(f"{start}_{entry[word]}", entry, head_n, body_n, surface)
             builders[entry[word]](maker)
-            made = trait_materials(maker.prefix, entry["colours"], entry.get("unlit", ()), shared)
+            made = trait_materials(maker.prefix, entry["colours"], entry.get("unlit", ()), shared, entry.get("glass", ()))
             total = 0
             for shapes, _ in maker.parts:
                 thing = shapes.finish(shapes.name, Vector((0.0, 0.0, 0.0)), None, made)
@@ -2817,12 +2822,14 @@ def build(traits=None, replaced=None, head_replaced=None):
     elif bases.is_radioactive(traits):
         # A radioactive Chog: the crown its hat leaves (all of it under horns), no cream face, the skull's
         # teeth and nose showing, no cheek.
-        leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN))
+        leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN),
+                                hat_numbers.get("LEAF_SIDES"))
         bases.add_radioactive_hairline(head, head_n, surface, full.FACE)
         bases.add_skull_face(head, head_n, surface, full, draw_shape, oval, SKIN, full.EYE, full.BLUSH, full.FACE,
                              cheeks=False)
     else:
-        leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN))
+        leaves = add_leaf_crown(head, head_n, surface, hat_numbers.get("LEAVES", FULL_CROWN),
+                                hat_numbers.get("LEAF_SIDES"))
         leaves += rim_leaves_for(head, traits, replaced, head_n, body_n, surface)
         # Points of hair that a hat lets out on the brow (the durag), in the skin colour: part of the head.
         if hat_numbers.get("HAIR_POINTS"):
@@ -2890,7 +2897,8 @@ def build(traits=None, replaced=None, head_replaced=None):
             crossing = leaf_crossings(leaves, worn_on_head, head_n, surface)
             if trait == "Head":
                 seen = spike_sectors_seen(leaves, worn_on_head, head_n, surface)
-        trait_made = trait_materials(maker.prefix, entry["colours"], entry.get("unlit", ()), materials)
+        trait_made = trait_materials(maker.prefix, entry["colours"], entry.get("unlit", ()), materials,
+                                     entry.get("glass", ()))
         for shapes, on in maker.parts:
             if on == "Head":
                 full.turn_head_up(shapes, head_n)
