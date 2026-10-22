@@ -1,5 +1,8 @@
 # État courant et décisions
 
+**22 October 2026, 10:05 UTC (lead: a full costume before the rainbow; deployed).**
+- **Deployed:** build `20261022T095836261Z-578db447190e46aa898f2c21da2accf4`, stamp unchanged. The owner's correction: a dragon that pukes a rainbow throws fire; the order is what the hand holds, the full costume, the rainbow, the hat, the bone of a skull, the crown's spikes. `?impacts=226,112,70,16,74,1287`: #226 fire, #112 rainbow, #70 candle, #74 frog.
+
 **22 October 2026, 09:50 UTC (lead: the game is Chog Balls Stars; held things and rainbows thrown first; deployed).**
 - **Deployed:** build `20261022T093755118Z-4b247ef2a30b4626b558767eb8c7cb3c`, stamp unchanged (`880d50523c1273a1`). The owner renamed the game Chog Balls Stars (Chog Arena is shared by many projects): menu title, loading page, page and app names, share texts, sign-in message, submission draft; the address `chogarena.vercel.app` is kept. The basic attack is chosen in the owner's order: the thing held in the hand (Accessory, 195 Genesis, the very part thrown as a hat is), then the rainbow of a Rainbow Puke mouth (145), then the full costume, the hat, the bone of a skull, the crown's spikes; each held thing has its own impact (`docs/ATTACKS-FROM-THE-ART.md`).
 - **Verified:** `?impacts=28,70,26,45,591,1002` and `23,74,103,112,226,1287`: candles, cup, coin, knife in flight, rainbows on their impact; export 1,970 Genesis, 0 failed; 175 view tests; 129 service tests; judge fixtures agree; `/api/wager` still version 2 after the services restarted.
