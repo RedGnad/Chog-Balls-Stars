@@ -58,6 +58,11 @@ what is built and seen is said at the end.
 
 The 100 Genesis on another base (Skull, Radioactive, 1:1) get theirs with their heads.
 
+Their horns, the taped banana and the 1:1 brain are thrown whole like a hat; since 22 October 2026 each
+has its own impact: a ram's horns (Red Horn, Purple Horn) butt with chips of horn, a thump and a ring;
+demon, devil and void horns end in a puff of hellfire painted in the colour of the horns (orange, red,
+purple); the taped banana bounces off in bananas; the brain ends in a pink squelch.
+
 ## Full costumes (22 October 2026)
 
 `chog_attack_objects.ATTACK_OF_BODY`, read from the art of three Genesis per costume:

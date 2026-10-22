@@ -322,6 +322,21 @@ namespace Chog.Match
                 case "HeadLaser":
                     return Recipe("a glint of light", ImpactPieces.Diamonds, 7, 0.13f, 1.1f,
                         FxLayer.Of(ChogFx.Light, 0.5f, FxColour.Tinted), default, 1f, 6);
+                // Horns, a taped banana and a brain (22 October 2026: the last hats that only popped).
+                // A ram's horns butt: chips of horn and a thump. Demon, devil and void horns: a puff of
+                // hellfire in the colour of the horns (orange, red, purple).
+                case "RamHorns":
+                    return WithRing(Recipe("a ram's butt: chips of horn and a thump", ImpactPieces.Diamonds, 8, 0.14f, 1.2f,
+                        FxLayer.Of(ChogFx.Debris, 0.5f, FxColour.Tinted), FxLayer.Of(ChogFx.Hit, 0.5f, FxColour.Tinted), 0.8f, 0), 1.3f);
+                case "DemonHorns":
+                    return Recipe("a puff of hellfire in the colour of the horns", ImpactPieces.Diamonds, 6, 0.13f, 1.1f,
+                        FxLayer.Of(ChogFx.Fire, 0.45f, FxColour.Painted), FxLayer.Of(ChogFx.Smoke, 0.35f, FxColour.Painted), 0.9f, 4);
+                case "TapedBanana":
+                    return Recipe("taped bananas bouncing off and a pop", ImpactPieces.Copies, 4, 0.22f, 1.2f,
+                        FxLayer.Of(ChogFx.Hit, 0.5f, FxColour.Tinted), FxLayer.Of(ChogFx.Smoke, 0.3f, FxColour.Painted), 0.6f, 0);
+                case "Brain":
+                    return WithRing(Recipe("a pink squelch", ImpactPieces.Diamonds, 7, 0.13f, 0.7f,
+                        FxLayer.Of(ChogFx.Splash, 0.5f, FxColour.Painted), FxLayer.Of(ChogFx.Hit, 0.4f, FxColour.Tinted), 0.6f, 0), 1.1f);
                 default:
                     return Recipe("pieces of its colours and a pop", ImpactPieces.Diamonds, 7, 0.16f, 1f,
                         FxLayer.Of(ChogFx.Hit, 0.45f, FxColour.Tinted), default, 0.6f, 0);

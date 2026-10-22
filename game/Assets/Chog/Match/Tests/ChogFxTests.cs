@@ -16,8 +16,8 @@ namespace Chog.Match.Tests
         private const string LibraryPath = "game/Assets/Chog/Resources/ChogParts.bytes";
         private const string EffectsFolder = "game/Assets/Chog/Effects/Resources/ChogFx";
 
-        // The objects whose impact is only the burst of pieces and a pop (no family of their own yet).
-        private static readonly string[] Generic = { "RamHorns", "DemonHorns", "TapedBanana", "Brain" };
+        // The objects whose impact is only the burst of pieces and a pop (none since 22 October 2026).
+        private static readonly string[] Generic = { };
 
         [Test]
         public void EveryObjectAHatThrowsHasItsOwnImpact()
