@@ -1429,3 +1429,21 @@ Three items of the owner's review, one sheet each, the art beside the hero stage
    (`BONES_SHOW` in `chog_trait_bases.py`, read in `make_chog_traits.build`), and a Radioactive's ribs are in the deeper tone of its skin, not black. Not done: the bones through the translucent vest or tank top of a few
    Radioactives (#275, #1192) and the arm bones on the art.
 - **Checked**: the 114 Skull and Radioactive heroes (`export_chog_parts.py` builds all of them, limit 8,000 triangles). Not in a Unity build.
+
+
+### Batch 2: the next 24 values of Side=Right by number of Genesis
+
+Sheet: [clothes-batch2-2026-10-22.jpg](../../research/evidence/clothes-batch2-2026-10-22.jpg) (23 rows, the art then before | after: torso, torso from behind, hero stage). Values seen (two Genesis each): Squid Game,
+Cream, Pink, Aqua, Blue and Cyan Tuxedo, Fire Shirt, Chug Life, Hawaiian Polo, Blue and Red Chinese, Tank Top, CWO, Yellow Yukata, Yellow Shirt, Wizard, Red shirt, MILF Lover, Red Trackset, Black Shirt, Wizard Cape,
+Stripe Shirt, CEO Vest, Mummy.
+
+- **Hawaiian Polo** (30): the art covers the shirt with large white hibiscus flowers; ours had seven small dots. Nine flowers 0.028 to 0.036 (0.020 to 0.026), of 20 points (15), bolder petals.
+- **Blue and Red Chinese** (29 and 25): the art has no zip: a short column of gold toggles (cords with a knot at each end) across the top of the chest. Ours was a gold line down the whole front. Now `toggles`
+  (three cords 0.052 long, 0.034 apart, from 0.545 down) in the colour `Toggle`, no zip.
+- **CWO** (27) and **MILF Lover** (22): the words sit low on the shirt and are larger in the art: CWO 0.092 high at 0.345 (0.075 at 0.410), MILF 0.066 at 0.350 with a larger heart (0.032, at 0.118 across).
+- **Yellow Yukata** (27): a kimono: its fronts cross in a V with a red edge and the cloth is covered with swirls. Now the V (`crossed`, two bands 0.040 wide meeting at the breastbone) and nine swirls (five). **White Yukata** (Side=Left)
+  has the same cut: it takes it in the Side=Left batch.
+- **Wizard** (24): the drawstring of the hood hangs from the bow in two ties (`ties`).
+- **Judged faithful, unchanged**: Squid Game (069 and the zip), Cream, Pink, Aqua, Blue and Cyan Tuxedo (the V widened in batch 1), Fire Shirt, Chug Life, Tank Top, Yellow Shirt, Red shirt, Red Trackset, Black Shirt, CEO Vest.
+  **Wizard Cape** (5 Genesis on skeletons) lacks its yellow pattern and its ties (a skeleton, the faces agent's bones); **Mummy** (3) has the crossed bandages of the art; **Stripe Shirt** (4): the ribs drawn over it are the faces agent's.
+- **Checked**: `--budget`: largest #710 7,981, none over 8,000; library 1,970 Genesis, 0 failures. Not verified in Unity.

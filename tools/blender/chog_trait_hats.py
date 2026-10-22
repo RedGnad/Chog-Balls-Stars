@@ -1906,9 +1906,9 @@ def open_front(torso, maker, half_opening, fur_radius):
 def lay_flower(torso, maker, material, across, height, size, lift):
     """A flower of five round petals, as the Hawaiian polo is printed."""
     edge = []
-    for index in range(15):
-        turn = 2.0 * math.pi * index / 15
-        reach = size * (0.62 + 0.38 * abs(math.cos(2.5 * turn)))
+    for index in range(20):
+        turn = 2.0 * math.pi * index / 20
+        reach = size * (0.55 + 0.45 * abs(math.cos(2.5 * turn)))
         edge.append(shirt_front(maker, height + reach * math.sin(turn), across + reach * math.cos(turn), lift))
     middle = SimpleNamespace(middle=Vector((0.0, 0.0, height)))
     full.add_skin(torso, middle, [[shirt_front(maker, height, across, lift)], edge], material)
@@ -1964,6 +1964,19 @@ def decorate_shirt(maker, torso):
         shirt_band(torso, maker, torso.named("Sash"), places, half_width, lift * 2.0)
     if entry.get("scarf"):
         lay_scarf(torso, maker, colours)
+    for places, half_width in entry.get("crossed", ()):
+        shirt_band(torso, maker, torso.named("Collar"), places, half_width, lift * 3.0)
+    for places, half_width in entry.get("ties", ()):
+        shirt_band(torso, maker, torso.named("Bow"), places, half_width, lift * 2.0)
+    if entry.get("toggles"):
+        # The gold toggles of a Chinese jacket (22 October 2026, batch 2): a few short cords across the top of the chest, each with a knot at its ends,
+        # in place of a zip: (how many, height of the first, step down, half length, half thickness).
+        count, top, step, half_length, thick = entry["toggles"]
+        for index in range(count):
+            height = top - index * step
+            shirt_square(torso, maker, torso.named("Toggle"), 0.0, height, half_length, 0.0, lift * 2.0, tall=thick)
+            for side in (-1.0, 1.0):
+                shirt_square(torso, maker, torso.named("Toggle"), side * half_length, height, thick * 1.9, 0.0, lift * 2.5)
     for places, half_width in entry.get("swirls", ()):
         shirt_band(torso, maker, torso.named("Swirl"), places, half_width, lift)
     for across, height, size in entry.get("flowers", ()):
@@ -3221,10 +3234,11 @@ CLOTHES = {
     "Squid Game Guard": track((0.92, 0.11, 0.38), zip_colour=(0.20, 0.10, 0.14), SLEEVE=LONG_SLEEVE,
                               missing="a white triangle on the chest"),
     # The Chinese jackets: a band collar and a row of gold toggles, drawn as one line down the front.
-    "Blue Chinese": track((0.22, 0.25, 0.69), zip_colour=(0.93, 0.70, 0.20), collar=(0.14, 0.17, 0.58),
-                          SLEEVE=LONG_SLEEVE),
-    "Red Chinese": track((0.87, 0.13, 0.13), zip_colour=(0.93, 0.70, 0.20), collar=(0.58, 0.11, 0.12),
-                         SLEEVE=LONG_SLEEVE),
+    # (22 October 2026, batch 2: the art has no zip, it has a short column of gold toggles across the top of the chest.)
+    "Blue Chinese": {**track((0.22, 0.25, 0.69), collar=(0.14, 0.17, 0.58), SLEEVE=LONG_SLEEVE),
+                     "toggles": (3, 0.545, 0.034, 0.026, 0.0045)},
+    "Red Chinese": {**track((0.87, 0.13, 0.13), collar=(0.58, 0.11, 0.12), SLEEVE=LONG_SLEEVE),
+                    "toggles": (3, 0.545, 0.034, 0.026, 0.0045)},
     # Shirts in one colour.
     "Farmer Shirt": tee((0.95, 0.65, 0.20)),
     "Inmate": tee((0.94, 0.50, 0.17), missing="the word INMATE"),
@@ -3369,6 +3383,9 @@ def arc(across, height, radius, start_deg, stop_deg, steps=6):
             for index in range(steps + 1)]
 
 
+for _chinese in ("Blue Chinese", "Red Chinese"):
+    CLOTHES[_chinese]["colours"]["Toggle"] = (0.93, 0.70, 0.20)     # the gold of the toggles (batch 2, 22 October 2026)
+
 # The prints of the shirts of Side=Right (15 October 2026), placed as the pictures draw them on the
 # chest; the pictures of Side=Right show the left of the character at their right.
 INK_BLACK = (0.08, 0.06, 0.07)
@@ -3377,19 +3394,25 @@ CLOTHES.update({
                       labels=((0.060, 0.322, 0.088, 0.030),), print=("INMATE", 0.318, 0.036, 0.150, 0.060)),
     "Six Seven": printed("Six Seven", {"Print": INK_BLACK, "PrintLine": WHITE}, print=("67", 0.395, 0.110, 0.200, 0.0)),
     "Chug Life": printed("Chug Life", {"Print": INK_BLACK}, print=("CHUG LIFE", 0.420, 0.046, 0.250, 0.0)),
-    "CWO": printed("CWO", {"Print": (0.96, 0.67, 0.25), "PrintLine": INK_DARK}, print=("CWO", 0.410, 0.075, 0.220, 0.0)),
+    "CWO": printed("CWO", {"Print": (0.96, 0.67, 0.25), "PrintLine": INK_DARK}, print=("CWO", 0.345, 0.092, 0.250, 0.0)),
     "MILF Lover": printed("MILF Lover", {"Print": (0.97, 0.97, 0.97), "PrintLine": INK_DARK, "Heart": (0.95, 0.09, 0.09)},
-                          print=("MILF", 0.420, 0.054, 0.150, -0.030),
-                          logos=(("heart", 0.088, 0.422, 0.024, "Heart"),)),
+                          print=("MILF", 0.350, 0.066, 0.190, -0.030),
+                          logos=(("heart", 0.118, 0.352, 0.032, "Heart"),)),
     "Hawaiian Polo": printed("Hawaiian Polo", {"Flower": (0.98, 0.88, 0.88)},
-                             flowers=((-0.090, 0.505, 0.026), (0.050, 0.535, 0.024), (0.105, 0.425, 0.026),
-                                      (-0.025, 0.410, 0.025), (-0.110, 0.330, 0.023), (0.040, 0.305, 0.026),
-                                      (0.125, 0.285, 0.020))),
+                             # (22 October 2026, batch 2: the art covers the shirt with large white hibiscus flowers; nine, larger.)
+                             flowers=((-0.095, 0.510, 0.036), (0.040, 0.535, 0.032), (0.125, 0.455, 0.032), (-0.040, 0.425, 0.034),
+                                      (0.075, 0.370, 0.036), (-0.130, 0.360, 0.032), (0.005, 0.300, 0.034), (0.130, 0.290, 0.028),
+                                      (-0.085, 0.265, 0.030))),
     "Yellow Yukata": printed("Yellow Yukata", {"Swirl": (0.99, 0.75, 0.38)},
                              swirls=((arc(-0.07, 0.48, 0.035, 0.0, 270.0), 0.006), (arc(0.06, 0.52, 0.030, 90.0, 360.0), 0.006),
                                      (arc(0.09, 0.38, 0.035, 180.0, 450.0), 0.006),
                                      (arc(-0.06, 0.34, 0.032, -90.0, 180.0), 0.006),
-                                     (arc(0.00, 0.43, 0.022, 0.0, 300.0), 0.005))),
+                                     (arc(0.00, 0.43, 0.022, 0.0, 300.0), 0.005),
+                                     # (batch 2: the cloth is covered with these swirls, and its fronts cross in a V with a red edge.)
+                                     (arc(-0.115, 0.40, 0.030, 30.0, 300.0), 0.005), (arc(0.130, 0.46, 0.028, 120.0, 390.0), 0.005),
+                                     (arc(0.105, 0.30, 0.030, 0.0, 270.0), 0.005), (arc(-0.100, 0.26, 0.028, 90.0, 360.0), 0.005)),
+                             crossed=((((0.112, 0.572), (0.078, 0.505), (0.040, 0.447), (0.000, 0.392)), 0.020),
+                                      (((-0.112, 0.572), (-0.078, 0.505), (-0.040, 0.447), (-0.002, 0.392)), 0.020))),
     "Squid Game Guard": printed("Squid Game Guard", {"Logo": (0.97, 0.97, 0.97)},
                                 logos=(("triangle", 0.078, 0.385, 0.048, "Logo"),)),
     # (22 October 2026: a thick scarf, not a stripe: see SCARF.)
@@ -3397,8 +3420,11 @@ CLOTHES.update({
     # Its front is open: the body shows in its skin colour between two rolls of white fur.
     "Kings Robe": printed("Kings Robe", {"Fur": (0.96, 0.91, 0.89)}, open_front=(0.062, 0.034)),
     # Yellow triangles along the edge of the cape and a dark bow at the neck.
+    # (batch 2: the drawstring of the hood hangs from the bow in two ties, as the art draws them.)
     "Wizard": printed("Wizard", {"Trim": (0.92, 0.68, 0.10), "Bow": (0.09, 0.11, 0.27)}, zigzag=(0.442, 0.478, 16),
-                      logos=(("bow", 0.0, 0.552, 0.030, "Bow"),)),
+                      logos=(("bow", 0.0, 0.552, 0.030, "Bow"),),
+                      ties=((((0.014, 0.540), (0.032, 0.495), (0.028, 0.445)), 0.007),
+                            (((-0.014, 0.540), (-0.036, 0.490), (-0.032, 0.438)), 0.007))),
     # The green track suit of the players, its number on the chest (18 Genesis).
     "Squid Game": with_(track((0.12, 0.53, 0.43), zip_colour=(0.96, 0.97, 0.97), SLEEVE=LONG_SLEEVE),
                         {"Print": (0.96, 0.97, 0.97)}, print=("069", 0.400, 0.060, 0.200, 0.030)),
