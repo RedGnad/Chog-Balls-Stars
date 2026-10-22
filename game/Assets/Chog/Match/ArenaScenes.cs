@@ -1,5 +1,7 @@
 using System;
 using Quantum;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Chog.Match
 {
@@ -34,6 +36,32 @@ namespace Chog.Match
         public static string MapPathOf(EMatchMode mode)
         {
             return mode == EMatchMode.Siege ? SiegeMapPath : CoinsMapPath;
+        }
+
+        // When a match scene is loaded, any other one still loaded is unloaded (22 October 2026: the owner
+        // played coins then a siege and saw the crates of both maps; the scene of a finished match is
+        // unloaded by a coroutine of Quantum's that the result screen, which leaves the room at once,
+        // can outrun). Two arena scenes are never meant to be loaded together.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void WatchScenes()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        private static void OnSceneLoaded(Scene loaded, LoadSceneMode mode)
+        {
+            if (!IsArena(loaded.name))
+                return;
+            for (var i = SceneManager.sceneCount - 1; i >= 0; i--)
+            {
+                var other = SceneManager.GetSceneAt(i);
+                if (other != loaded && other.isLoaded && IsArena(other.name))
+                {
+                    Debug.Log("CHOG_SCENES unloading " + other.name + ", left from an earlier match, as " + loaded.name + " loads");
+                    SceneManager.UnloadSceneAsync(other);
+                }
+            }
         }
     }
 }
