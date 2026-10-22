@@ -1,5 +1,10 @@
 # État courant et décisions
 
+**22 October 2026, 10:30 UTC (lead: owner's hero review, first lots deployed).**
+- **Deployed:** build `20261022T102129035Z-ddb46fd0faf2491da81b7eb454778963`, stamp unchanged. Faces lot 8 batch 1 (`stream/heroes-faces` 70ab510, `heroes-eyes-batch1-2026-10-22.jpg`, `heroes-lot8-lasers-glasses-coin-2026-10-22.jpg`): a strict eye audit (Smirk Left, Retro Glass were wrongly graded faithful; Happy, Round, Dead, Normal Eye, Heart closer), laser beams from the visible eye, every mouth centred on the face's middle line, the Mon coin raised. Costumes (`stream/heroes-hats` 5b536f7): the ushanka tall with its fur roll and flaps (`costumes-ushanka-2026-10-22.jpg`), the clown nose a little out (`costumes-clown-nose-out-2026-10-22.jpg`).
+- **Verified:** export 1,970 Genesis, 0 failed; budget largest #630 7,991, none over 8,000; 175 view tests; `?heroes=39,34,210,549,35,242`; a local siege without exception; judge fixtures agree.
+**Next action:** eyes batch 2 and Smirk's second pass; costumes items 3+8 (headbands), 4 to 7.
+
 **22 October 2026, 10:05 UTC (lead: a full costume before the rainbow; deployed).**
 - **Deployed:** build `20261022T095836261Z-578db447190e46aa898f2c21da2accf4`, stamp unchanged. The owner's correction: a dragon that pukes a rainbow throws fire; the order is what the hand holds, the full costume, the rainbow, the hat, the bone of a skull, the crown's spikes. `?impacts=226,112,70,16,74,1287`: #226 fire, #112 rainbow, #70 candle, #74 frog.
 
