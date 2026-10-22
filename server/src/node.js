@@ -195,6 +195,43 @@ export function matchFiles(root) {
 }
 
 /**
+ * The match records on the disk of the container, mirrored to a remote store (the Upstash Redis of the ranks), so that a new
+ * container finds them: Render's free instance has no disk, and every deploy lost the matches, a staked match among them, whose
+ * page then asked for it forever (22 October 2026, the owner's 100 $CHOG). Everything but the replay itself is mirrored (match,
+ * verdict, decisions, players): the replay is only read by the judge, right after the match. A key the disk does not have is read
+ * from the mirror; a failed write to the mirror is reported and does not stop the match.
+ * @param {ReturnType<typeof matchFiles>} files
+ * @param {{get: (key: string) => Promise<string|null>, set: (key: string, value: string) => Promise<boolean>}} remote
+ */
+export function mirroredMatchStore(files, remote) {
+  const mirrored = key => !/\/replay-/.test(key);
+  const remoteKey = key => `matches/${key}`;
+  return {
+    root: files.root,
+    get: async key => {
+      const local = await files.get(key);
+      if (local !== null || !mirrored(key)) return local;
+      try {
+        return (await remote.get(remoteKey(key))) ?? null;
+      } catch (error) {
+        console.warn(`The match mirror could not be read for ${key}: ${error.message}`);
+        return null;
+      }
+    },
+    set: async (key, text) => {
+      await files.set(key, text);
+      if (!mirrored(key)) return;
+      try {
+        await remote.set(remoteKey(key), text);
+      } catch (error) {
+        console.warn(`The match mirror could not be written for ${key}: ${error.message}`);
+      }
+    },
+    list: prefix => files.list(prefix),
+  };
+}
+
+/**
  * The program that plays a match again (tools/quantum/Verifier.cs), as the judge calls it: it
  * is run on the folder of the match and its report is read back.
  * @param {object} options

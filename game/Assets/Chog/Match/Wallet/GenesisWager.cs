@@ -59,7 +59,12 @@ namespace Chog.Match
         /// <summary>Nobody won: every stake goes back.</summary>
         Draw,
         /// <summary>The match was called off: every stake goes back.</summary>
-        CalledOff
+        CalledOff,
+        /// <summary>
+        /// The game server does not know the match (lost with a container, before the mirror of 22 October 2026, or never judged):
+        /// its stakes wait on the chain, and the contract gives them back an hour after the first one (refundExpired).
+        /// </summary>
+        Lost
     }
 
     public struct WagerStaker
@@ -85,6 +90,7 @@ namespace Chog.Match
         private const string SettleSelector = "0x99bcbc7f"; // settle(bytes32,uint8,bytes), version 1
         private const string SettleWithGenesisSelector = "0x061ab97d"; // settle(bytes32,uint8,address[],bytes), version 2
         private const string VoidSelector = "0xe3c01265";   // voidMatch(bytes32,bytes)
+        private const string RefundExpiredSelector = "0xcc3e049b"; // refundExpired(bytes32)
         private const string TapSelector = "0x4e71d92d";    // claim() of the test token
 
         // A first claim from the tap cost 107,537 on a local chain (15 October 2026); Monad
@@ -220,6 +226,7 @@ namespace Chog.Match
         {
             public string state;
             public string amount;
+            public long firstStakeAt;
             public StakerAnswer[] stakers;
         }
 
@@ -273,6 +280,8 @@ namespace Chog.Match
         private sealed class OutcomeAnswer
         {
             public bool pending;
+            public bool lost;
+            public long refundAfterSeconds;
             public string matchKey;
             public int winnerTeam;
             public bool @void;
@@ -478,7 +487,8 @@ namespace Chog.Match
                 var answer = Parsed<OutcomeAnswer>(status, text);
                 if (answer != null && asked == LastGameId)
                 {
-                    Outcome = answer.pending ? WagerOutcome.Pending
+                    Outcome = answer.lost ? WagerOutcome.Lost
+                        : answer.pending ? WagerOutcome.Pending
                         : answer.@void ? WagerOutcome.CalledOff
                         : answer.winnerTeam == 2 ? WagerOutcome.Draw : WagerOutcome.Won;
                     WinnerTeam = answer.winnerTeam;
@@ -486,6 +496,8 @@ namespace Chog.Match
                     s_decisionSignature = answer.signature ?? "";
                     s_genesisPlayers = answer.genesisPlayers ?? Array.Empty<string>();
                     LastChainState = answer.stakes != null ? answer.stakes.state ?? "" : "";
+                    RefundableAt = answer.stakes != null && answer.stakes.firstStakeAt > 0 && answer.refundAfterSeconds > 0
+                        ? answer.stakes.firstStakeAt + answer.refundAfterSeconds : 0;
                     LastWinners = 0;
                     LastLosers = 0;
                     if (answer.stakes != null && answer.stakes.stakers != null)
@@ -561,6 +573,34 @@ namespace Chog.Match
             }, Fail);
         }
 
+        /// <summary>When the contract gives the stakes of the last match back to anyone who asks (unix seconds); 0 when unknown.</summary>
+        public static long RefundableAt { get; private set; }
+
+        /// <summary>
+        /// Whether the stakes of the last match wait on the chain with no decision to bring (the server lost the match, or never judged
+        /// it) and the hour after which the contract gives them back has passed.
+        /// </summary>
+        public static bool CanRefundExpired(long nowSeconds) => HasLastMatch && !IsBusy && LastChainState == "open"
+            && (Outcome == WagerOutcome.Lost || Outcome == WagerOutcome.Pending) && RefundableAt > 0 && nowSeconds >= RefundableAt
+            && PlayerWallet.State == WalletState.Ready;
+
+        /// <summary>Gives every stake of the last match back (refundExpired): no signature needed once the hour has passed.</summary>
+        public static void RefundExpired()
+        {
+            var now = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+            if (!CanRefundExpired(now))
+                return;
+            var sender = PlayerWallet.Address;
+            var data = RefundExpiredSelector + s_lastMatchKey.Substring(2);
+            SetStep(WagerStep.Switching, WagerAction.Claim, "");
+            MonadTransactions.SwitchTo(Chain, () =>
+            {
+                SetStep(WagerStep.Sending, WagerAction.Claim, "");
+                MonadTransactions.Send(sender, Address, data, ClaimGasLimit, "the refund of the stakes",
+                    () => Confirm(() => LastChainState == "refunded", ReadOutcome, "the refund of the stakes"), Fail);
+            }, Fail);
+        }
+
         /// <summary>Whether the connected wallet can take test tokens from the tap now (testnet only).</summary>
         public static bool CanTakeTestTokens => State == WagerState.Open && IsTest && !TookTestTokens && !IsBusy
             && PlayerWallet.State == WalletState.Ready;
@@ -596,6 +636,7 @@ namespace Chog.Match
             s_lastMatchKey = "";
             LastStakeWei = "";
             Outcome = WagerOutcome.Unknown;
+            RefundableAt = 0;
             LastChainState = "";
             s_decisionSignature = "";
             PlayerPrefs.DeleteKey(LastMatchKey);
@@ -619,6 +660,7 @@ namespace Chog.Match
             LastTeam = team;
             LastStakeWei = stakeWei ?? "";
             Outcome = WagerOutcome.Unknown;
+            RefundableAt = 0;
             LastChainState = "";
             PlayerPrefs.SetString(LastMatchKey, Kept(LastGameId, s_lastMatchKey, team, LastStakeWei));
             PlayerPrefs.Save();

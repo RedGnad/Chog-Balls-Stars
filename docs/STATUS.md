@@ -1,5 +1,11 @@
 # État courant et décisions
 
+**22 October 2026, 21:35 UTC (lead: matches survive a deploy, a stake never stays stuck, admin back; deployed).**
+- **Found:** Render's free instance has no disk: every deploy (seven that evening) replaced the container and lost the match records, a staked match among them (the owner's 100 $CHOG): `/api/wager/result` answered 404 and the menu showed "asking the game server" forever. The keep-alive ping only stops the instance from sleeping; it does not keep files across a new container.
+- **Deployed:** build `20261022T212556292Z-cfccaacd3e8943db8ac2f9ca45775da8`, stamp `7e77d8cf4a7c1e99`. Services: the match records (all but the replay) are mirrored to the Upstash Redis of the ranks (`mirroredMatchStore`, `rank-store.js` `set`), read from it when the disk lacks them; an unknown match answers its on-chain stakes and `refundAfterSeconds` (`lost: true`) instead of 404. Game: a `Lost` outcome; `GenesisWager.RefundExpired` calls the contract's `refundExpired(bytes32)` (0xcc3e049b) once the hour has passed. The menu's stake card says one short line ("Your 100 $CHOG comes back at 23:45", "You won +90 $CHOG"), one action at most (CLAIM, GET IT BACK), a close (X) that hides it until it changes, and nothing before the services answered. Admin testing on again (`PlayerWallet.AdminTesting`).
+- **Verified:** 132 service tests (two for the mirror); 176 view tests; a local siege with the new services without error; judge fixtures agree.
+- **Not verified:** the mirror against the real Upstash on Render, and the GET IT BACK path on mainnet (the owner's stake is the first case).
+
 **22 October 2026, 21:05 UTC (lead: hoods without the hole; deployed).**
 - **Deployed:** build `20261022T210103909Z-cedef602b2444728914d767d8c6f7f3d`, stamp `7e77d8cf4a7c1e99`. The owner: "the right side of the hoods has a hole". Behind the rim, on one side only, the cheek and the eye showed through the hood's wall (#376 shark, #537 gangster, turned around at 1000 points). `HOOD` SIZE 1.14, 1.24, 1.26 (was 1.12, 1.20, 1.22) and 24 points round the head (18); the shark's hood the same size. Sheet `try-hoods.jpg`; both sides checked on the turnaround.
 - **Verified:** export 1,970 Genesis, 0 failed, none over 8,000; 176 view tests; a local siege with the two hooded bots without error; judge fixtures agree.

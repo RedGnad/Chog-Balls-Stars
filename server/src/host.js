@@ -76,7 +76,7 @@ import { createChainCareers } from './careers-onchain.js';
 import { createChain, DEFAULT_RPC_URLS } from './chain.js';
 import { createJudge } from './judge.js';
 import { createMatches } from './matches.js';
-import { careerFile, createHttpServer, dotnetReplay, matchFiles, photonSecret, reownProjectId, servedBuild, servedPhotonVersion, sessionSecret } from './node.js';
+import { careerFile, createHttpServer, dotnetReplay, matchFiles, mirroredMatchStore, photonSecret, reownProjectId, servedBuild, servedPhotonVersion, sessionSecret } from './node.js';
 import { createPhoton } from './photon.js';
 import { createPrice } from './price.js';
 import { createReferee } from './referee.js';
@@ -130,8 +130,6 @@ ledger?.start();
 const standIns = createStandIns({ chain, setting: environment.STAND_INS ?? '' });
 const sessions = createSessions({ secret: await sessionSecret(dataFolder, environment.SESSION_SECRET) });
 
-const matchStore = matchFiles(join(dataFolder, 'matches'));
-const matches = createMatches({ store: matchStore });
 const rankRequested = environment.RANK_ENABLED === '1';
 const rankUrl = (environment.UPSTASH_REDIS_REST_URL ?? '').trim();
 const rankToken = (environment.UPSTASH_REDIS_REST_TOKEN ?? '').trim();
@@ -149,6 +147,9 @@ if (rankUrl && rankToken) {
   }
 }
 if (rankRequested && !rankStore) console.warn('Player rank is disabled: persistent storage is not connected.');
+// The matches survive a new container in the same remote store when there is one (mirroredMatchStore).
+const matchStore = rankStore ? mirroredMatchStore(matchFiles(join(dataFolder, 'matches')), rankStore) : matchFiles(join(dataFolder, 'matches'));
+const matches = createMatches({ store: matchStore });
 const ranks = rankRequested && rankStore ? createRanks({ store: rankStore, matches }) : null;
 const season = seasonFrom({ id: environment.SEASON_ID, endsAt: environment.SEASON_ENDS_AT, startsAt: environment.SEASON_STARTS_AT });
 const seasons = ranks ? createSeasons({ ranks, store: rankStore, season }) : null;

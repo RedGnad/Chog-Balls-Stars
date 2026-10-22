@@ -344,7 +344,14 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
    */
   async function outcome(gameId) {
     const decided = await decision(gameId);
-    return decided && { ...decided, stakes: await onChain(decided.matchKey) };
+    if (decided) return { ...decided, stakes: await onChain(decided.matchKey), refundAfterSeconds: REFUND_AFTER_SECONDS };
+    // A match these services never heard of, or lost (a new container before the mirror of 22 October 2026): its stakes are still
+    // on the chain, and the contract gives them back to anyone who asks REFUND_AFTER_SECONDS after the first one (refundExpired).
+    if (!contract || typeof gameId !== 'string' || gameId.length === 0) return null;
+    const matchKey = matchKeyOf(gameId);
+    const stakes = await onChain(matchKey);
+    if (stakes.state === 'none') return null;
+    return { lost: true, matchKey, stakes, refundAfterSeconds: REFUND_AFTER_SECONDS };
   }
 
   return { describe, onChain, ticket, lock, mine, decision, outcome, weekOf, address: contract };

@@ -77,10 +77,10 @@ namespace Chog.Match
         public static bool IsAdminAddress(string address) => string.Equals(address, AdminAddress, StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Whether the hero sheets offer the owner's wallet any Genesis (ADMIN). Off since 22 October 2026, evening, at the owner's
-        /// request: a Genesis picked that way is then forgotten and the wallet plays as any other.
+        /// Whether the hero sheets offer the owner's wallet any Genesis (ADMIN). Off for an hour on 22 October 2026, evening, at the
+        /// owner's request, on again since: off, a Genesis picked that way is forgotten and the wallet plays as any other.
         /// </summary>
-        public const bool AdminTesting = false;
+        public const bool AdminTesting = true;
 
         /// <summary>Whether the connected wallet is the owner's, while admin testing is on.</summary>
         public static bool IsAdmin => AdminTesting && State == WalletState.Ready && IsAdminAddress(Address);

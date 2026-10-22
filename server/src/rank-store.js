@@ -30,6 +30,8 @@ export function createRemoteRankStore({ url, token, fetchImpl = fetch }) {
     // A short-lived write proves the configured token can credit events, not just read them.
     probeWrite: async () => (await command(['SET', keyOf(`probe/${randomUUID()}`), 'ready', 'NX', 'EX', 60])) === 'OK',
     get: key => command(['GET', keyOf(key)]),
+    // Overwrites: the mirror of the match records (node.js, mirroredMatchStore) keeps the latest text of a key.
+    set: async (key, value) => (await command(['SET', keyOf(key), value])) === 'OK',
     // A game ID is credited once, even when two replay callbacks race.
     setIfAbsent: async (key, value) => (await command(['SET', keyOf(key), value, 'NX'])) === 'OK',
     list: async prefix => {

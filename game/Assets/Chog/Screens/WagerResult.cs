@@ -29,6 +29,9 @@ namespace Chog.Screens
 
         private TextMeshProUGUI _text;
         private Button _button;
+        private Button _close;
+        private string _shownKey = "";
+        private string _closedOn = "";
         private TextMeshProUGUI _buttonLabel;
         private float _readAt;
 
@@ -38,29 +41,35 @@ namespace Chog.Screens
         /// is nothing to tap.
         /// </summary>
         public static (string line, string button) Describe(WagerOutcome outcome, string chainState, bool mine, string stakeWei, string gainWei,
-                                                            string calledOffBecause, bool canClaim, string currency = "$CHOG", double usdPerChog = 0)
+                                                            string calledOffBecause, bool canClaim, string currency = "$CHOG", double usdPerChog = 0,
+                                                            bool canRefund = false, string refundAt = "")
         {
+            // One short line and one action at most (22 October 2026, the owner: "the UX is not clear, a stake must not float and stay
+            // stuck"). What a stake came to, never how the services work.
             var stake = ChogPrice.WithUsd(stakeWei, usdPerChog, currency);
             var paid = chainState == "settled" || chainState == "refunded";
+            if (canRefund)
+                return ("Your " + stake + " can come back now", "GET IT BACK");
             switch (outcome)
             {
                 case WagerOutcome.Pending:
-                    return ("STAKE " + stake + ": the match is being judged", "");
+                    return ("Your " + stake + " is at stake: the match is being checked", "");
+                case WagerOutcome.Lost:
+                    return paid ? ("Your " + stake + " came back", "OK")
+                        : ("Your " + stake + " comes back" + (refundAt.Length > 0 ? " at " + refundAt : " within the hour"), "");
                 // A team won but only one side had staked: the contract gives every stake back.
                 case WagerOutcome.Won when chainState == "refunded" || gainWei == "0":
-                    return ("NOBODY STAKED ON THE OTHER TEAM: YOUR STAKE OF " + stake + (paid ? " WAS GIVEN BACK" : " COMES BACK"),
-                        paid ? "OK" : canClaim ? "GET IT BACK" : "");
+                    return ("Nobody staked against you: your " + stake + (paid ? " came back" : " comes back"), paid ? "OK" : canClaim ? "GET IT BACK" : "");
                 case WagerOutcome.Won when mine:
-                    return ("YOUR TEAM WON: +" + ChogPrice.WithUsd(gainWei, usdPerChog, currency) + (paid ? ", PAID" : ""), paid ? "OK" : canClaim ? "CLAIM" : "");
+                    return ("You won +" + ChogPrice.WithUsd(gainWei, usdPerChog, currency), paid ? "OK" : canClaim ? "CLAIM" : "");
                 case WagerOutcome.Won:
-                    return ("YOUR TEAM LOST: YOUR STAKE OF " + stake + " GOES TO THE WINNERS", paid ? "OK" : canClaim ? "SETTLE" : "");
+                    return ("You lost your " + stake, paid ? "OK" : canClaim ? "SETTLE" : "");
                 case WagerOutcome.Draw:
-                    return ("A DRAW: YOUR STAKE OF " + stake + (paid ? " WAS GIVEN BACK" : " COMES BACK"), paid ? "OK" : canClaim ? "GET IT BACK" : "");
+                    return ("A draw: your " + stake + (paid ? " came back" : " comes back"), paid ? "OK" : canClaim ? "GET IT BACK" : "");
                 case WagerOutcome.CalledOff:
-                    return ("MATCH CALLED OFF (" + (calledOffBecause ?? "").ToUpperInvariant() + "): YOUR " + stake + (paid ? " WERE GIVEN BACK" : " COME BACK"),
-                        paid ? "OK" : canClaim ? "GET IT BACK" : "");
+                    return ("Match called off: your " + stake + (paid ? " came back" : " comes back"), paid ? "OK" : canClaim ? "GET IT BACK" : "");
                 default:
-                    return ("YOUR STAKE OF " + stake + ": ASKING THE GAME SERVER", "");
+                    return ("", "");
             }
         }
 
@@ -120,12 +129,15 @@ namespace Chog.Screens
                 textLeft = 0.12f;
             }
 
-            _text = ChogUi.Body("Text", transform, new Vector2(textLeft, 0.06f), new Vector2(0.74f, 0.94f), 26f,
+            _close = ChogUi.Button("Close", transform, new Vector2(0.905f, 0.18f), new Vector2(0.985f, 0.82f), ChogTheme.ButtonKind.Quiet,
+                "X", 26f);
+            _close.onClick.AddListener(OnClose);
+            _text = ChogUi.Body("Text", transform, new Vector2(textLeft, 0.06f), new Vector2(0.66f, 0.94f), 26f,
                 TextAlignmentOptions.Left, Color.white);
             _text.enableAutoSizing = true;
             _text.fontSizeMin = 14f;
             _text.fontSizeMax = 26f;
-            var buttonArea = Child("Button", transform, new Vector2(0.76f, 0.12f), new Vector2(0.98f, 0.88f));
+            var buttonArea = Child("Button", transform, new Vector2(0.67f, 0.14f), new Vector2(0.895f, 0.86f));
             var background = buttonArea.gameObject.AddComponent<Image>();
             background.color = AccentColor;
             _button = buttonArea.gameObject.AddComponent<Button>();
@@ -137,10 +149,14 @@ namespace Chog.Screens
             Refresh();
         }
 
+        private static long NowSeconds() => (long)(System.DateTime.UtcNow - new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc)).TotalSeconds;
+
         private static void OnButton()
         {
             if (GenesisWager.Step == WagerStep.Failed)
                 GenesisWager.Dismiss();
+            else if (GenesisWager.CanRefundExpired(NowSeconds()))
+                GenesisWager.RefundExpired();
             else if (GenesisWager.LastChainState == "settled" || GenesisWager.LastChainState == "refunded")
                 GenesisWager.ForgetLast();
             else
@@ -166,12 +182,7 @@ namespace Chog.Screens
                 return;
 
             var shown = GenesisWager.State == WagerState.Open && GenesisWager.HasLastMatch;
-            GetComponent<Image>().enabled = shown;
-            GetComponent<Outline>().enabled = shown;
-            var coinShown = transform.Find("Coin");
-            if (coinShown != null)
-                coinShown.gameObject.SetActive(shown);
-            _text.gameObject.SetActive(shown);
+            Show(shown);
             _button.gameObject.SetActive(false);
             if (!shown)
                 return;
@@ -186,11 +197,43 @@ namespace Chog.Screens
 
             var mine = GenesisWager.Outcome == WagerOutcome.Won && GenesisWager.WinnerTeam == GenesisWager.LastTeam;
             var gain = GenesisWager.WinnerGain(GenesisWager.LastStakeWei, GenesisWager.LastWinners, GenesisWager.LastLosers, GenesisWager.TakenShare);
+            var refundAt = GenesisWager.RefundableAt > 0
+                ? System.DateTimeOffset.FromUnixTimeSeconds(GenesisWager.RefundableAt).ToLocalTime().ToString("HH:mm") : "";
             var (line, button) = Describe(GenesisWager.Outcome, GenesisWager.LastChainState, mine, GenesisWager.LastStakeWei, gain,
-                GenesisWager.CalledOffBecause, GenesisWager.CanClaim, GenesisWager.Currency, GenesisWager.IsTest ? 0 : ChogPrice.UsdPerChog);
+                GenesisWager.CalledOffBecause, GenesisWager.CanClaim, GenesisWager.Currency, GenesisWager.IsTest ? 0 : ChogPrice.UsdPerChog,
+                GenesisWager.CanRefundExpired(NowSeconds()), refundAt);
+            // Nothing is shown before the services answered, nor after the player closed it (until something changes).
+            var key = line + "|" + button;
+            if (line.Length == 0 || key == _closedOn)
+            {
+                Show(false);
+                return;
+            }
+            _shownKey = key;
             _text.text = line;
             _button.gameObject.SetActive(button.Length > 0);
             _buttonLabel.text = button;
+        }
+
+        // The line, the action and the close of the card, or none of them.
+        private void Show(bool shown)
+        {
+            GetComponent<Image>().enabled = shown;
+            GetComponent<Outline>().enabled = shown;
+            var coin = transform.Find("Coin");
+            if (coin != null)
+                coin.gameObject.SetActive(shown);
+            _text.gameObject.SetActive(shown);
+            _close.gameObject.SetActive(shown);
+            if (!shown)
+                _button.gameObject.SetActive(false);
+        }
+
+        // The close: the card goes until what it says changes (a result arrives, a refund opens).
+        private void OnClose()
+        {
+            _closedOn = _shownKey;
+            Show(false);
         }
 
         private static TextMeshProUGUI Text(string name, Vector2 min, Vector2 max, Color color, float largest, Transform parent)
