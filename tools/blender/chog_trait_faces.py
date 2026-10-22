@@ -109,18 +109,21 @@ GLOSSY = {
 # A tear: where it leaves the eye (against the middle of the eye), where it ends (height on the face),
 # its width at the top and at the bottom, the width of its dark line (0: none), the share of its
 # width taken by the light streak along it, and how far it drifts to the side as it runs.
-WIDE_TEARS = {"FROM": (-0.008, -0.044), "TO": -0.172, "WIDTH": (0.036, 0.044), "LINE": 0.007,
-              "SHINE": 0.22, "DRIFT": -0.004}
-THIN_TEAR = {"FROM": (-0.040, -0.040), "TO": -0.128, "WIDTH": (0.010, 0.012), "LINE": 0.005,
-             "SHINE": 0.0, "DRIFT": -0.008, "DROP": (0.010, 0.014),
+# (22 October 2026: the sideways numbers FROM[0] and DRIFT are magnitudes now, laid on the outer side of each eye, mirrored;
+# they were signed towards -X for both eyes. The wide tears started 0.008 off the middle of the eye and drifted 0.004: now 0.024
+# and 0.008, so that the tear reads as running down the outer half of the eye.)
+WIDE_TEARS = {"FROM": (0.024, -0.044), "TO": -0.172, "WIDTH": (0.036, 0.044), "LINE": 0.007,
+              "SHINE": 0.22, "DRIFT": 0.008}
+THIN_TEAR = {"FROM": (0.040, -0.040), "TO": -0.128, "WIDTH": (0.010, 0.012), "LINE": 0.005,
+             "SHINE": 0.0, "DRIFT": 0.008, "DROP": (0.010, 0.014),
              # the tear welling under the pupil: an arc in the white, half width, height of its sag,
              # thickness
              "WELL": (0.034, 0.012, 0.009)}
 # "Closed Eye Crying": an arch over each closed eye, thick in its middle, slanted, and a wide tear
 # under it with no dark line.
 CLOSED_ARCH = {"AT": (0.112, 0.012), "ARC": (0.050, 0.020, 0.015), "TILT": -0.10, "STEPS": 10}
-CLOSED_TEARS = {"FROM": (0.004, -0.010), "TO": -0.172, "WIDTH": (0.034, 0.042), "LINE": 0.0,
-                "SHINE": 0.0, "DRIFT": -0.004}
+CLOSED_TEARS = {"FROM": (0.020, -0.010), "TO": -0.172, "WIDTH": (0.034, 0.042), "LINE": 0.0,
+                "SHINE": 0.0, "DRIFT": 0.008}
 # "Dead": a thick cross on each eye: half the length of a stroke, its thickness, its turn.
 # (THICKNESS 0.022 and HALF 0.044 until 22 October 2026: the strokes of the pictures are a fifth of the width of the
 # cross, ours a seventh.)
@@ -451,16 +454,20 @@ def glossy_eyes(part, surface, numbers, dark, white, lifts):
     return middles
 
 
-def tear(part, surface, materials, start, numbers, lifts):
+def tear(part, surface, materials, start, numbers, lifts, side=1.0):
     """A tear running down from "start": its dark line (when it has one), its colour, a light streak,
-    and a round end."""
+    and a round end. "side" is the side of the face its eye is on (+1 for the eye at +X, -1 for the other): the tear
+    drifts outwards and its streak lies on the inner side, so the two tears of a pair are mirror images
+    (22 October 2026, the owner on the banana #321: "why are the eyes and tears in the same direction?"; until then
+    both drifted towards -X, as in the three quarter pictures, which puts one on the outer side of its eye and the other on
+    the inner side)."""
     line_material, tear_material, shine_material = materials
     top, bottom = numbers.WIDTH
     steps = 6
     places, widths = [], []
     for index in range(steps + 1):
         share = index / steps
-        places.append((start[0] + numbers.DRIFT * share * share, start[1] + (numbers.TO - start[1]) * share))
+        places.append((start[0] + side * abs(numbers.DRIFT) * share * share, start[1] + (numbers.TO - start[1]) * share))
         widths.append(top + (bottom - top) * share)
     end = places[-1]
     if numbers.LINE > 0.0:
@@ -469,7 +476,7 @@ def tear(part, surface, materials, start, numbers, lifts):
     HOST.draw_line(part, surface, tear_material, places, widths, lifts[1])
     disc(part, surface, tear_material, end, bottom * 0.5, bottom * 0.5, lifts[1], 10)
     if numbers.SHINE > 0.0:
-        streak = [(place[0] - width * 0.22, place[1]) for place, width in zip(places[1:-1], widths[1:-1])]
+        streak = [(place[0] - side * width * 0.22, place[1]) for place, width in zip(places[1:-1], widths[1:-1])]
         HOST.draw_line(part, surface, shine_material, streak, [width * numbers.SHINE for width in widths[1:-1]], lifts[2])
 
 
@@ -579,12 +586,14 @@ def build_round_tear(maker):
     middles = glossy_eyes(part, surface, numbers, part.named("Dark"), part.named("White"), LIFT[3:])
     materials = (part.named("Dark"), part.named("Tear"), part.named("Tear"))
     for middle in middles:
-        start = (middle[0] + tears.FROM[0], middle[1] + tears.FROM[1])
-        tear(part, surface, materials, start, tears, LIFT[0:3])
+        side = 1.0 if middle[0] >= 0.0 else -1.0
+        start = (middle[0] + side * abs(tears.FROM[0]), middle[1] + tears.FROM[1])
+        tear(part, surface, materials, start, tears, LIFT[0:3], side)
         drop_wide, drop_tall = tears.DROP
-        disc(part, surface, part.named("Dark"), (start[0] + tears.DRIFT, tears.TO - drop_tall * 0.4),
+        drift = side * abs(tears.DRIFT)
+        disc(part, surface, part.named("Dark"), (start[0] + drift, tears.TO - drop_tall * 0.4),
              drop_wide + tears.LINE, drop_tall + tears.LINE, LIFT[0], 10, taper=-0.5)
-        disc(part, surface, part.named("Tear"), (start[0] + tears.DRIFT, tears.TO - drop_tall * 0.4),
+        disc(part, surface, part.named("Tear"), (start[0] + drift, tears.TO - drop_tall * 0.4),
              drop_wide, drop_tall, LIFT[1], 10, taper=-0.5)
         half_width, sag, thick = tears.WELL
         places = [(middle[0] + half_width * (-1.0 + 2.0 * index / 6),
@@ -601,8 +610,9 @@ def build_round_crying(maker):
     tears = SimpleNamespace(**WIDE_TEARS)
     middles = glossy_eyes(part, surface, numbers, part.named("Dark"), part.named("White"), LIFT[3:])
     for middle in middles:
-        start = (middle[0] + tears.FROM[0], middle[1] + tears.FROM[1])
-        tear(part, surface, (part.named("Dark"), part.named("Tear"), part.named("Shine")), start, tears, LIFT[0:3])
+        side = 1.0 if middle[0] >= 0.0 else -1.0
+        start = (middle[0] + side * abs(tears.FROM[0]), middle[1] + tears.FROM[1])
+        tear(part, surface, (part.named("Dark"), part.named("Tear"), part.named("Shine")), start, tears, LIFT[0:3], side)
 
 
 def build_closed_crying(maker):
@@ -613,8 +623,8 @@ def build_closed_crying(maker):
     half_width, arch, thick = numbers.ARC
     for side in (1.0, -1.0):
         middle = (side * numbers.AT[0], numbers.AT[1])
-        start = (middle[0] + tears.FROM[0], middle[1] + tears.FROM[1])
-        tear(part, surface, (part.named("Tear"), part.named("Tear"), part.named("Tear")), start, tears, LIFT[0:3])
+        start = (middle[0] + side * abs(tears.FROM[0]), middle[1] + tears.FROM[1])
+        tear(part, surface, (part.named("Tear"), part.named("Tear"), part.named("Tear")), start, tears, LIFT[0:3], side)
         places, widths = [], []
         for index in range(numbers.STEPS + 1):
             along = -1.0 + 2.0 * index / numbers.STEPS

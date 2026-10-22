@@ -1075,3 +1075,15 @@ it rises per unit outwards), 20 segments (14), eye middle 0.006 above the middle
 stage, stage close, bust, side and game camera, before | after beside the art: [heroes-lasers-right-2026-10-22.jpg](../../research/evidence/heroes-lasers-right-2026-10-22.jpg).
 Checked: library 1,970 Genesis, 0 failures; `--budget` largest #630 7,981 (was 7,969), none over 8,000. Not exact: the near eye of the pictures is larger than the far one
 (perspective); ours are equal. The beam still hides most of the lower part of the eye from the front, as it does on the pictures.
+
+## 22 October 2026: the tears mirrored (lot 5c)
+
+The owner on the banana #321 (Round Crying): "why are the eyes and tears in the same direction?". The tears were placed with a signed offset toward -X for both eyes (as the
+three quarter pictures show them, on the left of each eye), which puts one on the outer side of its eye and the other on the inner side: seen from the front it reads as a
+mistake. `tear()` of `chog_trait_faces.py` now takes the side of its eye: the sideways numbers `FROM[0]` and `DRIFT` of `WIDE_TEARS`, `THIN_TEAR` and `CLOSED_TEARS` are
+magnitudes laid on the outer side of each eye, mirrored (the light streak of a wide tear lies on the inner side of each). Wide tears start 0.024 off the middle of the eye and drift
+0.008 outwards (0.008 and 0.004 before, towards -X); closed-eye tears 0.020 and 0.008 (0.004 and 0.004); thin tears 0.040 and 0.008 as before but mirrored. Values: Round Crying
+(69 Genesis), Round Tear (65), Closed Eye Crying (57), all Origin on Side Right (there are no tears on Side Left or on a Skull); `Teary` (54) has no tear drawn. Sheet,
+8 Genesis (#321, #6, #39, #92, #27, #21, #18, #76) on the stage, close, bust, side and game camera, before | after beside the art:
+[heroes-tears-2026-10-22.jpg](../../research/evidence/heroes-tears-2026-10-22.jpg). Checked: library 1,970 Genesis, 0 failures; `--budget` largest #630 7,981, none over 8,000 (no
+triangle changed). The pictures themselves draw the tears on the left of the picture for both eyes: ours follow the owner's rule, not the three quarter drawing.
