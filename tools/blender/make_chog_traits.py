@@ -560,7 +560,7 @@ ROUND = {
     "AT": (0.112, 0.006),
     "LINE": (0.060, 0.066),      # half width, half height of the dark disc around the eye
     "WHITE": (0.049, 0.055),
-    "PUPIL": (0.033, 0.039),
+    "PUPIL": (0.036, 0.042),     # (0.033, 0.039 until 22 October 2026: the pictures draw the pupil filling the white)
 }
 # The visor: one band that wraps the front of the head from one row of leaves to the other.
 VISOR = {
@@ -2204,13 +2204,16 @@ def build_happy(maker):
 
 
 def build_round(maker):
-    """Two round eyes: a white disc in a dark line, a large dark pupil in its middle."""
+    """Two round eyes: a white disc in a dark line, a large dark pupil in its middle (PUPIL None: no pupil)."""
     numbers = maker.numbers(ROUND)
     part, surface = maker.part(), maker.surface
     layers = ((numbers.LINE, "Dark", DRAWN[0]), (numbers.WHITE, "White", DRAWN[1]), (numbers.PUPIL, "Dark", DRAWN[2]))
     for side in (1.0, -1.0):
         middle = (side * numbers.AT[0], numbers.AT[1])
-        for (half_width, half_height), material, lift in layers:
+        for size, material, lift in layers:
+            if size is None:      # no pupil: the radioactive "Round Eye" is a white disc in a ring
+                continue
+            half_width, half_height = size
             full.add_skin(part, surface, full.patch_loops(surface, middle, half_width, half_height, 2.0, 0.0, lift,
                                                           2, 14), part.named(material))
 

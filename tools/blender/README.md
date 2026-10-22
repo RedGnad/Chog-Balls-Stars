@@ -845,3 +845,22 @@ from the game camera the face is mostly under the hood or the hat, so the change
 of Side=Right the cream points of the brow stand up into the crown; ours are skin-coloured teeth hanging down
 (unchanged). The radioactive hairline (`RADIOACTIVE_HAIRLINE`) is at a fixed height, now inside the taller
 face: it is for the eyes and mouths audit. `chog_one_of_one.py` and `export_chog_parts.py` were not touched.
+
+## 22 October 2026: the eyes and mouths against their art (lot 2)
+
+Every value of `Eyes` and `Mouth` of the base Origin (64 rows, `make_chog_faces_audit.py`), then the Radioactive and Skull
+bases, set beside the real pictures: [verdicts and what is wrong](../../research/evidence/heroes-faces-audit-2026-10-22.md),
+[before and after, turned and from the game camera](../../research/evidence/heroes-faces-fix-2026-10-22.jpg)
+(`make_chog_faces_before_after.py --views ...`).
+
+- **Origin**: 48 of 64 rows faithful, 16 approximate, none wrong. Fixed: `Round`, `Round Eye` (pupil 0.033/0.039 to
+  0.036/0.042 and 0.030/0.035 to 0.034/0.039) and `Dead` (stroke 0.022 to 0.030). Not fixed: the lasers (short beams by
+  design, thick and slanting down on Side=Left; the beam is the attack's), `MOG`, `Chog Viper`, `BTC Glass`, `Frog`,
+  `Sunset visor`, `Worried` and `Lip Bite` mouths (small differences of size and shade).
+- **Radioactive (30 Genesis, 17 eye values): all wrong, fixed.** The pictures draw the eye of the plain value with every black
+  line, ring and pupil in the colour of the variant (`RADIOACTIVE_EYE_INKS`: dark red, blue, green, purple), and a `Round Eye`
+  with no pupil (`PUPIL: None`, `RADIOACTIVE_EYE_NUMBERS`); the builder had only tinted the white and kept everything black.
+  The third eye (`3rd Eye`) is a tilted white almond in a thin dark-red outline (`almond()`), not a black oval with a pupil.
+  The hairline follows the taller face (`RADIOACTIVE_HAIRLINE`).
+- **Checked**: `-- --budget`: largest #710 7,971 triangles, none over 8,000; the 90 Skull and Radioactive Genesis built:
+  largest 7,980, none failed.
