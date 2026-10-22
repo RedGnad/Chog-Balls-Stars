@@ -479,6 +479,9 @@ def main():
     def attack_for(found, worn):
         """The piece a hero's basic attack throws and how it moves (see chog_attack_objects)."""
         key, style = attacks.attack_of(found.get("Head"))
+        costume = attacks.attack_of_costume(found.get("Head"), found.get("Body"))
+        if costume:
+            return attack_pieces[costume[0]], costume[1]
         if bases.is_skull(found) and not found.get("Head"):
             key, style = "Bone", attacks.TUMBLE
         if key == "HAT":
@@ -513,7 +516,8 @@ def main():
     heroes[RECRUIT] = ("Recruit", [index for key in recruit_keys for index in by_key[key]],
                        attack_pieces["Leaf"], attacks.TUMBLE)
 
-    labels = {number: attacks.label_of(everyone[number].get("Head"), bases.is_skull(everyone[number])) if number in everyone else
+    labels = {number: attacks.label_of(everyone[number].get("Head"), bases.is_skull(everyone[number]),
+                                       everyone[number].get("Body")) if number in everyone else
               "THROWS THE SPIKES OF ITS CROWN" for number in heroes}
     # A 1:1 Genesis says what it throws in its own words (chog_one_of_one.LINES).
     labels.update({number: line for number, line in traits.one.LINES.items() if number in heroes})

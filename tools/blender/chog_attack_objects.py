@@ -1,5 +1,6 @@
 """The objects of the basic attacks (15 October 2026): what a hero throws or strikes with, drawn from the
-picture of its Genesis, value by value of the trait "Head" (docs/ATTACKS-FROM-THE-ART.md, where the
+picture of its Genesis, value by value of the trait "Head", or of "Body" for a full costume, which covers
+the crown and comes without a hat (docs/ATTACKS-FROM-THE-ART.md, where the
 table of what each picture shows lives). export_chog_parts.py builds them into the library of parts the
 game reads; the game moves them (Assets/Chog/Match/ChogAttackLook.cs).
 
@@ -62,6 +63,18 @@ ATTACK_OF_HEAD = {
 # Every other value of "Head" that the library dresses: the hat itself, turning flat.
 HAT_THROWN = ("HAT", SPIN)
 
+# A full costume covers the crown and never comes with a hat (every recorded Genesis in one of them has
+# no "Head"): what it throws comes from the costume, as the art draws it (22 October 2026). The value of
+# "Body" -> (the object, how it moves). A Genesis in any other clothing throws what its "Head" gives.
+ATTACK_OF_BODY = {
+    "Dragon suit": ("Fireball", POINT),
+    "Shark Suit": ("WaterDrop", POINT),
+    "Banana suit": ("Banana", TUMBLE),
+    "Astro Suit": ("Planet", SPIN),
+    "Toad green Suit": ("LilyPad", SPIN),
+    "Gangster suit": ("MoneyBag", TUMBLE),
+}
+
 
 # What a player reads under the hero: the object, in words.
 WORDS = {
@@ -71,11 +84,15 @@ WORDS = {
     "RedRing": "ITS HEADBAND", "YellowRing": "MAGIC RINGS", "Spear": "SPEARS", "Arrow": "ARROWS",
     "MoneyBag": "MONEY BAGS", "Pizza": "PIZZA", "MiniChog": "LITTLE CHOGS", "Yarn": "BALLS OF YARN",
     "RainbowBall": "RAINBOWS", "Nose": "CLOWN NOSES", "Bone": "BONES",
+    "Fireball": "FIREBALLS", "WaterDrop": "WATER", "Banana": "BANANAS", "Planet": "LITTLE PLANETS",
+    "LilyPad": "LILY PADS",
 }
 
 
-def label_of(head_value, skull=False):
+def label_of(head_value, skull=False, body_value=None):
     """The line under a hero: what it throws, and from which trait."""
+    if not head_value and body_value in ATTACK_OF_BODY:
+        return "THROWS " + WORDS[ATTACK_OF_BODY[body_value][0]] + " FROM ITS " + body_value.upper()
     key, _ = attack_of(head_value)
     if not head_value:
         return "THROWS BONES" if skull else "THROWS THE SPIKES OF ITS CROWN"
@@ -87,6 +104,13 @@ def label_of(head_value, skull=False):
 def attack_of(head_value):
     """(object key, style) of a value of "Head" ("" or None for no hat)."""
     return ATTACK_OF_HEAD.get(head_value or "", HAT_THROWN)
+
+
+def attack_of_costume(head_value, body_value):
+    """(object key, style) a full costume gives a Genesis without a hat, or None."""
+    if head_value:
+        return None
+    return ATTACK_OF_BODY.get(body_value or "")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -361,6 +385,70 @@ def build_leaf(shapes, word_pieces):
     shapes.shell(rings, 6, SKIN, OUTLINE)
 
 
+def build_fireball(shapes, word_pieces):
+    """The fire a dragon breathes, pointing along -Y: a hot yellow head and a flame trailing behind it in
+    tongues of orange and red (drawn unlit, it glows)."""
+    tube(shapes, Y * -0.12, -FORWARD, [(0.0, 0.03), (0.03, 0.085), (0.08, 0.105), (0.15, 0.085), (0.24, 0.045),
+                                        (0.32, 0.0)], shapes.named("Flame"), sides=12)
+    ball(shapes, Y * -0.075, 0.075, shapes.named("Core"), outline=0.0, stacks=6, sides=10)
+    for angle in (90.0, 210.0, 330.0):
+        out = X * math.cos(math.radians(angle)) + Z * math.sin(math.radians(angle))
+        axis = (-FORWARD + out * 0.55).normalized()
+        tube(shapes, Y * 0.02 + out * 0.05, axis, [(0.0, 0.04), (0.10, 0.025), (0.19, 0.0)],
+             shapes.named("Tongue"), outline=OUTLINE * 0.8, sides=8)
+
+
+def build_water_drop(shapes, word_pieces):
+    """A ball of sea water, pointing along -Y: round in front, drawn out behind, a glint and two drops."""
+    tube(shapes, Y * -0.12, -FORWARD, [(0.0, 0.03), (0.03, 0.08), (0.09, 0.105), (0.16, 0.08), (0.25, 0.035),
+                                        (0.30, 0.0)], shapes.named("Water"), sides=12)
+    ball(shapes, Vector((0.045, -0.06, 0.06)), 0.028, shapes.named("Glint"), outline=0.0, stacks=4, sides=6)
+    for x, y, z, r in ((0.07, 0.24, 0.03, 0.03), (-0.06, 0.28, -0.02, 0.022)):
+        ball(shapes, Vector((x, y, z)), r, shapes.named("Water"), outline=OUTLINE * 0.7, stacks=5, sides=8)
+
+
+def build_banana(shapes, word_pieces):
+    """A banana: a curved, slightly squared fruit, thin at both ends, a brown stem and a dark tip."""
+    rings = []
+    radius, sweep, steps = 0.22, math.radians(110.0), 12
+    for index in range(steps + 1):
+        t = index / steps
+        angle = -sweep * 0.5 + sweep * t
+        centre = Vector((math.sin(angle) * radius, 0.0, (math.cos(angle) - 1.0) * radius + radius * 0.16))
+        outward = Vector((math.sin(angle), 0.0, math.cos(angle)))
+        thick = 0.012 + 0.046 * math.sin(math.pi * min(1.0, max(0.0, 0.08 + t * 0.84)))
+        rings.append((centre, outward * thick, Y * thick * 0.92))
+    shapes.shell(rings, 6, shapes.named("Peel"), OUTLINE)
+    start = Vector((math.sin(-sweep * 0.5) * radius, 0.0, (math.cos(sweep * 0.5) - 1.0) * radius + radius * 0.16))
+    along = Vector((-math.cos(sweep * 0.5), 0.0, -math.sin(sweep * 0.5)))
+    tube(shapes, start, along, [(0.0, 0.014), (0.045, 0.012)], shapes.named("Stem"), sides=6)
+    end = Vector((-start.x, 0.0, start.z))
+    ball(shapes, end, 0.014, shapes.named("Stem"), outline=0.0, stacks=4, sides=6)
+
+
+def build_planet(shapes, word_pieces):
+    """A little planet from space, as an astronaut would bring back: a ball and its tilted ring."""
+    ball(shapes, NOWHERE, 0.10, shapes.named("Planet"))
+    for x, y, z, r in ((0.04, -0.08, 0.04, 0.022), (-0.05, -0.07, -0.03, 0.016)):
+        ball(shapes, Vector((x, y, z)), r, shapes.named("Crater"), outline=0.0, stacks=4, sides=6)
+    tilt = Vector((0.35, 0.0, 1.0)).normalized()
+    torus(shapes, NOWHERE, tilt, 0.165, 0.016, shapes.named("Ring"), segments=28, sides=6)
+
+
+def build_lily_pad(shapes, word_pieces):
+    """The pad a toad sits on: a round green leaf with its notch, and a pink flower on it."""
+    points = [(0.0, 0.0)]
+    for index in range(19):
+        angle = math.radians(105.0 + 330.0 * index / 18)
+        points.append((math.cos(angle) * 0.16, math.sin(angle) * 0.16))
+    prism(shapes, points, NOWHERE, X, Y, 0.025, shapes.named("Pad"))
+    for index in range(5):
+        angle = 2.0 * math.pi * index / 5
+        at = Vector((math.cos(angle) * 0.03 - 0.02, math.sin(angle) * 0.03 - 0.03, 0.035))
+        ball(shapes, at, 0.026, shapes.named("Flower"), outline=OUTLINE * 0.6, stacks=4, sides=6, tall=0.7)
+    ball(shapes, Vector((-0.02, -0.03, 0.05)), 0.016, shapes.named("Heart"), outline=0.0, stacks=4, sides=6)
+
+
 # key -> (colours as seen on screen, keys drawn unlit, builder, the colour of what is left where it hits).
 OBJECTS = {
     "Snowball": ({"Snow": (0.96, 0.98, 1.0), "Shade": (0.80, 0.88, 0.97)}, (), build_snowball, (0.90, 0.95, 1.0)),
@@ -395,4 +483,13 @@ OBJECTS = {
                     build_rainbow_ball, (0.98, 0.86, 0.18)),
     "Nose": ({"Red": (0.91, 0.15, 0.17), "Glint": (1.0, 1.0, 1.0)}, ("Glint",), build_nose, (0.91, 0.15, 0.17)),
     "Bone": ({"Bone": (0.95, 0.94, 0.88)}, (), build_bone, (0.95, 0.94, 0.88)),
+    "Fireball": ({"Flame": (1.0, 0.50, 0.10), "Core": (1.0, 0.93, 0.45), "Tongue": (0.93, 0.22, 0.10)},
+                 ("Flame", "Core", "Tongue"), build_fireball, (1.0, 0.55, 0.15)),
+    "WaterDrop": ({"Water": (0.30, 0.66, 0.98), "Glint": (1.0, 1.0, 1.0)}, ("Glint",), build_water_drop,
+                  (0.45, 0.75, 1.0)),
+    "Banana": ({"Peel": (1.0, 0.85, 0.22), "Stem": (0.40, 0.26, 0.12)}, (), build_banana, (1.0, 0.88, 0.35)),
+    "Planet": ({"Planet": (0.98, 0.60, 0.30), "Crater": (0.85, 0.45, 0.22), "Ring": (0.96, 0.92, 0.78)}, (),
+               build_planet, (0.98, 0.92, 0.78)),
+    "LilyPad": ({"Pad": (0.30, 0.72, 0.35), "Flower": (0.98, 0.62, 0.78), "Heart": (1.0, 0.86, 0.30)}, (),
+                build_lily_pad, (0.30, 0.72, 0.35)),
 }
