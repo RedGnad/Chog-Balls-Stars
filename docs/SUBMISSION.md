@@ -13,25 +13,40 @@ submitting. Character counts are for the 8,000-character fields.
   that day (its page's own styles): project cards show the image at 16:9 and another view at 16:7,
   both `object-fit: cover`; so 1920 by 1080 with what matters inside the middle 16:7 band.
 
-**Short description** (asked by the owner on 23 October 2026: every strength, concise and striking; a hook, five benefits with
-proof, one call to action; every line is what the game does today)
+**Short description** (asked by the owner on 23 October 2026: every feature worth showing, concise and striking: a hook,
+the features grouped by what they give the player, one call to action. Checked that day against the code and the live
+services: rental up to 30 days, 10% burned; second form 100 $CHOG; 5% of lost stakes to the Genesis players; ladder
+Bronze to Star; seasons are off live and are not claimed)
 
 > **Your Chog Genesis, alive in a 3v3 arena.**
 >
-> Connect your wallet and your NFT becomes a 3D hero built from its own traits. All 1,969 Genesis, each
-> one different.
+> Connect your wallet: your NFT becomes a 3D hero built from its own traits, and fights the way it looks. All 1,969
+> Genesis, the skulls, the Radioactives and the ten 1:1s included.
 >
-> - **Your NFT is the character.** Its outfit gives its class, its eyes its special, its aura the effect,
->   what it wears or holds its attack: fireballs from a Dragon suit, snowballs from a Russian Hat,
->   spinning coins from a Dollar Cap.
-> - **Fast 3v3 on your phone.** Three-minute sieges or coin races in the browser, nothing to install;
->   bots fill the empty seats.
-> - **Wins nobody can fake.** Our server replays every match from Photon's own record of the inputs
->   before anything counts.
-> - **Real stakes on Monad.** Stake $CHOG on your team, rent or lend your Genesis, unlock its second
->   form; part of every payment is burned.
-> - **Your Genesis builds a legacy.** Its career, badges and mastery are written on Monad and follow the
->   NFT to its next holder.
+> **PLAY YOUR NFT**
+> - Traits are powers. The outfit gives the class (brute, ranger, controller), the eyes the special, the aura its
+>   effect, the rarity how it is delivered, and what it wears or holds the attack: fireballs from a Dragon suit,
+>   snowballs from a Russian Hat, spinning coins from a Dollar Cap.
+> - Fast 3v3 on your phone. Three-minute Sieges (towers that fire lasers from their eyes, a beating heart to break)
+>   or Coin races, in the browser, nothing to install. Bots fill the empty seats.
+>
+> **EARN WITH YOUR GENESIS**
+> - Rent it out by the day for $CHOG, up to 30 days, without it ever leaving your wallet. The rent is earned by the
+>   second.
+> - Play it in staked matches: the Genesis players share a cut of what the losers staked, win or lose.
+> - Lend it to a friend for free with a link.
+>
+> **NO GENESIS? PLAY ANYWAY**
+> - Rent a hero by the day, play a holder's link, or start as a Recruit and pick the Genesis you want.
+>
+> **STAKE $CHOG ON YOUR TEAM**
+> - Winners are paid on our server's replay of Photon's own record of the inputs: a win nobody can fake. Part of
+>   every payment is burned.
+>
+> **PROGRESS THAT STAYS WITH THE NFT**
+> - Each Genesis keeps a career on Monad (matches, wins, badges, mastery) that follows it to its next holder.
+>   Mastery 2 unlocks its second form, or buy it now with $CHOG. The best Genesis are listed in TOP.
+> - Every player climbs a ladder, Bronze to Star, on verified sieges.
 >
 > **Play now on your phone. No Genesis? Play a Recruit and find yours.**
 
@@ -167,7 +182,7 @@ proof, one call to action; every line is what the game does today)
 >
 > **4. Events, the cheapest players to win (next).** Weekly community nights, holders against
 > holders in 3v3, with $CHOG pots on the stake contract and every result replayed by our judge;
-> hosted with Chog and Monad community accounts. The ladder's seasons bring players back.
+> hosted with Chog and Monad community accounts. The player ladder, Bronze to Star, brings them back.
 >
 > **5. Playing adds value to the NFT.** Careers, badges and mastery are written on Monad and follow
 > the Genesis to its next holder.
