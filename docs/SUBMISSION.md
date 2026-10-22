@@ -20,11 +20,13 @@ submitting. Character counts are for the 8,000-character fields.
 > its mouth, its clothes and its skin, modelled by us for all 1,969 Genesis, the skulls, the radioactive
 > Chogs and the ten 1:1 included. The
 > traits decide how it plays: its outfit gives its class (brute, ranger, controller), its eyes its
-> special attack, its aura the effect of that attack, its rarity how the attack is delivered, and its
-> hat what its basic attack throws: snowballs from a Russian Hat, dollar coins from a Dollar Cap, its
-> own cap spinning like a frisbee from a word cap, a leaf of its spiky crown when it wears nothing;
-> a full costume throws what it is: fireballs from a Dragon suit, sea water from a Shark Suit,
-> bananas from a Banana suit, a little ringed planet from an Astro Suit.
+> special attack, its aura the effect of that attack, its rarity how the attack is delivered, and what
+> it holds or wears what its basic attack throws. First the object in its hand: knives, hot coffee,
+> candles, spinning coins or hearts. Then a full costume, which throws what it is: fireballs from a
+> Dragon suit, sea water from a Shark Suit, bananas from a Banana suit, a little ringed planet from an
+> Astro Suit. Then a rainbow if it pukes one. Then its hat: snowballs from a Russian Hat, dollar coins
+> from a Dollar Cap, its own cap spinning like a frisbee from a word cap, a leaf of its spiky crown
+> when it wears nothing.
 > Two modes: SIEGE, where each team defends a tower with a Chog's head that shoots lasers from its eyes
 > and a beating heart for a core, three minutes to bring the other core down or to do more damage; and
 > COINS, a race for the coins of the arena. Matches are played on Photon Quantum's deterministic engine; after each match our services replay
@@ -93,7 +95,7 @@ submitting. Character counts are for the 8,000-character fields.
 
 > Take the NFT out and there is no hero: without a Genesis you are a grey recruit with 10% less
 > health and no Genesis attack. With one, everything you see and do comes from its traits: the 3D
-> character is built from them, the basic attack throws what its hat shows, the special comes from
+> character is built from them, the basic attack throws what it holds or wears, the special comes from
 > its eyes and its aura, the class from its outfit. Ownership is read on Monad mainnet at sign-in and
 > checked again by the services when a match starts; a lent or rented Genesis plays under the same
 > rules.

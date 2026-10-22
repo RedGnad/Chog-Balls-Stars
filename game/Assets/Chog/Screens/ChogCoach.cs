@@ -145,7 +145,7 @@ namespace Chog.Screens
                     break;
                 case 1:
                     _title.text = "2/3  ATTACK";
-                    _text.text = keys ? "Left click throws your basic attack, the one your hat gives."
+                    _text.text = keys ? "Left click throws your basic attack, from what your Genesis holds or wears."
                         : "Drag the pink stick to aim, let go to throw your basic attack.";
                     break;
                 default:
