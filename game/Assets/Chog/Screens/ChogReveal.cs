@@ -75,8 +75,9 @@ namespace Chog.Screens
             var hero = roster.Entries[index];
             var lines = roster.CardLines(hero, GenesisForms.PlayedBy(hero.TokenId));
             Build(hero.MetadataId, GenesisHeroCard.DisplayName(hero).ToUpperInvariant(),
-                new[] { "ITS OUTFIT GIVES", "ITS HAT GIVES", "ITS EYES GIVE", "ITS AURA GIVES" },
-                new[] { lines[0].Gives, ChogHeroModel.AttackLine(hero.MetadataId), lines[1].Gives, lines[2].Gives });
+                new[] { "ITS OUTFIT GIVES", "ITS BASIC ATTACK", "ITS EYES GIVE", "ITS AURA GIVES" },
+                new[] { lines[0].Gives, ChogHeroModel.AttackWords.Short(ChogHeroModel.AttackLine(hero.MetadataId),
+                    (lines[0].Gives ?? "").ToLowerInvariant()), lines[1].Gives, lines[2].Gives });
 
             // The picture pops up, then turns over into the hero.
             yield return Animate(0.45f, t => _card.localScale = Vector3.one * Overshoot(t));

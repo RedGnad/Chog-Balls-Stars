@@ -92,6 +92,87 @@ namespace Chog.Match
             return !Off && Library != null && Library.TryGetHero(metadataId, out var hero) ? hero.AttackLine ?? "" : "";
         }
 
+        /// <summary>
+        /// The basic attack in words for a class (22 October 2026, the owner: the line said what a hero throws
+        /// and nothing of how its class attacks). "role" is the class id of the roster ("brute", "ranger",
+        /// "controller"), empty for a recruit. Kind: the class's attack, short ("CLOSE STRIKE"); Short: the
+        /// verb of that attack and the thing ("LOBS GREEN CANDLES"); Detail: a sentence with where the thing
+        /// comes from ("Lobs green candles from its hand, onto zones that hold ground.").
+        /// </summary>
+        public static class AttackWords
+        {
+            public static string Kind(string role)
+            {
+                switch (role)
+                {
+                    case "brute": return "CLOSE STRIKE";
+                    case "ranger": return "LONG SHOT";
+                    case "controller": return "LOBBED ZONE";
+                    default: return "THROW";
+                }
+            }
+
+            private static string Verb(string role)
+            {
+                switch (role)
+                {
+                    case "brute": return "STRIKES WITH";
+                    case "ranger": return "SHOOTS";
+                    case "controller": return "LOBS";
+                    default: return "THROWS";
+                }
+            }
+
+            private static string How(string role)
+            {
+                switch (role)
+                {
+                    case "brute": return "up close";
+                    case "ranger": return "fast, from a distance";
+                    case "controller": return "onto zones that hold ground";
+                    default: return "";
+                }
+            }
+
+            /// <summary>The thing thrown and where it comes from, out of a line of the library ("THROWS X FROM ITS Y").</summary>
+            public static (string thing, string from) Parts(string line)
+            {
+                var words = (line ?? "").Trim();
+                if (words.StartsWith("THROWS ", System.StringComparison.Ordinal))
+                    words = words.Substring("THROWS ".Length);
+                var cut = words.IndexOf(" FROM ", System.StringComparison.Ordinal);
+                return cut < 0 ? (words, "") : (words.Substring(0, cut), words.Substring(cut + " FROM ".Length));
+            }
+
+            public static string Short(string line, string role)
+            {
+                var (thing, _) = Parts(line);
+                return thing.Length == 0 ? "" : Verb(role) + " " + thing;
+            }
+
+            public static string Detail(string line, string role)
+            {
+                var (thing, from) = Parts(line);
+                if (thing.Length == 0)
+                    return "";
+                var verb = Verb(role).ToLowerInvariant();
+                var how = How(role);
+                // The thing and the trait keep their capitals (TISM, BTC): only the small words are lowered.
+                var said = char.ToUpperInvariant(verb[0]) + verb.Substring(1) + " " + Plain(thing)
+                           + (from.Length > 0 ? " from " + Plain(from) : "") + (how.Length > 0 ? ", " + how : "") + ".";
+                return said;
+            }
+
+            private static string Plain(string words)
+            {
+                var parts = words.Split(' ');
+                for (var i = 0; i < parts.Length; i++)
+                    if (parts[i] == "ITS" || parts[i] == "THE" || parts[i] == "OF")
+                        parts[i] = parts[i].ToLowerInvariant();
+                return string.Join(" ", parts);
+            }
+        }
+
         /// <summary>Whether this Genesis (by the number shown in its name) has its 3D hero.</summary>
         public static bool Has(int metadataId)
         {

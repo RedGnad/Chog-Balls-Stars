@@ -240,7 +240,9 @@ namespace Chog.Screens
             _classTile.color = role == "BRUTE" ? ChogTheme.Danger : role == "RANGER" ? ChogTheme.Confirm : role == "CONTROLLER" ? ChogTheme.Purple : ChogTheme.Quiet;
             _classTrait.text = "Class from its outfit: " + lines[0].Value;
 
-            Row(0, "BASIC: " + ChogHeroModel.AttackLine(hero.MetadataId), "From its hat.");
+            var roleId = (lines[0].Gives ?? "").ToLowerInvariant();
+            var attackLine = ChogHeroModel.AttackLine(hero.MetadataId);
+            Row(0, "BASIC: " + ChogHeroModel.AttackWords.Kind(roleId), ChogHeroModel.AttackWords.Detail(attackLine, roleId));
             Row(1, "SPECIAL: " + lines[1].Gives, Source("eyes", lines[1].Value, lines[1].Summary));
             Row(2, "EFFECT: " + lines[2].Gives, Source("aura", lines[2].Value, lines[2].Summary));
             Row(3, "DELIVERY: " + lines[3].Gives, Source("rarity", lines[3].Value, lines[3].Summary));

@@ -149,7 +149,12 @@ namespace Chog.Screens
                 stage.Mood(won);
 
                 var name = ChogUi.Title("Name", host.transform, new Vector2(0.06f, 0.21f), new Vector2(0.44f, 0.30f), 50f);
-                var attack = ChogHeroModel.AttackLine(metadataId);
+                // The basic attack in the words of the hero's class ("LOBS GREEN CANDLES").
+                var played = Resources.Load<GenesisRoster>("GenesisRoster");
+                var at = played != null && tokenId > 0 ? played.IndexOf(tokenId) : -1;
+                var roleId = at >= 0 && played.RoleIds != null && played.Entries[at].Role < played.RoleIds.Length
+                    ? played.RoleIds[played.Entries[at].Role] : "";
+                var attack = ChogHeroModel.AttackWords.Short(ChogHeroModel.AttackLine(metadataId), roleId);
                 name.text = (metadataId == ChogHeroModel.Recruit ? "RECRUIT" : "CHOG #" + metadataId)
                             + (attack.Length > 0 ? "\n<size=48%><color=#E9E4FF>" + attack.ToUpperInvariant() + "</color></size>" : "");
             }
