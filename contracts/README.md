@@ -103,6 +103,32 @@ put staking on a match in scope (decision D33 in `docs/STATUS.md`). The backend 
 tickets and results (`server/src/wager.js`, `referee.js`) and the screens that stake and collect
 (`WagerPanel`, `WagerResult`) exist since 11 October.
 
+## Version 2: the Genesis players' share (22 October 2026, decided by the owner; not deployed yet)
+
+Of what the losers of a match staked, `burnedShare` is burned and `genesisShare` is split equally
+between the wallets that played a Chog Genesis in the match, staked or not (at most six, named by
+the referee with the result and signed with it). With 500 and 500 a winner gains exactly what
+version 1 paid (a tenth is still taken from the lost stakes) and half of what version 1 burned
+goes to the Genesis players; a match without one burns their share; a draw or a refund pays none.
+Why: the Genesis carries the game and its players bring the collection to the arena, staked or not;
+their share never depends on the result, so none gains by losing. `settle` takes the list
+(`settle(bytes32,uint8,address[],bytes)`); the services read `genesisShare()` and sign version 1
+results as before while `WAGER_ADDRESS` still names version 1, and the game encodes the call for the
+version `/api/wager` tells it. Tests: `test/ChogWager.t.sol` (the split, the signed list, the cap,
+the deploy bound, a fuzz that every unit is with a winner, a Genesis player or burned).
+
+Deploying it (the owner, with the deploying keystore; the referee is the one version 1 knows,
+`0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34` read on chain on 22 October 2026), then setting the
+printed address as `WAGER_ADDRESS` of the services on Render:
+
+```sh
+cd contracts && REFEREE=0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34 ~/.foundry/bin/forge script \
+  script/DeployWager.s.sol --rpc-url monad --account chog-dev --broadcast
+```
+
+Matches staked on version 1 before the switch are no longer signed for it: anyone gives their
+stakes back an hour after the first stake (`refundExpired`).
+
 ## What the contract does
 
 `src/ChogWager.sol`, about 260 lines, no dependency, not upgradeable.
