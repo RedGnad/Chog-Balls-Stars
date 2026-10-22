@@ -1,5 +1,11 @@
 # État courant et décisions
 
+**22 October 2026, 09:50 UTC (lead: the game is Chog Balls Stars; held things and rainbows thrown first; deployed).**
+- **Deployed:** build `20261022T093755118Z-4b247ef2a30b4626b558767eb8c7cb3c`, stamp unchanged (`880d50523c1273a1`). The owner renamed the game Chog Balls Stars (Chog Arena is shared by many projects): menu title, loading page, page and app names, share texts, sign-in message, submission draft; the address `chogarena.vercel.app` is kept. The basic attack is chosen in the owner's order: the thing held in the hand (Accessory, 195 Genesis, the very part thrown as a hat is), then the rainbow of a Rainbow Puke mouth (145), then the full costume, the hat, the bone of a skull, the crown's spikes; each held thing has its own impact (`docs/ATTACKS-FROM-THE-ART.md`).
+- **Verified:** `?impacts=28,70,26,45,591,1002` and `23,74,103,112,226,1287`: candles, cup, coin, knife in flight, rainbows on their impact; export 1,970 Genesis, 0 failed; 175 view tests; 129 service tests; judge fixtures agree; `/api/wager` still version 2 after the services restarted.
+- **Known:** a dragon with a Rainbow Puke (#226) now throws rainbows, not fire, as the owner's order says. The 09:36 push restarted the services while the owner may have been playing.
+**Next action:** the owner's 3D review lots (costumes item 2 onwards, faces lot 8).
+
 **22 October 2026, 09:10 UTC (wager version 2 live on the services).**
 - The owner set `WAGER_ADDRESS` to `0xc2c1e282dd8c1cc2a4689972ac9c48d3b1454425` on Render and redeployed by hand: `/api/wager` answers version 2, burnedShare 500, genesisShare 500, the referee of version 1. The dashboard value is what the service reads (the service is not synced from `render.yaml`; "Save only" keeps the old process running until a manual deploy).
 - Owner's review of the heroes in the game, sent to the two 3D agents as lots: eyes under glasses, mouth shapes and offsets, laser beams off the pupil (faces); ushanka height, clown nose a little out, hair through the red headband, Spartan helmet spikes, dragon belly from the side, balaclava, clothes and their motifs, headband height (costumes).
