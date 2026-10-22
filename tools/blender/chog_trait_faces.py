@@ -1375,6 +1375,13 @@ EYES = {
 
 EYES_OF_SIDE = {
     "Left": {
+        # (22 October 2026, CHOG #925, #1430, #1207, #1405, the skull among them) the near eye, on the left of the
+        # picture, is a long flat stroke whose right end is higher, the far eye a short arch: not the two equal arches of
+        # Side=Right.
+        "Happy": {
+            "kind": "Happy", "colours": {"Dark": DARK}, "unlit": ("Dark",),
+            "numbers": {"EYE_ARCS": {-1.0: (0.066, 0.026, 0.019, 0.034), 1.0: (0.032, 0.032, 0.013, 0.0)}},
+        },
         # The lasers of Side=Left: lidded eyes, and beams of other colours (CHOG #893, #252, #565, #1658),
         # most of their sides the light core with an edge of the darker colour under it.
         "Purple laser": {

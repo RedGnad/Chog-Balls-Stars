@@ -13,13 +13,13 @@ turned and from the game camera, is `heroes-faces-fix-2026-10-22.jpg`.
 
 | Group | Rows | Faithful | Approximate | Wrong |
 | --- | --- | --- | --- | --- |
-| Eyes, Origin | 43 | 29 | 14 (3 fixed) | 0 |
+| Eyes, Origin | 43 | 28 | 15 (4 fixed) | 0 |
 | Mouths, Origin | 21 | 19 | 2 | 0 |
 | Eyes, Radioactive (17 values, 30 Genesis) | 17 | 0 before, 17 after | 0 | 17 before, 0 after |
-| Eyes, Skull (17 of 25 values looked at) | 17 | 13 | 4 (Dead, three lasers) | 0 |
+| Eyes, Skull (25 of 25 value and Side pairs looked at) | 25 | 18 (Happy Left fixed) | 7 (Dead, five lasers, Side Eye Left) | 0 |
 | Third eye (Head `3rd Eye`, 4 Genesis) | 1 | 0 before, 1 after | 0 | 1 before |
 
-The Origin eyes and mouths were not the problem: no value is wrong, the three most worn approximate ones were fixed.
+The Origin eyes and mouths were not the problem: no value is wrong, the four most worn approximate ones were fixed.
 The Radioactive eyes were all wrong, in one way.
 
 ## The Radioactive coloured eyes (30 Genesis): wrong, fixed
@@ -65,12 +65,35 @@ Left approximate, not fixed (said so, with their cause):
 - `MOG`, `Chog Viper`, `BTC Glass`, `Frog`, `Sunset visor`, the Skull `Dead` cross (larger on the skulls than on Origin):
   small differences of size and shade, listed below.
 
-## Skull base (spot check, 17 of the 25 eye values)
+## Skull base (spot check, 17 of the 25 eye values; the other 8 are in the section after this one)
 
 #121 Purple laser, #459 Angry, #54 Dead, #207 Worried, #729 Green laser, #122 Vertical, #373 fire laser, #540 Smirk, #81
 Frog, #155 Happy, #483 Modern VR, #846 Flat, #1079 Normal, #1088 Thug, #1313 Up, #1331 XD, #1819 Flat: faithful, except
 Dead (cross smaller than the sockets of the picture) and the three lasers (beam length, as above), approximate. The skulls'
 jaw and teeth belong to the base, not to this audit.
+
+## Skull base, the 8 values not looked at (lot 4b, 22 October 2026)
+
+The 17 values of the spot check above were 17 of the 25 pairs of (eye value, Side) that the 90 Skull Genesis wear. The 8 left
+(found by listing the Skull Genesis of `genesis-metadata.jsonl` and taking away the 17 seen) are: **Purple laser, Left**
+(#418, #1647), **Angry, Left** (#993, #1221), **Happy, Left** (#1207, #1405), **Classic VR, Left** (#259), **Round, Right**
+(#1045), **Side Eye, Left** (#1107), **Retard, Left** (#1267) and **cyan laser, Left** (#1426). Each was set beside its
+picture and two more of the value (the other Skull Genesis, or the same value on the Origin base for the five worn once):
+[heroes-skull-eyes-2026-10-22.jpg](heroes-skull-eyes-2026-10-22.jpg), bust, front, side, game camera, before | after. The
+Left values of the Skull are drawn with the same eye builders as on Origin (only the Right `Flat`, `Normal`, `Up` and `Angry`
+have dark sockets, already audited).
+
+| Value | Genesis | Verdict | What is wrong |
+| --- | --- | --- | --- |
+| Angry, Left | #993, #1221 | faithful | white eye under a lid sloping to the nose, pupil to the right of the picture, glint: as the pictures (and #410, #425 of Origin) |
+| Classic VR, Left | #259 | faithful | black visor with its slanting white stripes, a light frame; stripes a little whiter than the pictures' grey |
+| Retard, Left | #1267 | faithful | large round whites, the near pupil low on the left, the far one to the right (as #32 and #1249) |
+| Round, Right | #1045 | faithful | dark disc in a white ring, no pupil, as the pictures; a little smaller than the near eye of the picture |
+| Side Eye, Left | #1107 | approximate | half lid and glint right; the far eye of the picture has a pink iris, ours is dark (small) |
+| Happy, Left | #1207, #1405 (and Origin #925, #1430, 33 Genesis) | wrong shape, fixed | two equal tall arches; the pictures draw a long flat stroke, its right end higher, on the near eye and a short arch on the far one: `EYES_OF_SIDE["Left"]["Happy"]`, `HAPPY["EYE_ARCS"]` (near eye half width 0.066, arch 0.026, rise 0.034; far 0.032, 0.032, 0.013) |
+| Purple laser, Left; cyan laser, Left | #418, #1647; #1426 | approximate | beams thick, short, slanting down where the pictures draw them level, a thin core: lot 4d |
+
+None was wrong enough to change beyond Happy (Left). Still approximate, listed: Side Eye (far eye iris), the lasers (lot 4d).
 
 ## The 64 Origin rows
 
@@ -101,7 +124,7 @@ jaw and teeth belong to the base, not to this audit.
 | 20 | Plasma visor | Right | 43 / 43 (#82, #60, #93) | Eyes_Visor | faithful |  |
 | 21 | Side Eye | Left | 34 / 35 (#983, #1442, #1764) | Eyes_SideEye | faithful |  |
 | 22 | Base | Left | 33 / 33 (#1120, #198, #220) | Eyes_BaseEye | faithful |  |
-| 23 | Happy | Left | 33 / 35 (#925, #1430, #1920) | Eyes_Happy | faithful |  |
+| 23 | Happy | Left | 33 / 35 (#925, #1430, #1920) | Eyes_Happy | approximate | two equal tall arches where the pictures draw a long flat stroke, its right end higher, for the near eye and a short arch for the far one (fixed 22 Oct, lot 4b, seen on the Skull #1207 and #1405: `EYES_OF_SIDE` Left `Happy`) |
 | 24 | MOG | Left | 32 / 32 (#162, #176, #181) | Eyes_Goggles | approximate | goggles narrower than the big wrapped goggles of the picture |
 | 25 | Vertical | Left | 31 / 34 (#895, #1897, #1923) | Eyes_Vertical | faithful |  |
 | 26 | Flat | Left | 30 / 32 (#671, #1731, #1824) | Eyes_FlatEye | faithful |  |
@@ -123,7 +146,7 @@ jaw and teeth belong to the base, not to this audit.
 | 42 | cyan laser | Left | 17 / 18 (#25, #1142, #1151) | Eyes_Laser | approximate | same beams as Purple laser Left |
 | 43 | Thug | Left | 15 / 17 (#141, #203, #250) | Eyes_PixelShades | faithful |  |
 
-Rows: approximate 14 (630 Genesis), faithful 29 (1239 Genesis).
+Rows: approximate 15 (663 Genesis), faithful 28 (1206 Genesis).
 
 ### Mouth (21 rows, sorted by Genesis count)
 

@@ -53,19 +53,27 @@ def main():
     parser.add_argument("--quality", type=int, default=78)
     parser.add_argument("--views", default=None, help="caption:picture name pairs separated by commas, for instance "
                         "'bust:bust,front:turn_000' (default: bust, front, three quarter, side and game camera at phone size)")
+    parser.add_argument("--more", default=None, help="more pictures of the art, for the rows that name them: "
+                        "'number=other+other,number=other' (the pictures of other Genesis that wear the same value, "
+                        "after the art of the row)")
     parser.add_argument("--title", default="Face fill: the art, then before | after for each view")
     arguments = parser.parse_args()
     views = tuple(tuple(pair.split(":", 1)) for pair in arguments.views.split(",")) if arguments.views else VIEWS
     size, label = arguments.size, 150
     numbers = [word.strip() for word in arguments.genesis.split(",") if word.strip()]
-    columns = 1 + 2 * len(views)
+    more = {}
+    for item in (arguments.more.split(",") if arguments.more else []):
+        key, _, others = item.partition("=")
+        more[key.strip()] = [word.strip() for word in others.split("+") if word.strip()]
+    arts = 1 + max([len(others) for others in more.values()] or [0])
+    columns = arts + 2 * len(views)
     width, head = label + columns * size, 40
     sheet = Image.new("RGB", (width, head + len(numbers) * size), (245, 243, 238))
     draw = ImageDraw.Draw(sheet)
     draw.text((6, 4), arguments.title, font=font(15), fill=(20, 20, 20))
     draw.text((label, 22), "art", font=font(12), fill=(20, 20, 20))
     for index, (caption, _) in enumerate(views):
-        left = label + size * (1 + 2 * index)
+        left = label + size * (arts + 2 * index)
         draw.text((left + 2, 22), f"{caption}: before", font=font(12), fill=(20, 20, 20))
         draw.text((left + size + 2, 22), "after", font=font(12), fill=(20, 20, 20))
     for row, number in enumerate(numbers):
@@ -74,13 +82,16 @@ def main():
         for line, text in enumerate((f"CHOG #{number}", f"Side {traits.get('Side', '?')}", f"Body: {traits.get('Body')}",
                                      f"Head: {traits.get('Head')}")):
             draw.text((6, top + 6 + line * 17), text, font=font(13 if line else 15), fill=(20, 20, 20))
-        sheet.paste(Image.open(os.path.join(ART, f"{number}.jpg")).convert("RGB").resize((size, size), Image.LANCZOS),
-                    (label, top))
+        for column, shown in enumerate([number] + more.get(number, [])):
+            sheet.paste(Image.open(os.path.join(ART, f"{shown}.jpg")).convert("RGB").resize((size, size), Image.LANCZOS),
+                        (label + column * size, top))
+            if column:
+                draw.text((label + column * size + 3, top + 3), f"#{shown}", font=font(11), fill=(20, 20, 20))
         for index, (_, name) in enumerate(views):
             for shift, folder in enumerate((arguments.before, arguments.after)):
                 path = os.path.join(folder, number, f"chog_{number}_{name}.png")
                 picture = Image.open(path).convert("RGB")
-                sheet.paste(picture.resize((size, size), Image.LANCZOS), (label + size * (1 + 2 * index + shift), top))
+                sheet.paste(picture.resize((size, size), Image.LANCZOS), (label + size * (arts + 2 * index + shift), top))
     os.makedirs(os.path.dirname(os.path.abspath(arguments.out)), exist_ok=True)
     sheet.save(arguments.out, quality=arguments.quality, optimize=True)
     print(f"{arguments.out}: {sheet.size[0]}x{sheet.size[1]}, {os.path.getsize(arguments.out) / 1e6:.2f} MB")

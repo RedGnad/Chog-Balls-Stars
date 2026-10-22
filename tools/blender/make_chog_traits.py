@@ -555,6 +555,10 @@ HAPPY = {
     "AT": (0.110, 0.012),
     "ARC": (0.050, 0.034, 0.017),    # half width, height of the arch, thickness in its middle
     "STEPS": 8,
+    # An arch of its own for each eye (22 October 2026, Side=Left, read on CHOG #925, #1430, #1207, #1405): {side: (half
+    # width, height of the arch, thickness in its middle, how much higher its right end stands than its left)}, side -1 the
+    # eye on the left of the picture (the near eye), +1 the other. None: both eyes the same, ARC.
+    "EYE_ARCS": None,
 }
 ROUND = {
     "AT": (0.112, 0.006),
@@ -2196,14 +2200,17 @@ def build_happy(maker):
     """Two closed eyes: arches, thick in their middle."""
     numbers = maker.numbers(HAPPY)
     part, surface = maker.part(), maker.surface
-    half_width, arch, thick = numbers.ARC
     steps = numbers.STEPS
     for side in (1.0, -1.0):
+        half_width, arch, thick = numbers.ARC
+        rise = 0.0
+        if numbers.EYE_ARCS:
+            half_width, arch, thick, rise = numbers.EYE_ARCS[side]
         places, widths = [], []
         for index in range(steps + 1):
             along = -1.0 + 2.0 * index / steps
             hollow = 1.0 - along * along
-            places.append((side * numbers.AT[0] + along * half_width, numbers.AT[1] + arch * (hollow - 0.5)))
+            places.append((side * numbers.AT[0] + along * half_width, numbers.AT[1] + arch * (hollow - 0.5) + rise * along * 0.5))
             widths.append(thick * (0.45 + 0.55 * hollow ** 0.7))
         draw_line(part, surface, part.named("Dark"), places, widths, DRAWN[0])
 

@@ -953,3 +953,21 @@ camera at phone size: [heroes-astro-glass-2026-10-22.jpg](../../research/evidenc
   no blending. Not verified in Unity: no build was made for this lot.
 
 Still wrong: the hose and the flag are small at the size of the game (lot 4c).
+
+## 22 October 2026: the 8 Skull eye values never looked at (lot 4b)
+
+The audit had looked at 17 of the 25 (eye value, Side) pairs the 90 Skull Genesis wear. The 8 left: Purple laser Left (#418,
+#1647), Angry Left (#993, #1221), Happy Left (#1207, #1405), Classic VR Left (#259), Round Right (#1045), Side Eye Left (#1107),
+Retard Left (#1267), cyan laser Left (#1426). Each was set beside its picture and two more pictures of the value (other
+Skull Genesis, or the same value on the Origin base): [sheet](../../research/evidence/heroes-skull-eyes-2026-10-22.jpg)
+(`make_chog_faces_before_after.py`, new `--more` option for the extra pictures), verdicts in
+[the audit](../../research/evidence/heroes-faces-audit-2026-10-22.md).
+
+- **Faithful**: Angry Left, Classic VR, Retard Left, Round. **Approximate**: Side Eye Left (the far eye of the picture has a
+  pink iris, ours is dark), the two lasers (beams, lot 4d).
+- **Wrong, fixed: Happy on Side=Left** (33 Origin Genesis and 4 Skull). The pictures draw the near eye (left of the picture) as
+  a long flat stroke whose right end is higher, and the far eye as a short arch; the builder drew the two equal tall arches of
+  Side=Right. `EYES_OF_SIDE["Left"]["Happy"]` (`chog_trait_faces.py`) with the new `HAPPY["EYE_ARCS"]` (an arch of its own per
+  eye: half width, height, thickness, rise; `build_happy`, `make_chog_traits.py`): near eye 0.066, 0.026, 0.019, rise 0.034;
+  far eye 0.032, 0.032, 0.013, no rise. Seen on #925, #1430, #1207 and #1405 only; the other Happy Left Genesis follow by the
+  value. Side=Right Happy is unchanged.
