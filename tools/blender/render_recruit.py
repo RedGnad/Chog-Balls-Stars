@@ -199,11 +199,12 @@ def main():
     parser.add_argument("--name", default="recruit", help="the folder under --out and the name of the pictures")
     parser.add_argument("--out", default=DEFAULT_OUT, help="the folder that receives the folder of the pictures")
     parser.add_argument("--only", default="studio,game,turnaround", help="the families of render_chog_traits.py")
+    parser.add_argument("--size", type=int, default=504, help="side of a large picture (the stage pictures use it when it is not 504)")
     arguments = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
     folder = os.path.join(os.path.abspath(arguments.out), arguments.name)
     blend = os.path.join(folder, "ChogBody.blend")
     build_hero(os.path.abspath(arguments.library), arguments.hero, blend)
-    pictures.render_one(arguments.name, blend, folder, arguments.only)
+    pictures.render_one(arguments.name, blend, folder, arguments.only, size=arguments.size)
 
 
 if __name__ == "__main__":

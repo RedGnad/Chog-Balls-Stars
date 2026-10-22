@@ -136,12 +136,23 @@ POLISH = {
     # (Until then: a rounded square 0.250 from its middle, 0.305 at the brow, 0.178 high, which left 0.04 of
     # bare skin each side of the cheeks and 0.12 above the brow: the owner saw a delimited oval, smaller than
     # the face of the pictures. FACE_FIT 0.85 at the cheeks, 0.47 at the brow corner.)
-    "FACE_FIT": 0.985,
-    "FACE_TOP": 0.235,
+    # (22 October 2026, the owner on the recruit on the pedestal: "the forehead is too big now", "the face is too high", "the
+    # bottom does not reach the neck". Measured on the pictures of the bare Genesis (#76, #75, #112, #237, #432 at 1000 points):
+    # from the eyes up to the middle of the hair line is about 0.9 of the distance from the eyes to the mouth, and from the
+    # eyes down to the chin about twice that, so the cream face is tall below the eyes and short above them. FACE_TOP 0.235
+    # to 0.125 above the middle of the face (the eyes stand 0.012 above it: the hair line 0.09 above them, the teeth of hair
+    # 0.040 long, FRINGE_DROP 0.050 before), and the chin FACE_HALF_HEIGHT 0.178 to 0.196, which takes it to 0.246 under the
+    # middle of the head, 0.004 from the lowest point of the egg: the cream now wraps under the chin, to the neck. FACE_FIT
+    # 0.985 to 0.96: at the very edge the face turns away from the camera and the rim of the game's shader (a warm white
+    # added at the edges that face the key) turns its cream white, a sliver along the outline that was a skin ring
+    # before the face filled the head; 0.96 keeps most of the fill and leaves the grazing part to the skin.)
+    "FACE_FIT": 0.96,
+    "FACE_HALF_HEIGHT": 0.196,
+    "FRINGE_DROP": 0.040,
+    "FACE_TOP": 0.125,
     "FACE_SQUARENESS": 4.0,
     "CHEEK": (0.180, -0.062, 0.046, 0.032),
     "FRINGE_WIDTH": 0.088,
-    "FRINGE_DROP": 0.050,
     # The face lies on the head (18 October 2026, see add_settled_face): it stands FACE_LIFT off the egg of
     # the head (0.012 until then), in five rings evenly spaced over the head and 24 points round its edge
     # evenly spaced along it, so that each triangle of the face keeps above the head.
@@ -151,7 +162,13 @@ POLISH = {
     # hair. (A face 0.0030 off the egg let a point of the head show through it at the cheek: the quads by its
     # edge sag up to 0.0032 between their corners.)
     "FACE_LIFT": 0.0046,
-    "FACE_OVER": (0.0008, 0.0038),
+    # (22 October 2026, the specks inside the cheeks seen on the hero stage: FACE_OVER was (0.0008, 0.0038). The cheek is
+    # a fan of 12 triangles, its flat triangles sag under the egg between their corners, and so do those of the face, a
+    # little differently: measured on the 10,400 points of the two cheeks of #75 (check_face_overlaps.py --decals) the
+    # cheek stood 0.00014 over the face at its lowest, so a pixel here and there showed the cream through the pink. Now
+    # 0.0020 and 0.0052, and every layer drawn above them 0.0014 higher (settled(), LIFT of chog_trait_faces.py), which
+    # keeps their order: the lowest point of the cheeks is 0.0014 over the face, of an eye 0.0027.)
+    "FACE_OVER": (0.0020, 0.0052),
     "FACE_RING_SHARES": (0.2, 0.4, 0.6, 0.8, 1.0),
     "FACE_SEGMENTS": 24,
     "FACE_EDGE": (0.012, 0.0012, 0.0020, 0.005, 0.012),
@@ -171,7 +188,7 @@ DRAWN_BEFORE = (0.0245, 0.0277, 0.0307, 0.0337, 0.0367, 0.0397)
 
 def settled(lift):
     """Where a drawn layer that stood "lift" off the head until 18 October 2026 lies now."""
-    return 0.0066 + (lift - 0.0232) * (0.0011 / 0.0018)
+    return 0.0080 + (lift - 0.0232) * (0.0011 / 0.0018)     # 0.0066 until 22 October 2026, see FACE_OVER
 
 
 DRAWN = tuple(settled(lift) for lift in DRAWN_BEFORE)

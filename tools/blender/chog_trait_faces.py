@@ -52,7 +52,7 @@ X, Y, Z = Vector((1.0, 0.0, 0.0)), Vector((0.0, 1.0, 0.0)), Vector((0.0, 0.0, 1.
 # that a tear can lie under an eye and a glint over it. (0.0232 to 0.0358, 0.0018 apart, until 18 October
 # 2026: the eyes and mouths stood out of the face like sheets. Now on it: settled() of make_chog_traits.py
 # says the rule, the lowest layer 0.0012 over the cheeks, each next one 0.0011 higher.)
-LIFT = tuple(0.0066 + 0.0011 * layer for layer in range(8))
+LIFT = tuple(0.0080 + 0.0011 * layer for layer in range(8))    # 0.0066 + ... until 22 October 2026 (FACE_OVER in make_chog_traits.py)
 
 DARK = (0.05, 0.05, 0.05)
 WHITE = (0.95, 0.95, 0.95)
