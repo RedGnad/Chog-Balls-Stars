@@ -1,5 +1,12 @@
 # État courant et décisions
 
+**22 October 2026, 01:20 UTC (lead: costumes attack, full face, ladder and economy lots deployed).**
+- **Deployed:** build `20261022T010049645Z-64406dda6bec4f97800607be4f87ed3d` (simulation stamp unchanged, `f4a81f1ddbd919b6`, no new Photon version), from `lead/integration` fast-forwarded into `main`.
+- **In it:** full costumes give the basic attack (`chog_attack_objects.ATTACK_OF_BODY`: Dragon fireball with a flame trail, Shark water with bubbles, Banana, Astro planet, Toad lily pad, Gangster money bag; 147 Genesis that threw a crown leaf under their hood); the face fills the front of the head (`stream/heroes-faces` e6f9091, sheet `research/evidence/heroes-face-fill-2026-10-22.jpg`); ladder lots 3-4 (hidden Elo as a band, seasons on the API) with the room band C0 kept off behind `RATING_BAND_ROOMS=1` until a public room creation is checked; economy lots 2-3 (stake card on the result screen, cheapest rentals and rental ledger, home balance in dollars). Build requests accept `clean` (a stale IL2CPP cache failed to link the result screen's async methods).
+- **Verified:** 127 service tests, 168 view tests, typecheck of Chog.Match, Chog.Editor and Assembly-CSharp; library export 1,970 Genesis, 0 failed; `?impacts=16,116,37,249,32,40` shows each costume throwing its object and its impact; a local Recruit bot match through to the result screen without exception; judge fixtures agree.
+- **Not verified:** the stake card with a real stake, the rental card with live offers, the dragon/shark/astronaut suits themselves (remodel is lot 3 of the 3D stream), eyes and mouths (lot 2 running).
+**Next action:** owner review of the costumes in a match; lot 2 (eyes and mouths) then lot 3 (dragon, astronaut, shark suits) on `stream/heroes-faces`.
+
 **21 October 2026 (result-room release deployed for owner review).**
 - **Deployed with explicit owner authorization:** `stream/result-home` was fast-forwarded into `main` at `bba8b5e`, then Vercel deployed `https://chogarena.vercel.app/`. Its public page serves WebGL version `20261021T180233353Z`; the Render Photon endpoint reports the same build. The packaged build is `20261021T180233353Z-10023a260d094a11a4f9bda80ed53acb`, with unchanged simulation stamp `f4a81f1ddbd919b6`.
 - **Verified before deployment:** the full release suite and two judge fixtures passed as recorded below. A local Recruit bot match reached and retained the result screen after Photon room closure. The release page and backend version were checked publicly after deployment.
