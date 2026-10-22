@@ -1325,3 +1325,20 @@ hero stage side, hero stage, game camera in front).
   (0.011 off the volume, 0.008 at least) so that painted it does not stand off as a slab; flush it fought the volume.
 - **Checked**: 6 dragons before | after; `--budget`: largest #630 7,991, none over 8,000; library 1,970 Genesis, 0 failures. Not verified in Unity. The edge of the belly follows the faces
   of the collar and of the volume (steps, not a smooth outline); the art draws a rounded oval.
+
+### 7.6 The balaclava (Head Robber, 24 Genesis)
+
+Sheet: [costumes-balaclava-2026-10-22.jpg](../../research/evidence/costumes-balaclava-2026-10-22.jpg) (8 Genesis, the art then before | after: front close, three quarter, side, back
+three quarter, game camera behind, hero stage).
+
+- **What the art draws** (#14, #86, #319, #460, #630, #652, #781, #1960): a dark grey knitted mask wrapping the whole head as one smooth volume, fine ribs running up it, down to the
+  neck under the chin, no mouth hole; two large almond holes, each with a thin rolled edge, through which the face and the eye show. The owner: "bugged: a flat grey block with seams, the eye holes
+  thick rings".
+- **Rebuilt** (`BALACLAVA`, `build_balaclava`): one shell over the whole head, rows of points from the top to the lower edge under the chin (158 degrees at the front), at 20 angles
+  closer together at the front; the faces whose centre falls in a hole (`HOLE`, cut at 0.86 of the almond) are left out, and a thin rolled edge (12 stations, 4 sides) follows the almond
+  and covers the jagged cut; ribs (9 angles, a piece is left out where it would lie across a hole) darker than the knit. The flat panel 0.030 off the face, the flat bridge, the
+  thick rings and the seams are gone.
+- **Crown**: the top leaf and the top of the back row are gone (`ROBBER_POINTS`: no spike above a mask that wraps the head smooth; the art shows them only on the far side); the pairs stay and come
+  through the knit (`THROUGH`).
+- **Triangles**: the mask 1,312 (1,040), the base 280 less (two leaves fewer): #630 7,983, the heaviest Robber; `--budget` largest #630 7,983, none over 8,000.
+- **Not verified in Unity.** The pairs of leaves at both sides are larger than the few spikes the art shows on its far side; the lower edge has no cuff, the art draws a thick rolled edge.
