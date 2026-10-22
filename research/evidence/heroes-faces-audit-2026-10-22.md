@@ -178,6 +178,9 @@ Batch 5, Side Left ([sheet](heroes-eyes-batch5-2026-10-22.jpg)), same rule:
 
 Rows still to redo strictly: Retro Glass R (the rest), then Side Left: Chog Viper (shape), Classic VR, Modern VR, 3D Glass, BTC Glass, Thug, and the lasers of Left.
 
+Batch 6, Side Left glasses ([sheet](heroes-eyes-batch6-2026-10-22.jpg)): Classic VR (#46, #124) approximate, Modern VR (#491, #219, #227) approximate, made closer (taller visor), 3D Glass (#361, #419, #424)
+approximate (lenses a little small), BTC Glass (#189, #288, #510) approximate (coins a little small), Thug (#141, #203, #250) faithful as far as seen. Still to do: the Left lasers, Chog Viper shape, Retro Glass R (the rest).
+
 ## The 64 Origin rows
 
 <!-- audit table start -->
