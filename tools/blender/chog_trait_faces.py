@@ -111,6 +111,12 @@ CLOWN = {
     "SLOPE": 0.05,
     "GLINTS": ((-0.020, 0.006, 0.010, 0.012),),
     "MARK": (0.088, 0.078, 0.026),
+    # (22 October 2026, batch 5 on #178, #206, #224, #245, #142, #57, #70: the near eye a large flat eye 0.064 by 0.050 under a lid that ends in a flick at the left, a big glint, and a tall
+    # mark, a kite pointed up, 0.130 above and 0.060 below, 0.030 wide; the far eye a narrow oval 0.030 by 0.056 with a narrower mark, 0.100 above, 0.034 below, 0.020 wide.)
+    "EYES": {-1.0: {"SIZE": (0.064, 0.050), "AT": (0.122, -0.002), "CUT": 0.14, "SLOPE": 0.0, "LID": (0.016, 0.004, 0.034),
+                    "GLINTS": ((-0.026, 0.004, 0.012, 0.018),), "MARK": (0.130, 0.060, 0.030)},
+             1.0: {"SIZE": (0.030, 0.056), "AT": (0.106, 0.004), "CUT": 0.22, "SLOPE": 0.0, "LID": (0.012, 0.002, 0.004),
+                   "GLINTS": ((-0.004, 0.012, 0.007, 0.020),), "MARK": (0.100, 0.034, 0.020)}},
 }
 # A round shiny eye: a dark ring, the white, a large pupil and two glints ("Teary", and under the
 # tears of "Round Tear" and "Round Crying"). Half sizes; glints as in SIDE_EYE.
@@ -203,7 +209,13 @@ WHITE_EYE = {
 # "Angry": a half disc under a straight lid that slopes down towards the nose; a large pupil looks to
 # the right of the picture, cut by the lid.
 ANGRY = {**WHITE_EYE, "SIZE": (0.056, 0.050), "LID": (0.22, 0.22, 0.015, 0.014), "PUPIL": (0.040, 0.046),
-         "LOOK": ((0.020, -0.010), (0.020, -0.010)), "GLINTS": ((-0.012, 0.004, 0.010, 0.011),)}
+         "LOOK": ((0.020, -0.010), (0.020, -0.010)), "GLINTS": ((-0.012, 0.004, 0.010, 0.011),),
+         # (22 October 2026, batch 5, on #29, #91, #103, #276, #410: the near eye a wide half moon under a flat lid, 0.064 by 0.050, its pupil a black shape filling the left; the far one a narrow tall
+         # oval, 0.030 by 0.058, black with a glint, under no lid.)
+         "EYES": {-1.0: {"SIZE": (0.064, 0.050), "AT": (0.122, -0.004), "LID": (0.10, 0.0, 0.016, 0.016), "PUPIL": (0.044, 0.044), "LOOK": ((-0.010, -0.010), (-0.010, -0.010)),
+                         "GLINTS": ((-0.020, 0.006, 0.010, 0.012),)},
+                  1.0: {"SIZE": (0.030, 0.058), "AT": (0.106, 0.008), "LID": None, "PUPIL": (0.022, 0.046), "LOOK": ((0.0, -0.002), (0.0, -0.002)),
+                        "GLINTS": ((-0.004, 0.012, 0.006, 0.010),)}}}
 # "Vertical": a wide almond, a narrow upright pupil with a light stripe down it.
 VERTICAL = {**WHITE_EYE, "SIZE": (0.060, 0.032), "LINE": 0.011, "PUPIL": (0.011, 0.026),
             "GLINTS": ((0.0, 0.004, 0.0035, 0.012),),
@@ -229,22 +241,41 @@ SMIRK = {**WHITE_EYE, "SIZE": (0.034, 0.052), "ARCH": (0.012, 0.012), "TILT": 10
                     "LOOK": ((-0.012, -0.002), (-0.012, -0.002)),
                     "GLINTS": ((-0.030, 0.012, 0.016, 0.011), (-0.026, -0.008, 0.007, 0.005)), "AT": (0.124, 0.002)}}}
 # "Frog": a large round white, a wide flat pupil across its middle.
+# (22 October 2026, strict audit, batch 5 (Side Left), on #7, #15, #74, #131, #144: the near eye a tall oval 0.050 by 0.072 under a thick outline, its pupil a wide black blob in its lower
+# half with a large glint at the left; the far eye a smaller oval 0.030 by 0.056, the pupil in its middle. Two equal wide round eyes before.)
 FROG = {**WHITE_EYE, "SIZE": (0.058, 0.054), "LINE": 0.012, "PUPIL": (0.042, 0.020),
-        "GLINTS": ((-0.016, 0.006, 0.009, 0.006),)}
+        "GLINTS": ((-0.016, 0.006, 0.009, 0.006),),
+        "EYES": {-1.0: {"SIZE": (0.050, 0.072), "AT": (0.122, 0.000), "LINE": 0.013, "PUPIL": (0.040, 0.034), "LOOK": ((-0.004, -0.020), (-0.004, -0.020)),
+                        "GLINTS": ((-0.020, 0.008, 0.011, 0.012), (0.012, -0.012, 0.005, 0.005))},
+                 1.0: {"SIZE": (0.030, 0.056), "AT": (0.106, 0.008), "LINE": 0.011, "PUPIL": (0.020, 0.036), "LOOK": ((0.0, 0.0), (0.0, 0.0)),
+                       "GLINTS": ((-0.006, 0.010, 0.006, 0.010),)}}}
 # "Retard": a large round white, a small pupil off its middle, each eye looking its own way.
+# (22 October 2026, batch 5, on #32, #182, #216: the near eye a big white oval 0.062 by 0.064 with a pupil, 0.030 by 0.036, low at its left with a glint; the far eye a narrow oval 0.032 by 0.064
+# with a pupil in its middle.)
 RETARD = {**WHITE_EYE, "SIZE": (0.060, 0.060), "LINE": 0.012, "PUPIL": (0.021, 0.023),
-          "LOOK": ((0.026, 0.018), (-0.028, -0.004))}
+          "LOOK": ((0.026, 0.018), (-0.028, -0.004)),
+          "EYES": {-1.0: {"SIZE": (0.062, 0.064), "AT": (0.122, 0.000), "PUPIL": (0.031, 0.036), "LOOK": ((-0.022, -0.008), (-0.022, -0.008)),
+                          "GLINTS": ((-0.026, -0.002, 0.008, 0.010),)},
+                   1.0: {"SIZE": (0.032, 0.064), "AT": (0.106, 0.008), "PUPIL": (0.020, 0.030), "LOOK": ((0.0, 0.004), (0.0, 0.004)),
+                         "GLINTS": ()}}}
 # "Worried": a white under a lid that rises towards the nose, a large dark pupil with three glints.
 WORRIED_EYE = {**WHITE_EYE, "SIZE": (0.056, 0.054), "LINE": 0.011, "LID": (0.30, -0.26, 0.012, 0.004),
                "PUPIL": (0.044, 0.046), "LOOK": ((0.004, -0.006), (0.004, -0.006)),
-               "GLINTS": ((-0.014, 0.012, 0.012, 0.010), (0.016, -0.014, 0.008, 0.007), (-0.018, -0.020, 0.005, 0.005))}
+               "GLINTS": ((-0.014, 0.012, 0.012, 0.010), (0.016, -0.014, 0.008, 0.007), (-0.018, -0.020, 0.005, 0.005)),
+               # (22 October 2026, batch 5, on #192, #247, #349: the near eye is larger, 0.064 by 0.062, the far one a narrow oval 0.034 by 0.062 under the same lid.)
+               "EYES": {-1.0: {"SIZE": (0.064, 0.062), "AT": (0.122, 0.000), "PUPIL": (0.050, 0.052)},
+                        1.0: {"SIZE": (0.034, 0.062), "AT": (0.106, 0.008), "PUPIL": (0.026, 0.048),
+                              "GLINTS": ((-0.008, 0.012, 0.008, 0.009), (0.006, -0.014, 0.005, 0.005))}}}
 # "Base", the plain eyes of Side=Left: the lidded eye of "Side Eye", rounder, more of it under the lid,
 # which runs further past it; two glints.
 BASE_EYE = {**SIDE_EYE, "SIZE": (0.052, 0.050), "CUT": 0.36, "SLOPE": 0.10, "LID": (0.015, 0.020, 0.004),
             "GLINTS": ((-0.018, 0.012, 0.011, 0.014), (-0.024, -0.014, 0.004, 0.005)),
             "EYES": {side: {**eye, "CUT": eye["CUT"] + 0.10} for side, eye in SIDE_LEFT_EYES.items()}}
 # "XD": a thick chevron on each eye, its point towards the nose: half width, half height, thickness.
-XD = {"AT": (0.112, 0.004), "HALF": (0.040, 0.036), "THICKNESS": 0.016}
+# (22 October 2026, batch 5, on #85, #180, #273, #342: the near chevron is large, 0.062 by 0.060 with thick strokes, 0.022; the far one a narrow one, 0.020 by 0.046.)
+XD = {"AT": (0.112, 0.004), "HALF": (0.040, 0.036), "THICKNESS": 0.016,
+      "EYES": {-1.0: {"AT": (0.122, 0.000), "HALF": (0.062, 0.058), "THICKNESS": 0.022},
+               1.0: {"AT": (0.106, 0.008), "HALF": (0.022, 0.046), "THICKNESS": 0.014}}}
 
 # ---------------------------------------------------------------------------------------------
 # Eyes that are objects.
@@ -610,10 +641,11 @@ def build_tired(maker):
 
 def build_clown(maker):
     """The lidded eyes, each on a tall four-pointed mark of one or two colours."""
-    numbers = maker.numbers(CLOWN)
+    every = maker.numbers(CLOWN)
     part, surface = maker.part(), maker.surface
-    above, below, half_width = numbers.MARK
     for side in (1.0, -1.0):
+        numbers = SimpleNamespace(**{**vars(every), **(every.EYES or {}).get(side, {})})
+        above, below, half_width = numbers.MARK
         middle = (side * numbers.AT[0], numbers.AT[1])
         # The upper and the lower half of the mark, each a narrow pointed shape.
         for material, reach in (("Top", above), ("Bottom", -below)):
@@ -629,7 +661,7 @@ def build_clown(maker):
                 edge.append((middle[0] + width, middle[1] + reach * share))
             HOST.draw_shape(part, surface, part.named(material), edge, LIFT[0],
                             middle=(middle[0], middle[1] + reach * 0.25))
-    lidded_eyes(part, surface, numbers, part.named("Dark"), part.named("Glint"), LIFT[1:])
+    lidded_eyes(part, surface, every, part.named("Dark"), part.named("Glint"), LIFT[1:])
 
 
 def build_teary(maker):
@@ -857,11 +889,12 @@ def build_base_eye(maker):
 
 def build_xd(maker):
     """A thick chevron on each eye, its point towards the nose."""
-    numbers = maker.numbers(XD)
+    every = maker.numbers(XD)
     part, surface = maker.part(), maker.surface
-    half_width, half_height = numbers.HALF
-    thick = numbers.THICKNESS
     for side in (1.0, -1.0):
+        numbers = SimpleNamespace(**{**vars(every), **(every.EYES or {}).get(side, {})})
+        half_width, half_height = numbers.HALF
+        thick = numbers.THICKNESS
         middle = (side * numbers.AT[0], numbers.AT[1])
         tip = (middle[0] - side * half_width, middle[1])
         for up in (1.0, -1.0):
