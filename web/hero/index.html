@@ -227,7 +227,7 @@
     const link = new URL(location.pathname, location.href);
     link.searchParams.set('n', hero.metadataId);
     const kit = cardLines(hero).map(line => line.gives.id).join(' / ');
-    const text = `${hero.name} is a ${kit} in Chog Arena. What is yours?`;
+    const text = `${hero.name} is a ${kit} in Chog Balls Stars. What is yours?`;
     try {
       if (navigator.share) {
         await navigator.share({ title: hero.name, text, url: link.href });

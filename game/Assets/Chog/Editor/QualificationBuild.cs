@@ -17,7 +17,7 @@ namespace Chog.Editor
     public static class QualificationBuild
     {
         // Same working title as the menu (Chog.Screens.MenuTitle), in the page's own casing.
-        private const string ProductName = "Chog Arena";
+        private const string ProductName = "Chog Balls Stars";
 
         // The page the game is served in: Assets/WebGLTemplates/Chog.
         private const string PageTemplate = "PROJECT:Chog";

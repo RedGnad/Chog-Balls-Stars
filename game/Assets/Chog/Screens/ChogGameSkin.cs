@@ -92,7 +92,7 @@ namespace Chog.Screens
                         break;
                     default:
                         // The Photon sample exposes its three prototype classes while the player is
-                        // joining. Chog Arena does not ask a player to choose one: it resolves the
+                        // joining. Chog Balls Stars does not ask a player to choose one: it resolves the
                         // Genesis or the single recruit automatically.
                         if (button.GetComponent<TwinStickShooter.CharacterSelectionButtonDelegate>() != null)
                             button.gameObject.SetActive(false);
@@ -144,7 +144,7 @@ namespace Chog.Screens
         /// <summary>
         /// Owns only the presentation copy of the Photon preparation screen. The sample refreshes
         /// player cards every view frame, so this runs after it and keeps prototype names out of
-        /// Chog Arena without touching selection commands or deterministic game data.
+        /// Chog Balls Stars without touching selection commands or deterministic game data.
         /// </summary>
         private sealed class ChogPreparationCopy : MonoBehaviour
         {

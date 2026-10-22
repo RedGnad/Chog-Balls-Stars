@@ -117,7 +117,7 @@ namespace Chog.Match
             if (State != LoanState.Ready)
                 return;
 
-            PlayerWallet.ShareLink("Play my " + heroName + " in Chog Arena", Link, outcome =>
+            PlayerWallet.ShareLink("Play my " + heroName + " in Chog Balls Stars", Link, outcome =>
             {
                 if (State != LoanState.Ready)
                     return;

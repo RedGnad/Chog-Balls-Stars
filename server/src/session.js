@@ -14,7 +14,7 @@ const encoder = new TextEncoder();
 const CHALLENGE_SECONDS = 10 * 60;
 const SESSION_SECONDS = 7 * 24 * 3600;
 export const MAX_LOAN_DAYS = 30;
-const STATEMENT = 'Sign in to Chog Arena to play your Genesis and record its career. This costs nothing and sends no transaction.';
+const STATEMENT = 'Sign in to Chog Balls Stars to play your Genesis and record its career. This costs nothing and sends no transaction.';
 
 const toHex = bytes => Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
 const fromHex = hex => Uint8Array.from(hex.match(/.{2}/g) ?? [], pair => parseInt(pair, 16));

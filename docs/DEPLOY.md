@@ -328,7 +328,7 @@ Genesis read, Photon's entries refused without the secret). Photon's dashboard a
 
 ## The public address: Vercel in front of Render (16 October 2026)
 
-The game is **Chog Arena** and its address is `https://chogarena.vercel.app` (project `chogarena` of the owner's
+The game is **Chog Balls Stars** (named Chog Arena until 22 October 2026; the address keeps that name) and its address is `https://chogarena.vercel.app` (project `chogarena` of the owner's
 Vercel account; `chog-arena.vercel.app` belonged to someone else). Vercel serves the pages: the game, the hero
 page and the portraits, laid out by `sh tools/release/vercel_site.sh` from `site/` and `web/hero`, and published
 with `sh tools/release/vercel_site.sh deploy` (the vercel CLI, logged in as the owner). Everything under `/api/`

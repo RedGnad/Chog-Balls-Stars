@@ -1,6 +1,6 @@
 # Handoff for another agent (18 October 2026)
 
-Chog Arena is the owner's entry to the Chogathon: a 3v3 top-down arena (Unity 6000.6 WebGL, Photon Quantum 3)
+Chog Balls Stars (Chog Arena until 22 October 2026) is the owner's entry to the Chogathon: a 3v3 top-down arena (Unity 6000.6 WebGL, Photon Quantum 3)
 where each Chog Genesis NFT (1,969 tokens, Monad mainnet) plays as its own 3D hero, its traits deciding its look
 and its kit. Submission deadline: 23 October 2026, 15:00 UTC. Public game: `https://chogarena.vercel.app`
 (pages on Vercel, services on Render behind `/api/`). The owner talks in French; code, comments, commits and

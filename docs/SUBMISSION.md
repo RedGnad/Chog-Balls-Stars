@@ -7,7 +7,7 @@ submitting. Character counts are for the 8,000-character fields.
 
 ## 01 Basics
 
-- **Project name:** Chog Arena (chosen by the owner on 16 October 2026; Chog Genesis is the NFT collection)
+- **Project name:** Chog Balls Stars (chosen by the owner on 22 October 2026, after Chog Arena, a name many projects share; Chog Genesis is the NFT collection)
 - **Banner:** to make from a capture of the menu with a hero in 3D, or of the heroes sheet
   (`research/evidence/heroes-and-attack-objects-headless-2026-10-15.png`). Read on chogathon.chog.xyz
   that day (its page's own styles): project cards show the image at 16:9 and another view at 16:7,
@@ -15,7 +15,7 @@ submitting. Character counts are for the 8,000-character fields.
 
 **Description**
 
-> Chog Arena is a real-time 3v3 arena for phones where your Chog Genesis NFT is your hero. Connect
+> Chog Balls Stars is a real-time 3v3 arena for phones where your Chog Genesis NFT is your hero. Connect
 > the wallet that holds it and the game builds your Chog in 3D from its own traits: its hat, its eyes,
 > its mouth, its clothes and its skin, modelled by us for all 1,969 Genesis, the skulls, the radioactive
 > Chogs and the ten 1:1 included. The

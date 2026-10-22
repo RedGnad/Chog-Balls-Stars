@@ -13,8 +13,9 @@ namespace Chog.Screens
         private const string ObjectName = "ChogMenuTitle";
         private const string LogoSprites = "QuantumMenuLogo";
 
-        // The game's name, chosen by the owner on 16 October 2026 (Chog Genesis is the NFT collection).
-        public const string Title = "CHOG ARENA";
+        // The game's name, chosen by the owner on 22 October 2026 (Chog Arena until then: too many projects share
+        // it; Chog Genesis is the NFT collection).
+        public const string Title = "CHOG BALLS STARS";
         public const string Tagline = "3v3 arena. Your Genesis is your hero.";
 
         // The label of the sample's scene chooser, which this game, with one arena, does not offer.
