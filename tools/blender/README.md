@@ -1130,3 +1130,26 @@ magnitudes laid on the outer side of each eye, mirrored (the light streak of a w
 8 Genesis (#321, #6, #39, #92, #27, #21, #18, #76) on the stage, close, bust, side and game camera, before | after beside the art:
 [heroes-tears-2026-10-22.jpg](../../research/evidence/heroes-tears-2026-10-22.jpg). Checked: library 1,970 Genesis, 0 failures; `--budget` largest #630 7,981, none over 8,000 (no
 triangle changed). The pictures themselves draw the tears on the left of the picture for both eyes: ours follow the owner's rule, not the three quarter drawing.
+
+## 22 October 2026: lot 5, the owner's review of the deployed costumes
+
+Owner on the hero stage: dragon "almost perfect", astronaut "very good", shark "much better but still messy". One sheet, the art then
+before | after (front close, three quarter, game camera behind and in front):
+[costumes-lot5-2026-10-22.jpg](../../research/evidence/costumes-lot5-2026-10-22.jpg) (#116, #139, #16, #226, #25, #32, #242, #249, #572).
+
+- **Shark, tidied** (`hood_swell`, `add_shark_teeth`; entry `hood_numbers`): the head is one smooth volume, the snout a swell of the hood itself
+  (`SWELL`: 0.085 forward, 0.030 up, a Gaussian over the front of the top; the hood on 24 sides), no separate disc (the beret).
+  The teeth: 8 on top and 6 below, all of one size and spacing, feet in the roll of the hood rim (upper row) or on the upper edge of the band
+  that closes the hood under the chin (lower row, so no more necklace on the chest), tips on the face, pointing in; none past the silhouette
+  of the hood (the first ones were placed on the edge of the face, which is not the edge of the hood).
+- **Dragon, its eyes** (`MASCOT["EYES"]`, `add_dragon_head`): a half sunk ball with an outline on the hood each side of the snout, a dark slit
+  on its front facing ahead and up; read from the front, three quarters and the game camera (from above they make the face of the dragon).
+  A plush dragon onesie has them there; no picture shows the top of the hood, so this is a choice.
+- **Toads** (`toad()`, `build_frog_suit` of `chog_one_of_one.py`, shared with #973 which keeps its own `FROG_EYES`): the two eyes at the two
+  upper corners of the hood, 43 degrees each side of straight up (17 before), as #25, #32 and #242 draw them.
+- **Astronaut, the hose** (`build_astro`, `HOSE_WAY`, `HOSE_CHEST`): one ribbed tube, a smooth curve, from the tip of the side unit down beside the
+  helmet, over the shoulder and across the chest into the top of the chest box: both ends connected (the hanging piece is gone). Built on the head
+  from points of the rest pose. To stay under 8,000: ring 16 stations (18), unit on 6 sides (8), hose on 5 sides, dragon eye on 3 stacks.
+- **Checked**: 9 Genesis before | after; `--budget` largest #630 7,981, none over 8,000 (the dragons with the eyes were four over by up to 47).
+  Not verified in Unity. The astronaut's hose is thick and ribbed at the size of the game and the pupil of the toad is still round (the art draws a
+  rounded bar).

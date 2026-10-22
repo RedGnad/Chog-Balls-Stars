@@ -359,7 +359,8 @@ def build_frog_suit(maker):
     """#973: the suit and hood of a costume, two big frog eyes on top of the hood."""
     import chog_trait_hats as hats_module
     hats_module.build_costume(maker)
-    numbers = SimpleNamespace(**FROG_EYES)
+    # (22 October 2026: the toad suits give their own "frog_eyes", apart; #973 keeps FROG_EYES.)
+    numbers = SimpleNamespace(**{**FROG_EYES, **maker.entry.get("frog_eyes", {})})
     part = maker.part()
     for where in numbers.WHERE:
         out = Vector(where).normalized()
