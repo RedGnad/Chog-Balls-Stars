@@ -367,7 +367,8 @@ namespace Chog.Screens
                     RememberPendingRank(RankAddress, GameId);
                 }
 
-                _rankMoment = ChogUi.Area("RankMoment", screen, new Vector2(0.25f, 0.28f), new Vector2(0.75f, 0.76f));
+                // Over the hero's half, so the rank card and its bar, where the points land, stay in view.
+                _rankMoment = ChogUi.Area("RankMoment", screen, new Vector2(0.05f, 0.30f), new Vector2(0.49f, 0.74f));
                 var plate = _rankMoment.gameObject.AddComponent<Image>();
                 plate.sprite = ChogSprites.Rounded(26, 4, ChogTheme.Ink, ChogTheme.CardRaised);
                 plate.type = Image.Type.Sliced;
@@ -451,8 +452,11 @@ namespace Chog.Screens
             // leaving the "+N" in its own arc and landing on the rank bar, where the counter ticks up, the
             // bar fills to the new value and pulses, and a note sounds up the scale.
             private const int MaxSparks = 12;
-            private const float SparkFlightSeconds = 0.55f;
-            private const float SparkGapSeconds = 0.09f;
+            private const float SparkFlightSeconds = 0.6f;
+            private const float SparkGapSeconds = 0.1f;
+            // The spark and its glow, in points of the 1920 by 1080 screen: large enough to read on a phone.
+            private const float SparkSize = 44f;
+            private const float SparkCoreSize = 18f;
 
             private IEnumerator RevealRank(PlayerRankGain gain, PlayerRank rank)
             {
@@ -556,8 +560,13 @@ namespace Chog.Screens
                         var t = Mathf.Clamp01((now - born) / SparkFlightSeconds);
                         var eased = t * t * (3f - 2f * t);
                         var arc = Mathf.Sin(t * Mathf.PI) * bend;
+                        var was = spark.anchoredPosition;
                         spark.anchoredPosition = Vector2.Lerp(start, end, eased) + new Vector2(arc * 0.35f, arc);
-                        spark.localScale = Vector3.one * (0.6f + 0.6f * Mathf.Sin(t * Mathf.PI));
+                        spark.localScale = Vector3.one * (0.7f + 0.6f * Mathf.Sin(t * Mathf.PI));
+                        // The tail points back along the way just flown.
+                        var way = spark.anchoredPosition - was;
+                        if (way.sqrMagnitude > 0.01f)
+                            spark.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(way.y, way.x) * Mathf.Rad2Deg);
                         if (t >= 1f)
                         {
                             Destroy(spark.gameObject);
@@ -578,12 +587,18 @@ namespace Chog.Screens
 
             private static RectTransform MakeSpark(Transform layer, int index)
             {
-                var spark = ChogUi.Pinned("Spark" + index, layer, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(26f, 26f));
+                var spark = ChogUi.Pinned("Spark" + index, layer, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(SparkSize, SparkSize));
                 var glow = spark.gameObject.AddComponent<Image>();
                 glow.sprite = ChogSprites.Disc(32, 0.55f);
                 glow.color = ChogTheme.Gold;
                 glow.raycastTarget = false;
-                var core = ChogUi.Pinned("Core", spark, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(12f, 12f))
+                // A short tail behind the spark, the same gold, fading: a comet.
+                var tail = ChogUi.Pinned("Tail", spark, new Vector2(0.5f, 0.5f), new Vector2(1f, 0.5f), Vector2.zero, new Vector2(SparkSize * 1.6f, SparkSize * 0.55f))
+                    .gameObject.AddComponent<Image>();
+                tail.sprite = ChogSprites.Disc(32, 0.9f);
+                tail.color = new Color(ChogTheme.Gold.r, ChogTheme.Gold.g, ChogTheme.Gold.b, 0.55f);
+                tail.raycastTarget = false;
+                var core = ChogUi.Pinned("Core", spark, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(SparkCoreSize, SparkCoreSize))
                     .gameObject.AddComponent<Image>();
                 core.sprite = ChogSprites.Disc(16, 0.1f);
                 core.color = Color.white;
