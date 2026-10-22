@@ -201,7 +201,7 @@ USHANKA = {
     "CAP_ROWS": 5,
     # (Evening, the owner: "the hat itself is tall, not only the flap; understand the composition". The cap is a tall rounded crown of fur,
     # the turned-up flap lies against its front. Above the middle of the head the cap is stretched up this much, at its top.)
-    "CAP_TALL": 1.45,
+    "CAP_TALL": 1.32,
     # The front flap turned up: how far round from the front it goes on each side (degrees), the polar degrees of its foot, how much
     # larger than the head its foot is, its half height, its half thickness, how far it leans out from upright (degrees), the bumps of
     # the fur along its top edge (how many, how high) and how many points along it.
@@ -246,7 +246,9 @@ def build_ushanka(maker):
 
     def crown_point(angle, polar, size):
         point = on_head(surface, angle, polar, size)
-        rise = max(0.0, math.cos(polar)) ** 2 * half.z * size * (numbers.CAP_TALL - 1.0)
+        # Every point of the upper part rises the whole way, the lower part less: straight walls and a flat top, a box of fur
+        # (the owner, evening: "the cap should be a little more square").
+        rise = min(1.0, max(0.0, math.cos(polar)) / 0.45) * half.z * size * (numbers.CAP_TALL - 1.0)
         return point + Z * rise
 
     loops = [[on_head(surface, angle, polar, 0.90) for angle, polar in zip(angles, rims)]]
@@ -1331,7 +1333,8 @@ HATS = {
     "Russian Hat": {
         "shape": "Ushanka",
         # #39 at 1000 points: the flap tan (0.85, 0.72, 0.59), the fur darker in its shadows (0.71, 0.49, 0.34), the flaps alike.
-        "colours": {"Crown": (0.71, 0.49, 0.34), "Fur": (0.85, 0.72, 0.59), "Flap": (0.82, 0.68, 0.55)},
+        # The crown in the colour of the front flap: one fur (the owner, evening).
+        "colours": {"Crown": (0.85, 0.72, 0.59), "Fur": (0.85, 0.72, 0.59), "Flap": (0.82, 0.68, 0.55)},
     },
     "Red Headband": {
         "shape": "Headband",
@@ -1420,7 +1423,7 @@ HATS_OF_SIDE = {
         "Russian Hat": {
             "shape": "Ushanka",
             # The crown is fur too on the pictures (#91: 0.91, 0.85, 0.74 on its top, tan patches), the roll lighter (0.98, 0.93, 0.81).
-            "colours": {"Crown": (0.82, 0.66, 0.50), "Fur": (0.97, 0.92, 0.81), "Flap": (0.32, 0.27, 0.38),
+            "colours": {"Crown": (0.97, 0.92, 0.81), "Fur": (0.97, 0.92, 0.81), "Flap": (0.32, 0.27, 0.38),
                         "Snap": (0.95, 0.95, 0.95)},
         },
     },

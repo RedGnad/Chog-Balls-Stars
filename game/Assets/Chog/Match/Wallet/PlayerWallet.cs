@@ -76,8 +76,14 @@ namespace Chog.Match
 
         public static bool IsAdminAddress(string address) => string.Equals(address, AdminAddress, StringComparison.OrdinalIgnoreCase);
 
-        /// <summary>Whether the connected wallet is the owner's.</summary>
-        public static bool IsAdmin => State == WalletState.Ready && IsAdminAddress(Address);
+        /// <summary>
+        /// Whether the hero sheets offer the owner's wallet any Genesis (ADMIN). Off since 22 October 2026, evening, at the owner's
+        /// request: a Genesis picked that way is then forgotten and the wallet plays as any other.
+        /// </summary>
+        public const bool AdminTesting = false;
+
+        /// <summary>Whether the connected wallet is the owner's, while admin testing is on.</summary>
+        public static bool IsAdmin => AdminTesting && State == WalletState.Ready && IsAdminAddress(Address);
 
         public static SignInState SignIn { get; private set; } = SignInState.SignedOut;
 
@@ -450,7 +456,7 @@ namespace Chog.Match
         /// <summary>PickToken, except that the owner's wallet keeps the Genesis it chose last, held or not.</summary>
         public static int PickFor(string address, int[] playable, int remembered)
         {
-            return IsAdminAddress(address) && remembered > 0 ? remembered : PickToken(playable, remembered);
+            return AdminTesting && IsAdminAddress(address) && remembered > 0 ? remembered : PickToken(playable, remembered);
         }
 
         /// <summary>The Genesis an address may play: those it holds, then those it rents and does not hold.</summary>

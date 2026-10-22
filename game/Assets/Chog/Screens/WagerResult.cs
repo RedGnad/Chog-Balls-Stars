@@ -22,9 +22,10 @@ namespace Chog.Screens
         private static readonly Color PanelColor = ChogTheme.Card;
         private static readonly Color AccentColor = ChogTheme.Cheek;
         private static readonly Color ButtonTextColor = Color.white;
-        // A strip along the top of the menu.
-        private static readonly Vector2 StripMin = new Vector2(0.20f, 0.90f);
-        private static readonly Vector2 StripMax = new Vector2(0.80f, 0.995f);
+        // A card in the free middle of the top bar, between the player's chip and the wallet, in the theme's fonts with the coin of
+        // $CHOG (22 October 2026, the owner: a large plain text thrown across the top of the screen was a bad design).
+        private static readonly Vector2 StripMin = new Vector2(0.245f, 0.905f);
+        private static readonly Vector2 StripMax = new Vector2(0.645f, 0.99f);
 
         private TextMeshProUGUI _text;
         private Button _button;
@@ -44,7 +45,7 @@ namespace Chog.Screens
             switch (outcome)
             {
                 case WagerOutcome.Pending:
-                    return ("YOUR STAKE OF " + stake + ": THE MATCH IS BEING JUDGED", "");
+                    return ("STAKE " + stake + ": the match is being judged", "");
                 // A team won but only one side had staked: the contract gives every stake back.
                 case WagerOutcome.Won when chainState == "refunded" || gainWei == "0":
                     return ("NOBODY STAKED ON THE OTHER TEAM: YOUR STAKE OF " + stake + (paid ? " WAS GIVEN BACK" : " COMES BACK"),
@@ -102,10 +103,28 @@ namespace Chog.Screens
             area.anchorMax = StripMax;
             area.offsetMin = Vector2.zero;
             area.offsetMax = Vector2.zero;
-            GetComponent<Image>().color = PanelColor;
+            GetComponent<Image>().color = ChogTheme.CardRaised;
             ChogTheme.AsCard(GetComponent<Image>());
+            var frame = gameObject.AddComponent<Outline>();
+            frame.effectColor = ChogTheme.Gold;
+            frame.effectDistance = new Vector2(3f, -3f);
+            var token = Resources.Load<Texture2D>("ChogTokenCoin");
+            var textLeft = 0.03f;
+            if (token != null)
+            {
+                var coin = Child("Coin", transform, new Vector2(0.015f, 0.12f), new Vector2(0.105f, 0.88f));
+                var picture = coin.gameObject.AddComponent<Image>();
+                picture.sprite = Sprite.Create(token, new Rect(0f, 0f, token.width, token.height), new Vector2(0.5f, 0.5f), 100f);
+                picture.preserveAspect = true;
+                picture.raycastTarget = false;
+                textLeft = 0.12f;
+            }
 
-            _text = Text("Text", new Vector2(0.02f, 0.05f), new Vector2(0.74f, 0.95f), Color.white, 40f, transform);
+            _text = ChogUi.Body("Text", transform, new Vector2(textLeft, 0.06f), new Vector2(0.74f, 0.94f), 26f,
+                TextAlignmentOptions.Left, Color.white);
+            _text.enableAutoSizing = true;
+            _text.fontSizeMin = 14f;
+            _text.fontSizeMax = 26f;
             var buttonArea = Child("Button", transform, new Vector2(0.76f, 0.12f), new Vector2(0.98f, 0.88f));
             var background = buttonArea.gameObject.AddComponent<Image>();
             background.color = AccentColor;
@@ -113,7 +132,7 @@ namespace Chog.Screens
             _button.targetGraphic = background;
             ChogTheme.Shape(_button);
             _button.onClick.AddListener(OnButton);
-            _buttonLabel = Text("Label", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.92f), ButtonTextColor, 40f, buttonArea);
+            _buttonLabel = Text("Label", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.92f), ButtonTextColor, 30f, buttonArea);
             ChogTheme.AsTitle(_buttonLabel);
             Refresh();
         }
@@ -148,6 +167,10 @@ namespace Chog.Screens
 
             var shown = GenesisWager.State == WagerState.Open && GenesisWager.HasLastMatch;
             GetComponent<Image>().enabled = shown;
+            GetComponent<Outline>().enabled = shown;
+            var coinShown = transform.Find("Coin");
+            if (coinShown != null)
+                coinShown.gameObject.SetActive(shown);
             _text.gameObject.SetActive(shown);
             _button.gameObject.SetActive(false);
             if (!shown)

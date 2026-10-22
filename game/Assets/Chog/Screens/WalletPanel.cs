@@ -31,7 +31,9 @@ namespace Chog.Screens
 
         // The right column is one Genesis card and its wallet action. It replaces the old generic text slab
         // while keeping the same wallet, rental and career behaviour.
-        private static readonly Vector2 PanelMin = new Vector2(0.56f, 0.27f);
+        // Its foot stands clear of the mode and PLAY buttons under it (ChogHome, their tops at 0.278), with room for them to grow
+        // when hovered (22 October 2026: the card cut into them).
+        private static readonly Vector2 PanelMin = new Vector2(0.56f, 0.305f);
         private static readonly Vector2 PanelMax = new Vector2(0.98f, 0.89f);
 
         // Without a Genesis to play: the main button wide, or beside the one for any other wallet app.

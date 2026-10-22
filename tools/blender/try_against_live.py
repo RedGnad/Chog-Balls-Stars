@@ -64,9 +64,14 @@ def main():
     with open(live, "wb") as file:
         file.write(subprocess.run(["git", "show", "HEAD:" + LIBRARY], cwd=REPOSITORY, capture_output=True, check=True).stdout)
     trial = os.path.join(out, "try.bytes")
+    if os.path.isfile(trial):
+        os.remove(trial)
     # The export builds the recruit from parts of others: a bare head (#76) and the Side Eye of Side=Right (#112).
     blender("tools/blender/export_chog_parts.py", "--", "--out", trial, "--check", "0",
             "--genesis", ",".join(map(str, sorted(set(numbers) | {76, 112}))))
+    # Blender ends with 0 when the script raised: the library is the proof that the export ran.
+    if not os.path.isfile(trial):
+        sys.exit("the export wrote no library: run it by hand to read its error")
 
     for number in numbers:
         for which, library in (("live", live), ("try", trial)):

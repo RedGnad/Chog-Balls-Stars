@@ -22,7 +22,8 @@ namespace Chog.Match.Tests
             Assert.IsTrue(PlayerWallet.IsAdminAddress(owner));
             Assert.IsFalse(PlayerWallet.IsAdminAddress("0x80fb079237af2a634ba9b95263ba0bd53d20cd64"));
             Assert.IsFalse(PlayerWallet.IsAdminAddress(""));
-            Assert.AreEqual(1795, PlayerWallet.PickFor(owner, new[] { 3, 4 }, 1795));
+            // While admin testing is off, the owner's wallet picks as any other.
+            Assert.AreEqual(PlayerWallet.AdminTesting ? 1795 : 3, PlayerWallet.PickFor(owner, new[] { 3, 4 }, 1795));
             Assert.AreEqual(3, PlayerWallet.PickFor(owner, new[] { 3, 4 }, 0));
             Assert.AreEqual(3, PlayerWallet.PickFor("0x80fb079237af2a634ba9b95263ba0bd53d20cd64", new[] { 3, 4 }, 1795));
         }

@@ -178,11 +178,16 @@ WHITE_EYE = {
     "GLINTS": (),
     "SEGMENTS": 20,
     "EYES": None,
+    # Both eyes tilted the same way (the left end lower), not mirrored: a glance to one side.
+    "SAME_TILT": False,
 }
 # "Angry": a half disc under a straight lid that slopes down towards the nose; a large pupil looks to
 # the right of the picture, cut by the lid.
-ANGRY = {**WHITE_EYE, "SIZE": (0.056, 0.050), "LID": (0.22, 0.22, 0.015, 0.014), "PUPIL": (0.040, 0.046),
-         "LOOK": ((0.020, -0.010), (0.020, -0.010)), "GLINTS": ((-0.012, 0.004, 0.010, 0.011),)}
+# (22 October 2026, evening, the owner on #410: "these eyes do not match". At 1000 points (#410, #29, #276) the eye is a half disc under a
+# flat lid, nearly all black: the pupil fills it but for a thin white crescent low on the right, a large white glint high on the left.
+# Ours were white eyes with a small pupil under a thin lid.)
+ANGRY = {**WHITE_EYE, "SIZE": (0.062, 0.050), "LID": (0.04, 0.10, 0.016, 0.012), "PUPIL": (0.056, 0.054),
+         "LOOK": ((-0.012, 0.008), (-0.012, 0.008)), "GLINTS": ((-0.016, -0.012, 0.016, 0.014),)}
 # "Vertical": a wide almond, a narrow upright pupil with a light stripe down it.
 # (22 October 2026, evening, the owner on #1117: "some eyes must be improved, and this time really well". At 1000 points (#1117, #45, #296,
 # #1133) the eye is a long flat almond, about 2.3 times as wide as tall, in a bold outline, its pupil a black upright capsule a little left of
@@ -198,7 +203,10 @@ VERTICAL = {**WHITE_EYE, "SIZE": (0.072, 0.027), "LINE": 0.013, "PUPIL": (0.015,
 # with a white glint high on it and a small one low: a smug squint. Ours were two round open eyes. Both eyes alike: the near and far
 # eyes drawn differently earlier the same day were found deformed in the game.)
 SMIRK = {**WHITE_EYE, "SIZE": (0.062, 0.033), "ARCH": (0.024, 0.014), "TILT": 16.0, "PUPIL": (0.036, 0.040),
-         "LOOK": ((-0.024, -0.002), (-0.024, -0.002)), "GLINTS": ((-0.004, 0.012, 0.012, 0.008), (-0.026, -0.012, 0.004, 0.004))}
+         "LOOK": ((-0.024, -0.002), (-0.024, -0.002)), "GLINTS": ((-0.004, 0.012, 0.012, 0.008), (-0.026, -0.012, 0.004, 0.004)),
+         # (Evening, the owner: "the smirk eyes are still not aligned". The seven Smirk pictures looked at (#2, #111, #242, #441, #455, #499,
+         # #517) slant both eyes the same way, the left end lower: a sideways glance. Ours were mirrored, a frown.)
+         "SAME_TILT": True}
 # "Frog": a large round white, a wide flat pupil across its middle.
 FROG = {**WHITE_EYE, "SIZE": (0.058, 0.054), "LINE": 0.012, "PUPIL": (0.042, 0.020),
         "GLINTS": ((-0.016, 0.006, 0.009, 0.006),)}
@@ -334,7 +342,10 @@ COIN = {
     "COIN_AT": (-0.006, -0.092), "COIN_OFF": (0.040, 0.008), "RADIUS": 0.058, "COIN_THICKNESS": 0.013,
     # (18 sides and 6 teeth until 15 October 2026; 12 and 4 for the triangle budget of the dressed
     # heroes: the coin covers the middle of the teeth.)
-    "COIN_TURN": (-18.0, 28.0), "SIDES": 12, "PRINT": 0.62, "OUTLINE_THICKNESS": 0.008, "TEETH": 4,
+    # (Evening, the owner on #25: "the coin is almost horizontal although it is held in the teeth". Tilted 28 degrees face up, on a head that
+    # looks up a little it lay flat from the stage camera. The art (#25, #34, #395) holds it upright, its face to the viewer: 6 degrees face down.)
+    # Turned towards the side the stage camera sees, as the art shows its face in three quarters.
+    "COIN_TURN": (34.0, -6.0), "SIDES": 12, "PRINT": 0.62, "OUTLINE_THICKNESS": 0.008, "TEETH": 4,
 }
 # "Clown Mouth": a wide red smile with a dark line along its middle.
 # (First: RED (0.030, 0.012) from -0.070 to 0.104: on the bust a thin red line where the pictures draw
@@ -756,7 +767,7 @@ def build_white_eye(defaults):
             half_width, half_height = numbers.SIZE
             line, segments = numbers.LINE, numbers.SEGMENTS
             middle = (side * numbers.AT[0], numbers.AT[1])
-            turn = -numbers.TILT * side
+            turn = numbers.TILT if numbers.SAME_TILT else -numbers.TILT * side
 
             def place(local):
                 return turned(middle, local, turn)
