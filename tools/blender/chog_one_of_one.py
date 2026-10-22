@@ -41,7 +41,7 @@ DARK = (0.06, 0.05, 0.07)
 
 # number -> the look given to it, as traits of the collection (values below or of the other tables).
 LOOKS = {
-    53: {"Base": "Origin", "Skin": "1:1 Flame", "Eyes": "1:1 Glowing Eye", "Mouth": "Smile",
+    53: {"Base": "Origin", "Skin": "1:1 Flame", "Eyes": "1:1 Glowing Eye", "Mouth": "Smile", "Head": "1:1 Flame Hair",
          "Body": "1:1 Flame Cape"},
     392: {"Base": "Skull", "Skin": "1:1 Ghost Skull", "Eyes": "1:1 Socket Eye", "Head": "1:1 Skull Flames"},
     434: {"Base": "Origin", "Skin": "1:1 Scream", "Eyes": "1:1 Scream Eye", "Mouth": "1:1 Scream Mouth",
@@ -55,14 +55,16 @@ LOOKS = {
            "Body": "1:1 Angel Wings"},
     1290: {"Base": "Origin", "Skin": "1:1 Warrior", "Eyes": "1:1 Blue Eye", "Mouth": "Flat",
            "Head": "1:1 Gold Helmet", "Body": "1:1 Warrior Tee"},
-    1373: {"Base": "Origin", "Skin": "1:1 Gold", "Eyes": "1:1 Gold Eye", "Mouth": "Smile", "Head": "1:1 Gold Shine"},
+    1373: {"Base": "Origin", "Skin": "1:1 Gold", "Eyes": "1:1 Gold Eye", "Mouth": "Smile", "Head": "1:1 Gold Shine",
+           "Body": "1:1 Gold Plating"},
     1376: {"Base": "Origin", "Skin": "1:1 Devil", "Eyes": "1:1 Devil Eye", "Mouth": "1:1 Fang",
            "Head": "1:1 Devil Horns", "Body": "1:1 Devil Suit"},
 }
 # Whose hands and feet take the colour of the skin, not the pink mittens of a Chog.
 HANDS_OF_SKIN = {53, 1006, 1159, 1373, 1376}
 # Whose cheeks are not pink: the manga page is grey and white only.
-BLUSH = {1006: (0.66, 0.66, 0.68)}
+# (22 October 2026, second pass: the Chog of fire has no pink cheeks; the circles on its cheeks are a deeper orange.)
+BLUSH = {1006: (0.66, 0.66, 0.68), 53: (0.96, 0.44, 0.08), 1373: (0.92, 0.46, 0.06)}
 
 # The colours of their skins (skin, face; "top" for a skin that runs to another colour at the top).
 SKINS = {
@@ -73,7 +75,8 @@ SKINS = {
     "1:1 Manga": {"skin": (0.78, 0.78, 0.79), "face": (0.97, 0.97, 0.97)},
     "1:1 Angel": {"skin": (0.95, 0.88, 0.72), "face": (0.98, 0.93, 0.83)},
     "1:1 Warrior": {"skin": (0.62, 0.30, 0.86), "face": (0.98, 0.80, 0.84)},
-    "1:1 Gold": {"skin": (0.95, 0.70, 0.10), "top": (1.00, 0.88, 0.40), "face": (1.00, 0.82, 0.30)},
+    # (22 October 2026, second pass: polished metal runs from a deep orange gold at the feet to a bright yellow at the top; it was 0.95 0.70 0.10 to 1.00 0.88 0.40.)
+    "1:1 Gold": {"skin": (0.94, 0.67, 0.07), "top": (1.00, 0.92, 0.46), "face": (1.00, 0.86, 0.34)},
     "1:1 Devil": {"skin": (0.86, 0.14, 0.16), "face": (0.98, 0.64, 0.64)},
 }
 # The skull of #392, in the bone colour of its picture (chog_trait_bases.SKULL_SKINS).
@@ -104,13 +107,13 @@ def round_eye(white, dark, pupil=(0.030, 0.035), **numbers):
 
 
 EYES = {
-    "1:1 Glowing Eye": round_eye((1.00, 0.97, 0.70), (1.00, 0.86, 0.36), (0.040, 0.046)),
+    "1:1 Glowing Eye": round_eye((1.00, 0.98, 0.78), (1.00, 0.84, 0.30), (0.046, 0.052), LINE=(0.086, 0.094), WHITE=(0.068, 0.076)),
     "1:1 Socket Eye": round_eye((0.10, 0.07, 0.06), (0.98, 0.55, 0.12), (0.026, 0.030)),
     "1:1 Zombie Eye": round_eye((0.07, 0.07, 0.08), (0.36, 0.95, 0.32), (0.020, 0.024)),
     "1:1 Blue Eye": round_eye((0.93, 0.95, 1.00), (0.30, 0.48, 0.92), (0.040, 0.056), LINE=(0.070, 0.086), WHITE=(0.064, 0.080)),
     "1:1 Gold Eye": round_eye((1.00, 0.93, 0.62), (0.90, 0.68, 0.16), (0.032, 0.050), LINE=(0.056, 0.080), WHITE=(0.050, 0.074)),
     "1:1 Devil Eye": round_eye((0.95, 0.18, 0.18), (0.50, 0.02, 0.05), (0.036, 0.048), LINE=(0.064, 0.080), WHITE=(0.056, 0.072)),
-    # (23 October 2026, the ten 1:1 compared with their 1000 px art.) The Scream: two large cream discs in a thin brown line with a small
+    # (22 October 2026, the ten 1:1 compared with their 1000 px art.) The Scream: two large cream discs in a thin brown line with a small
     # dark pupil, the pupils off to the same side, as painted.
     "1:1 Scream Eye": round_eye((0.98, 0.93, 0.74), (0.40, 0.30, 0.26), (0.016, 0.020), LINE=(0.074, 0.084), WHITE=(0.068, 0.078)),
     # The manga page: a big white disc in a thick black line, a black pupil with a white speck (the eye of an angry hero).
@@ -125,7 +128,7 @@ def mouths(table):
         "1:1 Zombie Drool": {**drool, "colours": {**drool["colours"], "Drool": (0.55, 0.90, 0.35)}},
         # The gold tooth of the collection in white: a fang.
         "1:1 Fang": {**tooth, "colours": {**tooth["colours"], "Gold": (0.97, 0.97, 0.97)}},
-        # The Scream: a tall open oval in a thin line, much larger than the small "wo" (23 October 2026).
+        # The Scream: a tall open oval in a thin line, much larger than the small "wo" (22 October 2026).
         "1:1 Scream Mouth": {**table["wo"], "colours": {**table["wo"]["colours"], "Line": (0.42, 0.22, 0.20)},
                              "numbers": {"AT": (0.0, -0.086), "SIZE": (0.036, 0.064), "GLINT": (0.0, 0.0, 0.0001)}},
     }
@@ -135,7 +138,7 @@ def mouths(table):
 # Hats.
 # ---------------------------------------------------------------------------------------------
 
-# (23 October 2026, from #1159: the halo is a large thick gold ring floating well above the crown, wider than the head; the brow over the open eye is a thick white bar.)
+# (22 October 2026, from #1159: the halo is a large thick gold ring floating well above the crown, wider than the head; the brow over the open eye is a thick white bar.)
 HALO = {"HEIGHT": 0.77, "RADIUS": 0.27, "TUBE": 0.036, "TILT_DEG": 18.0, "AROUND": 16, "SIDES": 5,
         "BROW": ((0.040, 0.090), (0.190, 0.108), 0.026)}
 
@@ -185,7 +188,7 @@ def build_halo(maker):
         face_stroke(brows, maker.surface, brows.named("Brow"), places, [width, width * 1.05, width * 0.8], host.DRAWN[2])
 
 
-# (23 October 2026: the flames of #392 are a great sheet of fire streaming from the back of the head up and to the side, tongues as tall as the skull,
+# (22 October 2026: the flames of #392 are a great sheet of fire streaming from the back of the head up and to the side, tongues as tall as the skull,
 # with a few licking along the jaw; until then nine small tongues 0.20 to 0.30 long in a crown.)
 FLAMES = {"COUNT": 9, "FROM_DEG": 60.0, "TO_DEG": 300.0, "LENGTH": (0.30, 0.52), "WIDTH": 0.085, "LEAN_DEG": 62.0}
 
@@ -235,7 +238,7 @@ def build_skull_flames(maker):
 BRAIN = {"WHERE": (-0.66, -0.34, 0.66), "LOBES": ((0.0, 0.0, 0.0, 0.075), (0.06, 0.04, 0.02, 0.065),
                                                   (-0.05, 0.05, 0.01, 0.06), (0.02, -0.06, 0.0, 0.06),
                                                   (-0.03, -0.03, 0.05, 0.055), (0.05, -0.02, 0.05, 0.05)),
-         # (23 October 2026, from #494: the brain is large, spilling over the brow, blood running from it down the face; the mouth
+         # (22 October 2026, from #494: the brain is large, spilling over the brow, blood running from it down the face; the mouth
          # is open with green slime hanging from it in strands; blood speckles the face.) Blood: how many drips, how long (degrees down the head),
          # their width; the strands of slime: where (to the side) and how far down; the speckles: (to the side, above, radius).
          "SCALE": 1.45, "DRIPS": ((0.0, 26.0), (-14.0, 40.0), (13.0, 18.0)), "DRIP_WIDTH": 0.012,
@@ -286,7 +289,7 @@ def build_brain(maker):
         face_patch(part, surface, part.named("Slime"), (side, bottom - width * 0.4), width * 0.75, width * 0.9, host.DRAWN[1], 8)
 
 
-# (23 October 2026, from #1290: the helmet is a Y of gold: a wide band across the brow whose ends rise at the temples, and a flat stem down the middle of the face
+# (22 October 2026, from #1290: the helmet is a Y of gold: a wide band across the brow whose ends rise at the temples, and a flat stem down the middle of the face
 # between the eyes to the nose; a red gem in a gold setting stands on the band, tall as a kite. The face has two red-pink stripes of war paint down each cheek and the
 # eyes are large and shiny. Until then a headband with two blades in a V and a small ball of a gem.)
 HELMET_CREST = {"GEM": (0.060, 0.082, 0.026), "STEM": ((0.0, 0.150), (0.0, 0.040), (0.0, -0.020)), "STEM_WIDTH": (0.052, 0.040, 0.026),
@@ -329,10 +332,10 @@ def build_gold_helmet(maker):
 # Clothing.
 # ---------------------------------------------------------------------------------------------
 
-# (23 October 2026: the collar of #53 is a thick brown band round the neck with a round gold clasp, the red cape wide over the shoulders: the collar
+# (22 October 2026: the collar of #53 is a thick brown band round the neck with a round gold clasp, the red cape wide over the shoulders: the collar
 # was 0.040 tall and the clasp 0.026, hidden by the head.)
-CAPE = {"COLLAR": (0.075, 0.034), "FROM_DEG": 150.0, "THICK": 0.012, "HEM": 0.06, "FLARE": 0.10, "ROWS": 7,
-        "CLASP": 0.040}
+CAPE = {"COLLAR": (0.100, 0.040), "FROM_DEG": 150.0, "THICK": 0.012, "HEM": 0.06, "FLARE": 0.12, "ROWS": 7,
+        "CLASP": 0.056}
 
 
 def build_cape(maker):
@@ -376,7 +379,7 @@ def build_cape(maker):
     host.add_loops(part, loops, part.named("Cape"), 0.012)
 
 
-# (23 October 2026, from #1159: the wings are large, layered white feathers fanning out behind the shoulders, as tall as the head; until then four feathers
+# (22 October 2026, from #1159: the wings are large, layered white feathers fanning out behind the shoulders, as tall as the head; until then four feathers
 # 0.36 to 0.56 long, 0.075 wide, in a blade of 8 sides.)
 WINGS = {"ROOT": (0.07, 0.13), "FEATHERS": ((14.0, 0.66), (40.0, 0.76), (66.0, 0.72), (92.0, 0.58), (118.0, 0.42)),
          "WIDTH": 0.140, "THICK": 0.020, "BACK_DEG": 35.0}
@@ -450,7 +453,7 @@ def build_frog_suit(maker):
 
 
 PEPE = {
-    # (23 October 2026, from #973: Pepe has a huge pair of thick pink-red lips in a frown across the lower face, and the frog suit has a ruff of
+    # (22 October 2026, from #973: Pepe has a huge pair of thick pink-red lips in a frown across the lower face, and the frog suit has a ruff of
     # yellow-green points round the neck.) The lips: the places of their line (to the side, above), their width, the dark line round them.
     "LIPS": ((-0.165, -0.150), (-0.100, -0.112), (-0.034, -0.098), (0.034, -0.098), (0.100, -0.112), (0.165, -0.150)),
     "LIPS_WIDTH": 0.046, "LIPS_LINE": 0.060,
@@ -481,7 +484,7 @@ def add_pepe(maker, head_part):
 
 
 # ---------------------------------------------------------------------------------------------
-# What the ten lacked against their 1000 px pictures (23 October 2026, the owner: "the 1:1 are not worked enough").
+# What the ten lacked against their 1000 px pictures (22 October 2026, the owner: "the 1:1 are not worked enough").
 # ---------------------------------------------------------------------------------------------
 
 def face_patch(part, surface, material, middle, half_width, half_height, lift, segments=14, squareness=2.0):
@@ -496,7 +499,9 @@ def face_stroke(part, surface, material, places, widths, lift):
     host.draw_line(part, surface, material, places, widths, lift)
 
 
-SCREAM_HANDS = {"AT": (0.250, -0.060), "OFF": 0.040, "SIZE": (0.052, 0.088, 0.046), "THUMB": (0.040, 0.020, 0.032)}
+# (22 October 2026, second pass: the hands of the picture are large, flat on the cheeks, the four fingers up along the face; they did not show from the front.)
+SCREAM_HANDS = {"AT": (0.205, -0.070), "OFF": 0.058, "SIZE": (0.082, 0.120, 0.052), "THUMB": (0.062, 0.030, 0.050),
+                "FINGERS": ((-0.010, 0.020), (0.026, 0.040), (0.060, 0.044), (0.094, 0.030)), "FINGER": (0.026, 0.060)}
 
 
 def build_scream_hands(maker):
@@ -515,6 +520,13 @@ def build_scream_hands(maker):
         reach, size, drop = numbers.THUMB
         thumb = place + out * thick * 0.5 - across * sign * reach - up * drop
         part.shell(base.ball_rings(thumb, up, across, size * 1.3, size, size, 3), 7, part.named("Hand"), 0.010)
+        # The four fingers, along the top of the hand, standing up the cheek and a little towards the temple.
+        finger_wide, finger_tall = numbers.FINGERS_SIZE if hasattr(numbers, "FINGERS_SIZE") else numbers.FINGER
+        for along_hand, rise in numbers.FINGERS:
+            base_at = place + out * thick * 0.7 + across * sign * along_hand + up * (tall * 0.75)
+            lean = (up + out * 0.25 - across * sign * 0.15).normalized()
+            part.shell(base.ball_rings(base_at + lean * rise, lean, across, finger_tall * 0.5 + rise * 0.5, finger_wide, finger_wide * 0.9, 3), 6,
+                       part.named("Hand"), 0.008)
 
 
 def KIT_outward(surface, side, up):
@@ -566,6 +578,108 @@ def build_warrior_tee(maker):
                                                     (numbers.LENGTH, 0.0))), 4, torso.named("Fur" if index % 2 == 0 else "FurShade"), 0.0)
 
 
+FLAME_HAIR = {
+    # (22 October 2026, second pass on #53: the head of the Chog of fire IS a flame: the crown is tongues of fire, a lighter orange outline round a fiery face, not
+    # leaves on a round skin-coloured head.) Two rows of tongues: the first round the face (degrees from the front each side, how many, the polar angle of its
+    # foot at the front and at the side, its length at the top and at the side, width), the second behind and above it.
+    "FRONT": (9, 82.0, 56.0, 78.0, (0.34, 0.20), 0.090), "BACK": ((100.0, 0.36), (130.0, 0.38), (160.0, 0.36), (180.0, 0.40)),
+    "LEAN_DEG": 38.0, "WIDTH_BACK": 0.095,
+}
+
+
+def build_flame_hair(maker):
+    """#53: the crown of the Chog of fire as tongues of fire (orange, with a yellow heart) all round and above the face."""
+    numbers = SimpleNamespace(**FLAME_HAIR)
+    part, surface = maker.part(), maker.surface
+    count, spread, polar_front, polar_side, (long_top, long_side), width = numbers.FRONT
+    tongues = []
+    for index in range(count):
+        share = index / (count - 1)
+        degrees = -spread + 2.0 * spread * share
+        side = abs(degrees) / spread
+        polar = polar_front + (polar_side - polar_front) * side ** 1.3
+        length = long_top + (long_side - long_top) * side
+        tongues.append((degrees, polar, length, width * (1.0 - 0.25 * side)))
+    for degrees, length in numbers.BACK:
+        for sign in ((1.0, -1.0) if degrees < 180.0 else (1.0,)):
+            tongues.append((degrees * sign, 62.0, length, numbers.WIDTH_BACK))
+    for index, (degrees, polar_deg, length, wide) in enumerate(tongues):
+        theta, polar = math.radians(270.0 + degrees), math.radians(polar_deg)
+        direction = Vector((math.sin(polar) * math.cos(theta), math.sin(polar) * math.sin(theta), math.cos(polar)))
+        foot = surface.towards(direction) - direction * 0.02
+        flat = Vector((direction.x, direction.y, 0.0))
+        flat = flat.normalized() if flat.length > 1e-6 else Y
+        lean = math.radians(numbers.LEAN_DEG)
+        along = (direction * 0.6 + Z * math.sin(lean) * 1.0 + flat * 0.2).normalized()
+        across = along.cross(flat).normalized() if abs(along.dot(flat)) < 0.95 else X
+        wave = 0.10 if index % 2 else -0.10
+        blade(part, foot, along, across, length, wide, 0.016, part.named("Fire"), wave, outline=0.010, sides=5)
+        blade(part, foot + along * 0.025, along, across, length * 0.60, wide * 0.55, 0.020, part.named("Core"), wave, outline=0.0, sides=4)
+
+
+GOLD_PLATING = {
+    # The polished gold of #1373 (22 October 2026, second pass): bright streaks of light and darker gold in the shade, laid on the body: on the torso three streaks and a band of shade
+    # down each side and under the belly, on each arm a streak along the top and a band of shade under it, on each leg a streak down the front. Each: where (to the side, or degrees
+    # round the arm), from height to height (or from how far down the arm to how far), half width; lift off the surface.
+    "TORSO_SHINE": ((-0.065, 0.15, 0.52, 0.020), (0.040, 0.20, 0.46, 0.012), (0.090, 0.26, 0.42, 0.008)),
+    "TORSO_SHADE": ((-0.150, 0.14, 0.46, 0.030), (0.150, 0.14, 0.46, 0.030)),
+    "BELLY": (0.130, 0.11, 0.17),
+    "ARM_SHINE": (0.0, 0.07, 0.24, 0.018), "ARM_SHADE": (180.0, 0.07, 0.26, 0.026),
+    "LEG_SHINE": (0.020, 0.06, 0.26, 0.016),
+    "LIFT": 0.006,
+}
+
+
+def build_gold_plating(maker):
+    """#1373: streaks of light and bands of shade laid on the gold body, so it reads as metal."""
+    import chog_trait_hats as hats_module
+    import make_chog_traits as host
+    numbers = SimpleNamespace(**GOLD_PLATING)
+    body = maker.body
+    torso = maker.part(on="Body")
+    middle = SimpleNamespace(middle=Vector((0.0, 0.0, 0.40)))
+    lift = numbers.LIFT
+
+    def strip(side, low, high, half, material, steps=5):
+        rows = [[hats_module.shirt_front(maker, low + (high - low) * index / (steps - 1), side + edge, lift) for edge in (-half, half)]
+                for index in range(steps)]
+        full.add_skin(torso, middle, rows, material, around=False)
+
+    for side, low, high, half in numbers.TORSO_SHINE:
+        strip(side, low, high, half, torso.named("Shine"))
+    for side, low, high, half in numbers.TORSO_SHADE:
+        strip(side, low, high, half, torso.named("Shade"))
+    wide, low, high = numbers.BELLY
+    rows = [[hats_module.shirt_front(maker, low + (high - low) * index / 3.0, side, lift * 0.5) for side in (-wide, -wide * 0.4, wide * 0.4, wide)]
+            for index in range(4)]
+    full.add_skin(torso, middle, rows, torso.named("Shade"), around=False)
+    # The legs: a streak down the front of each.
+    shine_side, bottom, top, half = numbers.LEG_SHINE
+    for sign in (1.0, -1.0):
+        hip = Vector((sign * body.LEG_HALF_SPACING, 0.0, body.LEG_TOP))
+        ankle = Vector((sign * (body.LEG_HALF_SPACING + body.LEG_STANCE), 0.0, 0.0))
+        rows = []
+        for index in range(4):
+            height = bottom + (top - bottom) * index / 3.0
+            centre = ankle + (hip - ankle) * (height / body.LEG_TOP)
+            front = centre - Y * (body.LEG_HALF_DEPTH + lift)
+            rows.append([front + X * (sign * shine_side + edge) for edge in (-half, half)])
+        full.add_skin(torso, SimpleNamespace(middle=Vector((sign * 0.1, 0.0, 0.1))), rows, torso.named("Shine"), around=False)
+    # The arms: a streak along the top, a band of shade under.
+    spread, ahead = math.radians(body.ARM_SPREAD_DEG), math.radians(body.ARM_FORWARD_DEG)
+    reach = body.ARM_RADIUS + lift
+    for name, side in (("armLeft", 1.0), ("armRight", -1.0)):
+        arm = maker.part(on=name)
+        down = Vector((side * math.sin(spread), -math.sin(ahead), -math.cos(spread) * math.cos(ahead))).normalized()
+        first, second = base.frame_across(down, -Y)
+        top_way = second * -side
+        for (degrees, start, stop, half), material in ((numbers.ARM_SHINE, "Shine"), (numbers.ARM_SHADE, "Shade")):
+            way = top_way * math.cos(math.radians(degrees)) + first * math.sin(math.radians(degrees))
+            across = down.cross(way).normalized()
+            rows = [[down * distance + way * reach + across * edge for edge in (-half, half)] for distance in (start, (start + stop) * 0.5, stop)]
+            full.add_skin(arm, SimpleNamespace(middle=down * start), rows, arm.named(material), around=False)
+
+
 GOLD_SHINE = {
     # The streaks of light of the gold Chog (#1373: it is polished, with a white-yellow light running along its edges): the places of each
     # (to the side, above), its width; the glints in the eyes: to the side of the middle of each eye, above it, radius.
@@ -588,7 +702,7 @@ def build_gold_shine(maker):
 
 
 DEVIL_HORNS = {
-    # (23 October 2026, from #1376: the horns are glossy red drops standing on the brow, curving outward, with a white light along each; the eyes are large and
+    # (22 October 2026, from #1376: the horns are glossy red drops standing on the brow, curving outward, with a white light along each; the eyes are large and
     # glossy with a white glint. Until then the ridged horns of the radioactive Chogs in dark red.) Where each stands (to the side, above) on the face, how far
     # out of the head it leans, its height, the radius profile along it.
     "AT": (0.185, 0.190), "LEAN": 0.60, "PROFILE": ((0.0, 0.078), (0.060, 0.088), (0.120, 0.064), (0.180, 0.032), (0.235, 0.0)),
@@ -658,8 +772,8 @@ def add_devil_wings(maker):
 
 HAT_SHAPES = {"Halo": build_halo, "SkullFlames": build_skull_flames, "Brain": build_brain,
               "GoldHelmet": build_gold_helmet, "ScreamHands": build_scream_hands, "MangaBrows": build_manga_brows,
-              "GoldShine": build_gold_shine, "DevilHorns": build_devil_horns}
-CLOTH_KINDS = {"Cape": build_cape, "Wings": build_wings, "DevilSuit": build_devil_suit, "FrogSuit": build_frog_suit,
+              "GoldShine": build_gold_shine, "DevilHorns": build_devil_horns, "FlameHair": build_flame_hair}
+CLOTH_KINDS = {"GoldPlating": build_gold_plating, "Cape": build_cape, "Wings": build_wings, "DevilSuit": build_devil_suit, "FrogSuit": build_frog_suit,
                "WarriorTee": build_warrior_tee}
 
 
@@ -680,6 +794,7 @@ def hats(headband_numbers):
                                                                 "Gem": (0.88, 0.10, 0.14), "Paint": (0.93, 0.30, 0.40),
                                                                 "Glint": (1.0, 1.0, 1.0)}, "unlit": ("Paint", "Glint")},
         "1:1 Devil Horns": {"shape": "DevilHorns", "colours": {"Horn": (0.98, 0.10, 0.12), "Glint": (1.0, 0.96, 0.96)}, "unlit": ("Glint",)},
+        "1:1 Flame Hair": {"shape": "FlameHair", "colours": {"Fire": (1.00, 0.55, 0.10), "Core": (1.00, 0.88, 0.28)}, "unlit": ("Fire", "Core")},
         "1:1 Gold Shine": {"shape": "GoldShine", "colours": {"Shine": (1.0, 0.97, 0.76)}, "unlit": ("Shine",)},
     }
     numbers = {
@@ -692,6 +807,8 @@ def hats(headband_numbers):
         "ScreamHands": {"OUTLINE_THICKNESS": 0.012},
         "MangaBrows": {"OUTLINE_THICKNESS": 0.012},
         "GoldShine": {"OUTLINE_THICKNESS": 0.012},
+        # The flames are the whole crown: no leaf, no teeth of hair on the brow.
+        "FlameHair": {"OUTLINE_THICKNESS": 0.012, "FRINGE": False, "LEAVES": tuple((0.0, None, None) for _ in range(7))},
         "DevilHorns": {"OUTLINE_THICKNESS": 0.012},
     }
     return entries, numbers
@@ -704,6 +821,7 @@ def with_colours(entry, **colours):
 def clothes(tee, costume):
     """The clothing of the 1:1 ("tee" and "costume" make entries as chog_trait_hats does)."""
     return {
+        "1:1 Gold Plating": {"kind": "GoldPlating", "colours": {"Shine": (1.0, 0.97, 0.74), "Shade": (0.66, 0.38, 0.03)}, "unlit": ("Shine",)},
         "1:1 Flame Cape": {"kind": "Cape", "colours": {"Cape": (0.84, 0.15, 0.12), "Collar": (0.45, 0.22, 0.12),
                                                          "Clasp": (0.96, 0.70, 0.16)}},
         "1:1 Scream Coat": tee((0.20, 0.15, 0.46)),
@@ -745,10 +863,10 @@ def build_trident_object(shapes, word_pieces):
 
 
 TUMBLE = 1   # chog_attack_objects.TUMBLE
-# (23 October 2026: the Scream, the manga page and the gold Chog now wear a value of "Head", the strokes and the hands of their faces: they still throw a spike
+# (22 October 2026: the Scream, the manga page and the gold Chog now wear a value of "Head", the strokes and the hands of their faces: they still throw a spike
 # of their crown, as before, not those.)
 ATTACK_OF_HEAD = {"1:1 Devil Horns": ("Trident", POINT), "1:1 Scream Hands": ("Leaf", TUMBLE), "1:1 Manga Brows": ("Leaf", TUMBLE),
-                  "1:1 Gold Shine": ("Leaf", TUMBLE)}
+                  "1:1 Gold Shine": ("Leaf", TUMBLE), "1:1 Flame Hair": ("Leaf", TUMBLE)}
 ATTACK_OBJECTS = {"Trident": ({"Trident": (0.56, 0.30, 0.80)}, (), build_trident_object, (0.70, 0.45, 0.95))}
 ATTACK_WORDS = {"Trident": "TRIDENTS"}
 LINES = {

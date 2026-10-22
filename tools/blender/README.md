@@ -1368,3 +1368,17 @@ Sheet: [heroes-one-of-one-2026-10-22.jpg](../../research/evidence/heroes-one-of-
 - **Checked**: the ten build, 6,287 to 7,789 triangles; `--budget`: largest hero #630 7,983, none over 8,000; library 1,970 Genesis, 0 failures.
 - **Not done / not verified in Unity**: the painted brushwork of #434, the screentone and the streaming hair of #1006, the glow and the white-yellow outline of #1373 and #53 (the outline material is shared by every hero), the
   cracks of the skull of #392, the ragged edge of the face of #494, the pose of the arms (the game moves them). The skull and the zombie faces are the faces agent's.
+
+### 7.7b Second pass on #53, #1373 and #434
+
+Sheet: [heroes-one-of-one-pass2-2026-10-22.jpg](../../research/evidence/heroes-one-of-one-pass2-2026-10-22.jpg) (the art at 1000 points, then before | after, `make_chog_one_of_one_sheet.py --numbers`); "before" is the first pass above.
+The title of the sheet of the ten said 23 October: it says 22 October now (the file name is unchanged).
+
+- **#53 Flame**: the head IS a flame. The crown of leaves on a round skin-coloured head is gone: `1:1 Flame Hair` (`FlameHair`, `build_flame_hair`), 9 tongues round the face and 7 behind and above it
+  (orange with a yellow heart, a lighter outline, waving), no leaf, no teeth of hair on the brow; the cheeks are a deeper orange, not pink (`BLUSH`); the eyes are larger glowing discs (`LINE` 0.086 by 0.094); the
+  brown collar is 0.100 tall (0.075) with a clasp of 0.056 (0.040), the cape wider (`FLARE` 0.12), so the collar, the clasp and the red cape show from the front on the hero stage.
+- **#1373 Gold**: it had two streaks on the face only. Now `1:1 Gold Plating` (`GoldPlating`): three streaks of light and two bands of shade down the torso, a darker belly, a streak along the
+  top of each arm with a band of shade under it, a streak down the front of each leg; the skin runs from 0.94 0.67 0.07 to 1.00 0.92 0.46 (a try at 0.86 0.50 0.04 read as terracotta); the cheeks are orange.
+  Not done: the glowing outline (the outline material is shared by every hero), the dark-gold shading on the head.
+- **#434 The Scream**: the hands are 0.082 by 0.120 (0.052 by 0.088), flat on the cheeks (0.205 out, 0.058 off the face), with the thumb and four fingers standing up along the face, so they show from the front.
+- **Checked**: #53 7,976 triangles (7,311: the tongues of the flame head cost 665), #434 7,427, #1373 6,373; `--budget`: largest hero #630 7,983, none over 8,000; library 1,970 Genesis, 0 failures; what each throws is unchanged (#53, #434, #1373 throw the leaf: `1:1 Flame Hair` is in `ATTACK_OF_HEAD`, or the 2,240 triangles of the flames would be thrown).

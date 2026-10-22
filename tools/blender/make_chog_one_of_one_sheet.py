@@ -1,4 +1,4 @@
-"""One before/after sheet of the ten 1:1 Genesis, each beside its picture at 1000 points (23 October 2026). Plain Python, no Blender: it reads the pictures that
+"""One before/after sheet of the ten 1:1 Genesis, each beside its picture at 1000 points (22 October 2026). Plain Python, no Blender: it reads the pictures that
 make_chog_traits_many.py rendered into two folders (before and after a change), as make_chog_faces_before_after.py does, but the art comes from a folder of
 your choice, here the 1000 point pictures (not kept in the repository: the addresses are in .artifacts/genesis-art/manifest.jsonl, "source", a .webp each).
 
@@ -35,21 +35,24 @@ def main():
     parser.add_argument("--after", required=True)
     parser.add_argument("--art-folder", required=True, help="the folder of the pictures, <number>.jpg each")
     parser.add_argument("--out", required=True)
+    parser.add_argument("--numbers", default=None, help="only these Genesis, separated by commas (default: the ten)")
+    parser.add_argument("--title", default="The ten 1:1, 22 October 2026: the art at 1000 points, then before | after for each view")
     parser.add_argument("--size", type=int, default=190, help="side of one picture")
     parser.add_argument("--quality", type=int, default=78)
     arguments = parser.parse_args()
+    numbers = tuple(int(number) for number in arguments.numbers.split(",")) if arguments.numbers else NUMBERS
     size, label = arguments.size, 110
     art_size = size + 40
     width, head = label + art_size + len(VIEWS) * 2 * size, 40
-    sheet = Image.new("RGB", (width, head + len(NUMBERS) * art_size), (245, 243, 238))
+    sheet = Image.new("RGB", (width, head + len(numbers) * art_size), (245, 243, 238))
     draw = ImageDraw.Draw(sheet)
-    draw.text((6, 4), "The ten 1:1, 23 October 2026: the art at 1000 points, then before | after for each view", font=font(15), fill=(20, 20, 20))
+    draw.text((6, 4), arguments.title, font=font(15), fill=(20, 20, 20))
     draw.text((label, 22), "art (1000 px)", font=font(12), fill=(20, 20, 20))
     for index, (caption, _) in enumerate(VIEWS):
         left = label + art_size + 2 * size * index
         draw.text((left + 2, 22), f"{caption}: before", font=font(12), fill=(20, 20, 20))
         draw.text((left + size + 2, 22), "after", font=font(12), fill=(20, 20, 20))
-    for row, number in enumerate(NUMBERS):
+    for row, number in enumerate(numbers):
         top = head + row * art_size
         draw.text((6, top + 6), f"CHOG #{number}", font=font(14), fill=(20, 20, 20))
         draw.text((6, top + 26), NAMES[number], font=font(12), fill=(60, 60, 60))
