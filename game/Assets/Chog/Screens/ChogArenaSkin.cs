@@ -529,7 +529,7 @@ namespace Chog.Screens
             foreach (var root in roots)
             foreach (var candidate in root.GetComponentsInChildren<Transform>(true))
             {
-                if (candidate.name != "Crate")
+                if (!IsCrate(candidate.name))
                     continue;
                 var renderers = candidate.GetComponentsInChildren<Renderer>(true);
                 if (renderers.Length == 0)
@@ -565,6 +565,21 @@ namespace Chog.Screens
                 s_top.mainTexture = s_paint;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             renderer.receiveShadows = true;
+        }
+
+        /// <summary>
+        /// A crate of a map: "Crate", or "Crate -1,4" as the siege's map names them with their cell (SiegeMapBuilder). The siege's crates
+        /// lost their candy skin when its map was built again on 22 October 2026 with those names (the owner: "even in siege the crates
+        /// are pink without the texture"); the coins map keeps its sample crates, named otherwise, in their own look.
+        /// </summary>
+        internal static bool IsCrate(string name)
+        {
+            if (name == "Crate")
+                return true;
+            if (name == null || !name.StartsWith("Crate ", System.StringComparison.Ordinal))
+                return false;
+            var cell = name.Substring("Crate ".Length).Split(',');
+            return cell.Length == 2 && int.TryParse(cell[0], out _) && int.TryParse(cell[1], out _);
         }
 
         private static bool HasSkin(GameObject[] roots)

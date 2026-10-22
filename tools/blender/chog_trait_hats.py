@@ -202,8 +202,10 @@ USHANKA = {
     "FLARE": 0.26,
     "BULGE": 0.06,        # the wall swells a little at its middle, as a fur crown does
     "WALL": (0.350, 0.275, 0.035),
-    "TOP": 0.520,
-    "DOME": 0.070,
+    # (22 October 2026, evening, the owner: "the Russian hat is still not a Russian hat". At 1000 points (#91, #34, #144) the crown is a
+    # rounded dome of fur, not a cylinder with a flat lid: TOP 0.520 and DOME 0.070 read as a pot. Lower wall, rounder top.)
+    "TOP": 0.470,
+    "DOME": 0.150,
     # The rows of the wall as shares of its height from the lower edge (the first, tucked on the head, the next ones the roll of fur),
     # the shares at which the colour of the fur gives way to that of the crown (the first bands are fur), and the bumps of the fur round
     # the lower edge (how many, how deep against the wall).
@@ -216,10 +218,15 @@ USHANKA = {
     "WAVE_Z": 0.012,     # the lower edge rises and falls with the bumps of the fur (a fluffy edge)
     # An ear flap: how far out of the middle at its top, at its middle and at its foot (it hangs nearly upright beside the face), how
     # far ahead of the middle of the head, its heights (top, then foot), half width at the top and at the foot, half thickness.
-    "FLAP": ((0.325, 0.340, 0.335, 0.325), -0.015, (0.330, 0.195, 0.055, -0.075), (0.098, 0.088, 0.078, 0.055), 0.030),
+    # (22 October 2026, evening: on the pictures the flaps frame the face, their outer face of leather seen from the front three
+    # quarters; hanging flat against the sides, only their cream edge showed. Now a little ahead and opening out towards the foot.)
+    "FLAP": ((0.330, 0.352, 0.368, 0.372), 0.020, (0.330, 0.215, 0.105, 0.020), (0.098, 0.088, 0.078, 0.055), 0.030),
+    # How far each flap is turned about the upright towards the front (degrees): its outer face of leather is seen from the front
+    # and three quarters, framing the face as on the pictures, its foot at the jaw (it hung to the shoulders, like hair).
+    "FLAP_YAW": 30.0,
     # Where a flap is leather (the colour "Snap" is given: Side=Left), a rim of fur behind it: how much wider and longer the rim is,
     # and how far behind the leather it lies.
-    "FLAP_RIM": (0.020, 0.024, 0.014),
+    "FLAP_RIM": (0.012, 0.014, 0.010),
     "SNAPS": ((0.42, 0.015), (0.74, 0.015)),   # along the flap from its top, radius
     "OUTLINE_THICKNESS": 0.020,
     # The fur hat covers the head down to the brow and over the ears: no leaf comes out of it at the
@@ -281,17 +288,21 @@ def build_ushanka(maker):
     out_x, ahead, heights, widths, half_thick = numbers.FLAP
     colours = maker.entry["colours"]
     leather = "Snap" in colours
+    yaw = math.radians(numbers.FLAP_YAW)
     for side in (1.0, -1.0):
+        # The outer face of the flap looks out and towards the front (-Y); its width runs across that.
+        facing = (X * side * math.cos(yaw) - Y * math.sin(yaw)).normalized()
+        across = (Y * math.cos(yaw) + X * side * math.sin(yaw)).normalized()
+
         def flap(wider, longer, behind):
             path, wide, thick = [], [], []
             last = len(heights) - 1
             for index, (z, half_wide) in enumerate(zip(heights, widths)):
-                x = side * (out_x[min(index, len(out_x) - 1)] - behind)
-                foot = index + 1 if index == last else index
-                path.append(Vector((x, middle.y + ahead, z - (longer if index == last else 0.0))))
+                x = side * out_x[min(index, len(out_x) - 1)]
+                path.append(Vector((x, middle.y + ahead, z - (longer if index == last else 0.0))) - facing * behind)
                 rounded = 1.0 if index < last else 0.55
-                wide.append(Y * (half_wide + wider) * rounded)
-                thick.append(X * side * half_thick)
+                wide.append(across * (half_wide + wider) * rounded)
+                thick.append(facing * half_thick)
             return path, wide, thick
 
         slab(part, *flap(0.0, 0.0, 0.0), part.named("Flap"), outline)
@@ -300,8 +311,9 @@ def build_ushanka(maker):
             slab(part, *flap(wider, longer, behind), part.named("Fur"), outline)
             for along, radius in numbers.SNAPS:
                 index = min(len(heights) - 1, int(round(along * (len(heights) - 1))))
-                centre = Vector((side * (out_x[min(index, len(out_x) - 1)] + half_thick + 0.004), middle.y + ahead, heights[index]))
-                disc_on(part, surface, centre, X * side, radius, part.named("Snap"))
+                centre = Vector((side * out_x[min(index, len(out_x) - 1)], middle.y + ahead, heights[index])) \
+                    + facing * (half_thick + 0.004)
+                disc_on(part, surface, centre, facing, radius, part.named("Snap"))
 
 
 # ---------------------------------------------------------------------------------------------
@@ -724,6 +736,9 @@ SPARTAN = {
     # (22 October 2026, the owner: two spikes pointed DOWN at the back like a bug, and the sides did not show as the art draws them: 3 or 4
     # short spikes out of the rear edge of the helmet, pointing out and a little up. The lowest pair was turned to 118 degrees (down) and the back
     # row to 100 (down), 1.6 and 1.3 times as long as a leaf of the crown. Now two pairs out of the rear edge (92 and 80 degrees, each tried against the shell, leaf_crossings), 1.45 times a leaf of the crown, as long as the pictures draw them beside the shell, the points bending up; the leaf straight back is gone, it hung down the nape whatever its lean, the head being turned up.)
+    # (22 October 2026, evening: the owner wants the spikes out at the sides. Tried: the upper and middle pairs root under the shell and cross it
+    # whatever their turn (leaf_crossings); the two pairs that clear it stay behind the helmet, longer or not. Spikes beside the helmet need
+    # spikes of the helmet's own, not leaves of the crown: not done.)
     "LEAVES": (GONE, GONE, GONE, leaf(1.45, 92.0, 55.0, 0.55, 0.62), GONE, leaf(1.45, 80.0, 70.0, 0.55, 0.58), GONE),
     # The pictures show no teeth of hair on the brow inside the helmet.
     "FRINGE": False,
@@ -1398,7 +1413,8 @@ HATS_OF_SIDE = {
         # Cream fur, a tan crown, flaps of dark leather with two white snaps each.
         "Russian Hat": {
             "shape": "Ushanka",
-            "colours": {"Crown": (0.89, 0.66, 0.52), "Fur": (0.95, 0.90, 0.80), "Flap": (0.32, 0.27, 0.38),
+            # The crown is fur too on the pictures (#91: 0.91, 0.85, 0.74 on its top, tan patches), the roll lighter (0.98, 0.93, 0.81).
+            "colours": {"Crown": (0.88, 0.78, 0.64), "Fur": (0.97, 0.92, 0.81), "Flap": (0.32, 0.27, 0.38),
                         "Snap": (0.95, 0.95, 0.95)},
         },
     },
@@ -2615,7 +2631,10 @@ MASCOT = {
     # (row, first column, last column): the columns are 18 degrees wide, 0 is the first right of the front, -1 the first left of it;
     # and the faces of the collar under the chin, the first and last point of the rim they run between (the rim has 24 points).
     "BELLY": ((0, -3, 2),),
-    "BELLY_CHIN": (14, 22),
+    # (22 October 2026, evening, the owner: "even the colours of the dragon's belly are bugged". The collar's faces under the chin are big
+    # triangles: painted from 14 to 22 they drew a slanted, jagged edge across the shoulders. Only the middle of the collar, under the chin,
+    # takes the pale colour now; unpainted (tried) the dragon had no belly left.)
+    "BELLY_CHIN": (16, 20),
     # The ridge down the back (not drawn by any picture: no picture shows the back, 22 October 2026): the heights of its
     # plates, from the top of the head down to the tail, their half width at the foot and their length.
     "RIDGE": (1.10, 1.00, 0.88, 0.74, 0.60, 0.46),

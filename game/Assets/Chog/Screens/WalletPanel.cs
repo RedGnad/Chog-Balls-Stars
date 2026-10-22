@@ -95,6 +95,11 @@ namespace Chog.Screens
 
         // With a Genesis to play: its mastery road, then the Genesis of the wallet.
         private MasteryRoad _road;
+        // The kit of the Genesis played, in place of its mastery road (22 October 2026, the owner: the road read as a window nobody
+        // understood): its class, what its basic attack throws, its special.
+        private RectTransform _kit;
+        private readonly TextMeshProUGUI[] _kitTitles = new TextMeshProUGUI[3];
+        private readonly TextMeshProUGUI[] _kitLines = new TextMeshProUGUI[3];
         private RectTransform _rosterArea;
         private TextMeshProUGUI _rosterTitle;
         private TextMeshProUGUI _rosterInfo;
@@ -312,6 +317,17 @@ namespace Chog.Screens
 
             // With a Genesis to play: its mastery, then the Genesis of the wallet, picked by a tap.
             _road = MasteryRoad.Create(transform, RoadMin, RoadMax);
+            _road.gameObject.SetActive(false);
+            _kit = Child("Kit", transform, RoadMin, RoadMax);
+            for (var row = 0; row < 3; row++)
+            {
+                var top = 0.97f - row * 0.32f;
+                _kitTitles[row] = ChogUi.Title("KitTitle" + row, _kit, new Vector2(0.05f, top - 0.13f), new Vector2(0.95f, top), 34f,
+                    TextAlignmentOptions.Left);
+                _kitTitles[row].color = row == 0 ? ChogTheme.Gold : ChogTheme.Cream;
+                _kitLines[row] = ChogUi.Body("KitLine" + row, _kit, new Vector2(0.05f, top - 0.30f), new Vector2(0.95f, top - 0.13f), 22f,
+                    TextAlignmentOptions.TopLeft, ChogTheme.PurpleSoft);
+            }
             _rosterArea = Child("Roster", transform, RosterMin, RosterMax);
             var line = ChogUi.Plate("Line", _rosterArea, new Vector2(0.04f, 0.985f), new Vector2(0.96f, 1f), ChogTheme.Line, 2);
             line.sprite = null;
@@ -436,7 +452,7 @@ namespace Chog.Screens
             var checkingPass = !holds && GuestPass.State == GuestPassState.Checking;
             var played = holds ? PlayerWallet.ChosenTokenId : guest ? GuestPass.TokenId : 0;
             var owns = holds && Array.IndexOf(PlayerWallet.Tokens, played) >= 0;
-            var rents = holds && !owns && played > 0;
+            var rents = holds && !owns && played > 0 && !adminPick;
 
             // Careers are read once it is known which Genesis the panel shows, and again when a rental adds one.
             var careersOf = holds ? PlayerWallet.Address + " with " + tokens.Length : guest ? "guest of " + GuestPass.TokenId : "";
@@ -471,7 +487,7 @@ namespace Chog.Screens
                 _marketWhenReady = false;
 
             var playing = holds || guest;
-            _road.gameObject.SetActive(playing);
+            _kit.gameObject.SetActive(playing);
             _rosterArea.gameObject.SetActive(playing);
             _title.gameObject.SetActive(!playing);
             // The address is on the wallet button at the top right already.
@@ -535,15 +551,13 @@ namespace Chog.Screens
                 PlayedChanged?.Invoke();
             RefreshPoster(playing);
 
-            // The mastery of the Genesis played, as its career on Monad says.
             if (playing)
-            {
-                GenesisCareers.TryGet(played, out var career);
-                _road.Show(career, playedIndex >= 0 && _roster.HasSecondForm(_roster.Entries[playedIndex].Shape));
-            }
+                ShowKit(played, playedIndex);
 
-            _rosterTitle.text = guest ? "LENT TO YOU" : PlayerWallet.Tokens.Length > 0 ? "YOUR GENESIS" : "YOUR RENTED GENESIS";
+            _rosterTitle.text = guest ? "LENT TO YOU" : adminPick && PlayerWallet.Tokens.Length == 0 ? "ADMIN TEST"
+                : PlayerWallet.Tokens.Length > 0 ? "YOUR GENESIS" : "YOUR RENTED GENESIS";
             _rosterInfo.text = guest ? "by " + PlayerWallet.ShortAddress(GuestPass.Lender) + ", " + GuestPass.TimeLeft(GuestPass.ExpiresAtMs, NowMs()) + " left"
+                : adminPick ? "BACK TO RECRUIT on its hero sheet"
                 : rents ? RentedInfo(GenesisRental.RentedUntilSeconds(played), NowMs() / 1000)
                 : tokens.Length > 1 ? (pages > 1 ? (_page + 1) + " / " + pages + "   " : "") + "tap one to play it"
                 : "";
@@ -710,6 +724,30 @@ namespace Chog.Screens
                 default:
                     return "This wallet holds no Chog Genesis." + (GenesisRental.State == RentalState.Open ? " Browse RENT in the left menu to play one." : "");
             }
+        }
+
+        // The kit of the Genesis played: its class (from its outfit), what its basic attack throws, its special (from its eyes).
+        private void ShowKit(int tokenId, int index)
+        {
+            if (_roster == null || index < 0)
+            {
+                for (var row = 0; row < 3; row++)
+                    _kitTitles[row].text = _kitLines[row].text = "";
+                return;
+            }
+            var hero = _roster.Entries[index];
+            var lines = _roster.CardLines(hero, GenesisForms.PlayedBy(tokenId));
+            var roleId = (lines[0].Gives ?? "").ToLowerInvariant();
+            var attackLine = ChogHeroModel.AttackLine(hero.MetadataId);
+            var thrown = ChogHeroModel.AttackWords.Parts(attackLine).thing;
+            var kind = ChogHeroModel.AttackWords.Kind(roleId);
+            _kitTitles[0].text = (lines[0].Gives ?? "").ToUpperInvariant();
+            _kitLines[0].text = "Class from its outfit: " + lines[0].Value;
+            _kitTitles[1].text = "BASIC: " + (thrown.Length > 0 ? thrown : kind);
+            var detail = ChogHeroModel.AttackWords.Detail(attackLine, roleId);
+            _kitLines[1].text = detail.Length > 0 ? kind + ". " + detail : kind;
+            _kitTitles[2].text = "SPECIAL: " + (lines[1].Gives ?? "").ToUpperInvariant();
+            _kitLines[2].text = lines[1].Value == "none" ? "No eyes trait." : "From its eyes, " + lines[1].Value + ".";
         }
 
         private static long NowMs() => (long)(DateTime.UtcNow - UnixEpoch).TotalMilliseconds;

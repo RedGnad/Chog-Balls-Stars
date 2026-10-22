@@ -1564,3 +1564,16 @@ Sheet, 6 Genesis (#4, #50, #109 Chog Viper L; #1184, #1621, #312 Retro Glass R),
 Sheet: [clothes-batch4-fix-2026-10-22.jpg](../../research/evidence/clothes-batch4-fix-2026-10-22.jpg) (#189, #229 Zero THOTS; #474, #556 Guko).
 - **Zero THOTS**: one line 0.058 tall, allowed 0.400 wide so it wraps round the chest as in the art (at 0.300 the line was limited to about 0.040 tall).
 - **Guko**: a white disc of radius 0.052 on the left of the chest with a small black spiky mark (a star) on it.
+
+## 22 October 2026, evening: every change against the live hero (`try_against_live.py`)
+
+After a day of eye and jaw work that the owner found worse than the morning's heroes (taken back, `docs/STATUS.md` 18:35 UTC), a 3D change
+is judged beside the LIVE hero, not only the art: `sh tools/dev/heavy_lock.sh <who> python3 tools/blender/try_against_live.py --name <try>
+--genesis 91,34` exports the named Genesis from the working tree, renders them and the same heroes of the library at HEAD on the home stage
+(close, three quarters, front) and writes `research/evidence/try-<try>.jpg`: art | live | try. About ten seconds a Genesis.
+
+Kept this evening, each better than live on its sheet: Retro Glass eyes without the dark pupil disc, a pale highlight as the art draws
+(`try-retro-eyes.jpg`); a flatter, tilted smirk under a heavy lid (`try-smirk.jpg`); the Russian Hat a rounder fur dome, flaps turned to
+show their leather and ending at the jaw (`try-ushanka.jpg`, `try-ushanka-right.jpg`); the dragon belly painted only under the chin's
+middle (`try-dragon-belly.jpg`). Not done: spikes beside the Spartan helmet (the leaves that would show there cross the shell,
+`try-spartan.jpg`); they need spikes of the helmet's own.

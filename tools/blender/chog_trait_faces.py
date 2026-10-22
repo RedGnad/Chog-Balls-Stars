@@ -186,8 +186,12 @@ VERTICAL = {**WHITE_EYE, "SIZE": (0.060, 0.032), "LINE": 0.011, "PUPIL": (0.011,
 # of the picture.
 # (22 October 2026, evening: the two different eyes of the strict audit were taken back with the rest of it, the owner finding
 # them deformed in the game; the equal almonds of the morning stand until a smirk is shown better than them.)
-SMIRK = {**WHITE_EYE, "SIZE": (0.058, 0.040), "ARCH": (0.020, 0.008), "TILT": 14.0, "PUPIL": (0.034, 0.038),
-         "LOOK": ((-0.020, -0.004), (-0.020, -0.004)), "GLINTS": ((-0.010, 0.012, 0.010, 0.007),)}
+# (22 October 2026, evening, the owner: "the smirk is not a smirk at all". At 1000 points (#2, #242, #111) each eye is a flat almond
+# tilted with its outer end low, a THICK black lid along its whole top, a large black pupil filling its left part from top to bottom
+# with a white glint high on it and a small one low: a smug squint. Ours were two round open eyes. Both eyes alike: the near and far
+# eyes drawn differently earlier the same day were found deformed in the game.)
+SMIRK = {**WHITE_EYE, "SIZE": (0.062, 0.033), "ARCH": (0.024, 0.014), "TILT": 16.0, "PUPIL": (0.036, 0.040),
+         "LOOK": ((-0.024, -0.002), (-0.024, -0.002)), "GLINTS": ((-0.004, 0.012, 0.012, 0.008), (-0.026, -0.012, 0.004, 0.004))}
 # "Frog": a large round white, a wide flat pupil across its middle.
 FROG = {**WHITE_EYE, "SIZE": (0.058, 0.054), "LINE": 0.012, "PUPIL": (0.042, 0.020),
         "GLINTS": ((-0.016, 0.006, 0.009, 0.006),)}
@@ -254,8 +258,12 @@ RETRO_GLASS_NUMBERS = {"RIM": 0.11, "THICKNESS": 0.022, "LENS_BULGE": 0.003, "OU
 # the nose: a frown. Until then an iris 0.096 by 0.104 under a thin lid line that rose towards the nose. IRIS: to the side of the middle
 # of the lens, above it, half width, half height; PUPIL: half width, half height; LID: thickness of the lid line, how far above the middle
 # of the iris it cuts the iris and the pupil, how much it rises per unit towards the outer side.)
-RETRO_EYES = {"IRIS": (0.004, -0.008, 0.068, 0.066), "PUPIL": (0.036, 0.042), "LID": (0.013, 0.030, 0.30),
-              "GLINTS": ((-0.020, 0.004, 0.015, 0.019), (0.018, -0.022, 0.007, 0.008)), "LIFT": 0.0025}
+# (22 October 2026, evening, the owner: "there is still a circle that is not like the Genesis". At 1000 points (#35, #1184, #165) the iris
+# has NO dark pupil: it is one steel blue disc under the lid, with a large pale blue highlight high on its left and a small white dot
+# under that. The dark pupil disc and its rim made the circle. HIGHLIGHT: to the side of the middle of the iris, above it, half
+# width, half height (the same side for both eyes: where the light is), drawn in the colour "Pupil"; GLINTS the white dot.)
+RETRO_EYES = {"IRIS": (0.004, -0.008, 0.068, 0.066), "HIGHLIGHT": (-0.024, 0.006, 0.024, 0.028), "LID": (0.013, 0.030, 0.30),
+              "GLINTS": ((-0.030, -0.026, 0.008, 0.009),), "LIFT": 0.0025}
 # "3D Glass" (CHOG #361, #379): the lens of "Anime Glass" more square, in a thick light grey frame; the
 # lens over the right eye of the character blue, the one over its left eye red.
 GLASSES_3D_NUMBERS = {"LENS": (0.126, 0.016, 0.100, 0.066), "LENS_SQUARENESS": 4.0, "LENS_TAPER": 0.04,
@@ -1050,7 +1058,9 @@ def build_retro_glass(maker):
             return [(place, min(up, above + lid_above + slope * (place - to_side) * side)) for place, up in edge]
 
         lay(part.named("Iris"), under_lid(oval_edge(iris, half_width, half_height, 16)), iris, eyes.LIFT)
-        lay(part.named("Pupil"), under_lid(oval_edge(iris, *eyes.PUPIL, 12)), iris, eyes.LIFT * 2.0)
+        shine_side, shine_up, shine_wide, shine_tall = eyes.HIGHLIGHT
+        shine = (to_side + shine_side, above + shine_up)
+        lay(part.named("Pupil"), under_lid(oval_edge(shine, shine_wide, shine_tall, 12)), shine, eyes.LIFT * 2.0)
         steps = 4
         lid = [(to_side + half_width * 1.15 * (-1.0 + 2.0 * index / steps),
                 above + lid_above + thick * 0.4 + slope * half_width * 1.15 * (-1.0 + 2.0 * index / steps) * side)
@@ -1379,7 +1389,7 @@ EYES = {
     "Retro Glass": {
         "kind": "RetroGlass",
         "colours": {"Frame": (0.82, 0.12, 0.16), "Lens": (0.68, 0.85, 0.93), "Iris": (0.38, 0.60, 0.74),
-                    "Pupil": (0.18, 0.32, 0.46), "Lid": (0.16, 0.20, 0.30), "Glint": WHITE},
+                    "Pupil": (0.66, 0.87, 0.96), "Lid": (0.16, 0.20, 0.30), "Glint": WHITE},   # "Pupil": the pale highlight
         "unlit": ("Lens", "Iris", "Pupil", "Lid", "Glint"),
         "numbers": RETRO_GLASS_NUMBERS,
     },
