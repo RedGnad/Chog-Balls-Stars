@@ -860,32 +860,31 @@ def build_plunger(maker):
 
 
 BALACLAVA = {
-    # The mask: a knitted shell over the brow, the top, the sides and the back down to the neck
-    # (polar degrees of its edge by degrees from the front: the edge runs just above the eyes, then
-    # down beside them), and a panel over the face below the eyes and between them. Two eye holes, each
-    # ringed by a rolled edge.
-    "RIM": ((0.0, 83.0), (26.0, 84.0), (40.0, 128.0), (100.0, 152.0), (180.0, 150.0)),
-    "SIZE": 1.11,
-    "ROWS": 4,
-    # 20 around and 14 ribs until batch 7: with the whole crown through it, a robber in a heavy robe went
-    # over 8,000 triangles.
-    "SIDES": 14,
-    # The panel over the lower face and the bridge between the eyes, in the coordinates of the face (to
-    # the side, above its middle): its edges, how far off the head.
-    "LOWER": (-0.26, 0.26, -0.27, -0.072),
-    "BRIDGE": (-0.040, 0.040, -0.080, 0.090),
-    "PANEL_LIFT": 0.030,
-    "PANEL_STEPS": (8, 3),
-    # The eye holes: middle (to the side, above), half width, half height, the radius of the rolled edge.
-    "HOLE": (0.114, 0.004, 0.072, 0.084, 0.016),
-    "HOLE_STATIONS": 12,
-    # The knit: darker ribs from the edge up over the top: how many, their half width.
-    "RIBS": (10, 0.006),
-    "OUTLINE_THICKNESS": 0.020,
-    # A knitted mask, tight on the head: the pictures draw the spikes of the far side and of the back
-    # coming out of it. Those leaves stay, turned down as under a cap, and come through the knit
-    # ("THROUGH": the check of the leaves is told so). The mask covers the mouth: the 24 Robber Genesis
-    # have no value of "Mouth" in the metadata anyway; "HIDES" keeps it so if one ever had.
+    # (22 October 2026, the owner: "the balaclavas are bugged": a flat grey block with seams, the eye holes thick rings. The art (#14, #86, #319,
+    # #460, #630, #652, #781, #1960): a dark grey knitted mask that wraps the whole head as one smooth volume, fine ribs running up it, down
+    # to the neck under the chin; two large almond holes, each with a thin rolled edge, through which the face and the eye show; no mouth hole.
+    # Until then a shell over the top and the back, a flat panel laid 0.030 off the face under the eyes, a flat bridge, and rings of 0.016.)
+    # The mask is one shell over the whole head: rows of points from the top down to its lower edge, round the head at angles seen from above,
+    # closer together at the front where the holes are. The angles (degrees from the front, one side, the other mirrored; 180 once), the
+    # polar degrees of the rows (the last is the lower edge, in RIM by degrees from the front: under the chin), how much larger than the head.
+    "ANGLES": (0.0, 9.0, 18.0, 27.0, 36.0, 45.0, 60.0, 80.0, 105.0, 135.0, 180.0),
+    "ROWS": (0.0, 38.0, 66.0, 78.0, 84.0, 90.0, 96.0, 103.0, 110.0, 118.0, 127.0, 138.0),
+    "RIM": ((0.0, 158.0), (60.0, 152.0), (110.0, 150.0), (180.0, 146.0)),
+    "SIZE": 1.065,
+    # The eye holes, in the coordinates of the face (to the side, above its middle): middle, half width, half height, the share of the hole
+    # that is cut out of the shell (the rest of its edge is covered by the rolled edge), the radius of that rolled edge, its stations, sides.
+    "HOLE": (0.122, 0.010, 0.080, 0.094, 0.86, 0.012, 12, 4),
+    "HOLE_LIFT": 0.016,
+    # The ribs of the knit: the angles they run at (degrees from the front, both sides; 0 and 180 once), the polar degrees of their stations
+    # from the top, half width, how far off the shell. A piece that would lie across a hole is left out.
+    "RIB_ANGLES": (0.0, 14.0, 28.0, 52.0, 66.0, 84.0, 108.0, 132.0, 180.0),
+    "RIB_STATIONS": (10.0, 34.0, 58.0, 76.0, 90.0, 104.0, 118.0, 132.0, 146.0),
+    "RIB_HALF": 0.0055,
+    "RIB_LIFT": 0.004,
+    "OUTLINE_THICKNESS": 0.016,
+    # A knitted mask, tight on the head: the pictures draw the spikes of the far side coming out of it. Those leaves stay and come through the
+    # knit ("THROUGH": the check of the leaves is told so). The mask covers the mouth: the 24 Robber Genesis have no value of "Mouth" in the
+    # metadata anyway; "HIDES" keeps it so if one ever had.
     "LEAVES": (GONE, GONE, GONE, leaf(1.2, 116.0, None, 0.35), GONE, leaf(1.2, 106.0, 40.0, 0.35),
                leaf(1.2, None, 104.0, 0.35)),
     "THROUGH": True,
@@ -894,54 +893,83 @@ BALACLAVA = {
 
 
 def build_balaclava(maker):
-    numbers = maker.numbers(BALACLAVA)
-    part, surface = maker.part(), maker.surface
-    sides, rows = numbers.SIDES, numbers.ROWS
+    numbers = SimpleNamespace(**{**BALACLAVA, **maker.entry.get("numbers", {})})
+    part, surface, head = maker.part(), maker.surface, maker.head
     outline = numbers.OUTLINE_THICKNESS
-    angles = [2.0 * math.pi * index / sides for index in range(sides)]
-    rims = [math.radians(interpolate(numbers.RIM, from_front(angle))) for angle in angles]
-    loops = [[on_head(surface, angle, polar, 0.92) for angle, polar in zip(angles, rims)]]
-    for row in range(rows):
-        share = row / rows
-        loops.append([on_head(surface, angle, polar * (1.0 - share), numbers.SIZE) for angle, polar in zip(angles, rims)])
-    loops.append([on_head(surface, 0.0, 0.0, numbers.SIZE)])
-    shares = [(0.0,) * sides] + [(1.0,) * sides] * rows + [(1.0,)]
-    KIT.add_loops(part, loops, part.named("Knit"), outline, shares=shares)
-    # The ribs of the knit, from the edge up towards the top.
-    count, half = numbers.RIBS
+    half_angles = [value for value in numbers.ANGLES if 0.0 < value < 180.0]
+    degrees = sorted([-value for value in half_angles] + [0.0] + half_angles + [180.0])
+    angles = [math.radians(270.0 + value) for value in degrees]
+    count = len(angles)
+    rims = [math.radians(interpolate(numbers.RIM, abs(value))) for value in degrees]
+    middle_side, middle_up, half_wide, half_tall, cut, radius, stations, ring_sides = numbers.HOLE
+    mid_z = surface.middle.z + head.FACE_MIDDLE[1]
+
+    def in_hole(point, grow):
+        """Is a point of the head in one of the two holes (grown by "grow"), as seen from the front?"""
+        if point.y > -0.04:
+            return False
+        for sign in (1.0, -1.0):
+            if (((point.x - sign * middle_side) / (half_wide * grow)) ** 2
+                    + ((point.z - mid_z - middle_up) / (half_tall * grow)) ** 2) < 1.0:
+                return True
+        return False
+
+    # The shell: rows from the top down to the edge, the last row under the head, so the edge is hidden.
+    mesh = part.mesh
+    rows = [[on_head(surface, 0.0, 0.0, numbers.SIZE)]]
+    for polar_deg in numbers.ROWS[1:]:
+        rows.append([on_head(surface, angle, math.radians(polar_deg), numbers.SIZE) for angle in angles])
+    rows.append([on_head(surface, angle, rim, numbers.SIZE) for angle, rim in zip(angles, rims)])
+    rows.append([on_head(surface, angle, rim, 0.93) for angle, rim in zip(angles, rims)])
+    verts = [[mesh.verts.new(point) for point in row] for row in rows]
+    faces, fade = [], {}
+    for vertex in verts[1]:
+        fade[vertex] = 1.0
     for index in range(count):
-        angle = 2.0 * math.pi * (index + 0.5) / count
-        rim = math.radians(interpolate(numbers.RIM, from_front(angle)))
-        rows_of_rib = []
-        for step in range(4):
-            polar = rim * (1.0 - step / 4.0) + math.radians(8.0) * (step / 4.0)
-            across = Vector((-math.sin(angle), math.cos(angle), 0.0)) * half
-            here = on_head(surface, angle, polar, numbers.SIZE + 0.012)
-            rows_of_rib.append([here - across, here + across])
-        full.add_skin(part, surface, rows_of_rib, part.named("Rib"), around=False)
-    # The panel over the lower face and the bridge between the eyes.
-    lift = numbers.PANEL_LIFT
-    across_steps, up_steps = numbers.PANEL_STEPS
-    for left, right, low, high in (numbers.LOWER, numbers.BRIDGE):
-        grid = [[surface.front(left + (right - left) * column / across_steps, low + (high - low) * row / up_steps, lift)
-                 for column in range(across_steps + 1)] for row in range(up_steps + 1)]
-        full.add_skin(part, surface, grid, part.named("Knit"), around=False)
-    # The rolled edge of each eye hole.
-    middle_side, middle_up, half_width, half_height, radius = numbers.HOLE
+        faces.append(mesh.faces.new((verts[0][0], verts[1][(index + 1) % count], verts[1][index])))
+    for lower, upper in zip(verts[1:], verts[2:]):
+        for index in range(count):
+            after = (index + 1) % count
+            corners = (lower[index], lower[after], upper[after], upper[index])
+            centre = sum((corner.co for corner in corners), Vector()) / 4.0
+            if in_hole(centre, cut):
+                continue
+            faces.append(mesh.faces.new(corners))
+    for row in verts[1:-1]:
+        for vertex in row:
+            fade[vertex] = 1.0
+    for vertex in verts[-1]:
+        fade[vertex] = 0.0
+    for face in faces:
+        face.smooth = True
+    part.paint(faces, part.named("Knit"))
+    part.outlined.append((faces, outline, fade))
+    # The ribs of the knit.
+    rib_half = [value for value in numbers.RIB_ANGLES if 0.0 < value < 180.0]
+    rib_degrees = sorted([-value for value in rib_half] + [0.0] + rib_half + [180.0])
+    for value in rib_degrees:
+        angle = math.radians(270.0 + value)
+        across = Vector((-math.sin(angle), math.cos(angle), 0.0)) * numbers.RIB_HALF
+        places = [on_head(surface, angle, math.radians(polar), numbers.SIZE + numbers.RIB_LIFT / surface.half.z) for polar in numbers.RIB_STATIONS]
+        for low, high in zip(places, places[1:]):
+            if in_hole((low + high) * 0.5, 1.25) or in_hole(low, 1.15) or in_hole(high, 1.15):
+                continue
+            full.add_skin(part, surface, [[low - across, low + across], [high - across, high + across]], part.named("Rib"), around=False)
+    # The rolled edge of each eye hole: a thin tube round the almond.
     for sign in (1.0, -1.0):
         path, wide, thick = [], [], []
-        for index in range(numbers.HOLE_STATIONS + 1):
-            turn = 2.0 * math.pi * index / numbers.HOLE_STATIONS
-            side = sign * middle_side + half_width * math.cos(turn)
-            up = middle_up + half_height * math.sin(turn)
+        for index in range(stations + 1):
+            turn = 2.0 * math.pi * index / stations
+            side = sign * middle_side + half_wide * math.cos(turn)
+            up = middle_up + half_tall * math.sin(turn)
+            point = surface.front(side, up, numbers.HOLE_LIFT)
+            ahead = surface.front(sign * middle_side + half_wide * math.cos(turn + 0.01), middle_up + half_tall * math.sin(turn + 0.01),
+                                  numbers.HOLE_LIFT) - point
             out = KIT.outward(surface, side, up)
-            point = surface.front(side, up, lift)
-            ahead = surface.front(sign * middle_side + half_width * math.cos(turn + 0.01),
-                                  middle_up + half_height * math.sin(turn + 0.01), lift) - point
             path.append(point)
             wide.append(out.cross(ahead.normalized()).normalized() * radius)
             thick.append(out * radius * 0.8)
-        slab(part, path, wide, thick, part.named("Edge"), outline * 0.8, sides=6)
+        slab(part, path, wide, thick, part.named("Edge"), 0.0, sides=ring_sides)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -1415,7 +1443,8 @@ HATS_OF_SIDE = {
 # bare head the owner compared them with (#17, Plumber). A knitted mask is pulled over the spiky head, so the
 # whole crown of a bare head comes out through it, each leaf where it grows; the pictures, which show only
 # the far side, draw those of the far side.
-ROBBER_POINTS = FULL_CROWN
+# (22 October 2026: not the top leaf nor the top of the back row, which the art shows nowhere above a mask that wraps the whole head smooth.)
+ROBBER_POINTS = (GONE, WHOLE, WHOLE, WHOLE, GONE, WHOLE, WHOLE)
 
 
 def seen(looked_at, art, leaves, under_rim=None, **numbers):
