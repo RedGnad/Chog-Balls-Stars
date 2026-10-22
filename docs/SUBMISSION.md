@@ -8,7 +8,7 @@ submitting. Character counts are for the 8,000-character fields.
 ## 01 Basics
 
 - **Project name:** Chog Balls Stars (chosen by the owner on 22 October 2026, after Chog Arena, a name many projects share; Chog Genesis is the NFT collection)
-- **Banner:** `research/evidence/banner-key-art-2026-10-23.jpg` (made on 23 October 2026 from the game's own 3D heroes, attack
+- **Banner:** `research/evidence/banner-key-art-v2-2026-10-23.jpg` (the first composition: `banner-key-art-2026-10-23.jpg`) (made on 23 October 2026 from the game's own 3D heroes, attack
   objects and towers in Blender: `tools/blender/make_key_art.py`, `tools/release/compose_banner.py`). Read on chogathon.chog.xyz
   that day (its page's own styles): project cards show the image at 16:9 and another view at 16:7,
   both `object-fit: cover`; so 1920 by 1080 with what matters inside the middle 16:7 band.

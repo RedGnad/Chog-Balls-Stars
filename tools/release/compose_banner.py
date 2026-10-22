@@ -268,7 +268,7 @@ def main():
     tagline = outlined_text(size, arguments.tagline, font("LilitaOne-Regular.ttf", round(54 * scale)), (width * 0.5, height * 0.315),
                             (255, 255, 255), (220, 210, 255), INK, round(6 * scale), (0, round(6 * scale)), tilt=2.0)
     picture.alpha_composite(tagline)
-    footer = outlined_text(size, arguments.footer, font("Nunito-Black.ttf", round(34 * scale)), (width * 0.5, height * 0.875),
+    footer = outlined_text(size, arguments.footer, font("Nunito-Black.ttf", round(34 * scale)), (width * 0.5, height * 0.85),
                            (255, 255, 255), (235, 230, 255), INK, round(5 * scale), (0, round(4 * scale)))
     picture.alpha_composite(footer)
 
