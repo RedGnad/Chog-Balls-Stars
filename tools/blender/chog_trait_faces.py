@@ -80,9 +80,12 @@ SIDE_EYE = {
 # bag is, how much larger, and the width of its dark line.
 TIRED = {
     **SIDE_EYE,
+    # (22 October 2026, strict audit, batch 3, on #66, #106, #123, #246, #267: larger eyes than SIDE_EYE, one upright glint at the top left of the pupil, a grey-blue
+    # bag under each that is a crescent, not a ring: SIZE 0.058 by 0.062 and the glint moved to the left.)
+    "SIZE": (0.058, 0.062),
     "CUT": 0.04,
     "SLOPE": -0.06,
-    "GLINTS": ((0.020, -0.002, 0.010, 0.012),),
+    "GLINTS": ((-0.016, 0.008, 0.010, 0.019),),
     "BAG": (0.012, 0.010, 0.010),
     "BAG_LINE": 0.006,
 }
@@ -125,7 +128,9 @@ THIN_TEAR = {"FROM": (0.040, -0.040), "TO": -0.128, "WIDTH": (0.010, 0.012), "LI
              "WELL": (0.034, 0.012, 0.009)}
 # "Closed Eye Crying": an arch over each closed eye, thick in its middle, slanted, and a wide tear
 # under it with no dark line.
-CLOSED_ARCH = {"AT": (0.112, 0.012), "ARC": (0.050, 0.020, 0.015), "TILT": -0.10, "STEPS": 10}
+# (22 October 2026, strict audit, batch 3, on #21, #18, #24, #261, #263: the closed eye of the pictures is a SAD arch, thick, its outer end much lower than its inner one
+# (it droops), a thick black stroke 0.030 in the middle; ours were upright happy arches. TILT -0.10 to -0.40, ARC 0.054 by 0.022, thickness 0.020 to 0.026.)
+CLOSED_ARCH = {"AT": (0.112, 0.012), "ARC": (0.054, 0.022, 0.026), "TILT": -0.40, "STEPS": 10}
 CLOSED_TEARS = {"FROM": (0.020, -0.010), "TO": -0.172, "WIDTH": (0.034, 0.042), "LINE": 0.0,
                 "SHINE": 0.0, "DRIFT": 0.008}
 # "Dead": a thick cross on each eye: half the length of a stroke, its thickness, its turn.
@@ -1301,7 +1306,9 @@ EYES = {
         "kind": "Round",
         "colours": {"Dark": DARK, "White": WHITE},
         "unlit": ("Dark", "White"),
-        "numbers": {"PUPIL": (0.034, 0.039)},
+        # (22 October 2026, strict audit, batch 3, on #37, #79, #68, #130, #237: the eyes of the pictures are TALL ovals, 0.72 as wide as high, a thin white ring round a
+        # black pupil that fills nearly all of it: 0.056 by 0.074, 0.046 by 0.064, pupil 0.038 by 0.056 where ours were round, 0.060 by 0.066.)
+        "numbers": {"LINE": (0.056, 0.074), "WHITE": (0.046, 0.064), "PUPIL": (0.038, 0.056)},
     },
     "Side Eye": {
         "kind": "SideEye",

@@ -612,7 +612,13 @@ ROUND = {
 # The visor: one band that wraps the front of the head from one row of leaves to the other.
 VISOR = {
     "UP": 0.020,                 # its middle, above the middle of the face
-    "HALF_HEIGHT": (0.056, 0.042),   # in the middle of the front, at its ends
+    # (22 October 2026, strict audit of the eyes, batch 3, on #1, #30, #100, #105 gradient; #60, #62, #82 plasma; #11, #83, #147 sunset: the visor of the pictures is
+    # a lens, an almond with round ends, taller in the middle than a band (0.076 against 0.056) and lower at its ends (0.036 against 0.042), its
+    # colours running smoothly where ours stepped in ten flat stripes. HALF_HEIGHT is the middle and the end; ROUND how round the ends are (1 a parabola,
+    # less rounder); SMOOTH how many pieces each stripe of PIECES is cut into, their colours run between the stripes (smooth_visors).)
+    "HALF_HEIGHT": (0.076, 0.036),   # in the middle of the front, at its ends
+    "ROUND": 0.55,
+    "SMOOTH": 2,
     "HALF_WIDTH": 0.338,         # the oval it follows seen from above: half width, half depth
     "HALF_DEPTH": 0.306,
     "AROUND_DEG": 80.0,
@@ -2358,7 +2364,7 @@ def build_visor(maker):
         here = surface.middle + Vector((numbers.HALF_WIDTH * math.sin(angle), -numbers.HALF_DEPTH * math.cos(angle),
                                         height))
         out = Vector((math.sin(angle) / numbers.HALF_WIDTH, -math.cos(angle) / numbers.HALF_DEPTH, 0.0)).normalized()
-        tall = middle_tall + (end_tall - middle_tall) * across * across
+        tall = end_tall + (middle_tall - end_tall) * max(1.0 - across * across, 0.0) ** numbers.ROUND
         back = here - out * numbers.THICKNESS
         loops.append([here + Z * tall, here + out * numbers.BULGE, here - Z * tall,
                       back - Z * tall * 0.96, back + Z * tall * 0.96])
@@ -2685,11 +2691,37 @@ MOUTH_KINDS = {"GoldTooth": build_gold_tooth, "Smile": build_smile, "Drool": bui
 CLOTH_KINDS = {"Tee": build_tee, **hats_and_clothes.CLOTH_KINDS}
 # trait of the collection: (start of the name of its part, its table, the word that names the
 # builder in an entry, the builders). Clothing comes first: it is under everything else.
+def smooth_visors(table):
+    """Every entry of the table that is a visor, with its stripes cut into VISOR["SMOOTH"] pieces each whose colour runs between the colours of the stripes
+    (linearly from the middle of one stripe to the middle of the next): the visors of the pictures run smoothly (22 October 2026)."""
+    made = {}
+    for name, entry in table.items():
+        if not isinstance(entry, dict) or entry.get("kind") != "Visor":
+            made[name] = entry
+            continue
+        numbers = {**VISOR, **entry.get("numbers", {})}
+        pieces, steps = numbers["PIECES"], numbers["SMOOTH"]
+        count = len(pieces) * steps
+        colours, names = {}, []
+        for index in range(count):
+            position = (index + 0.5) / steps - 0.5                    # in stripes, the middle of the first at 0
+            low = min(max(int(math.floor(position)), 0), len(pieces) - 1)
+            high = min(low + 1, len(pieces) - 1)
+            share = min(max(position - low, 0.0), 1.0)
+            first, second = entry["colours"][pieces[low]], entry["colours"][pieces[high]]
+            key = f"S{index}"
+            colours[key] = tuple(round(a + (b - a) * share, 4) for a, b in zip(first, second))
+            names.append(key)
+        made[name] = {**entry, "colours": colours, "numbers": {**entry.get("numbers", {}), "PIECES": tuple(names)},
+                      "unlit": ()}
+    return made
+
+
 OF_SIDE = {"Mouth": faces.by_side(MOUTHS_OF_SIDE, faces.MOUTHS_OF_SIDE), "Eyes": faces.EYES_OF_SIDE}
 TRAIT_PARTS = {
     "Body": ("Cloth", CLOTHES, "kind", CLOTH_KINDS),
     "Head": ("Hat", HATS, "shape", HAT_SHAPES),
-    "Eyes": ("Eyes", {**EYES, **faces.EYES, **bases.radioactive_eyes({**EYES, **faces.EYES})}, "kind", EYE_KINDS),
+    "Eyes": ("Eyes", smooth_visors({**EYES, **faces.EYES, **bases.radioactive_eyes({**EYES, **faces.EYES})}), "kind", EYE_KINDS),
     "Mouth": ("Mouth", {**MOUTHS, **faces.MOUTHS}, "kind", MOUTH_KINDS),
     # What a Genesis holds in its right hand (chog_trait_accessories.py, 17 October 2026).
     "Accessory": ("Accessory", accessories.ACCESSORIES, "kind", accessories.ACCESSORY_KINDS),

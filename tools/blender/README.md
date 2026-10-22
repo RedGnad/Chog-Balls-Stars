@@ -1429,3 +1429,20 @@ Three items of the owner's review, one sheet each, the art beside the hero stage
    (`BONES_SHOW` in `chog_trait_bases.py`, read in `make_chog_traits.build`), and a Radioactive's ribs are in the deeper tone of its skin, not black. Not done: the bones through the translucent vest or tank top of a few
    Radioactives (#275, #1192) and the arm bones on the art.
 - **Checked**: the 114 Skull and Radioactive heroes (`export_chog_parts.py` builds all of them, limit 8,000 triangles). Not in a Unity build.
+
+## 22 October 2026: strict eye audit, batch 3 (lot 8)
+
+Gradient, Sunset and Plasma visors (157 Genesis), Round Eye (61), Closed Eye Crying (57), Tired (56), Right, strict rule, 3 to 6 Genesis per value (#1, #30, #100, #105; #11, #83, #147; #60, #62, #82; #37, #79, #68, #237; #21, #18, #24, #261;
+#66, #106, #123, #246, #267). Sheet, 19 Genesis, the art beside the front close and the three quarter close, before | after (before rendered from a temporary copy of origin/main, not kept):
+[heroes-eyes-batch3-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch3-2026-10-22.jpg).
+
+- **Visors, Right: approximate, made closer.** The visor of the pictures is a lens (an almond with round ends, 0.076 half height in the middle and 0.036 at its ends where ours was a band 0.056 and 0.042), its colours running
+  smoothly where ours stepped in ten flat stripes. `VISOR["HALF_HEIGHT"]`, `ROUND` 0.55 for the ends, and `smooth_visors()` (`make_chog_traits.py`) cuts each stripe in two with the colour running between the stripes (20 to 24 pieces).
+  Still differs: the art's lens is larger and slanted in the three quarter pictures and its edge is a thick black line round it; the colour still shows a step every 0.03 across.
+- **Round Eye, Right: wrong shape, redrawn, now approximate.** Tall ovals 0.72 as wide as high, a thin white ring, the pupil filling the white (0.056 by 0.074 dark disc, 0.046 by 0.064 white, pupil 0.038 by 0.056; round and 0.060 by 0.066 before).
+  Approximate: the near eye is larger than the far one in the pictures.
+- **Closed Eye Crying, Right: wrong, redrawn, now approximate.** The pictures draw a SAD closed eye: a thick arch, its outer end much lower than its inner one; ours were upright happy arches. `CLOSED_ARCH` tilt -0.10 to -0.40, 0.054 by 0.022, thickness 0.026 (0.015).
+  The tear is as in lot 5c.
+- **Tired, Right: approximate, made closer.** Larger eyes (0.058 by 0.062), one upright glint at the top left of the pupil (it was at the right); the grey-blue bag is a crescent in the pictures and a ring in ours (not changed).
+- **Checked**: library export builds all 1,970 Genesis under 8,000 triangles; by eye on the sheet only; not in a Unity build.
+- **Left to do**: Side Left (Side Eye, Base, Happy, MOG, Vertical, Flat, Frog, Clown Eye, Chog Viper, Clown Eye Mix, Classic VR, Modern VR, Retard, XD, 3D Glass, BTC Glass, Worried, Thug), then Right: Teary, Retro Glass and Anime Glass remainders.
