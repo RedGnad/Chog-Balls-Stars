@@ -41,6 +41,17 @@ namespace Chog.Editor
 
             // Farthest point the area can touch, measured from the caster.
             public float Reach => ForwardOffset + Velocity * Lifetime + Radius;
+
+            /// <summary>The same sweep with its area "scale" times as wide (the super attack of a 1:1).</summary>
+            public Sweep Scaled(float scale)
+            {
+                if (Mathf.Approximately(scale, 1f))
+                    return this;
+                var copy = (Sweep)MemberwiseClone();
+                copy.Radius = Radius * scale;
+                copy.VisualScale = VisualScale * scale;
+                return copy;
+            }
         }
 
         // What an Aura does to the signature.
@@ -77,12 +88,10 @@ namespace Chog.Editor
             public float ReturnShare;
             // A persistent zone: what the zone left behind deals at each of its ticks; 0 for none.
             public float ZoneDamagePerTick;
-            // The inversion, the super attack of a 1:1 (22 October 2026): this many more copies leave at once,
-            // turned SpreadDegrees apart; a shape that does not aim (the nova) or a lobbed one (the puddle)
-            // strikes that many more times instead, SpreadInterval apart. 0 for the other deliveries.
-            public int Spread;
-            public float SpreadDegrees;
-            public float SpreadInterval;
+            // The inversion, the super attack of a 1:1: its area is this many times as wide (1 for the other deliveries).
+            // (22 October 2026, morning: three copies turned 120 degrees apart; the owner, evening: two of them went away from
+            // the target and it did not read; one larger strike with a stronger golden burst instead.)
+            public float AreaScale = 1f;
         }
 
         private const string NotBuiltSummary = "not built yet, plays like a direct hit";
@@ -107,10 +116,9 @@ namespace Chog.Editor
             // The damage is spread over time, and a target can walk out of the zone.
             new Delivery { Expression = "persistent-zone", Summary = "hits at 50%, then leaves a zone for 3 s",
                            Share = 0.5f, ZoneDamagePerTick = 500f },
-            // The ten 1:1 Genesis are the rarest: their signature is a super attack, three times at full
-            // strength, in three directions when it aims.
-            new Delivery { Expression = "inversion", Summary = "a super attack: three at once at full strength, in three directions",
-                           Spread = 2, SpreadDegrees = 120f, SpreadInterval = 0.35f }
+            // The ten 1:1 Genesis are the rarest: their signature is a super attack, one strike 1.6 times as wide at 125%.
+            new Delivery { Expression = "inversion", Summary = "a super attack: one strike 1.6 times as wide, at 125%",
+                           Share = 1.25f, AreaScale = 1.6f }
         };
 
         /// <summary>What the roster needs from this importer, parallel to its id tables.</summary>
@@ -410,8 +418,9 @@ namespace Chog.Editor
                 // the first form the names it had before second forms existed.
                 var deliverySuffix = delivery.Expression == "direct" ? "" : Capitalised(delivery.Expression);
                 for (var form = 0; form < GenesisRoster.FormCount; form++)
-                foreach (var sweep in form == 0 ? Sweeps : SecondSweeps)
+                foreach (var unscaled in form == 0 ? Sweeps : SecondSweeps)
                 {
+                    var sweep = unscaled.Scaled(delivery.AreaScale);
                     var suffix = deliverySuffix + (form == 0 ? "" : SecondFormSuffix);
                     var name = "Genesis" + Capitalised(sweep.Shape) + Capitalised(aura.Effect) + suffix;
 
@@ -445,19 +454,8 @@ namespace Chog.Editor
                     var skill = LoadOrCreate<GenesisSignatureSkillData>(name + "SkillData", written);
                     CopySkill(plainSkill, skill);
                     Repeat(skill, delivery);
-                    // The super attack: copies turned apart for a shape that aims, more strikes for the nova.
                     skill.Spread = 0;
                     skill.SpreadDegrees = FP._0;
-                    if (delivery.Spread > 0)
-                    {
-                        if (sweep.Shape == "nova")
-                            Repeat(skill, new Delivery { Hits = delivery.Spread + 1, Interval = delivery.SpreadInterval });
-                        else
-                        {
-                            skill.Spread = delivery.Spread;
-                            skill.SpreadDegrees = Fixed(delivery.SpreadDegrees);
-                        }
-                    }
                     skill.AttackPrototype = attackPrototype;
                     skill.AttackDataOverride = new AssetRef<AttackData> { Id = GuidOf(attack) };
                     skill.Reach = Fixed(sweep.Reach);
@@ -497,14 +495,10 @@ namespace Chog.Editor
                 if (delivery.ReturnShare > 0f || delivery.ZoneDamagePerTick > 0f)
                     continue;
 
-                // A lobbed puddle cannot turn: the super attack lobs it that many more times.
-                var lobbed = delivery.Spread > 0
-                    ? new Delivery { Expression = delivery.Expression, Hits = delivery.Spread + 1, Interval = delivery.SpreadInterval, Share = delivery.Share }
-                    : delivery;
                 for (var form = 0; form < GenesisRoster.FormCount; form++)
                 {
                     skills[form + "/" + delivery.Expression + "/" + PuddleShape + "/" + aura.Effect] =
-                        ImportPuddle(aura, effect, lobbed, deliverySuffix + (form == 0 ? "" : SecondFormSuffix), form == 1,
+                        ImportPuddle(aura, effect, delivery, deliverySuffix + (form == 0 ? "" : SecondFormSuffix), form == 1,
                             written, attackPrototype, shapeMaterial);
                 }
             }
@@ -600,8 +594,7 @@ namespace Chog.Editor
             zone.EffectInterval = sampleZone.EffectInterval;
             zone.EffectRepeatCount = sampleZone.EffectRepeatCount;
             zone.Shape = JsonUtility.FromJson<Shape2DConfig>(JsonUtility.ToJson(sampleZone.Shape));
-            if (second)
-                zone.Shape.CircleRadius = Fixed(sampleZone.Shape.CircleRadius.AsFloat * SecondPuddleRadiusScale);
+            zone.Shape.CircleRadius = Fixed(sampleZone.Shape.CircleRadius.AsFloat * (second ? SecondPuddleRadiusScale : 1f) * delivery.AreaScale);
             ApplyAura(zone, aura, effect, (second ? SecondPuddleDamagePerTick : PuddleDamagePerTick) * delivery.Share);
             // Drawn as a puddle of tears in the colours of the caster's eyes.
             zone.VisualKind = GenesisVisualKind.GroundDisc;

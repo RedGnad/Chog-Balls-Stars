@@ -11,8 +11,10 @@ namespace Quantum
 	{
 		// First numbers, to be tuned by play. A hero has about 6,000 health and hits for 400 to
 		// 900: a tower takes some fifteen hits, a core some thirty.
-		public static readonly FP TowerHealth = 8000;
-		public static readonly FP CoreHealth = 12000;
+		// (8,000 and 12,000 until 22 October 2026, evening: the owner, "matches can be dispatched too fast"; three players on a core
+		// leave no time for a comeback. Half as much again.)
+		public static readonly FP TowerHealth = 12000;
+		public static readonly FP CoreHealth = 18000;
 		public static readonly FP TowerRadius = FP._0_50 + FP._0_10;
 		// The core is drawn 1.5 times its model (StructureViews.CoreScale): its plinth is 1.60 wide at the
 		// ground (research/evidence/siege-map-layouts-2026-10-17). With 1.5 a hero stops with its body

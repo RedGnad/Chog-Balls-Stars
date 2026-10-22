@@ -30,8 +30,8 @@ MonoBehaviour:
       Value: 416728545450138221
   HasTTL: 1
   ActionInterval:
-    RawValue: 22937
-  ActionAmount: 3
+    RawValue: 65536
+  ActionAmount: 1
   RotationLockDuration:
     RawValue: 32768
   MovementLockDuration:

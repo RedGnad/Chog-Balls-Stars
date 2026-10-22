@@ -24,7 +24,7 @@ MonoBehaviour:
   VisualTint: {r: 0.25, g: 0.4, b: 1, a: 1}
   VisualKind: 6
   ShapeMaterial: {fileID: 2100000, guid: e484f787bfd0c473e97d36e9947011ff, type: 2}
-  VisualRadius: 3
+  VisualRadius: 4.8
   IsGenesisSignature: 1
   GenesisEffect: 6
   GenesisEffectDuration:
@@ -38,7 +38,7 @@ MonoBehaviour:
   DestroyOnHitStatic: 0
   EffectsOnOthers:
   - Value:
-      RawValue: 111411200
+      RawValue: 139264000
     AttributeType: 1
     Appliance: 1
     Operation: 2
@@ -59,7 +59,7 @@ MonoBehaviour:
   ForwardOffset:
     RawValue: 0
   Radius:
-    RawValue: 196608
+    RawValue: 314572
   StopAtWalls: 0
   LeavesBehindPrototype:
     Id:

@@ -275,7 +275,7 @@ MonoBehaviour:
   - fires twice, half a second apart, 60% each
   - goes out at 60%, then comes back to you at 80%
   - hits at 50%, then leaves a zone for 3 s
-  - 'a super attack: three at once at full strength, in three directions'
+  - 'a super attack: one strike 1.6 times as wide, at 125%'
   RolePrototypes:
   - Id:
       Value: 3101334269603457031

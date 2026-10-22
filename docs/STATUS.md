@@ -1,5 +1,10 @@
 # État courant et décisions
 
+**22 October 2026, 20:20 UTC (lead: tower and core health +50%, the 1:1 super attack as one wider strike; NEW SIMULATION STAMP; deployed).**
+- **Deployed:** build `20261022T200608935Z-abcc80756c2e4f10bd34a0a08c8c0b7a`, stamp `7e77d8cf4a7c1e99` (was `b8d600c2135da877`). `Structures.TowerHealth` 12,000 and `CoreHealth` 18,000 (8,000 and 12,000; the owner: matches could be dispatched too fast). The inversion delivery (1:1) is one strike 1.6 times as wide at 125% (`GenesisSignatureImporter`, `AreaScale`, `Sweep.Scaled`; the puddle's zone too) in place of three copies 120 degrees apart; its golden cast burst larger (`ChogFxRecipes.ForDelivery`, stars 1.15, 18 rays, 2 rings). Card text and `web/hero/heroes.json` regenerated.
+- **Verified:** 32 headless simulation tests; the local build connected to Photon with the new version and played a full siege with five 1:1 bots, recorded as the new judge fixture `tests/fixtures/replays/20261022T201430-siege-health-winner1-tick3521.json` (a core fell at 117 s with five 1:1 bots charged from the start); the judge agrees on all four fixtures.
+- **Not verified:** the wider strike seen on screen by the owner; whether +50% is enough with humans.
+
 **22 October 2026, 20:05 UTC (lead: Side Left happy eyes, the owner's home as a holder's; deployed).**
 - **Deployed:** build `20261022T195628615Z-ad2f6303e0a744878b5103c483658aef`, stamp unchanged. Happy on Side Left: two equal arches (a long stroke beside a short arch read as deformed, #26; `try-happy-left.jpg`). The Genesis the owner picks with ADMIN shows on the home as in a holder's wallet (YOUR GENESIS, in the list), no admin wording.
 - **Verified:** export 1,970 Genesis, 0 failed; 176 view tests; judge fixtures agree.

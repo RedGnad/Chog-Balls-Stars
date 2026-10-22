@@ -43,12 +43,12 @@ MonoBehaviour:
   AutoAimRadius:
     RawValue: 655360
   Reach:
-    RawValue: 791019
+    RawValue: 804782
   ReturnAttackData:
     Id:
       Value: 0
   ReturnDistance:
     RawValue: 0
-  Spread: 2
+  Spread: 0
   SpreadDegrees:
-    RawValue: 7864320
+    RawValue: 0

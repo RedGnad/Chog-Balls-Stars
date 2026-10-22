@@ -16,9 +16,9 @@ namespace Quantum
 		// travel: its second strike is made where the caster then stands.
 		public FP ReturnDistance;
 
-		// The inversion delivery, the super attack of a 1:1 Genesis (22 October 2026): this many more
-		// copies of the attack leave at the same moment, each turned SpreadDegrees from the one before
-		// (2 at 120: three directions at once). 0 for every other delivery.
+		// Copies of the attack turned apart, this many more, each SpreadDegrees from the one before. The super
+		// attack of a 1:1 used them in the morning of 22 October 2026; it is one wider strike since the evening
+		// (GenesisSignatureImporter, AreaScale), and every skill has 0 here.
 		public int Spread;
 		public FP SpreadDegrees;
 

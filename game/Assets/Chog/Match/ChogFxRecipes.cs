@@ -494,8 +494,9 @@ namespace Chog.Match
                 case "inversion":
                     return new DeliveryRecipe
                     {
-                        Words = "inversion (Legendary 1:1): golden stars and rays",
-                        Cast = FxLayer.Of(ChogFx.MagicStars, 0.7f, FxColour.Tinted, Gold), Flash = Gold, Rays = 12, Rings = 1
+                        // (Larger since 22 October 2026, evening: the super attack is one strike 1.6 times as wide.)
+                        Words = "inversion (Legendary 1:1): golden stars, rays and two rings",
+                        Cast = FxLayer.Of(ChogFx.MagicStars, 1.15f, FxColour.Tinted, Gold), Flash = Gold, Rays = 18, Rings = 2
                     };
                 default:
                     return new DeliveryRecipe { Words = "direct (Common)" };
