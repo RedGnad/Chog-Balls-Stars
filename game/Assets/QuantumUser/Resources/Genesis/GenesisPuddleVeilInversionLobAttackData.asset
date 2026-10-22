@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d677eac30bde9d144b987bde2952e6f6, type: 3}
+  m_Name: GenesisPuddleVeilInversionLobAttackData
+  m_EditorClassIdentifier: Quantum.Simulation::Quantum.ArcherSpecialFirstAttackData
+  Identifier:
+    Path: QuantumUser/Resources/Genesis/GenesisPuddleVeilInversionLobAttackData
+    Guid:
+      Value: 327261167448991081
+  SFX:
+    Clip: {fileID: 0}
+    Volume: 1
+  Visual: {fileID: 0}
+  VisualScale: 1
+  VisualTint: {r: 0.55, g: 0.55, b: 0.6, a: 1}
+  VisualKind: 3
+  ShapeMaterial: {fileID: 2100000, guid: e484f787bfd0c473e97d36e9947011ff, type: 2}
+  VisualRadius: 0
+  IsGenesisSignature: 0
+  GenesisEffect: 0
+  GenesisEffectDuration:
+    RawValue: 0
+  TTL:
+    RawValue: 327680
+  IgnoreOwner: 1
+  HitEnemies: 0
+  HitAlies: 0
+  DestroyOnHitDynamic: 0
+  DestroyOnHitStatic: 0
+  EffectsOnOthers: []
+  EffectsOnSource: []
+  Velocity:
+    RawValue: 393216
+  PostImpactPrototype:
+    Id:
+      Value: 1475016177276948974
+  PostImpactDataOverride:
+    Id:
+      Value: 528751230322462552

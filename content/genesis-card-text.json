@@ -1,5 +1,5 @@
 {
-    "rulesetVersion": "genesis-0.3.0",
+    "rulesetVersion": "genesis-0.4.0",
     "roles": [
         {
             "id": "brute",
@@ -119,7 +119,7 @@
         },
         {
             "id": "inversion",
-            "summary": "not built yet, plays like a direct hit",
+            "summary": "a super attack: three at once at full strength, in three directions",
             "color": ""
         }
     ],

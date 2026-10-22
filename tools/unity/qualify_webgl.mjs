@@ -244,8 +244,10 @@ try {
     }
   }
   if(process.env.CHOG_BROWSER_HOLD_KEY){
-    // Hold one movement key (w, a, s or d) after the clicks, then capture where the character went.
-    const key=process.env.CHOG_BROWSER_HOLD_KEY.toLowerCase(),code='Key'+key.toUpperCase(),vk=key.toUpperCase().charCodeAt(0);
+    // Hold one movement key (w, a, s or d) after the clicks, then capture where the character went; "space"
+    // holds the space bar, which fires the special.
+    const named=process.env.CHOG_BROWSER_HOLD_KEY.toLowerCase();
+    const key=named==='space'?' ':named,code=named==='space'?'Space':'Key'+named.toUpperCase(),vk=named==='space'?32:named.toUpperCase().charCodeAt(0);
     await command('Input.dispatchKeyEvent',{type:'keyDown',key,code,windowsVirtualKeyCode:vk,nativeVirtualKeyCode:vk});
     await sleep(Number(process.env.CHOG_BROWSER_HOLD_MS||2000));
     await command('Input.dispatchKeyEvent',{type:'keyUp',key,code,windowsVirtualKeyCode:vk,nativeVirtualKeyCode:vk});

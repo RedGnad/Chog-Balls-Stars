@@ -49,3 +49,6 @@ MonoBehaviour:
       Value: 408121617610279698
   ReturnDistance:
     RawValue: 0
+  Spread: 0
+  SpreadDegrees:
+    RawValue: 0

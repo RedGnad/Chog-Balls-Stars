@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5543f9d4d3bca4524888cd5df5816455, type: 3}
+  m_Name: GenesisWaveVeilInversionSecondAttackData
+  m_EditorClassIdentifier: Quantum.Simulation::Quantum.GenesisSweepAttackData
+  Identifier:
+    Path: QuantumUser/Resources/Genesis/GenesisWaveVeilInversionSecondAttackData
+    Guid:
+      Value: 386798100274076204
+  SFX:
+    Clip: {fileID: 0}
+    Volume: 1
+  Visual: {fileID: 0}
+  VisualScale: 0
+  VisualTint: {r: 0.55, g: 0.55, b: 0.6, a: 1}
+  VisualKind: 5
+  ShapeMaterial: {fileID: 2100000, guid: e484f787bfd0c473e97d36e9947011ff, type: 2}
+  VisualRadius: 1
+  IsGenesisSignature: 1
+  GenesisEffect: 8
+  GenesisEffectDuration:
+    RawValue: 0
+  TTL:
+    RawValue: 49152
+  IgnoreOwner: 1
+  HitEnemies: 1
+  HitAlies: 0
+  DestroyOnHitDynamic: 0
+  DestroyOnHitStatic: 0
+  EffectsOnOthers:
+  - Value:
+      RawValue: 88473600
+    AttributeType: 1
+    Appliance: 1
+    Operation: 2
+    Duration:
+      RawValue: 0
+    ApplyOnSummonParent: 0
+  - Value:
+      RawValue: 32768
+    AttributeType: 4
+    Appliance: 1
+    Operation: 2
+    Duration:
+      RawValue: 0
+    ApplyOnSummonParent: 0
+  EffectsOnSource: []
+  Velocity:
+    RawValue: 917504
+  ForwardOffset:
+    RawValue: 65536
+  Radius:
+    RawValue: 65536
+  StopAtWalls: 0
+  LeavesBehindPrototype:
+    Id:
+      Value: 0
+  LeavesBehindData:
+    Id:
+      Value: 0
