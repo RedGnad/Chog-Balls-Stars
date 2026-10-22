@@ -1295,3 +1295,18 @@ three quarter, game camera behind, hero stage).
   rear edge, none crosses it. `SECTORS` (135, -135) asks a tip to show on each side from above.
 - **Checked**: 8 Genesis before | after; the 40 Spartan Genesis build; `--budget`: largest #630 7,991, none over 8,000; library 1,970 Genesis, 0 failures. Not verified in Unity. From
   straight behind the leaves still overlap into a fan at the nape (they point back, the head being turned up); the art has no view from behind.
+
+## 22 October 2026: strict eye audit, batch 2, and a second pass on Smirk (lot 8)
+
+Same strict rule as batch 1 (each eye by itself, at the stage view, at least three Genesis per value). Sheet, 18 Genesis, the art beside the front close and the three quarter close, before | after (the
+before pictures were rendered from a temporary copy of origin/main and not kept): [heroes-eyes-batch2-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch2-2026-10-22.jpg).
+
+- **Smirk Left, second pass.** On #242, #111, #441 the near eye is a long flat almond, about 2.4 times as wide as high, nearly all black (the pupil fills it) with a crescent of white at the top right under a heavy lid: it
+  is now `SIZE` 0.088 by 0.037, tilt 12, pupil 0.078 by 0.036, heavy lid, so it reads as a different shape from the small tall far eye at the stage close view. Approximate: the lower line of the lid is simpler than the drawing's.
+- **Round Crying, Round Tear, Teary (188 Genesis), `GLOSSY`: wrong shape, redrawn.** The shiny eyes of the pictures (#6, #39, #125, #92, #213, #260) are tall ovals about 0.7 as wide as high with a thin white ring round a black pupil that
+  fills nearly all of it, one large oval glint up from the middle and a small one low; ours were round discs 0.94 as wide as high. Now ring 0.060 by 0.082, white 0.050 by 0.073, pupil 0.045 by 0.067. Approximate: the near eye is smaller than the far one in the pictures.
+- **Side Eye, Right (66): approximate, made closer** (#97, #179, #258, #47, #86): larger (0.060 by 0.066), the lid cutting at 0.30, one large upright glint instead of two small ones. Entry-level `numbers`, so Tired, the clown and Side Left are unchanged.
+- **Anime Glass, Right (64): approximate, made closer** (#3, #98, #157, #236, #199): lenses 0.092 by 0.090 half sizes (0.104 by 0.074), squareness 2.6 (3.2): about as high as wide and rounded, not rectangles; entry-level numbers, so Retro Glass, BTC and 3D Glass are unchanged.
+- **Fire, Green and Purple laser eyes, Right (194): approximate** (#38, #135, #212, #72, #104, #107, #52): the frowning almond of lot 5b is right in shape and place; nothing changed in this batch. From the front the beam is seen end on as a vertical bar, as in the pictures.
+- **Checked**: library 1,970 Genesis, 0 failures; `--budget` largest #630 7,991 (unchanged, 9 under 8,000), none over. By eye on the sheet only: no measurement of eye sizes against the art beyond the proportions read above; not in a Unity build.
+- **Left to do**: the rest of the strict audit, in the order of `heroes-faces-audit-2026-10-22.md` (Gradient visor, Round Eye, Closed Eye Crying, Tired, Sunset and Plasma visors, then Side Left).
