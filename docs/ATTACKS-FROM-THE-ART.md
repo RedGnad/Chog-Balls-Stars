@@ -16,7 +16,12 @@ what is built and seen is said at the end.
   the hat itself when the print is a word (TISM, WAGMI: the cap is thrown and spins like a
   frisbee, its word on it), the thing itself when the Head value is a thing (the plunger, the
   clown nose). What each picture shows is in `tools/blender/head-values-from-the-art.md`.
-- **A hero without a hat throws a leaf of its own crown**, in its skin colour.
+- **A full costume gives the object when there is no hat** (22 October 2026, the owner's call): a
+  dragon breathes fire, a shark throws water, a banana throws bananas. A full costume covers the
+  crown, so a leaf of it made no sense, and every recorded Genesis in one of them has no `Head`
+  (147 Genesis), so the costume never competes with a hat. The special still comes from the eyes:
+  a dragon with laser eyes throws fireballs and fires lasers.
+- **A hero without a hat or full costume throws a leaf of its own crown**, in its skin colour.
 
 ## The objects, value by value (base Origin, 45 values and the bare head)
 
@@ -52,6 +57,21 @@ what is built and seen is said at the end.
 | Rainbow Wig (18) | a ball of rainbow | colours |
 
 The 100 Genesis on another base (Skull, Radioactive, 1:1) get theirs with their heads.
+
+## Full costumes (22 October 2026)
+
+`chog_attack_objects.ATTACK_OF_BODY`, read from the art of three Genesis per costume:
+
+| Body value (Genesis) | Object | While it flies | What hits |
+| --- | --- | --- | --- |
+| Gangster suit (41) | a money bag (the bandit's mask and hood) | | dollar coins |
+| Banana suit (25) | a banana, end over end | | bananas bouncing off |
+| Shark Suit (25) | a ball of sea water | bubbles | a splash and a ring |
+| Astro Suit (24) | a little ringed planet, spinning | | stars from space |
+| Dragon suit (23) | a fireball, its flame trailing | flames | a burst of fire |
+| Toad green Suit (9) | a lily pad with its flower, spinning | | leaves and a splash |
+
+Duck Float (29) is a float worn under a hat: those Genesis keep the object of their hat.
 
 ## How it is drawn (performance)
 

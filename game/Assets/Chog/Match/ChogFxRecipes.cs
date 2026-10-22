@@ -153,8 +153,27 @@ namespace Chog.Match
         private static readonly Color RainDrop = new Color(0.55f, 0.78f, 1f);
         private static readonly Color Bronze = new Color(0.95f, 0.72f, 0.38f);
         private static readonly Color RoyalLight = new Color(0.45f, 0.62f, 1f);
+        private static readonly Color Flame = new Color(1f, 0.55f, 0.15f);
+        private static readonly Color SeaWater = new Color(0.40f, 0.72f, 1f);
 
         /// <summary>The impact of a basic attack that throws this piece of the library ("Attack_Snowball", "Hat_Cap").</summary>
+        /// <summary>
+        /// What streams behind a basic attack while it flies, for the few objects that are made of it (the
+        /// fire of a dragon suit, the water of a shark suit); not On for every other.
+        /// </summary>
+        public static FxLayer TrailOf(string piece)
+        {
+            switch (Key(piece))
+            {
+                case "Fireball":
+                    return FxLayer.Of(ChogFx.Burning, 0.32f);
+                case "WaterDrop":
+                    return FxLayer.Of(ChogFx.Bubbles, 0.3f, FxColour.Tinted, SeaWater);
+                default:
+                    return default;
+            }
+        }
+
         public static ImpactRecipe ForAttack(string piece)
         {
             var key = Key(piece);
@@ -244,6 +263,27 @@ namespace Chog.Match
                 case "Bone":
                     return Recipe("bones and dust", ImpactPieces.Copies, 5, 0.24f, 0.9f,
                         FxLayer.Of(ChogFx.Smoke, 0.35f, FxColour.Painted), default, 0.5f, 0);
+                // Full costumes (chog_attack_objects.ATTACK_OF_BODY).
+                case "Fireball":
+                    return Recipe("the fireball bursts into flames", ImpactPieces.Diamonds, 7, 0.13f, 1.1f,
+                        FxLayer.Of(ChogFx.FireExplosion, 0.45f), FxLayer.Of(ChogFx.Fire, 0.4f), 1.3f, 6, Flame);
+                case "WaterDrop":
+                {
+                    var water = WithRing(Recipe("a splash of sea water and bubbles", ImpactPieces.Diamonds, 9, 0.11f, 1.1f,
+                        FxLayer.Of(ChogFx.Splash, 0.55f, FxColour.Painted, SeaWater), FxLayer.Of(ChogFx.Bubbles, 0.45f, FxColour.Tinted, SeaWater),
+                        0.6f, 0, SeaWater), 1.3f);
+                    water.PieceColour = SeaWater;
+                    return water;
+                }
+                case "Banana":
+                    return Recipe("bananas bouncing off and a pop", ImpactPieces.Copies, 4, 0.22f, 1.2f,
+                        FxLayer.Of(ChogFx.Hit, 0.5f, FxColour.Tinted), FxLayer.Of(ChogFx.Smoke, 0.3f, FxColour.Painted), 0.6f, 0);
+                case "Planet":
+                    return Recipe("a burst of stars from space", ImpactPieces.Diamonds, 8, 0.12f, 1.1f,
+                        FxLayer.Of(ChogFx.MagicStars, 0.55f, FxColour.Tinted), FxLayer.Of(ChogFx.Light, 0.4f, FxColour.Tinted), 1.1f, 8);
+                case "LilyPad":
+                    return Recipe("green leaves and a splash", ImpactPieces.Flakes, 7, 0.15f, 0.9f,
+                        FxLayer.Of(ChogFx.Leaves, 0.5f, FxColour.Tinted), FxLayer.Of(ChogFx.Splash, 0.35f, FxColour.Painted, SeaWater), 0.5f, 0);
                 case "Trident":
                 {
                     var trident = Recipe("purple sparks and a crackle", ImpactPieces.Diamonds, 6, 0.13f, 1.1f,

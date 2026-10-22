@@ -29,6 +29,8 @@ namespace Chog.Match
         private const float SpinDegreesPerSecond = 720f;
         private const float TumbleDegreesPerSecond = 540f;
         private const float StrikeSeconds = 0.25f;
+        // The longest a trail goes on if nothing stops it (an attack flies well under that).
+        private const float TrailSeconds = 2f;
         // Above the ground, at the height of the hands of a hero.
         private const float Height = 0.9f;
         // A lob: the top of its arc for a throw of no length, and what each unit of length adds.
@@ -63,6 +65,9 @@ namespace Chog.Match
         private Transform _landing;
         private Color _landingColour;
         private Color _side;
+        // What streams behind it while it flies (ChogFxRecipes.TrailOf), and the round of that effect.
+        private ChogFxPlayback _trail;
+        private int _trailRound;
 
         /// <summary>
         /// Dresses the view of an attack whose data is named "dataName", thrown by the hero of
@@ -211,6 +216,29 @@ namespace Chog.Match
             _age = 0f;
             _object.localPosition = new Vector3(0f, Height, 0f);
             _object.localScale = Vector3.zero;
+            StartTrail();
+        }
+
+        // Thrown fire leaves flames behind it, thrown water its bubbles; the effect follows the object.
+        private void StartTrail()
+        {
+            StopTrail();
+            if (_strike || !ChogHeroModel.TryGetAttackParts(_metadataId, out var parts))
+                return;
+            var trail = ChogFxRecipes.TrailOf(parts.Piece);
+            if (!trail.On)
+                return;
+            var colour = trail.Fixed.a > 0f ? trail.Fixed : _impact;
+            _trail = GenesisEffects.Play(trail.Effect, _object.position, trail.Size, colour, trail.Colour, follow: _object,
+                                         lasting: TrailSeconds);
+            _trailRound = _trail != null ? _trail.Round : 0;
+        }
+
+        private void StopTrail()
+        {
+            if (_trail != null)
+                _trail.Stop(_trailRound);
+            _trail = null;
         }
 
         private void LateUpdate()
@@ -284,6 +312,7 @@ namespace Chog.Match
         private void OnDisable()
         {
             Hide();
+            StopTrail();
             if (!_shown || _object == null || !gameObject.scene.isLoaded)
                 return;
             _shown = false;
