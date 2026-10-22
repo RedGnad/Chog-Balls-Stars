@@ -92,7 +92,9 @@ export function rankEligibility(match, verdict) {
   for (const player of players) {
     const admissions = (match.admissions ?? []).filter(entry => entry.player === player.player);
     const admitted = admissions.at(-1);
-    if (!admitted || admitted.tokenId !== player.tokenId || admitted.standIn) return 'invalid_admission';
+    // A stand-in plays a Genesis it does not hold: no rank. The owner's wallet testing any Genesis (photon.js isAdmin) earns its
+    // own player rank, so the rank moment can be seen (22 October 2026); its Genesis' career and wager share stay out.
+    if (!admitted || admitted.tokenId !== player.tokenId || (admitted.standIn && admitted.right !== 'admin')) return 'invalid_admission';
     if (!isAddress(admitted.address) || admitted.right === 'guest') continue;
     const address = admitted.address.toLowerCase();
     if (addresses.has(address)) return 'duplicate_wallet';

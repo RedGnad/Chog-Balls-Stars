@@ -24,6 +24,10 @@ test('ranking accepts one to six replayed humans and requires a signed-in recipi
   assert.equal(rankEligibility(match, { ...verdict, testOptions: undefined }), 'preview');
   assert.equal(rankEligibility({ ...match, app: { appVersion: 'sim-example-preview-siege' } }, verdict), 'preview');
   assert.equal(rankEligibility({ ...match, admissions: match.admissions.slice(1) }, verdict), 'invalid_admission');
+  const standIn = { ...match, admissions: match.admissions.map((entry, index) => index === 0 ? { ...entry, right: 'stand-in', standIn: true } : entry) };
+  assert.equal(rankEligibility(standIn, verdict), 'invalid_admission');
+  const admin = { ...match, admissions: match.admissions.map((entry, index) => index === 0 ? { ...entry, right: 'admin', standIn: true } : entry) };
+  assert.equal(rankEligibility(admin, verdict), null, 'the owner testing a Genesis earns its own rank');
   assert.equal(rankEligibility({ ...match, admissions: match.admissions.map((entry, index) => index === 5 ? { ...entry, address: address(1) } : entry) }, verdict), 'duplicate_wallet');
   assert.equal(rankEligibility({ ...match, admissions: match.admissions.map((entry, index) => index === 5 ? { ...entry, address: null, right: 'guest' } : entry) }, verdict), null);
   assert.equal(rankEligibility({ ...match, admissions: [{ ...admission(players[0]), address: null, right: 'guest' }] },

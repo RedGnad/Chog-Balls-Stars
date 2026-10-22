@@ -410,7 +410,10 @@ namespace Chog.Screens
             var now = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
 
             _play.gameObject.SetActive(playable || adminOnly);
-            ChogUi.LabelOf(_play).text = adminOnly ? "ADMIN: PLAY IT" : "PLAY IT";
+            // The owner's ADMIN button only picks the Genesis (the home shows it, the next match plays it), and on the one
+            // picked that way it gives the recruit back (22 October 2026, the owner).
+            ChogUi.LabelOf(_play).text = !adminOnly ? "PLAY IT"
+                : PlayerWallet.ChosenTokenId == _tokenId ? "ADMIN: BACK TO RECRUIT" : "ADMIN: USE IT";
             _rentOut.gameObject.SetActive(canRentOut);
             _lend.gameObject.SetActive(canLend);
             _rent.gameObject.SetActive(canRent);
@@ -487,10 +490,20 @@ namespace Chog.Screens
                 : "You rent it: " + left + " left.";
         }
 
-        // PLAY IT: this Genesis is chosen, the sheet closes and the match is looked for.
+        // PLAY IT: this Genesis is chosen, the sheet closes and the match is looked for. The owner's ADMIN button
+        // (a Genesis the wallet does not play) only picks it, or gives the recruit back, and closes the sheet.
         private void PlayIt()
         {
-            if (Array.IndexOf(PlayerWallet.Playable, _tokenId) >= 0 || PlayerWallet.IsAdmin)
+            if (Array.IndexOf(PlayerWallet.Playable, _tokenId) < 0 && PlayerWallet.IsAdmin)
+            {
+                if (PlayerWallet.ChosenTokenId == _tokenId)
+                    PlayerWallet.ChooseRecruit();
+                else
+                    PlayerWallet.Choose(_tokenId);
+                Close();
+                return;
+            }
+            if (Array.IndexOf(PlayerWallet.Playable, _tokenId) >= 0)
                 PlayerWallet.Choose(_tokenId);
             Close();
             if (_main != null)

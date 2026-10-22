@@ -61,6 +61,9 @@ namespace Chog.Match
         private ChogBodyAnimator _body;
         private int _showing = -1;
         private bool _turns = true;
+        // Room left over the head, as a share of the hero's height: the arms of a cheer rise above it (22 October 2026, the
+        // owner: the victory was cut at the top and the hands clipped by the edge of the picture).
+        private float _headroom;
         // What dragging added to the hero's turn.
         private float _turned;
 
@@ -167,6 +170,7 @@ namespace Chog.Match
                 return;
             _turns = false;
             _hero.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            _headroom = won ? 0.5f : 0f;
             if (won)
                 _body.Cheer();
             else
@@ -191,12 +195,14 @@ namespace Chog.Match
 
             // Framed on the whole hero and its pedestal, whatever the shape of the stage.
             var height = ChogHeroModel.ModelHeight + 0.55f;
+            var extra = ChogHeroModel.ModelHeight * _headroom;
             var aspect = size.x / (float)size.y;
-            var fit = Mathf.Max(height, (PedestalRadius * 2.4f) / aspect);
+            var fit = Mathf.Max(height + extra, (PedestalRadius * 2.4f) / aspect);
             var distance = fit * 0.5f / Mathf.Tan(FieldOfView * 0.5f * Mathf.Deg2Rad);
             var turn = Quaternion.Euler(Elevation, 0f, 0f);
             _camera.transform.localRotation = turn;
-            _camera.transform.localPosition = new Vector3(0f, height * 0.36f, 0f) - turn * Vector3.forward * distance;
+            // The bottom of the picture stays where it was; the headroom is added above.
+            _camera.transform.localPosition = new Vector3(0f, height * 0.36f + extra * 0.5f, 0f) - turn * Vector3.forward * distance;
 
             if (_turns)
                 _hero.localRotation = Quaternion.Euler(0f, StartTurn + _turned + SwayDegrees * Mathf.Sin(Time.unscaledTime * 2f * Mathf.PI / SwaySeconds), 0f);

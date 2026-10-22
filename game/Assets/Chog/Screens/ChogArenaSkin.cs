@@ -91,6 +91,17 @@ namespace Chog.Screens
             ChogMatchPost.Attach(roots);
         }
 
+        /// <summary>
+        /// Puts a skin made for a scene into that scene. A new object goes to the active scene, which can be the arena of the
+        /// match before while the next one loads: its skins then went with it when it was unloaded (ArenaScenes), and the
+        /// siege showed its sample crates and floor (22 October 2026, the owner, a siege after another match).
+        /// </summary>
+        internal static void KeepIn(GameObject made, GameObject[] roots)
+        {
+            if (made != null && roots != null && roots.Length > 0 && roots[0] != null && roots[0].scene.IsValid() && made.scene != roots[0].scene)
+                SceneManager.MoveGameObjectToScene(made, roots[0].scene);
+        }
+
         private static Shader s_arenaShader;
         private static Texture2D s_floorTile;
 
@@ -163,6 +174,7 @@ namespace Chog.Screens
                 renderer.enabled = false;
 
             var skin = new GameObject(ObjectName, typeof(MeshFilter), typeof(MeshRenderer));
+            ChogArenaSkin.KeepIn(skin, roots);
             skin.GetComponent<MeshFilter>().sharedMesh = FloorMesh(bounds);
             var shader = arenaShader != null && arenaShader.isSupported ? arenaShader : Shader.Find("Standard");
             if (s_ground == null)
@@ -331,6 +343,7 @@ namespace Chog.Screens
             mesh.SetTriangles(stones, 1);
             mesh.RecalculateBounds();
             var detail = new GameObject(DetailName, typeof(MeshFilter), typeof(MeshRenderer));
+            ChogArenaSkin.KeepIn(detail, roots);
             detail.GetComponent<MeshFilter>().sharedMesh = mesh;
             if (s_grout == null)
             {
@@ -536,6 +549,7 @@ namespace Chog.Screens
                 original.enabled = false;
 
             var skin = new GameObject(ObjectName, typeof(MeshFilter), typeof(MeshRenderer));
+            ChogArenaSkin.KeepIn(skin, roots);
             var mesh = CandyMesh(covers);
             skin.GetComponent<MeshFilter>().sharedMesh = mesh;
             var renderer = skin.GetComponent<MeshRenderer>();

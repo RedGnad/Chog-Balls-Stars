@@ -428,7 +428,9 @@ namespace Chog.Screens
             var state = PlayerWallet.State;
             // What the wallet may play: the Genesis it holds, then those it rents.
             var tokens = PlayerWallet.Playable;
-            var holds = state == WalletState.Ready && tokens.Length > 0;
+            // A Genesis the owner's wallet picked with ADMIN (ChogHeroSheet) is shown and played like one it holds.
+            var adminPick = PlayerWallet.IsAdmin && PlayerWallet.ChosenTokenId > 0 && Array.IndexOf(tokens, PlayerWallet.ChosenTokenId) < 0;
+            var holds = state == WalletState.Ready && (tokens.Length > 0 || adminPick);
             // A Genesis of the player's own wallet, held or rented, wins over one that was lent.
             var guest = !holds && GuestPass.State == GuestPassState.Valid;
             var checkingPass = !holds && GuestPass.State == GuestPassState.Checking;

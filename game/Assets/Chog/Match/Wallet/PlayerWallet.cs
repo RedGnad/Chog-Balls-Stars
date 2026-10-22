@@ -395,6 +395,17 @@ namespace Chog.Match
             Changed?.Invoke();
         }
 
+        /// <summary>The owner's wallet gives back a Genesis it picked with ADMIN: the first one it holds, else the recruit.</summary>
+        public static void ChooseRecruit()
+        {
+            if (!IsAdmin)
+                return;
+            PlayerPrefs.SetInt(ChosenTokenKey, 0);
+            PlayerPrefs.Save();
+            ChosenTokenId = PickToken(Playable, 0);
+            Changed?.Invoke();
+        }
+
         /// <summary>
         /// Asks the wallet to sign the services' message, which proves the player controls the
         /// address. It costs nothing and sends no transaction.

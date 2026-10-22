@@ -175,39 +175,10 @@ namespace Chog.Screens
             controls.VictoryTitle = title;
             controls.VictoryGlow = playing && ChogHeroModel.Has(metadataId)
                 ? host.transform.Find("Glow")?.GetComponent<Image>() : null;
-            if (tokenId > 0)
-            {
-                controls.Road = MasteryRoad.Create(card.transform, new Vector2(0.03f, 0.24f), new Vector2(0.97f, 0.97f));
-                var chip = ChogUi.Plate("Monad", card.transform, new Vector2(0.03f, 0.04f), new Vector2(0.97f, 0.20f),
-                    new Color(0.08f, 0.06f, 0.14f, 0.6f), 12);
-                controls.Tick = ChogUi.Icon("Tick", chip.transform, ChogIcons.Icon.Check, new Vector2(0.015f, 0.12f), new Vector2(0.09f, 0.88f));
-                controls.Tick.enabled = false;
-                controls.Career = ChogUi.Body("Career", chip.transform, new Vector2(0.10f, 0.08f), new Vector2(0.70f, 0.92f), 30f);
-                var reporter = GenesisCareers.ReporterFor(tokenId, PlayerWallet.ChosenTokenId,
-                    PlayerWallet.SignIn == SignInState.SignedIn, GuestPass.TokenId);
-                controls.WaitingForRecord = reporter != GenesisCareers.Reporter.Nobody &&
-                    !BuildIdentity.PhotonVersion.Contains(BuildIdentity.PreviewSuffix);
-                controls.Career.text = controls.WaitingForRecord ? "VERIFYING MATCH"
-                    : BuildIdentity.PhotonVersion.Contains(BuildIdentity.PreviewSuffix) ? "PREVIEW: NO CAREER POINTS"
-                    : "CAREER NOT RECORDED";
-                controls.Gained = ChogUi.Title("Gained", chip.transform, new Vector2(0.62f, 0.08f), new Vector2(0.97f, 0.92f), 40f,
-                    TextAlignmentOptions.Right, ChogTheme.Hex("9BF7A8"));
-                controls.BuildReward(card.transform);
-                if (GenesisCareers.TryGet(tokenId, out var before))
-                {
-                    controls.BeforeCareer = before;
-                    controls.PointsBefore = before.mastery != null ? before.mastery.points : -1;
-                    controls.Road.Show(before, MasteryRoad.HasSecondForm(tokenId));
-                }
-                else
-                {
-                    controls.Road.Show(null, MasteryRoad.HasSecondForm(tokenId));
-                }
-            }
-            else
-            {
-                controls.BuildRecruitRank(card.transform);
-            }
+            // Every player, a Genesis too, sees the player rank card and its bar, where the points of a verified siege
+            // fly (22 October 2026, the owner: the Genesis' mastery road here read as a window nobody understood, and
+            // hid the rank moment). The Genesis' mastery stays on its hero sheet.
+            controls.BuildRecruitRank(card.transform);
 
             if (playing)
             {
@@ -341,7 +312,7 @@ namespace Chog.Screens
                     _rankTier.text = "PLAYER RANK";
                     _rankValue.text = PlayerWallet.SignIn == SignInState.SignedIn ? "RANK LOADING" : "SIGN IN TO EARN";
                     _rankNext.text = "";
-                    Career.text = "Recruit has no Genesis mastery. Siege can earn player points.";
+                    Career.text = TokenId > 0 ? "Siege matches earn player points." : "Recruit has no Genesis mastery. Siege can earn player points.";
                 }
             }
 
@@ -720,6 +691,12 @@ namespace Chog.Screens
 
             public void Preview()
             {
+                // The result shows the player rank card now (no mastery road): its preview is the rank moment's.
+                if (Road == null)
+                {
+                    PreviewRank();
+                    return;
+                }
                 BeforeCareer = new GenesisCareer
                 {
                     tokenId = TokenId, matches = 1,
@@ -758,7 +735,7 @@ namespace Chog.Screens
 
             private void OnRecorded(GenesisCareer career, bool credited)
             {
-                if (Career == null || career == null || career.tokenId != TokenId)
+                if (Career == null || Road == null || career == null || career.tokenId != TokenId)
                     return;
                 WaitingForRecord = false;
                 if (!credited)
