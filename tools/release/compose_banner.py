@@ -190,7 +190,7 @@ def main():
     parser.add_argument("--layers", default=os.path.join(ROOT, ".artifacts", "key-art", "banner"))
     parser.add_argument("--out", default=os.path.join(ROOT, "research", "evidence", "banner-key-art.jpg"))
     parser.add_argument("--title", default="CHOG BALLS STARS")
-    parser.add_argument("--tagline", default="STAKE $CHOG. WIN THE BRAWL.")
+    parser.add_argument("--tagline", default="BET $CHOG. WIN THE BRAWL.")
     parser.add_argument("--footer", default="3v3 MOBA  •  1,969 CHOGS COME ALIVE  •  ON MONAD")
     arguments = parser.parse_args()
     with open(os.path.join(arguments.layers, "layers.json"), encoding="utf-8") as file:
@@ -219,7 +219,8 @@ def main():
 
     # The towers, far behind their teams, their eyes firing towards the clash.
     for tower in sorted(layers.get("towers", []), key=lambda entry: -entry["depth"]):
-        image = distance_look(load(tower["file"]), tower["depth"], scale)
+        # The towers stay sharp: they are the goal of the match, the owner wants them seen.
+        image = load(tower["file"])
         colour = TEAM["blue"] if tower["side"] == "Ours" else TEAM["red"]
         picture.alpha_composite(rim_glow(image, colour, round(8 * scale), 0.8))
         picture.alpha_composite(image)

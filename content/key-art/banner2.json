@@ -1,5 +1,5 @@
 {
- "about": "Banner, second composition (23 October 2026, the owner: more creative, clearer, a better camera): a low camera near the ground with a wide lens and a tilted frame. The teams come at each other along a V that closes on the clash in the middle: the blue Dragon leaps at the lens at the front left, the red Shark answers at the front right, the others stand farther along each side, each one apart so every silhouette reads, and the two towers rise on the horizon behind the clash. Focal 1067 pixels across 1920 (20 mm): x units aside at depth d land 1067 x / d pixels from the middle.",
+ "about": "Banner, second composition (23 October 2026, the owner: more creative, clearer, a better camera): a low camera near the ground with a wide lens and a tilted frame. The teams come at each other along a V that closes on the clash in the middle: the blue Dragon leaps at the lens at the front left, the red Shark answers at the front right, the others stand farther along each side, each one apart so every silhouette reads, and the two towers rise on the horizon behind the clash. Focal 1067 pixels across 1920 (20 mm): x units aside at depth d land 1067 x / d pixels from the middle. A whole costume (the dragon, the shark) holds the face in an opening of the body's volume: the head must not turn in it, so their poses keep the head in line with the body and lean the body less.",
  "size": [
   1920,
   1080
@@ -8,12 +8,12 @@
   "at": [
    0.4,
    -5.6,
-   0.45
+   0.95
   ],
   "look": [
    0.3,
    0.0,
-   2.05
+   1.8
   ],
   "lens": 20.0,
   "roll": -5.0
@@ -23,20 +23,20 @@
   {
    "side": "Ours",
    "at": [
-    -3.7,
-    15.6
+    -5.2,
+    16.0
    ],
-   "facing": 25.0,
-   "scale": 1.9
+   "facing": 22.0,
+   "scale": 2.6
   },
   {
    "side": "Theirs",
    "at": [
-    4.9,
-    15.6
+    6.2,
+    16.5
    ],
-   "facing": -25.0,
-   "scale": 1.9
+   "facing": -22.0,
+   "scale": 2.6
   }
  ],
  "heroes": [
@@ -109,15 +109,15 @@
    "facing": -45.0,
    "lift": 0.45,
    "pose": {
-    "run": 1.0,
+    "run": 0.5,
     "strike": 0.25,
     "body": [
-     14,
+     -10,
      0,
      6
     ],
     "head": [
-     -8,
+     10,
      0,
      0
     ]
@@ -128,22 +128,22 @@
    "number": 42,
    "team": "blue",
    "at": [
-    -1.75,
+    -1.5,
     -2.75
    ],
    "facing": 40.0,
    "lift": 0.5,
    "scale": 1.0,
    "pose": {
-    "run": 1.0,
+    "run": 0.5,
     "strike": 0.25,
     "body": [
-     16,
+     -10,
      0,
      -6
     ],
     "head": [
-     -10,
+     10,
      0,
      0
     ]
