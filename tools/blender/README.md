@@ -1172,3 +1172,17 @@ face by construction (`opening_rim`) and still close around it on the sheet.
   hair), median 7,175, none over 8,000, **9 triangles under the limit**. `check_face_overlaps.py --specks` on #76: the face is nowhere in front of a drawn thing. `measure_face_gaps.py` on #76:
   the head still pokes through the face at 41 of 3,240 points along its top edge (0 before this lot) whatever the lift (0.0046, 0.0065) or the number of points (24, 32): under the teeth of hair, no
   skin is seen in the cream in the pictures at the stage or in the bust; not understood, left open.
+
+## 22 October 2026: the top of the face meets the fringe (lot 7)
+
+The owner on the recruit (front, close, stage): above the zigzag fringe a band of the skin of the head with a jagged lower edge shows over the cream, across the forehead, "the head goes through the
+face". It is the open item of lot 6 (`measure_face_gaps.py`: the head through the face at 41 of 3,240 points on #76), and it is visible in the game. **Cause**: with the width squareness of lot 6
+(`FACE_SQUARENESS_X` 20) the edge of the face went straight up the sides and then crossed the whole brow in the last degree of its angle, so no point of the edge lay along the brow: a gap of 0.3 between
+two edge points (`face_edge_angles` printed x 0.167 then -0.132 at the top, not even symmetrical), and the flat triangles of the face's top ring that span it sag under the dome of the head by more than
+`FACE_LIFT` (0.0046). Neither the lift (0.0065) nor more points (32) fixed it, because the points still did not fall along the brow. **Fix** (`make_chog_traits.py`): `FACE_SQUARENESS_X_TOP` 8, the width
+over the brow is rounded off more than at the cheeks (20 stays below the cheeks, so the sides and the chin of lot 6 are kept); the top edge now has points every 0.09 or less
+(x 0.185, 0.128, 0.090, -0.013, -0.090, -0.128, -0.185); and `FACE_TOP_LIFT` 0.002, a little more lift along the brow (growing with the square of the ring, the fringe lifted with it), as a margin.
+`measure_face_gaps.py`: 0 head pokes on the recruit (`--genesis 0` builds the base) and on #76, #75, #112, #237, #432, #23, #85, #116, #16, #249, #15, #1287, #3, #4, #947, #43, #21, #51, #10 (the face is the
+same on every one of them), and 0 of 49,896 face points on #76 and #23 with the new `--dense 20`. Sheet, the recruit, #76, #75, #112, #23, #116, #16, #249, front close, three quarter close, stage and bust, before | after,
+and an enlarged crop of the forehead of the recruit and of #76: [heroes-face-top-2026-10-22.jpg](../../research/evidence/heroes-face-top-2026-10-22.jpg). Library 1,970 Genesis, 0 failures; `--budget` largest #630 7,991
+(unchanged), none over 8,000.
