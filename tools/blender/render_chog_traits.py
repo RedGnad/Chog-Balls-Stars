@@ -89,6 +89,18 @@ TURN_ELEVATION_DEG = 12.0
 TURN_HEIGHT = 0.9
 TURN_FRAME = 0.95
 TURN_SIZE = 360
+# The pedestal (22 October 2026, the costumes): the whole hero seen as the hero sheet and the home pedestal of the game
+# show it, close, a little above, with perspective: three quarters from the front, from the side, three quarters from
+# behind, from behind. Same tuple as render_chog_full.VIEWS (turn, degrees above the horizon, without perspective,
+# height looked at, width framed, unused). chog_<name>_pedestal.png, _pedestal_side.png, _pedestal_back34.png and
+# _pedestal_back.png.
+PEDESTAL_VIEWS = {
+    "pedestal": (35.0, 16.0, False, 0.66, 1.80, False),
+    "pedestal_side": (90.0, 12.0, False, 0.66, 1.80, False),
+    "pedestal_back34": (145.0, 16.0, False, 0.66, 1.80, False),
+    "pedestal_back": (180.0, 12.0, False, 0.66, 1.80, False),
+}
+shots.VIEWS.update(PEDESTAL_VIEWS)
 
 
 def gradient_skin(material, bottom, top, low=0.62, high=1.12):
@@ -333,7 +345,7 @@ def render_one(name, blend=None, out=None, only=None, colour=None, size=504, bus
         if in_game:
             flat.write_small(path, path[:-4] + "_phone.png", size // shots.PHONE_POINTS)
 
-    families = {"bust", "studio", "game", "towards", "turnaround"}
+    families = {"bust", "studio", "game", "towards", "turnaround", "pedestal"}
     wanted = set(only.split(",")) if only else {"bust", "studio", "game"}
     if wanted - families:
         raise SystemExit(f"CHOG_RENDER unknown families {sorted(wanted - families)}: use {sorted(families)}")
@@ -351,6 +363,9 @@ def render_one(name, blend=None, out=None, only=None, colour=None, size=504, bus
         render.render(os.path.join(folder, f"chog_{name}_bust.png"))
     if "studio" in wanted:
         for view_name in shots.STUDIO_VIEWS:
+            shoot(view_name, False)
+    if "pedestal" in wanted:
+        for view_name in PEDESTAL_VIEWS:
             shoot(view_name, False)
     for view_name in shots.GAME_VIEWS:
         if "game" in wanted or ("towards" in wanted and view_name == "game_front"):
