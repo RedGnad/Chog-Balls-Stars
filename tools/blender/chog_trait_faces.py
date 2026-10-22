@@ -75,14 +75,30 @@ SIDE_EYE = {
     "LID": (0.013, 0.022, 0.006),
     "GLINTS": ((-0.024, 0.002, 0.011, 0.013), (-0.030, -0.024, 0.004, 0.005)),
     "SEGMENTS": 16,
+    # "EYES": numbers of one eye only, by its side (-1 the eye at -X, the near one on the left of the picture of Side=Left, +1 the other), laid over those of
+    # both (22 October 2026: the pictures of Side=Left draw two different eyes, see SIDE_LEFT_EYES).
+    "EYES": None,
+}
+# (22 October 2026, strict audit of the eyes, batch 4, Side=Left, on #17, #34, #64, #73, #151 (Side Eye) and #23, #198, #220, #240, #381 (Base): the two eyes of a pair are two
+# drawings. The near one, on the left of the picture, is a wide flat eye, about 1.6 times as wide as high, a straight lid whose line runs on to the right as a point, a black
+# pupil that fills it with a tall glint at its left; the far one a small narrow oval, a third as wide as high, black, with an upright glint, under a lid. We drew two equal
+# eyes 0.052 across. The near eye lies 0.122 from the middle of the face, the far one 0.108.)
+SIDE_LEFT_EYES = {
+    -1.0: {"SIZE": (0.082, 0.046), "AT": (0.122, -0.002), "CUT": 0.12, "SLOPE": 0.0, "LID": (0.018, 0.004, 0.036),
+           "GLINTS": ((-0.040, -0.006, 0.012, 0.022), (-0.032, -0.034, 0.004, 0.005))},
+    1.0: {"SIZE": (0.030, 0.056), "AT": (0.108, 0.004), "CUT": 0.22, "SLOPE": 0.0, "LID": (0.012, 0.002, 0.004),
+          "GLINTS": ((-0.004, 0.010, 0.007, 0.022),)},
 }
 # "Tired": the same eye, lower under its lid, with a grey-blue bag under it: how far below the eye the
 # bag is, how much larger, and the width of its dark line.
 TIRED = {
     **SIDE_EYE,
+    # (22 October 2026, strict audit, batch 3, on #66, #106, #123, #246, #267: larger eyes than SIDE_EYE, one upright glint at the top left of the pupil, a grey-blue
+    # bag under each that is a crescent, not a ring: SIZE 0.058 by 0.062 and the glint moved to the left.)
+    "SIZE": (0.058, 0.062),
     "CUT": 0.04,
     "SLOPE": -0.06,
-    "GLINTS": ((0.020, -0.002, 0.010, 0.012),),
+    "GLINTS": ((-0.016, 0.008, 0.010, 0.019),),
     "BAG": (0.012, 0.010, 0.010),
     "BAG_LINE": 0.006,
 }
@@ -125,7 +141,9 @@ THIN_TEAR = {"FROM": (0.040, -0.040), "TO": -0.128, "WIDTH": (0.010, 0.012), "LI
              "WELL": (0.034, 0.012, 0.009)}
 # "Closed Eye Crying": an arch over each closed eye, thick in its middle, slanted, and a wide tear
 # under it with no dark line.
-CLOSED_ARCH = {"AT": (0.112, 0.012), "ARC": (0.050, 0.020, 0.015), "TILT": -0.10, "STEPS": 10}
+# (22 October 2026, strict audit, batch 3, on #21, #18, #24, #261, #263: the closed eye of the pictures is a SAD arch, thick, its outer end much lower than its inner one
+# (it droops), a thick black stroke 0.030 in the middle; ours were upright happy arches. TILT -0.10 to -0.40, ARC 0.054 by 0.022, thickness 0.020 to 0.026.)
+CLOSED_ARCH = {"AT": (0.112, 0.012), "ARC": (0.054, 0.022, 0.026), "TILT": -0.40, "STEPS": 10}
 CLOSED_TEARS = {"FROM": (0.020, -0.010), "TO": -0.172, "WIDTH": (0.034, 0.042), "LINE": 0.0,
                 "SHINE": 0.0, "DRIFT": 0.008}
 # "Dead": a thick cross on each eye: half the length of a stroke, its thickness, its turn.
@@ -139,7 +157,10 @@ HEART = {"AT": (0.112, 0.012), "HALF_WIDTH": 0.070,   # 0.060 until 22 October 2
           "LINE": 0.010, "LEAN_DEG": 12.0,
          "GLINT": (-0.026, 0.020, 0.011, 0.008), "SEGMENTS": 28}
 # "Flat" (Side=Left): a short thick dash for each eye.
-FLAT_EYE = {"AT": (0.112, 0.004), "HALF": 0.044, "THICKNESS": 0.017, "SLOPE": 0.04}
+# (22 October 2026, batch 4, on #218, #196, #301, #450, #531, #296: the near eye is a long thick dash of three black strokes, 0.058 half long, the far one a short one, 0.026, slanting.)
+FLAT_EYE = {"AT": (0.112, 0.004), "HALF": 0.044, "THICKNESS": 0.017, "SLOPE": 0.04,
+            "EYES": {-1.0: {"AT": (0.124, -0.004), "HALF": 0.060, "THICKNESS": 0.024, "SLOPE": 0.0},
+                     1.0: {"AT": (0.106, 0.006), "HALF": 0.028, "THICKNESS": 0.016, "SLOPE": -0.15}}}
 # The eyes of a skull as the pictures of Side=Right draw "Flat", "Normal" and "Up" on six skeletons
 # (#846, #1214; #1079, #1311; #1313, #1889; 16 October 2026): a large dark socket for each eye, with a short
 # white dash across its middle ("dash"), a round white glint near its top ("glint"), or nothing.
@@ -185,7 +206,12 @@ ANGRY = {**WHITE_EYE, "SIZE": (0.056, 0.050), "LID": (0.22, 0.22, 0.015, 0.014),
          "LOOK": ((0.020, -0.010), (0.020, -0.010)), "GLINTS": ((-0.012, 0.004, 0.010, 0.011),)}
 # "Vertical": a wide almond, a narrow upright pupil with a light stripe down it.
 VERTICAL = {**WHITE_EYE, "SIZE": (0.060, 0.032), "LINE": 0.011, "PUPIL": (0.011, 0.026),
-            "GLINTS": ((0.0, 0.004, 0.0035, 0.012),)}
+            "GLINTS": ((0.0, 0.004, 0.0035, 0.012),),
+            # (22 October 2026, batch 4, on #63, #78, #175, #45: the near eye a large white almond with a thick outline and a narrow upright pupil, the far one small and tall.)
+            "EYES": {-1.0: {"SIZE": (0.078, 0.046), "AT": (0.122, 0.002), "PUPIL": (0.013, 0.034),
+                            "GLINTS": ((-0.003, 0.012, 0.004, 0.014),)},
+                     1.0: {"SIZE": (0.030, 0.046), "AT": (0.106, 0.008), "PUPIL": (0.010, 0.032),
+                           "GLINTS": ((-0.002, 0.010, 0.003, 0.012),)}}}
 # "Smirk": an almond whose outer end is lower, a thick arched upper lid, the pupil looking to the left
 # of the picture.
 # (22 October 2026, the owner on the toad #242, strict audit of the eyes: the art draws two DIFFERENT eyes. On #242, #111, #441, #2, #499, #455, #1193
@@ -215,7 +241,8 @@ WORRIED_EYE = {**WHITE_EYE, "SIZE": (0.056, 0.054), "LINE": 0.011, "LID": (0.30,
 # "Base", the plain eyes of Side=Left: the lidded eye of "Side Eye", rounder, more of it under the lid,
 # which runs further past it; two glints.
 BASE_EYE = {**SIDE_EYE, "SIZE": (0.052, 0.050), "CUT": 0.36, "SLOPE": 0.10, "LID": (0.015, 0.020, 0.004),
-            "GLINTS": ((-0.018, 0.012, 0.011, 0.014), (-0.024, -0.014, 0.004, 0.005))}
+            "GLINTS": ((-0.018, 0.012, 0.011, 0.014), (-0.024, -0.014, 0.004, 0.005)),
+            "EYES": {side: {**eye, "CUT": eye["CUT"] + 0.10} for side, eye in SIDE_LEFT_EYES.items()}}
 # "XD": a thick chevron on each eye, its point towards the nose: half width, half height, thickness.
 XD = {"AT": (0.112, 0.004), "HALF": (0.040, 0.036), "THICKNESS": 0.016}
 
@@ -232,7 +259,7 @@ XD = {"AT": (0.112, 0.004), "HALF": (0.040, 0.036), "THICKNESS": 0.016}
 # (where across at its start and end, height on the lens, thickness).
 GOGGLES = {
     "UP": 0.022,
-    "HALF_HEIGHT": (0.060, 0.050),
+    "HALF_HEIGHT": (0.074, 0.054),
     "HALF_WIDTH": 0.330,
     "HALF_DEPTH": 0.298,
     "AROUND_DEG": 74.0,
@@ -459,7 +486,9 @@ def lidded_eyes(part, surface, numbers, dark, glint, lifts, seen=None):
     """Both lidded eyes with their lid lines and glints. Returns the middles of the eyes; "seen", a list, receives the middle of the
     area of each (what the lid leaves of the oval), where a beam leaves it."""
     middles = []
+    every = numbers
     for side in (1.0, -1.0):
+        numbers = SimpleNamespace(**{**vars(every), **(every.EYES or {}).get(side, {})})
         middle, lid = lidded_eye(part, surface, dark, numbers, side, lifts[0])
         if seen is not None:
             half_width, half_height = numbers.SIZE
@@ -702,9 +731,10 @@ def build_heart(maker):
 
 def build_flat_eye(maker):
     """A short thick dash for each eye."""
-    numbers = maker.numbers(FLAT_EYE)
+    every = maker.numbers(FLAT_EYE)
     part, surface = maker.part(), maker.surface
     for side in (1.0, -1.0):
+        numbers = SimpleNamespace(**{**vars(every), **(every.EYES or {}).get(side, {})})
         middle = (side * numbers.AT[0], numbers.AT[1])
         places = [(middle[0] + numbers.HALF * share, middle[1] + numbers.SLOPE * numbers.HALF * share * side)
                   for share in (-1.0, -0.5, 0.0, 0.5, 1.0)]
@@ -1301,7 +1331,9 @@ EYES = {
         "kind": "Round",
         "colours": {"Dark": DARK, "White": WHITE},
         "unlit": ("Dark", "White"),
-        "numbers": {"PUPIL": (0.034, 0.039)},
+        # (22 October 2026, strict audit, batch 3, on #37, #79, #68, #130, #237: the eyes of the pictures are TALL ovals, 0.72 as wide as high, a thin white ring round a
+        # black pupil that fills nearly all of it: 0.056 by 0.074, 0.046 by 0.064, pupil 0.038 by 0.056 where ours were round, 0.060 by 0.066.)
+        "numbers": {"LINE": (0.056, 0.074), "WHITE": (0.046, 0.064), "PUPIL": (0.038, 0.056)},
     },
     "Side Eye": {
         "kind": "SideEye",
@@ -1437,12 +1469,14 @@ EYES = {
 
 EYES_OF_SIDE = {
     "Left": {
+        "Side Eye": {"kind": "SideEye", "colours": {"Dark": DARK, "Glint": WHITE}, "unlit": ("Dark", "Glint"),
+                     "numbers": {"EYES": SIDE_LEFT_EYES}},
         # (22 October 2026, CHOG #925, #1430, #1207, #1405, the skull among them) the near eye, on the left of the
         # picture, is a long flat stroke whose right end is higher, the far eye a short arch: not the two equal arches of
         # Side=Right.
         "Happy": {
             "kind": "Happy", "colours": {"Dark": DARK}, "unlit": ("Dark",),
-            "numbers": {"EYE_ARCS": {-1.0: (0.066, 0.026, 0.019, 0.034), 1.0: (0.032, 0.032, 0.013, 0.0)}},
+            "numbers": {"EYE_ARCS": {-1.0: (0.068, 0.028, 0.026, 0.040), 1.0: (0.028, 0.036, 0.012, 0.0)}},
         },
         # The lasers of Side=Left: lidded eyes, and beams of other colours (CHOG #893, #252, #565, #1658),
         # most of their sides the light core with an edge of the darker colour under it.

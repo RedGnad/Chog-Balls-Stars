@@ -142,9 +142,29 @@ Batch 2 ([sheet](heroes-eyes-batch2-2026-10-22.jpg)), same rule:
 | Anime Glass, Right (64) | #3, #98, #157, #236, #199 | approximate (was faithful) | lenses were rectangles 1.4 times as wide as high; now rounder and as high as wide; the frame weight and the tilt of each lens not exact |
 | Fire, Green, Purple laser, Right (67, 64, 63) | #38, #135, #212, #72, #104, #107, #52 | approximate | frowning almond and beam from its middle as drawn (lots 5b, 8); the almond is a little larger than the drawing's |
 
-Rows still to redo strictly, most worn first: Gradient visor R, Round Eye R, Closed Eye Crying R, Retro Glass (the rest), Tired R,
-Teary R, Sunset visor R, Plasma visor R, then Side Eye L, Base L, Happy L, MOG L, Vertical L, Flat L, Frog L, Clown Eye L, Chog Viper L, the lasers of Left, Clown Eye Mix L, Classic VR L, Modern VR L, Retard L, XD L,
-3D Glass L, BTC Glass L, Worried L, Thug L.
+Batch 3 ([sheet](heroes-eyes-batch3-2026-10-22.jpg)), same rule:
+
+| Value, Side (Origin Genesis) | Genesis looked at | Strict verdict | What differs |
+| --- | --- | --- | --- |
+| Gradient visor, Right (61) | #1, #30, #100, #105, #133 | approximate (was faithful) | the lens shape and smooth run of colour made closer; the art's lens is larger, slanted in three quarters, with a thick black edge |
+| Sunset visor, Right (53) | #11, #83, #147, #153, #159 | approximate | same lens and smooth colours; the dark red middle and orange ends as drawn |
+| Plasma visor, Right (43) | #60, #62, #82, #93, #114 | approximate (was faithful) | same; the blue ends are darker and the yellow wider in the art |
+| Round Eye, Right (61) | #37, #79, #68, #130, #237 | wrong (was approximate), redrawn, now approximate | tall ovals with a thin ring and a pupil filling the white; near eye larger in the pictures |
+| Closed Eye Crying, Right (57) | #21, #18, #24, #261, #263 | wrong (was faithful), redrawn, now approximate | a sad drooping arch, not a happy one; the thickness varies along the stroke in the art |
+| Tired, Right (56) | #66, #106, #123, #246, #267 | approximate (was faithful) | larger eyes and the glint at the top left; the bag is a crescent in the art, a ring in ours |
+
+Batch 4, Side Left ([sheet](heroes-eyes-batch4-2026-10-22.jpg)), same rule; the two eyes of a pair are two drawings on Side Left:
+
+| Value, Side (Origin Genesis) | Genesis looked at | Strict verdict | What differs |
+| --- | --- | --- | --- |
+| Side Eye, Left (34) | #17, #34, #64, #73, #151 | wrong (was faithful), redrawn, now approximate | near eye large and flat with a lid flick, far eye small and narrow; ours were two equal eyes |
+| Base, Left (33) | #23, #198, #220, #240, #381 | wrong (was faithful), redrawn, now approximate | same two drawings |
+| Happy, Left (33) | #26, #223, #71, #221, #925 | approximate | near eye a hooked blade with a white streak, far one a narrow hook; the hook and the streak are not drawn |
+| MOG, Left (32) | #181, #162, #176, #293, #380 | approximate (was approximate) | tall lens, smooth colours made closer; the art's lens is a smooth rainbow with a thick frame |
+| Vertical, Left (31) | #63, #78, #175, #45, #296 | wrong (was faithful), redrawn, now approximate | near eye a large white almond with a narrow pupil, far eye small and tall |
+| Flat, Left (30) | #218, #196, #301, #450, #531 | approximate (was faithful) | near dash long and thick, far one short; the art's near dash is three strokes |
+
+Rows still to redo strictly: Retro Glass R (the rest), then Side Left: Frog, Clown Eye, Chog Viper, the lasers of Left, Clown Eye Mix, Classic VR, Modern VR, Retard, XD, 3D Glass, BTC Glass, Worried, Thug, Angry, Smirk (done), Happy (done).
 
 ## The 64 Origin rows
 

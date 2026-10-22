@@ -1447,3 +1447,38 @@ Stripe Shirt, CEO Vest, Mummy.
 - **Judged faithful, unchanged**: Squid Game (069 and the zip), Cream, Pink, Aqua, Blue and Cyan Tuxedo (the V widened in batch 1), Fire Shirt, Chug Life, Tank Top, Yellow Shirt, Red shirt, Red Trackset, Black Shirt, CEO Vest.
   **Wizard Cape** (5 Genesis on skeletons) lacks its yellow pattern and its ties (a skeleton, the faces agent's bones); **Mummy** (3) has the crossed bandages of the art; **Stripe Shirt** (4): the ribs drawn over it are the faces agent's.
 - **Checked**: `--budget`: largest #710 7,981, none over 8,000; library 1,970 Genesis, 0 failures. Not verified in Unity.
+## 22 October 2026: strict eye audit, batch 3 (lot 8)
+
+Gradient, Sunset and Plasma visors (157 Genesis), Round Eye (61), Closed Eye Crying (57), Tired (56), Right, strict rule, 3 to 6 Genesis per value (#1, #30, #100, #105; #11, #83, #147; #60, #62, #82; #37, #79, #68, #237; #21, #18, #24, #261;
+#66, #106, #123, #246, #267). Sheet, 19 Genesis, the art beside the front close and the three quarter close, before | after (before rendered from a temporary copy of origin/main, not kept):
+[heroes-eyes-batch3-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch3-2026-10-22.jpg).
+
+- **Visors, Right: approximate, made closer.** The visor of the pictures is a lens (an almond with round ends, 0.076 half height in the middle and 0.036 at its ends where ours was a band 0.056 and 0.042), its colours running
+  smoothly where ours stepped in ten flat stripes. `VISOR["HALF_HEIGHT"]`, `ROUND` 0.55 for the ends, and `smooth_visors()` (`make_chog_traits.py`) cuts each stripe in two with the colour running between the stripes (20 to 24 pieces).
+  Still differs: the art's lens is larger and slanted in the three quarter pictures and its edge is a thick black line round it; the colour still shows a step every 0.03 across.
+- **Round Eye, Right: wrong shape, redrawn, now approximate.** Tall ovals 0.72 as wide as high, a thin white ring, the pupil filling the white (0.056 by 0.074 dark disc, 0.046 by 0.064 white, pupil 0.038 by 0.056; round and 0.060 by 0.066 before).
+  Approximate: the near eye is larger than the far one in the pictures.
+- **Closed Eye Crying, Right: wrong, redrawn, now approximate.** The pictures draw a SAD closed eye: a thick arch, its outer end much lower than its inner one; ours were upright happy arches. `CLOSED_ARCH` tilt -0.10 to -0.40, 0.054 by 0.022, thickness 0.026 (0.015).
+  The tear is as in lot 5c.
+- **Tired, Right: approximate, made closer.** Larger eyes (0.058 by 0.062), one upright glint at the top left of the pupil (it was at the right); the grey-blue bag is a crescent in the pictures and a ring in ours (not changed).
+- **Checked**: library export builds all 1,970 Genesis under 8,000 triangles; by eye on the sheet only; not in a Unity build.
+- **Left to do**: Side Left (Side Eye, Base, Happy, MOG, Vertical, Flat, Frog, Clown Eye, Chog Viper, Clown Eye Mix, Classic VR, Modern VR, Retard, XD, 3D Glass, BTC Glass, Worried, Thug), then Right: Teary, Retro Glass and Anime Glass remainders.
+
+## 22 October 2026: strict eye audit, batch 4: Side Left (lot 8)
+
+Side Eye L (34 Origin Genesis), Base L (33), Happy L (33), MOG L (32), Vertical L (31), Flat L (30), strict rule, 5 Genesis each (#17, #34, #64, #73, #151; #23, #198, #220, #240, #381; #26, #223, #71, #221, #925; #181, #162,
+#176, #293, #380; #63, #78, #175, #45, #296; #218, #196, #301, #450, #531). Sheet, 14 Genesis, the art beside the front close and the three quarter close, before | after:
+[heroes-eyes-batch4-2026-10-22.jpg](../../research/evidence/heroes-eyes-batch4-2026-10-22.jpg).
+
+- **The common finding: on Side=Left the two eyes of a pair are two different drawings** (as on Smirk). The near eye, on the left of the picture, is large: wide and flat, 1.6 times as wide as high, a straight lid that runs on to the right
+  as a point, a pupil that fills it, a tall glint at its left. The far eye is a small narrow oval, a third as wide as high. We drew two equal eyes. `EYES` (numbers of one eye by its side) is now in the lidded eyes (`SIDE_EYE`, `lidded_eyes`),
+  in `FLAT_EYE` and in `VERTICAL`, and `SIDE_LEFT_EYES` holds the two eyes of Side Eye and Base.
+- **Side Eye L, Base L: wrong, redrawn, now approximate.** A Left entry for Side Eye (`EYES_OF_SIDE["Left"]`, the Right entry keeps its own numbers): near eye 0.082 by 0.046 with a lid flick 0.036 inwards, far eye 0.030 by 0.056. Approximate: the near
+  eye's pupil does not touch the lid in the same way, the far eye is a little too tall.
+- **Happy L: approximate, made closer.** The near eye a thicker hooked blade (0.026 thick, rising 0.040), the far one a narrower hook. The art's blade ends in a downward hook and carries a white streak: not drawn.
+- **Vertical L: wrong, redrawn, now approximate.** A large white almond with a narrow upright pupil for the near eye (0.078 by 0.046), a small tall one for the far eye (0.030 by 0.046).
+- **Flat L: approximate, made closer.** The near eye a long thick dash (0.060 half, 0.024 thick), the far one short (0.028) and slanting; the art's near dash is three strokes, ours one.
+- **MOG L (and Chog Viper): approximate, made closer.** The goggles of the pictures are a tall lens (0.074 half height, 0.054 at the ends where ours was 0.060 and 0.050) with colours running smoothly: `smooth_visors()` now cuts the stripes of goggles too
+  (14 pieces). The art's lens is a smooth rainbow with a thick dark frame and a notch at the nose; ours still shows a step every 0.04.
+- **Checked**: library export builds all 1,970 Genesis under 8,000 triangles; by eye on the sheet only; not in a Unity build.
+- **Left to do**: Left: Frog, Clown Eye, Clown Eye Mix, Chog Viper (shape), Classic VR, Modern VR, Retard, XD, 3D Glass, BTC Glass, Worried, Thug, Angry, Smirk done, the lasers; Right: Retro Glass remainder.
