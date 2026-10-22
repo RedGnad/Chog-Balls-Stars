@@ -793,3 +793,55 @@ eyes and mouths 0.0232 to 0.0397), and the faceted head lies up to 0.007 inside 
 B=/Applications/Blender.app/Contents/MacOS/Blender
 $B --background --factory-startup -t 4 --python tools/blender/measure_face_gaps.py -- --genesis 75,1287,23
 ```
+
+
+## 22 October 2026: the face fills the front of the head
+
+The owner: "the cream face is drawn as a delimited oval on the front of the head and looks smaller than in the
+art". On the Genesis art (looked at on 18 Genesis: the hoodies #23, #78, #85, #124, #57, #182; the costumes #16,
+#143, #116, #37, #249, #32, #40; the bare heads #75 and #15; the caps #3, #4, #947) the cream face runs from the
+edge of the hood, the cap or the costume opening to the other, and at the sides up to the skin of the crown; the
+only skin above it is a row of teeth. In 3D it was a rounded square 0.250 from its middle (0.266 at its widest,
+0.178 high) inside a head 0.300 wide and 0.250 high: a ring of bare skin 0.03 to 0.04 wide each side of the cheeks,
+and 0.12 of skin above the brow. Sheet, art beside each hero, before and after, from the front, three quarters,
+the side and the game camera at phone size:
+[heroes-face-fill-2026-10-22.jpg](../../research/evidence/heroes-face-fill-2026-10-22.jpg)
+(`make_chog_faces_before_after.py`).
+
+- **The edge of the face follows the egg of the head** (`face_place` in `make_chog_traits.py`). The fixed oval
+  (`FACE_HALF_WIDTH` 0.250, `FACE_TAPER` 0.22, both removed from `POLISH`) is now `FACE_FIT` 0.985 of the width
+  the head has at each height, a rounded square of `FACE_SQUARENESS` 4.0 (3.0 before: a flatter brow), the brow
+  `FACE_TOP` 0.235 above the middle of the face (0.178 before; the chin stays at `FACE_HALF_HEIGHT` 0.178 below
+  it, at the bottom of the head). Seen from the front its area goes from 0.157 to 0.199 (+26 %), from 67 % to
+  84 % of the front of the head; its widest half width from 0.266 to 0.295. The middle of the face
+  (`FACE_MIDDLE`) did not move, and neither did the eyes, mouths, cheeks and nose, which are placed from it:
+  they stay where the art puts them. The teeth of hair follow the brow (`FACE_TOP`).
+- **The openings follow the face, by construction.** Every opening had numbers typed in for the old face. Now
+  `opening_rim()` (`make_chog_traits.py`) finds, for each angle round the head, where the shell of the hood or the
+  helmet meets the edge of the face seen from the front, pushed out by `GAP` (the dark line and the roll): the
+  `RIM` of the hood (`HOOD`, `GAP` 0.022, `RIM_TAIL` for the jaw and the neck behind) and the ring of the
+  astronaut helmet (`ASTRO`, `RING_GAP` 0.040). The yellow hoodie, the gangster, shark and toad suits and the
+  astronaut ring get it; an entry may still give its own `RIM`. The banana and the dragon cut their volume along
+  `face_place` (`MASCOT["OPENING"]`), so they widened with the face, and their collar with them. The typed tables
+  are kept in comments.
+- **FACE_LIFT 0.0038 to 0.0046, FACE_OVER[0] 0.0016 to 0.0008, FACE_OVER[1] 0.0046 to 0.0038.** A bigger face
+  has longer quads, which sag; on the first try 4 of 3,240 measured points of the face (`measure_face_gaps.py`)
+  let a point of the head show through as a speck of skin. At 0.0046 none does (#23, #37, #75, #15 measured for the face: 0.0072 off the head on average, 0.0114 at
+  most; #23 and #75 for everything drawn on it: no head poke through the face, the cheeks, any eye or mouth; the
+  two skin-coloured teeth that the head touches are the same colour). The cheeks stay 0.0054 off the egg, the eyes
+  and mouths 0.0066 and up, as before.
+- **Checked**: `-- --budget` (1,869 heroes of the base Origin built): largest #710 7,971 triangles, median 7,157,
+  none over 8,000 (the face has the same rings and points, so the counts did not move), no failure and no leaf
+  through a hat. Built and turned all round (front, three quarters, side, back, top, the two angles of the game)
+  for 15 Genesis (hoods, the six costumes, caps, a beanie, bare heads of both Sides) and 16 more for the leaves
+  and hats (#43, #21, #51, #10, #44, #12, #14, #39, #29, #17, #18, #80, #70, #275, #207, #1287): the face
+  does not show above a cap or under a hat, the hoods and costumes close on it with no gap and no overlap from
+  the front and the three quarters.
+
+Still wrong, or not done: the face reaches the silhouette of the head from the front and from three quarters,
+but not round the side (a pure side view shows the cream stopping at the cheek, as before): going further
+round would take more rings, and the heaviest heroes are 29 triangles under the limit. At the size of a phone
+from the game camera the face is mostly under the hood or the hat, so the change reads little there. On the art
+of Side=Right the cream points of the brow stand up into the crown; ours are skin-coloured teeth hanging down
+(unchanged). The radioactive hairline (`RADIOACTIVE_HAIRLINE`) is at a fixed height, now inside the taller
+face: it is for the eyes and mouths audit. `chog_one_of_one.py` and `export_chog_parts.py` were not touched.

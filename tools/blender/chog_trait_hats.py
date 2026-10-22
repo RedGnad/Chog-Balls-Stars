@@ -1885,8 +1885,14 @@ HOODIE = {
 # degrees from the front (over the brow, down beside the face to the jaw, down to the neck behind),
 # how much larger than the head it is, rows, sides, and the roll along the edge of the opening (its
 # radius, and how far around from the front it runs).
+# The edge of the opening follows the edge of the face (22 October 2026, make_chog_traits.opening_rim): it
+# stands "GAP" off it (the dark line of the face and the roll of the hood), and below the widest point of the
+# face the hood closes to the jaw and the neck behind as "RIM_TAIL" says (degrees from the front, polar
+# degrees). A "RIM" table of an entry would replace all that. (Typed in by hand until then, for a face 0.25
+# wide: (0, 52), (35, 62), (62, 116), (110, 148), (180, 156).)
 HOOD = {
-    "RIM": ((0.0, 52.0), (35.0, 62.0), (62.0, 116.0), (110.0, 148.0), (180.0, 156.0)),
+    "GAP": 0.022,
+    "RIM_TAIL": ((110.0, 148.0), (180.0, 156.0)),
     "SIZE": ((0.0, 1.12), (60.0, 1.20), (180.0, 1.22)),
     "ROWS": 4,
     "SIDES": 18,
@@ -1896,9 +1902,19 @@ HOOD = {
 }
 
 
+def hood_numbers_of(maker):
+    """The numbers of the hood of an entry, its "RIM" (degrees from the front, polar degrees) following the
+    edge of the face unless the entry gives its own."""
+    numbers = SimpleNamespace(**{**HOOD, **maker.entry.get("hood_numbers", {})})
+    if not hasattr(numbers, "RIM"):
+        numbers.RIM = KIT.opening_rim(maker.head, lambda degrees: interpolate(numbers.SIZE, degrees), numbers.GAP,
+                                      numbers.RIM_TAIL)
+    return numbers
+
+
 def build_hood_up(maker):
     """A hood over the head (a part on "Head"), its opening framing the face, a roll along the edge."""
-    numbers = SimpleNamespace(**{**HOOD, **maker.entry.get("hood_numbers", {})})
+    numbers = hood_numbers_of(maker)
     part, surface = maker.part(on="Head"), maker.surface
     sides, rows = numbers.SIDES, numbers.ROWS
     angles = [2.0 * math.pi * index / sides for index in range(sides)]
@@ -2059,7 +2075,7 @@ def build_costume(maker):
     build_hood_up(maker)
     hood = maker.parts[-1][0]
     surface = maker.surface
-    hood_numbers = SimpleNamespace(**{**HOOD, **entry.get("hood_numbers", {})})
+    hood_numbers = hood_numbers_of(maker)
     around, upper, lower, larger = numbers.CHIN
     rows = []
     for polar_deg in (upper, (upper + lower) * 0.5, lower):
@@ -2257,14 +2273,12 @@ def build_mascot(maker):
     # The opening: the oval of the face, as add_face draws it, and the ways from the middle of the head
     # through it; the middle of the face; a frame across the way the face looks.
     share, points = numbers.OPENING
-    half_width = head.FACE_HALF_WIDTH + head.FACE_LINE * share
-    half_height = head.FACE_HALF_HEIGHT + head.FACE_LINE * share
+    # (the edge of the face itself, face_place, with the share of its dark line on top of it)
+    grown = 1.0 + head.FACE_LINE * share / head.HEAD_HALF_WIDTH
     rim = []
     for index in range(points):
         angle = 2.0 * math.pi * index / points
-        side = half_width * KIT.power(math.cos(angle), head.FACE_SQUARENESS)
-        up = half_height * KIT.power(math.sin(angle), head.FACE_SQUARENESS)
-        rim.append(surface.front(side * (1.0 + head.FACE_TAPER * up / half_height), up, 0.0))
+        rim.append(surface.front(*KIT.face_place(head, angle, grown), 0.0))
     looking = (surface.front(0.0, 0.0, 0.0) - surface.middle).normalized()
     first, second = base.frame_across(looking, X)
 
@@ -2508,9 +2522,13 @@ def head_normal_at(surface, point):
 
 
 ASTRO = {
-    # The ring of the helmet around the face: polar degrees of the opening by degrees from the front
-    # (it goes all round the face), how much larger than the head, its radius.
-    "RING": ((0.0, 50.0), (45.0, 66.0), (75.0, 110.0), (110.0, 160.0), (180.0, 170.0)),
+    # The ring of the helmet around the face: how much larger than the head, its radius (its opening, polar
+    # degrees by degrees from the front, goes all round the face).
+    # (Since 22 October 2026 the opening follows the edge of the face, make_chog_traits.opening_rim: the ring
+    # stands "RING_GAP" off it, and "RING_TAIL" closes it under the chin and behind. Typed in by hand until
+    # then, for a face 0.25 wide: (0, 50), (45, 66), (75, 110), (110, 160), (180, 170).)
+    "RING_GAP": 0.040,
+    "RING_TAIL": ((110.0, 160.0), (180.0, 170.0)),
     "RING_SIZE": 1.12,
     "RING_RADIUS": 0.040,
     "RING_STATIONS": 18,
@@ -2526,6 +2544,7 @@ def build_astro(maker):
     ring of the helmet around the face. The glass of the helmet is not drawn: the face and the crown
     show as through it."""
     numbers = SimpleNamespace(**ASTRO)
+    numbers.RING = KIT.opening_rim(maker.head, lambda degrees: numbers.RING_SIZE, numbers.RING_GAP, numbers.RING_TAIL)
     build_track(maker)
     torso, body = maker.parts[0][0], maker.body
     height, out_by, radius = numbers.COLLAR
