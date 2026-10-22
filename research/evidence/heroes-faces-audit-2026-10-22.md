@@ -164,7 +164,19 @@ Batch 4, Side Left ([sheet](heroes-eyes-batch4-2026-10-22.jpg)), same rule; the 
 | Vertical, Left (31) | #63, #78, #175, #45, #296 | wrong (was faithful), redrawn, now approximate | near eye a large white almond with a narrow pupil, far eye small and tall |
 | Flat, Left (30) | #218, #196, #301, #450, #531 | approximate (was faithful) | near dash long and thick, far one short; the art's near dash is three strokes |
 
-Rows still to redo strictly: Retro Glass R (the rest), then Side Left: Frog, Clown Eye, Chog Viper, the lasers of Left, Clown Eye Mix, Classic VR, Modern VR, Retard, XD, 3D Glass, BTC Glass, Worried, Thug, Angry, Smirk (done), Happy (done).
+Batch 5, Side Left ([sheet](heroes-eyes-batch5-2026-10-22.jpg)), same rule:
+
+| Value, Side (Origin Genesis) | Genesis looked at | Strict verdict | What differs |
+| --- | --- | --- | --- |
+| Frog, Left (27) | #7, #15, #74, #131, #144 | wrong (was approximate), redrawn, now approximate | tall near oval with a wide pupil low, small far oval; ours were two equal wide eyes |
+| Retard, Left (23) | #32, #182, #216, #217, #395 | wrong (was faithful), redrawn, now approximate | near eye big with a pupil low at the left, far eye narrow |
+| Clown Eye, Left (27) | #178, #206, #224, #245, #142 | wrong (was faithful), redrawn, now approximate | near eye large under a tall kite mark, far eye narrow under a narrower mark |
+| Clown Eye Mix, Left (25) | #57, #70, #790, #942, #969 | wrong (was faithful), redrawn, now approximate | same two drawings in red above and blue below |
+| XD, Left (23) | #85, #180, #273, #342, #505 | approximate (was faithful) | large near chevron, narrow far one |
+| Worried, Left (18) | #192, #247, #349, #445, #547 | approximate (was faithful) | near eye larger, far eye narrow |
+| Angry, Left (27) | #29, #91, #103, #276, #410 | wrong (was faithful), redrawn, now approximate | near half moon under a flat lid, far eye a narrow oval with no brow |
+
+Rows still to redo strictly: Retro Glass R (the rest), then Side Left: Chog Viper (shape), Classic VR, Modern VR, 3D Glass, BTC Glass, Thug, and the lasers of Left.
 
 ## The 64 Origin rows
 
