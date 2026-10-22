@@ -39,7 +39,8 @@ contract DeployMainnet is Script {
         (, address deployer,) = vm.readCallers();
         require(referee != deployer, "the referee and the deploying wallet must be two different keys");
         address treasury = vm.envOr("TREASURY", deployer);
-        ChogWager wager = new ChogWager(CHOG, referee, burnedShare, deployer);
+        // (Version 2 of the wager takes a Genesis players' share, none here: script/DeployWager.s.sol deploys it alone.)
+        ChogWager wager = new ChogWager(CHOG, referee, burnedShare, 0, deployer);
         ChogRental rental = new ChogRental(CHOG, GENESIS, burnedShare);
         ChogShop shop = new ChogShop(CHOG, GENESIS, treasury, burnedShare, deployer);
         shop.setItem(SECOND_FORM, uint128(itemPrice * 1 ether), true);

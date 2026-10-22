@@ -53,7 +53,7 @@ contract ChogWagerTest is Test {
         referee = vm.addr(REFEREE_KEY);
         chog = new WagerToken();
         // A tenth of what the losers staked is burned.
-        wager = new ChogWager(address(chog), referee, 1000, admin);
+        wager = new ChogWager(address(chog), referee, 1000, 0, admin);
         address[4] memory players = [ana, bo, cy, dee];
         for (uint256 index; index < players.length; ++index) {
             chog.mint(players[index], 1000 ether);
@@ -82,7 +82,16 @@ contract ChogWagerTest is Test {
     }
 
     function _resultFrom(uint256 key, ChogWager on, bytes32 matchKey, uint8 winnerTeam) private view returns (bytes memory) {
-        return _sign(key, keccak256(abi.encode(on.RESULT(), block.chainid, address(on), matchKey, winnerTeam)));
+        return _resultWith(key, on, matchKey, winnerTeam, new address[](0));
+    }
+
+    // A result naming the wallets that played a Genesis in the match (version 2).
+    function _resultWith(uint256 key, ChogWager on, bytes32 matchKey, uint8 winnerTeam, address[] memory genesisPlayers)
+        private
+        view
+        returns (bytes memory)
+    {
+        return _sign(key, keccak256(abi.encode(on.RESULT(), block.chainid, address(on), matchKey, winnerTeam, genesisPlayers)));
     }
 
     function _result(bytes32 matchKey, uint8 winnerTeam) private view returns (bytes memory) {
@@ -143,7 +152,7 @@ contract ChogWagerTest is Test {
         vm.expectEmit();
         emit Settled(MATCH, 0, 190 ether, 20 ether);
         vm.prank(makeAddr("anyone"));
-        wager.settle(MATCH, 0, result);
+        wager.settle(MATCH, 0, new address[](0), result);
 
         assertEq(_state(MATCH), 2, "settled");
         assertEq(chog.balanceOf(ana), 1090 ether);
@@ -158,7 +167,7 @@ contract ChogWagerTest is Test {
         _stake(MATCH, ana, 0, STAKE);
         _stake(MATCH, cy, 1, STAKE);
         _stake(MATCH, dee, 1, STAKE);
-        wager.settle(MATCH, 0, _result(MATCH, 0));
+        wager.settle(MATCH, 0, new address[](0), _result(MATCH, 0));
         assertEq(chog.balanceOf(ana), 1180 ether, "her stake back and 180 of the 200 lost");
         assertEq(chog.totalSupply(), 3980 ether);
         assertEq(chog.balanceOf(address(wager)), 0);
@@ -175,7 +184,7 @@ contract ChogWagerTest is Test {
         bytes memory result = _result(MATCH, 0);
         vm.expectEmit();
         emit Settled(MATCH, 0, 131, 11);
-        wager.settle(MATCH, 0, result);
+        wager.settle(MATCH, 0, new address[](0), result);
         assertEq(chog.balanceOf(ana), 1000 ether + 30);
         assertEq(chog.balanceOf(dee), 1000 ether - 101);
         assertEq(supply - chog.totalSupply(), 11, "the tenth, and the unit three winners cannot share");
@@ -294,7 +303,7 @@ contract ChogWagerTest is Test {
         assertEq(team1, 8);
 
         // Sixteen payments in one settlement go through.
-        wager.settle(MATCH, 1, _result(MATCH, 1));
+        wager.settle(MATCH, 1, new address[](0), _result(MATCH, 1));
         assertEq(chog.balanceOf(address(wager)), 0);
         assertEq(chog.balanceOf(address(uint160(0xA001))), 190 ether);
     }
@@ -305,7 +314,7 @@ contract ChogWagerTest is Test {
         bytes memory draw = _result(MATCH, 2);
         vm.expectEmit();
         emit Refunded(MATCH);
-        wager.settle(MATCH, 2, draw);
+        wager.settle(MATCH, 2, new address[](0), draw);
 
         assertEq(_state(MATCH), 3, "refunded");
         assertEq(chog.balanceOf(ana), 1000 ether);
@@ -318,13 +327,13 @@ contract ChogWagerTest is Test {
         // Only team 0 staked: whoever wins, there is nothing to win.
         _stake(MATCH, ana, 0, STAKE);
         _stake(MATCH, bo, 0, STAKE);
-        wager.settle(MATCH, 0, _result(MATCH, 0));
+        wager.settle(MATCH, 0, new address[](0), _result(MATCH, 0));
         assertEq(_state(MATCH), 3);
         assertEq(chog.balanceOf(ana), 1000 ether);
 
         _stake(OTHER_MATCH, ana, 0, STAKE);
         _stake(OTHER_MATCH, bo, 0, STAKE);
-        wager.settle(OTHER_MATCH, 1, _result(OTHER_MATCH, 1));
+        wager.settle(OTHER_MATCH, 1, new address[](0), _result(OTHER_MATCH, 1));
         assertEq(_state(OTHER_MATCH), 3);
         assertEq(chog.balanceOf(bo), 1000 ether);
         assertEq(chog.totalSupply(), 4000 ether);
@@ -334,21 +343,21 @@ contract ChogWagerTest is Test {
         _twoAgainstTwo();
         bytes memory forged = _resultFrom(OTHER_KEY, wager, MATCH, 1);
         vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
-        wager.settle(MATCH, 1, forged);
+        wager.settle(MATCH, 1, new address[](0), forged);
 
         // The referee said team 0: the same signature does not make team 1 win, nor a draw.
         bytes memory result = _result(MATCH, 0);
         vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
-        wager.settle(MATCH, 1, result);
+        wager.settle(MATCH, 1, new address[](0), result);
         vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
-        wager.settle(MATCH, 2, result);
+        wager.settle(MATCH, 2, new address[](0), result);
         vm.expectRevert(abi.encodeWithSelector(ChogWager.BadTeam.selector, 3));
-        wager.settle(MATCH, 3, result);
+        wager.settle(MATCH, 3, new address[](0), result);
 
         // A ticket is not a result, even from the referee.
         bytes memory ticket = _ticket(MATCH, ana, 0, STAKE);
         vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
-        wager.settle(MATCH, 0, ticket);
+        wager.settle(MATCH, 0, new address[](0), ticket);
         assertEq(chog.balanceOf(address(wager)), 400 ether);
     }
 
@@ -359,14 +368,14 @@ contract ChogWagerTest is Test {
         bytes memory result = _result(MATCH, 0);
 
         vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
-        wager.settle(OTHER_MATCH, 0, result);
+        wager.settle(OTHER_MATCH, 0, new address[](0), result);
 
-        wager.settle(MATCH, 0, result);
+        wager.settle(MATCH, 0, new address[](0), result);
         vm.expectRevert(abi.encodeWithSelector(ChogWager.NotOpen.selector, MATCH));
-        wager.settle(MATCH, 0, result);
+        wager.settle(MATCH, 0, new address[](0), result);
 
         // The same referee, the same match name, another contract: its own signatures only.
-        ChogWager other = new ChogWager(address(chog), referee, 1000, admin);
+        ChogWager other = new ChogWager(address(chog), referee, 1000, 0, admin);
         bytes memory ticket = _ticketFrom(REFEREE_KEY, other, MATCH, ana, 0, STAKE, deadline);
         bytes memory otherTicket = _ticketFrom(REFEREE_KEY, other, MATCH, cy, 1, STAKE, deadline);
         bytes memory ticketOfTheFirst = _ticket(MATCH, ana, 0, STAKE);
@@ -382,19 +391,19 @@ contract ChogWagerTest is Test {
         other.stake(MATCH, 1, STAKE, deadline, otherTicket);
         vm.stopPrank();
         vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
-        other.settle(MATCH, 0, result);
-        other.settle(MATCH, 0, otherResult);
+        other.settle(MATCH, 0, new address[](0), result);
+        other.settle(MATCH, 0, new address[](0), otherResult);
         assertEq(chog.balanceOf(address(other)), 0);
     }
 
     function test_NothingIsStakedOnAMatchThatIsOverAndNothingIsSettledBeforeAStake() public {
         bytes memory early = _result(MATCH, 0);
         vm.expectRevert(abi.encodeWithSelector(ChogWager.NotOpen.selector, MATCH));
-        wager.settle(MATCH, 0, early);
+        wager.settle(MATCH, 0, new address[](0), early);
 
         _stake(MATCH, ana, 0, STAKE);
         _stake(MATCH, cy, 1, STAKE);
-        wager.settle(MATCH, 1, _result(MATCH, 1));
+        wager.settle(MATCH, 1, new address[](0), _result(MATCH, 1));
 
         bytes memory late = _ticket(MATCH, bo, 1, STAKE);
         vm.prank(bo);
@@ -418,7 +427,7 @@ contract ChogWagerTest is Test {
         vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
         wager.voidMatch(MATCH, result);
         vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
-        wager.settle(MATCH, 0, called);
+        wager.settle(MATCH, 0, new address[](0), called);
 
         vm.expectEmit();
         emit Refunded(MATCH);
@@ -431,7 +440,7 @@ contract ChogWagerTest is Test {
         vm.expectRevert(abi.encodeWithSelector(ChogWager.NotOpen.selector, MATCH));
         wager.voidMatch(MATCH, called);
         vm.expectRevert(abi.encodeWithSelector(ChogWager.NotOpen.selector, MATCH));
-        wager.settle(MATCH, 0, result);
+        wager.settle(MATCH, 0, new address[](0), result);
     }
 
     function test_AfterAnHourWithoutAResultAnyoneGetsTheStakesBack() public {
@@ -458,7 +467,7 @@ contract ChogWagerTest is Test {
 
         // A result that comes afterwards pays nothing, and stakes are given back once.
         vm.expectRevert(abi.encodeWithSelector(ChogWager.NotOpen.selector, MATCH));
-        wager.settle(MATCH, 0, result);
+        wager.settle(MATCH, 0, new address[](0), result);
         vm.expectRevert(abi.encodeWithSelector(ChogWager.NotOpen.selector, MATCH));
         wager.refundExpired(MATCH);
         vm.expectRevert(abi.encodeWithSelector(ChogWager.NotOpen.selector, OTHER_MATCH));
@@ -476,13 +485,13 @@ contract ChogWagerTest is Test {
         wager.setReferee(vm.addr(OTHER_KEY));
 
         vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
-        wager.settle(MATCH, 0, oldResult);
+        wager.settle(MATCH, 0, new address[](0), oldResult);
         vm.prank(ana);
         vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
         wager.stake(OTHER_MATCH, 0, STAKE, deadline, oldTicket);
 
         // The new referee tells the result of the match that was open.
-        wager.settle(MATCH, 1, _resultFrom(OTHER_KEY, wager, MATCH, 1));
+        wager.settle(MATCH, 1, new address[](0), _resultFrom(OTHER_KEY, wager, MATCH, 1));
         assertEq(chog.balanceOf(cy), 1090 ether);
     }
 
@@ -513,16 +522,16 @@ contract ChogWagerTest is Test {
 
     function test_TheWagerCannotBeDeployedHalfConfigured() public {
         vm.expectRevert(ChogWager.ZeroAddress.selector);
-        new ChogWager(address(0), referee, 0, admin);
+        new ChogWager(address(0), referee, 0, 0, admin);
         vm.expectRevert(ChogWager.ZeroAddress.selector);
-        new ChogWager(address(chog), address(0), 0, admin);
+        new ChogWager(address(chog), address(0), 0, 0, admin);
         vm.expectRevert(ChogWager.ZeroAddress.selector);
-        new ChogWager(address(chog), referee, 0, address(0));
+        new ChogWager(address(chog), referee, 0, 0, address(0));
         vm.expectRevert(ChogWager.ShareTooLarge.selector);
-        new ChogWager(address(chog), referee, 10_001, admin);
+        new ChogWager(address(chog), referee, 10_001, 0, admin);
         // An address without code would let stakes "succeed" without a token moving.
         vm.expectRevert(ChogWager.NotAToken.selector);
-        new ChogWager(makeAddr("not a token"), referee, 0, admin);
+        new ChogWager(makeAddr("not a token"), referee, 0, 0, admin);
     }
 
     function test_WithoutApprovalOrFundsNothingIsStaked() public {
@@ -543,7 +552,7 @@ contract ChogWagerTest is Test {
 
     function test_ATokenThatAnswersNothingIsStakedPaidOutAndGivenBack() public {
         SilentWagerToken silent = new SilentWagerToken();
-        ChogWager other = new ChogWager(address(silent), referee, 1000, admin);
+        ChogWager other = new ChogWager(address(silent), referee, 1000, 0, admin);
         address[2] memory players = [ana, cy];
         for (uint8 index; index < 2; ++index) {
             silent.mint(players[index], 2 * STAKE);
@@ -556,7 +565,7 @@ contract ChogWagerTest is Test {
             vm.stopPrank();
         }
 
-        other.settle(MATCH, 0, _resultFrom(REFEREE_KEY, other, MATCH, 0));
+        other.settle(MATCH, 0, new address[](0), _resultFrom(REFEREE_KEY, other, MATCH, 0));
         assertEq(silent.balanceOf(ana), 190 ether, "her stake and 90 of the 100 lost; her other stake is still held");
         other.voidMatch(OTHER_MATCH, _voidFrom(REFEREE_KEY, other, OTHER_MATCH));
         assertEq(silent.balanceOf(ana), 290 ether);
@@ -591,7 +600,7 @@ contract ChogWagerTest is Test {
         assertFalse(staked);
 
         // The list stays readable once the match is paid.
-        wager.settle(MATCH, 1, _result(MATCH, 1));
+        wager.settle(MATCH, 1, new address[](0), _result(MATCH, 1));
         (players,) = wager.stakersOf(MATCH);
         assertEq(players.length, 3);
     }
@@ -609,7 +618,7 @@ contract ChogWagerTest is Test {
         team0 = uint8(bound(team0, 1, 8));
         team1 = uint8(bound(team1, 1, 8));
         share = uint16(bound(share, 0, 10_000));
-        ChogWager other = new ChogWager(address(chog), referee, share, admin);
+        ChogWager other = new ChogWager(address(chog), referee, share, 0, admin);
         uint256 count = uint256(team0) + team1;
         for (uint256 index; index < count; ++index) {
             _stakeOn(other, address(uint160(0xB000 + index)), index < team0 ? 0 : 1, stakeAmount);
@@ -618,7 +627,7 @@ contract ChogWagerTest is Test {
 
         uint256 supplyBefore = chog.totalSupply();
         uint8 winnerTeam = teamOneWins ? 1 : 0;
-        other.settle(MATCH, winnerTeam, _resultFrom(REFEREE_KEY, other, MATCH, winnerTeam));
+        other.settle(MATCH, winnerTeam, new address[](0), _resultFrom(REFEREE_KEY, other, MATCH, winnerTeam));
 
         uint256 winners = teamOneWins ? team1 : team0;
         uint256 lost = (count - winners) * stakeAmount;
@@ -632,6 +641,116 @@ contract ChogWagerTest is Test {
         assertEq(winners * toEachWinner + burned, count * stakeAmount, "paid in is with a winner or burned");
         assertGe(burned, lost * share / 10_000, "at least the burned share");
         assertLt(burned - lost * share / 10_000, winners, "plus less than one unit a winner");
+    }
+
+    // Version 2 (22 October 2026): half of the tenth taken from the lost stakes goes to the Genesis players.
+    function _versionTwo() private returns (ChogWager split) {
+        split = new ChogWager(address(chog), referee, 500, 500, admin);
+        _stakeOn(split, makeAddr("w0"), 0, STAKE);
+        _stakeOn(split, makeAddr("w1"), 0, STAKE);
+        _stakeOn(split, makeAddr("l0"), 1, STAKE);
+        _stakeOn(split, makeAddr("l1"), 1, STAKE);
+    }
+
+    function _two(address first, address second) private pure returns (address[] memory list) {
+        list = new address[](2);
+        list[0] = first;
+        list[1] = second;
+    }
+
+    event GenesisPlayerPaid(bytes32 indexed matchKey, address indexed player, uint256 amount);
+
+    function test_TheGenesisPlayersShareHalfOfWhatVersionOneBurnedAndTheWinnersGainTheSame() public {
+        ChogWager split = _versionTwo();
+        // One Genesis player staked and lost (l0), the other did not stake at all (gus).
+        address gus = makeAddr("gus");
+        address[] memory genesis = _two(makeAddr("l0"), gus);
+        uint256 supply = chog.totalSupply();
+
+        // 200 lost: 10 burned, 10 to the two Genesis players, 180 to the two winners as in version 1.
+        vm.expectEmit();
+        emit GenesisPlayerPaid(MATCH, makeAddr("l0"), 5 ether);
+        vm.expectEmit();
+        emit GenesisPlayerPaid(MATCH, gus, 5 ether);
+        vm.expectEmit();
+        emit Settled(MATCH, 0, 190 ether, 10 ether);
+        split.settle(MATCH, 0, genesis, _resultWith(REFEREE_KEY, split, MATCH, 0, genesis));
+
+        assertEq(chog.balanceOf(makeAddr("w0")), 190 ether, "a winner gains what version 1 paid");
+        assertEq(chog.balanceOf(makeAddr("w1")), 190 ether);
+        assertEq(chog.balanceOf(makeAddr("l0")), 5 ether, "a Genesis player who lost still earns the share");
+        assertEq(chog.balanceOf(gus), 5 ether, "a Genesis player who did not stake earns it too");
+        assertEq(chog.balanceOf(makeAddr("l1")), 0);
+        assertEq(supply - chog.totalSupply(), 10 ether, "half of the tenth is burned");
+        assertEq(chog.balanceOf(address(split)), 0, "the contract keeps nothing");
+    }
+
+    function test_WithoutAGenesisPlayerTheirShareIsBurned() public {
+        ChogWager split = _versionTwo();
+        uint256 supply = chog.totalSupply();
+        split.settle(MATCH, 1, new address[](0), _resultFrom(REFEREE_KEY, split, MATCH, 1));
+        assertEq(chog.balanceOf(makeAddr("l0")), 190 ether, "team 1 won, gains as in version 1");
+        assertEq(supply - chog.totalSupply(), 20 ether, "the whole tenth is burned");
+        assertEq(chog.balanceOf(address(split)), 0);
+    }
+
+    function test_TheGenesisPlayersAreSignedWithTheResult() public {
+        ChogWager split = _versionTwo();
+        address[] memory signed = _two(makeAddr("gus"), makeAddr("hal"));
+        bytes memory result = _resultWith(REFEREE_KEY, split, MATCH, 0, signed);
+        // Another list, a shorter one or none: the signature no longer matches.
+        vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
+        split.settle(MATCH, 0, _two(makeAddr("gus"), makeAddr("eve")), result);
+        address[] memory one = new address[](1);
+        one[0] = makeAddr("gus");
+        vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
+        split.settle(MATCH, 0, one, result);
+        vm.expectRevert(ChogWager.NotSignedByTheReferee.selector);
+        split.settle(MATCH, 0, new address[](0), result);
+        split.settle(MATCH, 0, signed, result);
+        assertEq(chog.balanceOf(makeAddr("hal")), 5 ether);
+    }
+
+    function test_ADrawPaysNoGenesisShareAndAResultNamesSixGenesisPlayersAtMost() public {
+        ChogWager split = _versionTwo();
+        address[] memory seven = new address[](7);
+        for (uint256 index; index < 7; ++index) seven[index] = address(uint160(0xC000 + index));
+        bytes memory tooMany = _resultWith(REFEREE_KEY, split, MATCH, 0, seven);
+        vm.expectRevert(abi.encodeWithSelector(ChogWager.TooManyGenesisPlayers.selector, 7));
+        split.settle(MATCH, 0, seven, tooMany);
+
+        address[] memory genesis = _two(makeAddr("gus"), makeAddr("hal"));
+        split.settle(MATCH, 2, genesis, _resultWith(REFEREE_KEY, split, MATCH, 2, genesis));
+        assertEq(chog.balanceOf(makeAddr("gus")), 0, "a draw gives the stakes back and pays no share");
+        assertEq(chog.balanceOf(makeAddr("w0")), STAKE);
+    }
+
+    function test_AShareThatWouldTakeMoreThanTheLostStakesCannotBeDeployed() public {
+        vm.expectRevert(ChogWager.ShareTooLarge.selector);
+        new ChogWager(address(chog), referee, 6000, 4001, admin);
+        new ChogWager(address(chog), referee, 6000, 4000, admin);
+    }
+
+    function testFuzz_VersionTwoKeepsEveryUnitWithAWinnerAGenesisPlayerOrBurned(uint8 genesisCount, uint96 stakeAmount)
+        public
+    {
+        genesisCount = uint8(bound(genesisCount, 0, 6));
+        uint256 amount = bound(stakeAmount, 1, 1_000_000 ether);
+        ChogWager split = new ChogWager(address(chog), referee, 500, 500, admin);
+        for (uint256 index; index < 5; ++index) _stakeOn(split, address(uint160(0xD000 + index)), index < 2 ? 0 : 1, amount);
+        address[] memory genesis = new address[](genesisCount);
+        for (uint256 index; index < genesisCount; ++index) genesis[index] = address(uint160(0xE000 + index));
+        uint256 supply = chog.totalSupply();
+        split.settle(MATCH, 0, genesis, _resultWith(REFEREE_KEY, split, MATCH, 0, genesis));
+
+        uint256 lost = 3 * amount;
+        uint256 toEachWinner = amount + (lost - lost * 500 / 10_000 - lost * 500 / 10_000) / 2;
+        uint256 toEachGenesis = genesisCount == 0 ? 0 : (lost * 500 / 10_000) / genesisCount;
+        assertEq(chog.balanceOf(address(uint160(0xD000))), toEachWinner);
+        if (genesisCount > 0) assertEq(chog.balanceOf(address(uint160(0xE000))), toEachGenesis);
+        uint256 burned = supply - chog.totalSupply();
+        assertEq(2 * toEachWinner + genesisCount * toEachGenesis + burned, 5 * amount, "every unit accounted for");
+        assertEq(chog.balanceOf(address(split)), 0);
     }
 
     // A new player is given the stake and puts it on a team of MATCH, on any wager contract.

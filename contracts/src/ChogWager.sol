@@ -11,11 +11,14 @@ interface IWagerToken {
 /// @title ChogWager
 /// @notice The players of one match each stake the same amount of $CHOG on their own team.
 /// The contract holds the stakes until the game's referee says who won: the winners then get
-/// their stake back plus an equal share of what the losers staked, less a share that is burned.
+/// their stake back plus an equal share of what the losers staked, less a share that is burned and
+/// a share paid to the players who played a Chog Genesis in the match, whether they staked or not
+/// (version 2, 22 October 2026: the Genesis carries the game, so its players earn from every staked
+/// match they play; the winners' gain is unchanged, the share comes out of what version 1 burned).
 /// The referee is a key of the game's backend, which signs a result only after it has played the
 /// match again from the inputs the game server recorded. It also signs, before the match, the
 /// ticket that lets a player stake on the team that player is really in. Anyone may bring a
-/// signed result to the contract. If no result comes within an hour of the first stake, anyone
+/// signed result to the contract, with the list of the Genesis players the referee signed with it. If no result comes within an hour of the first stake, anyone
 /// can have every stake given back: the stakes never depend on the backend staying alive.
 /// Not upgradeable. The owner can only replace the referee and hand the contract over.
 contract ChogWager {
@@ -40,6 +43,8 @@ contract ChogWager {
 
     /// @notice A match takes no more stakes than this.
     uint256 public constant MAX_STAKERS = 16;
+    /// @notice A result names no more Genesis players than a match has players (3 against 3).
+    uint256 public constant MAX_GENESIS_PLAYERS = 6;
     /// @notice How long after its first stake a match without a result can be refunded by anyone.
     uint256 public constant REFUND_AFTER = 1 hours;
     /// @notice What the three kinds of referee signature start with, so one is never taken for another.
@@ -50,6 +55,9 @@ contract ChogWager {
     IWagerToken public immutable chog;
     /// @notice Share of what the losers staked that is burned, in basis points (10_000 is all of it).
     uint16 public immutable burnedShare;
+    /// @notice Share of what the losers staked that is split equally between the Genesis players of
+    /// the match, in basis points; burned instead when the match had none.
+    uint16 public immutable genesisShare;
     /// @notice The key whose signature admits a stake and tells the winner.
     address public referee;
     address public owner;
@@ -60,6 +68,7 @@ contract ChogWager {
 
     event Staked(bytes32 indexed matchKey, address indexed player, uint8 team, uint256 amount);
     event Settled(bytes32 indexed matchKey, uint8 winnerTeam, uint256 paidToEachWinner, uint256 burned);
+    event GenesisPlayerPaid(bytes32 indexed matchKey, address indexed player, uint256 amount);
     event Refunded(bytes32 indexed matchKey);
     event RefereeChanged(address indexed referee);
     event OwnerChanged(address indexed previousOwner, address indexed newOwner);
@@ -79,19 +88,21 @@ contract ChogWager {
     error NotOpen(bytes32 matchKey);
     error TooEarly(uint256 refundableAt);
     error PaymentFailed();
+    error TooManyGenesisPlayers(uint256 count);
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert NotOwner();
         _;
     }
 
-    constructor(address chog_, address referee_, uint16 burnedShare_, address owner_) {
+    constructor(address chog_, address referee_, uint16 burnedShare_, uint16 genesisShare_, address owner_) {
         if (chog_ == address(0) || referee_ == address(0) || owner_ == address(0)) revert ZeroAddress();
         // Stakes are held here: an address without code would take them for paid without moving anything.
         if (chog_.code.length == 0) revert NotAToken();
-        if (burnedShare_ > BASIS_POINTS) revert ShareTooLarge();
+        if (uint256(burnedShare_) + genesisShare_ > BASIS_POINTS) revert ShareTooLarge();
         chog = IWagerToken(chog_);
         burnedShare = burnedShare_;
+        genesisShare = genesisShare_;
         referee = referee_;
         owner = owner_;
         emit RefereeChanged(referee_);
@@ -147,14 +158,21 @@ contract ChogWager {
     }
 
     /// @notice Pays a match out on the result the referee signed: 0 or 1 for the team that won,
-    /// 2 for a draw. Anyone may bring the signature. Each winner gets their stake back and an
-    /// equal share of what the losers staked, less the burned share; what cannot be shared
-    /// equally is burned too. A draw, or a side on which nobody staked, gives every stake back.
-    function settle(bytes32 matchKey, uint8 winnerTeam, bytes calldata signature) external {
+    /// 2 for a draw, and the wallets that played a Genesis in it. Anyone may bring the signature.
+    /// Each winner gets their stake back and an equal share of what the losers staked, less the
+    /// burned share and the Genesis share; each Genesis player gets an equal part of the Genesis
+    /// share; what cannot be shared equally is burned too. A draw, or a side on which nobody
+    /// staked, gives every stake back and pays no Genesis share.
+    function settle(bytes32 matchKey, uint8 winnerTeam, address[] calldata genesisPlayers, bytes calldata signature)
+        external
+    {
         if (winnerTeam > DRAW) revert BadTeam(winnerTeam);
+        if (genesisPlayers.length > MAX_GENESIS_PLAYERS) revert TooManyGenesisPlayers(genesisPlayers.length);
         Match storage played = _matches[matchKey];
         if (played.state != OPEN) revert NotOpen(matchKey);
-        _requireReferee(keccak256(abi.encode(RESULT, block.chainid, address(this), matchKey, winnerTeam)), signature);
+        _requireReferee(
+            keccak256(abi.encode(RESULT, block.chainid, address(this), matchKey, winnerTeam, genesisPlayers)), signature
+        );
 
         uint256 winners = winnerTeam == 0 ? played.stakersTeam0 : winnerTeam == 1 ? played.stakersTeam1 : 0;
         uint256 losers = played.players.length - winners;
@@ -165,13 +183,12 @@ contract ChogWager {
 
         played.state = SETTLED;
         uint256 lost = losers * played.stakeAmount;
-        uint256 gain = (lost - lost * burnedShare / BASIS_POINTS) / winners;
-        uint256 burned = lost - gain * winners;
+        uint256 genesisPot = lost * genesisShare / BASIS_POINTS;
+        uint256 gain = (lost - lost * burnedShare / BASIS_POINTS - genesisPot) / winners;
         uint256 paid = played.stakeAmount + gain;
-        address[] storage players = played.players;
-        for (uint256 index; index < players.length; ++index) {
-            if (_teamPlusOne[matchKey][players[index]] == winnerTeam + 1) _pay(players[index], paid);
-        }
+        _payWinners(matchKey, played.players, winnerTeam, paid);
+        uint256 toGenesis = _payGenesisPlayers(matchKey, genesisPlayers, genesisPot);
+        uint256 burned = lost - gain * winners - toGenesis;
         if (burned > 0) chog.burn(burned);
         emit Settled(matchKey, winnerTeam, paid, burned);
     }
@@ -220,6 +237,29 @@ contract ChogWager {
         for (uint256 index; index < players.length; ++index) {
             teams[index] = _teamPlusOne[matchKey][players[index]] - 1;
         }
+    }
+
+    function _payWinners(bytes32 matchKey, address[] storage players, uint8 winnerTeam, uint256 paid) private {
+        for (uint256 index; index < players.length; ++index) {
+            if (_teamPlusOne[matchKey][players[index]] == winnerTeam + 1) _pay(players[index], paid);
+        }
+    }
+
+    // Splits the pot equally between the Genesis players and returns what was paid; the rest of the
+    // pot (all of it when the match had no Genesis player) is left to be burned.
+    function _payGenesisPlayers(bytes32 matchKey, address[] calldata genesisPlayers, uint256 pot)
+        private
+        returns (uint256 paid)
+    {
+        if (genesisPlayers.length == 0) return 0;
+        uint256 each = pot / genesisPlayers.length;
+        if (each == 0) return 0;
+        for (uint256 index; index < genesisPlayers.length; ++index) {
+            if (genesisPlayers[index] == address(0)) revert ZeroAddress();
+            _pay(genesisPlayers[index], each);
+            emit GenesisPlayerPaid(matchKey, genesisPlayers[index], each);
+        }
+        return each * genesisPlayers.length;
     }
 
     function _refund(bytes32 matchKey, Match storage played) private {

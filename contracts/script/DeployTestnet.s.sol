@@ -30,7 +30,7 @@ contract DeployTestnet is Script {
         (, address deployer,) = vm.readCallers();
         require(referee != deployer, "the referee and the deploying wallet must be two different keys");
         TestChog chog = new TestChog();
-        ChogWager wager = new ChogWager(address(chog), referee, BURNED_SHARE, deployer);
+        ChogWager wager = new ChogWager(address(chog), referee, BURNED_SHARE, 0, deployer);
         for (uint256 index; index < bench.length; ++index) {
             payable(bench[index]).transfer(benchMon);
         }

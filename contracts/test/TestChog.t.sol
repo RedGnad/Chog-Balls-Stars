@@ -67,11 +67,11 @@ contract TestChogTest is Test {
     // The wager runs on the stand-in as on $CHOG: two players stake 100 each, team 0 wins, the
     // winner gets 190 and 10 are burned.
     function test_AStakedMatchPaysAndBurnsWithTheStandIn() public {
-        ChogWager wager = new ChogWager(address(chog), vm.addr(REFEREE_KEY), 1000, address(this));
+        ChogWager wager = new ChogWager(address(chog), vm.addr(REFEREE_KEY), 1000, 0, address(this));
         _claimAndStake(wager, ana, 0);
         _claimAndStake(wager, bo, 1);
 
-        wager.settle(MATCH, 0, _sign(keccak256(abi.encode(wager.RESULT(), block.chainid, address(wager), MATCH, uint8(0)))));
+        wager.settle(MATCH, 0, new address[](0), _sign(keccak256(abi.encode(wager.RESULT(), block.chainid, address(wager), MATCH, uint8(0), new address[](0)))));
 
         assertEq(chog.balanceOf(ana), 1090 ether);
         assertEq(chog.balanceOf(bo), 900 ether);
