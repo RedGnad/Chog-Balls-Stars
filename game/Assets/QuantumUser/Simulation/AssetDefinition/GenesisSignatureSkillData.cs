@@ -16,11 +16,22 @@ namespace Quantum
 		// travel: its second strike is made where the caster then stands.
 		public FP ReturnDistance;
 
+		// The inversion delivery, the super attack of a 1:1 Genesis (22 October 2026): this many more
+		// copies of the attack leave at the same moment, each turned SpreadDegrees from the one before
+		// (2 at 120: three directions at once). 0 for every other delivery.
+		public int Spread;
+		public FP SpreadDegrees;
+
 		public override EntityRef OnAction(Frame frame, EntityRef source, EntityRef skillEntity, Skill* skill)
 		{
 			if (ReturnAttackData.IsValid == false)
 			{
-				return base.OnAction(frame, source, skillEntity, skill);
+				EntityRef first = base.OnAction(frame, source, skillEntity, skill);
+				for (int copy = 1; copy <= Spread; copy++)
+				{
+					FireTurned(frame, source, skillEntity, SpreadDegrees * copy * FP.Deg2Rad);
+				}
+				return first;
 			}
 
 			bool hasSource = source != default && frame.Exists(source);
@@ -63,6 +74,27 @@ namespace Quantum
 			frame.Events.SkillAction(skill->SkillData.Id);
 
 			return attackEntity;
+		}
+
+		// One more copy of the attack, from where the first one leaves, turned by "turn" radians: placed
+		// before the attack data reads its way (OnCreate), as the base action does.
+		private void FireTurned(Frame frame, EntityRef source, EntityRef skillEntity, FP turn)
+		{
+			EntityRef attackEntity = frame.Create(AttackPrototype);
+			Transform2D* attackTransform = frame.Unsafe.GetPointer<Transform2D>(attackEntity);
+			Transform2D from = source != default && frame.Exists(source)
+				? frame.Get<Transform2D>(source) : frame.Get<Transform2D>(skillEntity);
+			attackTransform->Position = from.Position;
+			attackTransform->Rotation = from.Rotation + turn;
+
+			Attack* attack = frame.Unsafe.GetPointer<Attack>(attackEntity);
+			attack->Source = source;
+			if (AttackDataOverride.IsValid)
+			{
+				attack->AttackData = AttackDataOverride;
+			}
+			AttackData data = frame.FindAsset<AttackData>(attack->AttackData.Id);
+			data.OnCreate(frame, attackEntity, source, attack);
 		}
 	}
 }

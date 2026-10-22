@@ -140,6 +140,8 @@ namespace Chog.Editor
             roster.SkinColors = SkinColorsFor(roster.SkinValues);
             roster.FaceMaterial = GenesisSignatureImporter.UnlitMaterial("GenesisFace");
             roster.UniqueLooks = GenesisSignatureImporter.UniqueLooks();
+            roster.RadioactiveLook = GenesisSignatureImporter.RadioactiveLook();
+            roster.RadioactiveSkin = GenesisSignatureImporter.RadioactiveSkin;
             foreach (var unique in roster.UniqueLooks)
                 if (Array.FindIndex(file.heroes, hero => hero.tokenId == unique.TokenId) < 0)
                     throw new InvalidOperationException("A look is authored for token " + unique.TokenId + ", which is not in the roster.");

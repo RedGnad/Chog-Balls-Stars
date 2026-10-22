@@ -428,7 +428,7 @@ internal static class Program
             HeroCatalog.Load(catalogJson.Replace("\"bodyRules\"", "\"typoBodyRules\""))));
         Test("catalog version and content hash travel with each hero", () => {
             var h = catalog.Resolve(Snapshot("512"));
-            Equal(h.RulesetVersion, "genesis-0.3.0"); Equal(h.CatalogHash, Hash(catalogJson));
+            Equal(h.RulesetVersion, "genesis-0.4.0"); Equal(h.CatalogHash, Hash(catalogJson));
         });
         Test("resolving another hero cannot mutate an earlier profile", () => {
             var before = catalog.Resolve(Snapshot("512")); catalog.Resolve(Snapshot("561"));
@@ -437,10 +437,17 @@ internal static class Program
             Equal(before.SignatureEffectId, catalog.Resolve(Snapshot("512")).SignatureEffectId);
         });
         Test("changed rules remain isolated in a new catalog instance", () => {
-            var next = HeroCatalog.Load(catalogJson.Replace("genesis-0.3.0", "genesis-next"));
+            var next = HeroCatalog.Load(catalogJson.Replace("genesis-0.4.0", "genesis-next"));
             Require(catalog.Hash != next.Hash, "Version change must change manifest hash.");
             Equal(next.Version, "genesis-next");
-            Equal(catalog.Resolve(Snapshot("512")).RulesetVersion, "genesis-0.3.0");
+            Equal(catalog.Resolve(Snapshot("512")).RulesetVersion, "genesis-0.4.0");
+        });
+        Test("an Epic Radioactive fires the radioactive burst (nova) whatever its Eyes", () => {
+            // 22 October 2026: the tier, not the Eyes, gives a Radioactive Genesis its shape.
+            var h = catalog.Resolve(Snapshot("512", json => json
+                .Replace("\"Origin\"", "\"Radioactive\"").Replace("\"Uncommon\"", "\"Epic\"")));
+            Equal(h.SignatureShapeId, "nova"); Equal(h.TierExpressionId, "persistent-zone");
+            Equal(catalog.Resolve(Snapshot("512")).SignatureShapeId, "wave");
         });
         Console.WriteLine("RESULT " + passed + " passed; " + failed + " failed.");
         return failed == 0 ? 0 : 1;

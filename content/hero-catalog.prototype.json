@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "rulesetVersion": "genesis-0.3.0",
+  "rulesetVersion": "genesis-0.4.0",
   "chainId": 143,
   "collection": "0xc96d31f8626c6d03fae5dcd3d61e3fb9f4a73763",
   "metadataRoot": "ipfs://bafybeid4ybujnscdipkno7ps5utqelp5ry5ryreqhay3zhgk3a6x4jruqu/",
@@ -340,7 +340,8 @@
     {
       "tier": "Epic",
       "base": "Radioactive",
-      "expressionId": "persistent-zone"
+      "expressionId": "persistent-zone",
+      "shapeId": "nova"
     },
     {
       "tier": "Legendary",
