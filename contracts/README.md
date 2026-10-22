@@ -103,7 +103,7 @@ put staking on a match in scope (decision D33 in `docs/STATUS.md`). The backend 
 tickets and results (`server/src/wager.js`, `referee.js`) and the screens that stake and collect
 (`WagerPanel`, `WagerResult`) exist since 11 October.
 
-## Version 2: the Genesis players' share (22 October 2026, decided by the owner; not deployed yet)
+## Version 2: the Genesis players' share (22 October 2026, decided by the owner; deployed by the owner the same day)
 
 Of what the losers of a match staked, `burnedShare` is burned and `genesisShare` is split equally
 between the wallets that played a Chog Genesis in the match, staked or not (at most six, named by
@@ -116,6 +116,12 @@ their share never depends on the result, so none gains by losing. `settle` takes
 results as before while `WAGER_ADDRESS` still names version 1, and the game encodes the call for the
 version `/api/wager` tells it. Tests: `test/ChogWager.t.sol` (the split, the signed list, the cap,
 the deploy bound, a fuzz that every unit is with a winner, a Genesis player or burned).
+
+**Deployed on Monad mainnet on 22 October 2026 at `0xc2c1e282dd8c1cc2a4689972ac9c48d3b1454425`** (block 115554918,
+transaction `0x9785295a1c5568cc81394488b6c5b0d70f0c9ae621a2aaa3ab3497814b3053aa`; read back the same day: referee
+`0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34`, owner `0x981F6E0Ea94f45fDB8ee7680DC862212E3C720e0`, burnedShare 500,
+genesisShare 500, $CHOG). The password prompt needs a real terminal: run from a `!` line, forge fails with
+"Device not configured".
 
 Deploying it (the owner, with the deploying keystore; the referee is the one version 1 knows,
 `0x125eE3EA9b3c0759C96dD3576A7CdB9D9Ba64E34` read on chain on 22 October 2026), then setting the

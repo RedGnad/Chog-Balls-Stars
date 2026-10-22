@@ -35,7 +35,8 @@ submitting. Character counts are for the 8,000-character fields.
 > Silver, Gold, Star) on the matches the replay has decided, shown on the end screen and at home. That career is written on Monad mainnet by our referee
 > once the replay has decided the match (the ChogCareers contract), so anyone can read it and it
 > follows the Genesis to its next holder. $CHOG runs through our contracts on Monad mainnet: players
-> stake $CHOG on their own team and the winners are paid on the replayed result; a holder rents their
+> stake $CHOG on their own team and the winners are paid on the replayed result, while the players
+> who played a Genesis in the match share a twentieth of what the losers staked, staked or not; a holder rents their
 > Genesis out at a price a day while keeping it in their wallet, the renter's payment is earned by the
 > second and the rental ends, with the rest paid back, when the holder sells the Genesis; and the
 > second form of a Genesis can be bought now instead of at mastery 2. A tenth of every payment is
@@ -54,7 +55,8 @@ submitting. Character counts are for the 8,000-character fields.
 - **Tech stack:** Unity 6 (WebGL, mobile first), Photon Quantum 3 (deterministic simulation,
   server-side input recording), Node.js services (wallet sign-in, Photon custom authentication and
   webhooks, a judge that replays every match with .NET), Solidity contracts on Monad mainnet (wager
-  `0xc7524a808d2b00b43a4d3e2becb8500e409b41e3`, rental `0x90c26090aea05a3dc18d6ba8fd80afe8f933bf86`
+  `0xc2c1e282dd8c1cc2a4689972ac9c48d3b1454425` (version 2, since 22 October 2026: half of what was burned goes to the
+  players who played a Genesis in the match; version 1 `0xc7524a80...` is no longer used), rental `0x90c26090aea05a3dc18d6ba8fd80afe8f933bf86`
   (version 2, since 17 October 2026; version 1 `0x7f1271d4...` is no longer used), careers
   `0x335bf7bc610645546e2b00de6a9fd0c4709d6111`, shop `0xb23a3c3492b9ba83d80c8abc9a5484d2885f058a`; Foundry
   tests), Reown AppKit and injected wallets, Blender (all 3D modelled by script).
