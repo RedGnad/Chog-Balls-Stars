@@ -2672,7 +2672,10 @@ MASCOT = {
     # the opening and pointed out of the head: now nearer the chin, lying along the face, shorter (LOWER_FANG: length, radius,
     # lean in, how far they rise off the face against the way up).)
     "FANG_PLACES": ((45.0, -1.0), (135.0, -1.0), (240.0, 1.0), (300.0, 1.0)),
-    "FANG": (0.105, 0.042, 0.55),
+    "FANG": (0.125, 0.048, 0.50),
+    # (23 October 2026: the upper fangs, short and pressed to the brow, did not show from a low camera; longer, and out of the head
+    # by this much of their way.)
+    "UPPER_FANG_OUT": 0.48,
     "LOWER_FANG": (0.082, 0.040, 0.30, 0.04),
     # The eyes (22 October 2026, the owner: "a dragon head with no eyes is not a head"): a plush dragon onesie has two round eyes on
     # the hood above and either side of the snout. A half sunk ball with a dark outline and a dark slit of a pupil facing ahead and
@@ -3123,7 +3126,7 @@ def add_dragon_head(maker, collar, rim, numbers, torso, on_dome, middle_body):
         out = head_normal_at(surface, rim[index])
         root = rim[index] + out * (COSTUME_FANG_LIFT if not lower else COSTUME_FANG_LIFT * 0.45)
         inward = Vector((face.x - root.x, 0.0, face.z - root.z)).normalized()
-        way = (Z * vertical + inward * lean + out * (0.30 if not lower else numbers.LOWER_FANG[3])).normalized()
+        way = (Z * vertical + inward * lean + out * (numbers.UPPER_FANG_OUT if not lower else numbers.LOWER_FANG[3])).normalized()
         collar.shell(base.tube_rings(root - way * 0.02, way, X, ((0.0, radius), (length * 0.55, radius * 0.62),
                                                                 (length, 0.0))), 5, collar.named("Fang"),
                      numbers.OUTLINE_THICKNESS * 0.8)
@@ -3167,6 +3170,12 @@ def add_shark(maker, collar, torso, rim, numbers, on_volume, middle_body, turn):
             length = space * long
             foot = surface.front(side, height, foot_lift)
             tip = surface.front(side + way[0] * length, height + way[1] * length, tip_lift)
+            if upper:
+                # (23 October 2026, the owner on the banner, a camera near the ground: "I see neither the upper teeth of the shark
+                # nor of the dragon". Laid on the brow, which faces up, they were seen edge on from below and the rim of the hood
+                # hid them. Their feet now stand in front of the rim and their tips off the face, so they stand out of it.)
+                foot = foot - Y * 0.014
+                tip = surface.front(side + way[0] * length, height + way[1] * length, tip_lift * 1.6) - Y * 0.006
             if not upper:
                 # Under the face the head looks down: laid on it a tooth is seen edge on from the front, a fringe. The lower
                 # teeth stand up in the space of the head instead, towards the middle of the face, a little forward.
@@ -3178,9 +3187,9 @@ def add_shark(maker, collar, torso, rim, numbers, on_volume, middle_body, turn):
             middle = (foot + tip) * 0.5
             along = (surface.front(side - way[1] * 0.005, height + way[0] * 0.005, 0.0)
                      - surface.front(side + way[1] * 0.005, height - way[0] * 0.005, 0.0)).normalized()
-            out = head_normal_at(surface, foot)
-            if not upper:
-                out = -Y
+            # A blade faces between the way out of the head and the front, so it reads from the game's camera above, from in
+            # front and from below; the lower ones face the front.
+            out = (head_normal_at(surface, foot) - Y).normalized() if upper else -Y
             wide = space * (0.5 if upper else 0.56)
             collar.shell([(foot, along * wide, out * half_thick), (middle, along * wide * 0.62, out * half_thick * 0.8),
                           (tip, Vector(), Vector())], 4, collar.named("Tooth"), outline)
