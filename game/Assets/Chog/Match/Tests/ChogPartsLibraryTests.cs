@@ -144,6 +144,15 @@ namespace Chog.Match.Tests
             Assert.AreEqual("THROWS ITS TISM CAP", owner.AttackLine);
             Assert.AreEqual("THROWS THE SPIKES OF ITS CROWN", bare.AttackLine);
 
+            // A Radioactive Multi Colored skin runs through its bands (format 6): green low, pink high.
+            var multi = System.Array.FindIndex(Library.Skins, skin => skin.Name == "Radioactive Multi Colored");
+            Assert.GreaterOrEqual(multi, 0, "no Radioactive Multi Colored skin");
+            Assert.IsNotNull(Library.Skins[multi].BandHeights, "the Multi Colored skin has no bands");
+            ChogPartsLibrary.BandAt(Library.Skins[multi], 0.4f, out var lowR, out var lowG, out _);
+            ChogPartsLibrary.BandAt(Library.Skins[multi], 0.9f, out var highR, out var highG, out _);
+            Assert.Greater(lowG, lowR, "green at the chest");
+            Assert.Greater(highR, highG, "pink at the forehead");
+
             // The basic attack in the words of a class (ChogHeroModel.AttackWords).
             Assert.AreEqual("LONG SHOT", ChogHeroModel.AttackWords.Kind("ranger"));
             Assert.AreEqual("LOBS SNOWBALLS", ChogHeroModel.AttackWords.Short(russian.AttackLine, "controller"));

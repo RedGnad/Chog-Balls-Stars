@@ -37,7 +37,7 @@ import render_chog_traits as pictures  # noqa: E402
 
 DEFAULT_LIBRARY = os.path.join(traits.REPOSITORY, "game", "Assets", "Chog", "Resources", "ChogParts.bytes")
 DEFAULT_OUT = os.path.join(traits.REPOSITORY, ".artifacts", "chog-body", "recruit-eyes")
-MAGIC = b"CHOGPARTS5"
+MAGIC = b"CHOGPARTS6"
 REST_PARTS = ("Body", "Head", "armLeft", "armRight")
 LIGHT_UNLIT = 1
 
@@ -79,6 +79,8 @@ def read_library(path):
         name = reader.text()
         values = reader.take("6f")
         reader.take("B3f")
+        for _ in range(reader.take("B")[0]):
+            reader.take("4f")
         skins.append({"name": name, "skin": values[:3], "face": values[3:]})
     rest = {}
     for _ in range(reader.take("I")[0]):

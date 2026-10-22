@@ -13,7 +13,9 @@ namespace Chog.Match
     /// </summary>
     public sealed class ChogPartsLibrary
     {
-        public const string Magic = "CHOGPARTS5";
+        public const string Magic = "CHOGPARTS6";
+        // The layout before skin bands (the structures' library is still written in it).
+        public const string MagicWithoutBands = "CHOGPARTS5";
 
         /// <summary>
         /// Where a skin that runs to another colour starts and ends doing so: heights over the feet, in units
@@ -49,6 +51,13 @@ namespace Chog.Match
             /// <summary>Whether the skin runs to another colour towards the top (the Radioactive base).</summary>
             public bool HasTop;
             public float TopR, TopG, TopB;
+            /// <summary>
+            /// Since format 6 (22 October 2026): the bands of colour of a Radioactive skin, as stops of height over
+            /// the feet (units of the model) and colour, lowest first; null when the skin has none. When set, they
+            /// replace the two-colour run.
+            /// </summary>
+            public float[] BandHeights;
+            public float[] BandR, BandG, BandB;
         }
 
         /// <summary>One of the four parts the game moves, and where it rests on its parent.</summary>
@@ -109,8 +118,9 @@ namespace Chog.Match
 
             using var reader = new BinaryReader(new MemoryStream(data), Encoding.UTF8);
             var magic = Encoding.ASCII.GetString(reader.ReadBytes(Magic.Length));
-            if (magic != Magic)
+            if (magic != Magic && magic != MagicWithoutBands)
                 throw new InvalidDataException("not a library of hero parts: " + magic);
+            var withBands = magic == Magic;
 
             var library = new ChogPartsLibrary();
 
@@ -136,6 +146,23 @@ namespace Chog.Match
                     HasTop = reader.ReadByte() != 0,
                     TopR = reader.ReadSingle(), TopG = reader.ReadSingle(), TopB = reader.ReadSingle()
                 };
+                var stops = withBands ? reader.ReadByte() : (byte)0;
+                if (stops > 0)
+                {
+                    var skin = library.Skins[i];
+                    skin.BandHeights = new float[stops];
+                    skin.BandR = new float[stops];
+                    skin.BandG = new float[stops];
+                    skin.BandB = new float[stops];
+                    for (var s = 0; s < stops; s++)
+                    {
+                        skin.BandHeights[s] = reader.ReadSingle();
+                        skin.BandR[s] = reader.ReadSingle();
+                        skin.BandG[s] = reader.ReadSingle();
+                        skin.BandB[s] = reader.ReadSingle();
+                    }
+                    library.Skins[i] = skin;
+                }
             }
 
             library.Rest = new RestPart[reader.ReadUInt32()];
@@ -242,7 +269,9 @@ namespace Chog.Match
             {
                 case RoleSkin:
                     r = colours.SkinR; g = colours.SkinG; b = colours.SkinB;
-                    if (colours.HasTop)
+                    if (colours.BandHeights != null)
+                        BandAt(colours, height, out r, out g, out b);
+                    else if (colours.HasTop)
                     {
                         var share = (height - GradientLow) / (GradientHigh - GradientLow);
                         share = share < 0f ? 0f : share > 1f ? 1f : share;
@@ -260,6 +289,31 @@ namespace Chog.Match
             }
 
             a = LightOf(made.Light);
+        }
+
+        /// <summary>The colour of a banded skin at "height": the stops below and above it mixed, the end stops held beyond.</summary>
+        public static void BandAt(SkinColours colours, float height, out float r, out float g, out float b)
+        {
+            var heights = colours.BandHeights;
+            var last = heights.Length - 1;
+            if (height <= heights[0])
+            {
+                r = colours.BandR[0]; g = colours.BandG[0]; b = colours.BandB[0];
+                return;
+            }
+            if (height >= heights[last])
+            {
+                r = colours.BandR[last]; g = colours.BandG[last]; b = colours.BandB[last];
+                return;
+            }
+            var above = 1;
+            while (heights[above] < height)
+                above++;
+            var below = above - 1;
+            var share = (height - heights[below]) / (heights[above] - heights[below]);
+            r = colours.BandR[below] + (colours.BandR[above] - colours.BandR[below]) * share;
+            g = colours.BandG[below] + (colours.BandG[above] - colours.BandG[below]) * share;
+            b = colours.BandB[below] + (colours.BandB[above] - colours.BandB[below]) * share;
         }
 
         /// <summary>The alpha a vertex colour carries for each way of drawing (see the shader Chog/Hero).</summary>
