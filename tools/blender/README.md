@@ -1518,3 +1518,9 @@ Sheet: [clothes-batch4-2026-10-22.jpg](../../research/evidence/clothes-batch4-20
 - **BBC** and **Zero THOTS** (9, 11): the words sit low on the shirt in the art and were too high: BBC 0.062 at 0.340, ZERO THOTS on one line, 0.040 at 0.345.
 - **Judged faithful, unchanged**: Glitch, Sky and Peach Hoodie, Blue Sleeveless, purple and dark vest, Toad pink and green suits (the eyes were set apart in lot 5), Pink and Cyan Shirt, Red 143 Jersey, Boner, the tanks, the holed jackets, Blue Mafia. The tee words (white and dark tee) stay undone: no way to tell which word goes on which Genesis.
 - **Checked**: `--budget`: largest #1742 7,996, none over 8,000. Not verified in Unity.
+
+### Batch 4 fixes (coordinator review)
+
+Sheet: [clothes-batch4-fix-2026-10-22.jpg](../../research/evidence/clothes-batch4-fix-2026-10-22.jpg) (#189, #229 Zero THOTS; #474, #556 Guko).
+- **Zero THOTS**: one line 0.058 tall, allowed 0.400 wide so it wraps round the chest as in the art (at 0.300 the line was limited to about 0.040 tall).
+- **Guko**: a white disc of radius 0.052 on the left of the chest with a small black spiky mark (a star) on it.

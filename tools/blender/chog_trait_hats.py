@@ -2074,10 +2074,13 @@ def decorate_shirt(maker, torso):
         for _ in range(entry["camo"]):
             shirt_square(torso, maker, torso.named("Camo"), sequence.uniform(-0.15, 0.15), sequence.uniform(0.25, 0.54), sequence.uniform(0.016, 0.028),
                          sequence.uniform(0.0, 90.0), lift * 1.5, tall=sequence.uniform(0.010, 0.020))
-    for across, height, radius, key in entry.get("discs", ()):
-        centre = shirt_front(maker, height, across, 0.008)
+    for layer, (across, height, radius, key) in enumerate(entry.get("discs", ())):
+        centre = shirt_front(maker, height, across, 0.008 + 0.004 * layer)
         out = (shirt_front(maker, height, across, 0.020) - centre).normalized()
-        disc_on(torso, SimpleNamespace(middle=Vector((0.0, 0.0, height))), centre, out, radius, torso.named(key), segments=10)
+        # (the last disc of a Guko emblem is a spiky mark: a star)
+        spiky = entry.get("emblem_spikes") and layer == len(entry["discs"]) - 1
+        disc_on(torso, SimpleNamespace(middle=Vector((0.0, 0.0, height))), centre, out, radius, torso.named(key),
+                segments=16 if spiky else 10, inner=radius * 0.45 if spiky else None)
     for across, height, half_wide, half_tall in entry.get("flag", ()):
         shirt_square(torso, maker, torso.named("FlagWhite"), across, height, half_wide, 0.0, lift * 2.0, tall=half_tall)
         for step in (-0.5, 0.5):
@@ -3461,7 +3464,7 @@ CLOTHES.update({
     "Cyan Shirt": tee((0.49, 0.92, 0.87)),
     # Tees with their word.
     "Zero THOTS": with_(tee((0.71, 0.51, 0.90)), colours={"Print": (0.97, 0.93, 0.99)},
-                        print=("ZERO THOTS", 0.345, 0.040, 0.240, 0.0)),
+                        print=("ZERO THOTS", 0.340, 0.058, 0.400, 0.0)),
     "Virgin": with_(tee((0.92, 0.56, 0.41)), colours={"Print": (0.99, 0.93, 0.88)},
                     print=("VIRGIN", 0.335, 0.050, 0.200, 0.0)),
     "BBC": with_(tee((0.42, 0.68, 0.95)), colours={"Print": (0.97, 0.97, 0.97), "PrintLine": (0.12, 0.18, 0.25)},
@@ -3732,7 +3735,7 @@ CLOTHES.update({
                                  (((-0.112, 0.572), (-0.078, 0.505), (-0.040, 0.447), (-0.002, 0.392)), 0.020))},
     # (batch 4: the black spiky emblem of the vest; the blue sleeves of the undershirt are not drawn.)
     "Guko": {**tee((0.98, 0.52, 0.10), collar=(0.16, 0.28, 0.72), missing="the blue sleeves of the undershirt and the belt"),
-             "discs": ((0.085, 0.470, 0.030, "Emblem"),)},
+             "discs": ((0.085, 0.470, 0.052, "EmblemDisc"), (0.085, 0.470, 0.026, "Emblem")), "emblem_spikes": True},
     "Gojo": {**tee((0.13, 0.14, 0.24), (0.09, 0.10, 0.17)), "numbers": {"STEP": 0.076, "COLLAR": (0.600, 0.640),
                                                                          "SLEEVE": LONG_SLEEVE},
              "discs": ((0.0, 0.560, 0.018, "Button"),)},
@@ -3760,7 +3763,7 @@ CLOTHES.update({
 })
 CLOTHES["Sci Fi"]["colours"].update({"Ring": (0.14, 0.14, 0.17), "Light": (0.35, 0.92, 0.98), "Strap": (0.20, 0.20, 0.24)})
 CLOTHES["Army Vest"]["colours"].update({"Camo": (0.27, 0.32, 0.17), "FlagWhite": (0.96, 0.96, 0.97), "FlagRed": (0.80, 0.14, 0.20), "FlagBlue": (0.16, 0.22, 0.58)})
-CLOTHES["Guko"]["colours"]["Emblem"] = (0.08, 0.06, 0.08)
+CLOTHES["Guko"]["colours"].update({"EmblemDisc": (0.97, 0.97, 0.95), "Emblem": (0.08, 0.06, 0.08)})
 CLOTHES["Gojo"]["colours"]["Button"] = (0.55, 0.57, 0.65)
 CLOTHES["White Yukata"]["colours"]["Flower"] = (0.96, 0.62, 0.74)   # the pink blossoms (batch 3, 22 October 2026)
 
