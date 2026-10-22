@@ -242,7 +242,12 @@ namespace Chog.Screens
 
             var roleId = (lines[0].Gives ?? "").ToLowerInvariant();
             var attackLine = ChogHeroModel.AttackLine(hero.MetadataId);
-            Row(0, "BASIC: " + ChogHeroModel.AttackWords.Kind(roleId), ChogHeroModel.AttackWords.Detail(attackLine, roleId));
+            // The title names what it throws (the owner, 22 October: "SNOWBALLS", not only "LONG SHOT"); the line under it
+            // says the class's kind of attack, then where the thing comes from.
+            var thrown = ChogHeroModel.AttackWords.Parts(attackLine).thing;
+            var kind = ChogHeroModel.AttackWords.Kind(roleId);
+            var detail = ChogHeroModel.AttackWords.Detail(attackLine, roleId);
+            Row(0, "BASIC: " + (thrown.Length > 0 ? thrown : kind), detail.Length > 0 ? kind + ". " + detail : "");
             Row(1, "SPECIAL: " + lines[1].Gives, Source("eyes", lines[1].Value, lines[1].Summary));
             Row(2, "EFFECT: " + lines[2].Gives, Source("aura", lines[2].Value, lines[2].Summary));
             Row(3, "DELIVERY: " + lines[3].Gives, Source("rarity", lines[3].Value, lines[3].Summary));

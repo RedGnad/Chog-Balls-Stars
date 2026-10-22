@@ -70,7 +70,7 @@ test('a signature from another wallet, a rewritten challenge or a stale one open
   assert.equal((await sessions.signIn({ message, proof, signature: holder.personalSign(message) })).reason, 'expired_challenge');
 });
 
-test('a session ends after a week and cannot be rewritten or made with another secret', async () => {
+test('a session ends after thirty days and cannot be rewritten or made with another secret', async () => {
   let clock = Date.UTC(2026, 9, 9, 12);
   const sessions = createSessions({ secret: SECRET, now: () => clock });
   const wallet = createWallet();
@@ -86,7 +86,7 @@ test('a session ends after a week and cannot be rewritten or made with another s
   assert.equal(await sessions.addressOf(undefined), null);
   assert.equal(await createSessions({ secret: SECRET + ' but another one' }).addressOf(session), null);
 
-  clock += 6 * 24 * 3600 * 1000;
+  clock += 29 * 24 * 3600 * 1000;
   assert.equal(await sessions.addressOf(session), wallet.address);
   clock += 2 * 24 * 3600 * 1000;
   assert.equal(await sessions.addressOf(session), null);

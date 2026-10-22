@@ -12,7 +12,8 @@ import { CHAIN_ID, isAddress } from './chain.js';
 
 const encoder = new TextEncoder();
 const CHALLENGE_SECONDS = 10 * 60;
-const SESSION_SECONDS = 7 * 24 * 3600;
+// Thirty days (22 October 2026, the owner: one signature a week was one too many).
+const SESSION_SECONDS = 30 * 24 * 3600;
 export const MAX_LOAN_DAYS = 30;
 const STATEMENT = 'Sign in to Chog Balls Stars to play your Genesis and record its career. This costs nothing and sends no transaction.';
 

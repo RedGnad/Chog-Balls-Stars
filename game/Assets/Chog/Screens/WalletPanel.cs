@@ -421,19 +421,11 @@ namespace Chog.Screens
 
         // Set when the player connects a wallet on this page: once it shows a Genesis, the signature
         // that lets the player play it is asked for at once, instead of waiting for a second button.
-        private bool _justConnected;
         private string _signInAskedFor = "";
-        private WalletState _lastState;
 
         private void Refresh()
         {
             var state = PlayerWallet.State;
-            // Connecting, then Reading (its Genesis), then Ready.
-            if (_lastState == WalletState.Connecting && (state == WalletState.Reading || state == WalletState.Ready))
-                _justConnected = true;
-            else if (state != WalletState.Reading && state != WalletState.Ready)
-                _justConnected = false;
-            _lastState = state;
             // What the wallet may play: the Genesis it holds, then those it rents.
             var tokens = PlayerWallet.Playable;
             var holds = state == WalletState.Ready && tokens.Length > 0;
@@ -594,15 +586,15 @@ namespace Chog.Screens
             // The signature is asked by itself whenever this wallet has no session: right after
             // connecting, after a rental, after a switch of account; for a wallet without a Genesis too
             // (22 October 2026: a connected player saw "SIGN IN FOR RANK" and took it for a second
-            // connection; its rank points need the same one signature; asked only when the player has just
-            // connected, not when a page opens on a wallet already connected). Once per address in a
-            // visit, so a player who closes the wallet is not asked again and keeps the button.
-            var wantsSession = holds ? PhotonIdentity.SignInNeededToPlay : state == WalletState.Ready && !guest && _justConnected;
+            // connection; its rank points need the same one signature). Also when the page opens on a wallet
+            // already connected (the owner, 22 October: a new address of the game had no session kept, and the
+            // button was one click too many). Once per address in a visit, so a player who closes the wallet
+            // is not asked again and keeps the button.
+            var wantsSession = holds ? PhotonIdentity.SignInNeededToPlay : state == WalletState.Ready && !guest;
             if (wantsSession && PlayerWallet.SignIn == SignInState.SignedOut
                 && PlayerWallet.SignInProblem.Length == 0 && _signInAskedFor != PlayerWallet.Address)
             {
                 _signInAskedFor = PlayerWallet.Address;
-                _justConnected = false;
                 PlayerWallet.StartSignIn();
             }
 
