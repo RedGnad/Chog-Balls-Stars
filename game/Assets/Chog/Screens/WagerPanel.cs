@@ -17,6 +17,8 @@ namespace Chog.Screens
     {
         private const string ObjectName = "ChogWagerPanel";
         private const float ReadEverySeconds = 3f;
+        // Until the services know the player is in the match, asked every second: the stake is ready sooner.
+        private const float ReadUntilInMatchSeconds = 1f;
 
         // Whole $CHOG a player can stake when the match has no stake yet.
         private static readonly int[] Amounts = { 1, 5, 10, 25, 50, 100, 250, 500, 1000 };
@@ -215,7 +217,7 @@ namespace Chog.Screens
             if (Time.unscaledTime < _readAt || string.IsNullOrEmpty(PlayerWallet.Session) || GenesisWager.IsBusy)
                 return;
 
-            _readAt = Time.unscaledTime + ReadEverySeconds;
+            _readAt = Time.unscaledTime + (GenesisWager.InMatch ? ReadEverySeconds : ReadUntilInMatchSeconds);
             GenesisWager.ReadMine();
         }
 
@@ -249,10 +251,14 @@ namespace Chog.Screens
 
             var canStake = signedIn && GenesisWager.InMatch && !GenesisWager.Locked && stakedTeam < 0 && !busy && s_team >= 0
                 && PlayerWallet.State == WalletState.Ready;
-            var free = canStake && GenesisWager.StakeWei.Length == 0;
+            // The controls show at once (22 October 2026: the owner saw an empty card for seconds while the
+            // services learned the player was in the match); the stake button only works once they know.
+            var soon = signedIn && !GenesisWager.Locked && stakedTeam < 0 && !busy && s_team >= 0 && PlayerWallet.State == WalletState.Ready;
+            var free = soon && GenesisWager.StakeWei.Length == 0;
             _less.gameObject.SetActive(free);
             _more.gameObject.SetActive(free);
-            _stake.gameObject.SetActive(canStake);
+            _stake.gameObject.SetActive(soon);
+            _stake.interactable = canStake;
             _stakeLabel.text = StakeButtonText(GenesisWager.StakeWei, Amounts[_amount], currency, usdPerChog);
         }
 

@@ -161,9 +161,11 @@ namespace Chog.Match
 
             // A negative turn about X brings a hanging arm forward. The arms swing against each
             // other in a run and go forward together in an attack; about Z they rise sideways.
-            var forward = -100f * thrown;
-            pose.ArmLeftTurn = new Vector3(swing * 55f * run + forward + 12f * slump, 0f, -150f * cheer + hop * 12f);
-            pose.ArmRightTurn = new Vector3(-swing * 55f * run + forward + 12f * slump, 0f, 150f * cheer - hop * 12f);
+            // A win raises them in a V beside the head, a little forward, pumping with each hop (22 October
+            // 2026: raised 150 degrees they met over the head and sank into it, the owner saw them merge).
+            var forward = -100f * thrown - 25f * cheer;
+            pose.ArmLeftTurn = new Vector3(swing * 55f * run + forward + 12f * slump, 0f, -115f * cheer + hop * 20f);
+            pose.ArmRightTurn = new Vector3(-swing * 55f * run + forward + 12f * slump, 0f, 115f * cheer - hop * 20f);
 
             // Squashed at once, then a spring that overshoots once and settles.
             var squash = Squash(flinch);
