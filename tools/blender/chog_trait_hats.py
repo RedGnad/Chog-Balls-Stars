@@ -747,12 +747,18 @@ CLOWN_NOSE = {
     # stands off the face, its radius, its sides and stacks, and the glint on its upper side (degrees
     # up from straight out, its radius).
     "AT": (0.004, -0.040),
-    "OFF": 0.022,
-    "RADIUS": 0.050,
-    "SIDES": 10,
-    "STACKS": 5,
+    # (22 October 2026, the owner on the hero stage: "the red nose looks weird, like a button". The art, 12 of the 31 Genesis (#210, #248,
+    # #195, #920...): a round red ball with a dark outline and a white glint, ON the nose of the face, nothing flat around it. Until
+    # then the ball stood 0.022 off the face with an outline shell, which showed from the side as a dark crescent and a thin ring, a
+    # button's rim. Now the ball is half sunk (its middle 0.004 off the face), no shell: the outline is the dark of a patch laid on the
+    # face under it, EDGE wider than the ball, which the face meets round the ball as a clean outline.)
+    "OFF": 0.004,
+    "RADIUS": 0.052,
+    "SIDES": 12,
+    "STACKS": 6,
     "GLINT": (38.0, 0.013),
-    "OUTLINE_THICKNESS": 0.014,
+    "EDGE": 0.0075,
+    "OUTLINE_THICKNESS": 0.0,
     # Nothing on the head: the whole crown stays, as the pictures show it.
     "LEAVES": FULL_CROWN,
 }
@@ -767,6 +773,9 @@ def build_clown_nose(maker):
     radius = numbers.RADIUS
     part.shell(base.ball_rings(centre, out, Z, radius, radius, radius, numbers.STACKS), numbers.SIDES,
                part.named("Ball"), numbers.OUTLINE_THICKNESS)
+    reach = radius + numbers.EDGE
+    full.add_skin(part, surface, full.patch_loops(surface, (side, up), reach, reach, 2.0, 0.0, KIT.DRAWN[2], 1, 20),
+                  part.named("Edge"))
     degrees, glint = numbers.GLINT
     upward = (Z - out * Z.dot(out)).normalized()
     towards = (out * math.cos(math.radians(degrees)) + upward * math.sin(math.radians(degrees))).normalized()
@@ -1307,8 +1316,8 @@ HATS = {
     # Values of "Head" that are not hats (15 October 2026), colours read on their layers.
     "Clown Nose": {
         "shape": "ClownNose",
-        "colours": {"Ball": (0.93, 0.07, 0.07), "Glint": (0.98, 0.93, 0.93)},
-        "unlit": ("Glint",),
+        "colours": {"Ball": (0.93, 0.07, 0.07), "Glint": (0.98, 0.93, 0.93), "Edge": (0.05, 0.03, 0.04)},
+        "unlit": ("Glint", "Edge"),
     },
     "Plumber": {
         "shape": "Plunger",
