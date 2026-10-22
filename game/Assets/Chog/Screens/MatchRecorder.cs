@@ -60,14 +60,12 @@ namespace Chog.Screens
 
         private void Start() => QuantumEvent.Subscribe<EventGameOver>(this, OnGameOver);
 
-        private void OnGameOver(EventGameOver e) => StartCoroutine(Send(e.Game, e.WinnerTeam));
+        // The record is taken at once (22 October 2026): the result screen starts leaving the room in the
+        // same image (ChogResultScreen), and a frame later the session and its recorded commands are gone.
+        private void OnGameOver(EventGameOver e) => StartCoroutine(Send(e.Game.GetRecordedReplay(), e.WinnerTeam));
 
-        private static IEnumerator Send(QuantumGame game, int winnerTeam)
+        private static IEnumerator Send(Quantum.QuantumReplayFile replay, int winnerTeam)
         {
-            // One more image, so the verified frame holds the end of the match.
-            yield return null;
-
-            var replay = game.GetRecordedReplay();
             if (replay == null)
             {
                 Debug.LogWarning("CHOG_REPLAY not sent: the match was not recorded");
