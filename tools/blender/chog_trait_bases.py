@@ -121,34 +121,55 @@ RADIOACTIVE_LINES = {
 }
 # The radioactive crown keeps the same seven-point silhouette as the Genesis Chog. A short dark line at its
 # roots separates the crown from the forehead, as in the portraits, without changing the points themselves.
-RADIOACTIVE_HAIRLINE = ((-0.235, 0.205), (-0.155, 0.180), (-0.075, 0.215), (0.0, 0.185),
-                        (0.075, 0.215), (0.155, 0.180), (0.235, 0.205))
+# (Seven points at a fixed height 0.18 to 0.215 until 22 October 2026, made for a face whose brow stood 0.178 over its
+# middle. The face now rises to 0.235 and its brow narrows: the line follows it, high in the middle and falling to the
+# sides, so that it stays on the face from one cheek to the other as the top edge of the head the pictures draw.)
+RADIOACTIVE_HAIRLINE = ((-0.235, 0.140), (-0.155, 0.172), (-0.075, 0.214), (0.0, 0.188),
+                        (0.075, 0.214), (0.155, 0.172), (0.235, 0.140))
 RADIOACTIVE_HAIRLINE_THICK = 0.016
 # Roots of volumetric Radioactive head items are clamped below the hairline. Their tips may rise through the
 # crown as in the portraits, but a horn, mushroom or seal must visibly grow from the forehead, not the top.
 RADIOACTIVE_FOREHEAD_TOP = 0.145
 # The tint the eyes of each colour glow in (the white of an eye of the collection, in that colour).
 RADIOACTIVE_EYE_TINTS = {
-    "Green": (0.95, 1.0, 0.50),
-    "Blue": (0.82, 0.98, 1.0),
-    "Red": (1.0, 0.86, 0.90),
-    "Mixed": (1.0, 0.96, 0.86),
+    "Green": (0.98, 0.96, 0.40),
+    "Blue": (0.86, 0.98, 1.0),
+    "Red": (1.0, 0.95, 0.96),
+    "Mixed": (1.0, 0.97, 0.95),
+}
+# The ink of the eyes of each colour (22 October 2026, read on CHOG #703, #834 (red), #343, #598, #1281 (blue), #31,
+# #473, #1100 (green), #140, #275, #1192 (mixed)): the pictures draw a radioactive eye as the eye of its plain value
+# with every black line, ring and pupil in the colour of the variant, never black.
+RADIOACTIVE_EYE_INKS = {
+    "Green": (0.24, 0.58, 0.08),
+    "Blue": (0.06, 0.33, 0.68),
+    "Red": (0.64, 0.07, 0.20),
+    "Mixed": (0.46, 0.15, 0.62),
 }
 # The eyes of the radioactive pictures are those of Side=Left in a colour: value word -> eye value drawn.
 RADIOACTIVE_EYE_KINDS = {"Round Eye": "Round Eye", "Retard": "Retard", "Side Eye": "Side Eye", "Happy": "Happy",
                          "Smirk": "Smirk", "Flat": "Flat"}
+# What a kind draws differently in a radioactive skull (replaces numbers of the plain entry): "Round Eye" is a white
+# disc in a ring of the ink, with no pupil (CHOG #703, #834, #343, #31, #1192), the ring thinner than the plain eye's.
+RADIOACTIVE_EYE_NUMBERS = {
+    "Round Eye": {"LINE": (0.058, 0.064), "WHITE": (0.050, 0.056), "PUPIL": None},
+}
 
 
 def radioactive_eyes(table):
-    """Entries for "<colour> <kind>": the entry of the plain kind, its whites in the glowing tint."""
+    """Entries for "<colour> <kind>": the entry of the plain kind, its whites in the glowing tint and its dark
+    lines, rings and pupils in the ink of the colour."""
     made = {}
     for colour, tint in RADIOACTIVE_EYE_TINTS.items():
+        ink = RADIOACTIVE_EYE_INKS[colour]
         for word, plain in RADIOACTIVE_EYE_KINDS.items():
             entry = table.get(plain)
             if not isinstance(entry, dict):
                 continue
-            colours = {key: (tint if key == "White" else value) for key, value in entry["colours"].items()}
-            made[f"{colour} {word}"] = {**entry, "colours": colours}
+            colours = {key: (tint if key == "White" else ink if key == "Dark" else value)
+                       for key, value in entry["colours"].items()}
+            numbers = {**entry.get("numbers", {}), **RADIOACTIVE_EYE_NUMBERS.get(word, {})}
+            made[f"{colour} {word}"] = {**entry, "colours": colours, **({"numbers": numbers} if numbers else {})}
     return made
 
 
@@ -478,17 +499,28 @@ def build_demon_horns(maker):
             part.shell(rings, numbers.SIDES, part.named("Horn"), 0.012)
 
 
+def almond(middle, half_width, half_height, tilt_deg, points=7):
+    """The places of the edge of an almond (two arcs meeting in a point at each end), tilted: (to the side, above)."""
+    turn = math.radians(tilt_deg)
+    edge = []
+    for index in range(-points, points + 1):
+        along = index / points
+        edge.append((along * half_width, half_height * (1.0 - along * along)))
+    for index in range(points - 1, -points, -1):
+        along = index / points
+        edge.append((along * half_width, -half_height * 0.8 * (1.0 - along * along)))
+    return [(middle[0] + x * math.cos(turn) - y * math.sin(turn), middle[1] + x * math.sin(turn) + y * math.cos(turn))
+            for x, y in edge]
+
+
 def build_third_eye(maker):
+    """The third eye: a white almond in a thin dark-red outline, tilted, no pupil (22 October 2026, read on CHOG #703,
+    #598, #1657, #1849; until then a black oval with a white eye and a black pupil in it, which no picture draws)."""
     import make_chog_traits as traits_module
     part, surface = maker.part(), maker.surface
-    # Three layers on the brow, laid on the head (settled(): 0.026, 0.034 and 0.042 off it until 18 October 2026).
-    lifts = [traits_module.settled(lift) for lift in (0.026, 0.026 * 1.3, 0.026 * 1.6)]
-    traits_module.draw_shape(part, surface, part.named("Dark"), traits_module.oval((0.0, 0.135), 0.040, 0.026, 16),
-                             lifts[0])
-    traits_module.draw_shape(part, surface, part.named("White"), traits_module.oval((0.0, 0.135), 0.032, 0.019, 16),
-                             lifts[1])
-    traits_module.draw_shape(part, surface, part.named("Dark"), traits_module.oval((0.0, 0.134), 0.011, 0.016, 10),
-                             lifts[2])
+    lifts = [traits_module.settled(lift) for lift in (0.026, 0.026 * 1.3)]
+    traits_module.draw_shape(part, surface, part.named("Dark"), almond((0.0, 0.135), 0.046, 0.030, -12.0), lifts[0])
+    traits_module.draw_shape(part, surface, part.named("White"), almond((0.0, 0.135), 0.038, 0.023, -12.0), lifts[1])
 
 
 def build_gem(maker):
@@ -891,7 +923,7 @@ HATS = {
     "Demon Horn": {"shape": "DemonHorns", "colours": {"Horn": (0.95, 0.52, 0.32)}},
     "Void Horn": {"shape": "DemonHorns", "colours": {"Horn": (0.52, 0.36, 0.86)}},
     "devil horn": {"shape": "DemonHorns", "colours": {"Horn": (0.90, 0.26, 0.26)}},
-    "3rd Eye": {"shape": "ThirdEye", "colours": {"Dark": (0.07, 0.05, 0.10), "White": (0.98, 0.97, 0.94)},
+    "3rd Eye": {"shape": "ThirdEye", "colours": {"Dark": (0.50, 0.10, 0.15), "White": (0.98, 0.97, 0.94)},
                 "unlit": ("Dark", "White")},
     "Diamond": {"shape": "Gem", "colours": {"Gem": (0.36, 0.76, 0.98)}, "unlit": ("Gem",)},
     "Holy Seal": {"shape": "Seal", "colours": {"Gold": (0.98, 0.80, 0.22)}},

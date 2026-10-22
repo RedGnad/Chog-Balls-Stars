@@ -122,7 +122,9 @@ CLOSED_ARCH = {"AT": (0.112, 0.012), "ARC": (0.050, 0.020, 0.015), "TILT": -0.10
 CLOSED_TEARS = {"FROM": (0.004, -0.010), "TO": -0.172, "WIDTH": (0.034, 0.042), "LINE": 0.0,
                 "SHINE": 0.0, "DRIFT": -0.004}
 # "Dead": a thick cross on each eye: half the length of a stroke, its thickness, its turn.
-DEAD = {"AT": (0.112, 0.008), "HALF": 0.044, "THICKNESS": 0.022, "TURN_DEG": 4.0}
+# (THICKNESS 0.022 and HALF 0.044 until 22 October 2026: the strokes of the pictures are a fifth of the width of the
+# cross, ours a seventh.)
+DEAD = {"AT": (0.112, 0.008), "HALF": 0.046, "THICKNESS": 0.030, "TURN_DEG": 4.0}
 # "Heart": a heart on each eye, its point down: half its width, the width of its dark line, how much
 # its top leans outwards, and its glint (in the axes of the heart: to the side, above, half width,
 # half height).
@@ -1240,7 +1242,7 @@ EYES = {
         "kind": "Round",
         "colours": {"Dark": DARK, "White": WHITE},
         "unlit": ("Dark", "White"),
-        "numbers": {"PUPIL": (0.030, 0.035)},
+        "numbers": {"PUPIL": (0.034, 0.039)},
     },
     "Side Eye": {
         "kind": "SideEye",

@@ -51,16 +51,20 @@ def main():
     parser.add_argument("--out", required=True)
     parser.add_argument("--size", type=int, default=164, help="side of one picture")
     parser.add_argument("--quality", type=int, default=78)
+    parser.add_argument("--views", default=None, help="caption:picture name pairs separated by commas, for instance "
+                        "'bust:bust,front:turn_000' (default: bust, front, three quarter, side and game camera at phone size)")
+    parser.add_argument("--title", default="Face fill: the art, then before | after for each view")
     arguments = parser.parse_args()
+    views = tuple(tuple(pair.split(":", 1)) for pair in arguments.views.split(",")) if arguments.views else VIEWS
     size, label = arguments.size, 150
     numbers = [word.strip() for word in arguments.genesis.split(",") if word.strip()]
-    columns = 1 + 2 * len(VIEWS)
+    columns = 1 + 2 * len(views)
     width, head = label + columns * size, 40
     sheet = Image.new("RGB", (width, head + len(numbers) * size), (245, 243, 238))
     draw = ImageDraw.Draw(sheet)
-    draw.text((6, 4), "Face fill: the art, then before | after for each view", font=font(15), fill=(20, 20, 20))
+    draw.text((6, 4), arguments.title, font=font(15), fill=(20, 20, 20))
     draw.text((label, 22), "art", font=font(12), fill=(20, 20, 20))
-    for index, (caption, _) in enumerate(VIEWS):
+    for index, (caption, _) in enumerate(views):
         left = label + size * (1 + 2 * index)
         draw.text((left + 2, 22), f"{caption}: before", font=font(12), fill=(20, 20, 20))
         draw.text((left + size + 2, 22), "after", font=font(12), fill=(20, 20, 20))
@@ -72,7 +76,7 @@ def main():
             draw.text((6, top + 6 + line * 17), text, font=font(13 if line else 15), fill=(20, 20, 20))
         sheet.paste(Image.open(os.path.join(ART, f"{number}.jpg")).convert("RGB").resize((size, size), Image.LANCZOS),
                     (label, top))
-        for index, (_, name) in enumerate(VIEWS):
+        for index, (_, name) in enumerate(views):
             for shift, folder in enumerate((arguments.before, arguments.after)):
                 path = os.path.join(folder, number, f"chog_{number}_{name}.png")
                 picture = Image.open(path).convert("RGB")
