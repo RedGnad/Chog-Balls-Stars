@@ -198,14 +198,18 @@ USHANKA = {
     # head it is, how many rows up to its top.
     "CAP_RIM": ((0.0, 66.0), (70.0, 84.0), (110.0, 100.0), (180.0, 108.0)),
     "CAP_SIZE": 1.07,     # (1.04 tried: the spikes under its rim at the back could not clear it)
-    "CAP_ROWS": 4,
+    "CAP_ROWS": 5,
+    # (Evening, the owner: "the hat itself is tall, not only the flap; understand the composition". The cap is a tall rounded crown of fur,
+    # the turned-up flap lies against its front. Above the middle of the head the cap is stretched up this much, at its top.)
+    "CAP_TALL": 1.45,
     # The front flap turned up: how far round from the front it goes on each side (degrees), the polar degrees of its foot, how much
     # larger than the head its foot is, its half height, its half thickness, how far it leans out from upright (degrees), the bumps of
     # the fur along its top edge (how many, how high) and how many points along it.
     # (Tried at 0.105 half height: the cap showed above the flap; on the pictures the flap's furry top edge IS the top of the hat seen from
     # the front.)
-    "FRONT": {"SPAN": 80.0, "FOOT": 70.0, "SIZE": 1.10, "HALF_HEIGHT": 0.125, "HALF_THICK": 0.034, "LEAN": 6.0,
-              "WAVES": (7, 0.016), "POINTS": 11},     # (0.165 tried: a tall wall, a chef's hat)
+    # Its foot on the brow, below the rim of the crown. (Half height 0.165 tried: a tall wall, a chef's hat.)
+    "FRONT": {"SPAN": 80.0, "FOOT": 82.0, "SIZE": 1.10, "HALF_HEIGHT": 0.138, "HALF_THICK": 0.034, "LEAN": 2.0,
+              "WAVES": (7, 0.016), "POINTS": 11},
     # An ear flap: how far out of the middle at its top, at its middle and at its foot (it hangs nearly upright beside the face), how
     # far ahead of the middle of the head, its heights (top, then foot), half width at the top and at the foot, half thickness.
     # (22 October 2026, evening: on the pictures the flaps frame the face, their outer face of leather seen from the front three
@@ -235,8 +239,23 @@ def build_ushanka(maker):
     sides, outline = numbers.SIDES, numbers.OUTLINE_THICKNESS
     middle = surface.middle
 
-    # The cap, fitting the head.
-    dome(part, surface, part.named("Crown"), sides, numbers.CAP_RIM, numbers.CAP_ROWS, numbers.CAP_SIZE, outline)
+    # The cap: a crown that fits the head round its rim and rises well above it (CAP_TALL).
+    half = surface.half
+    angles = [2.0 * math.pi * index / sides for index in range(sides)]
+    rims = [math.radians(interpolate(numbers.CAP_RIM, from_front(angle))) for angle in angles]
+
+    def crown_point(angle, polar, size):
+        point = on_head(surface, angle, polar, size)
+        rise = max(0.0, math.cos(polar)) ** 2 * half.z * size * (numbers.CAP_TALL - 1.0)
+        return point + Z * rise
+
+    loops = [[on_head(surface, angle, polar, 0.90) for angle, polar in zip(angles, rims)]]
+    for row in range(numbers.CAP_ROWS):
+        share = row / numbers.CAP_ROWS
+        loops.append([crown_point(angle, polar * (1.0 - share), numbers.CAP_SIZE) for angle, polar in zip(angles, rims)])
+    loops.append([crown_point(0.0, 0.0, numbers.CAP_SIZE)])
+    shares = [(0.0,) * sides] + [(1.0,) * sides] * numbers.CAP_ROWS + [(1.0,)]
+    KIT.add_loops(part, loops, part.named("Crown"), outline, shares=shares)
 
     # The front flap, turned up: a thick strip of fur round the front of the cap from the brow up, leaning out a little.
     front = numbers.FRONT
@@ -688,21 +707,29 @@ SPARTAN = {
     # ears); behind the ears it rises again, so the back of the head is open, where the leaves come out
     # and stand beside the helmet on the busts. (The cheek guards first went on to 118 degrees: the
     # leaves then hid behind them.)
-    "EDGE": ((0.0, 103.0), (5.0, 102.0), (9.0, 96.0), (13.0, 80.0), (20.0, 78.0), (27.0, 79.0), (32.0, 84.0),
-             (35.0, 126.0), (40.0, 142.0), (58.0, 148.0), (80.0, 146.0), (92.0, 138.0), (102.0, 112.0),
-             (112.0, 84.0), (124.0, 68.0), (140.0, 62.0), (160.0, 58.0), (180.0, 56.0)),
-    # It stands clear of everything drawn on the face (up to 0.040 off the head): a thick, round helmet.
-    "SIZE": 1.16,
+    # (22 October 2026, evening, the owner: "the helmet itself is badly designed against the picture; make it look good, the spikes may go
+    # through it". At 1000 points (#27, #21, #331) a Corinthian helmet close on the head: a broad nose guard with a flat end down between the
+    # eyes to their lower third, the brow just over the eyes, cheek guards down the sides of the face to the jaw, the back down to the nape,
+    # a gold trim along every edge, a tall thin red crest. Until then a shell 1.16 times the head whose cheek guards flared below the jaw like
+    # a bob of hair (polar 148), a short notch for a nose guard, the back open to let the spikes out.)
+    "EDGE": ((0.0, 111.0), (7.0, 111.0), (10.0, 104.0), (12.0, 86.0), (14.0, 79.0), (21.0, 77.0), (28.0, 78.0), (32.0, 83.0),
+             (35.0, 116.0), (42.0, 132.0), (60.0, 138.0), (80.0, 136.0), (100.0, 130.0), (125.0, 123.0), (150.0, 119.0),
+             (180.0, 118.0)),
+    "SIZE": 1.10,
+    # The spikes of the crown go through it, as the pictures draw them out of its back and sides.
+    "THROUGH": True,
     # The trim along every edge: a band this many degrees wide above the edge, in its own colour.
-    "TRIM_DEG": 6.0,
+    "TRIM_DEG": 7.0,
     # The rows of the shell above the trim, up to the top: the share of the polar angle of the edge.
     "ROWS": (0.78, 0.55, 0.32, 0.12),
     # The crest: along the middle of the head, (degrees from straight up, towards the back when positive;
     # height above the shell; half width). Wider and taller than in batch 3, and it ends where the back
     # of the helmet ends.
-    "CREST": ((-50.0, 0.060, 0.052), (-36.0, 0.190, 0.074), (-14.0, 0.290, 0.088), (12.0, 0.330, 0.092),
-              (28.0, 0.290, 0.088), (40.0, 0.190, 0.078), (48.0, 0.080, 0.060), (53.0, 0.020, 0.046)),
-    "CREST_SIDES": 8,
+    # (22 October 2026, evening: thinner and taller, a fan of stiff hair from the brow to the nape, its top edge bristling.)
+    "CREST": ((-52.0, 0.050, 0.034), (-44.0, 0.170, 0.040), (-36.0, 0.250, 0.044), (-28.0, 0.300, 0.046), (-18.0, 0.360, 0.048),
+              (-8.0, 0.350, 0.048), (2.0, 0.390, 0.048), (12.0, 0.370, 0.048), (22.0, 0.380, 0.046), (32.0, 0.330, 0.044),
+              (42.0, 0.300, 0.042), (52.0, 0.220, 0.040), (62.0, 0.120, 0.036), (70.0, 0.030, 0.032)),
+    "CREST_SIDES": 6,     # (8 until 22 October 2026, evening: with the spikes kept, #766 in a Kings Robe went 48 over 8,000 triangles)
     "OUTLINE_THICKNESS": 0.020,
     # The back of the head is open: the pair of the back row and the leaf straight back stand there,
     # the lowest pair of the star (which would go through a cheek guard) is turned back beside them.
@@ -715,7 +742,7 @@ SPARTAN = {
     # (22 October 2026, evening: the owner wants the spikes out at the sides. Tried: the upper and middle pairs root under the shell and cross it
     # whatever their turn (leaf_crossings); the two pairs that clear it stay behind the helmet, longer or not. Spikes beside the helmet need
     # spikes of the helmet's own, not leaves of the crown: not done.)
-    "LEAVES": (GONE, GONE, GONE, leaf(1.45, 92.0, 55.0, 0.55, 0.62), GONE, leaf(1.45, 80.0, 70.0, 0.55, 0.58), GONE),
+    "LEAVES": (GONE, WHOLE, WHOLE, WHOLE, GONE, WHOLE, WHOLE),
     # The pictures show no teeth of hair on the brow inside the helmet.
     "FRINGE": False,
     # Where a tip must show from above and from the game camera: the two sides behind the helmet and straight back.
@@ -1334,9 +1361,11 @@ HATS = {
                               (180.0, 108.0, 0.17, 1.24)),
                     "HAIRLINE": None,
                     # The band of the pictures is wide, its upper edge a frill of many small waves.
+                    # (22 October 2026, evening, the owner: "the yellow still shows through the red band" (#43): the curly edges of the
+                    # clumps over the brow came through it as yellow flecks. The band stands 0.14 off the hair, 0.10 before.)
                     "BAND": (((0.0, 81.0), (40.0, 81.0), (90.0, 84.0), (180.0, 86.0)),
                              ((0.0, 60.0), (40.0, 61.0), (90.0, 63.0), (180.0, 65.0)),
-                             0.10, 18, 2.5, 0.24, 36)},
+                             0.14, 18, 2.5, 0.24, 36)},
     },
     # A big afro in six colours, from the right of the character over the top to its left.
     "Rainbow Wig": {

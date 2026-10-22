@@ -134,14 +134,26 @@ namespace Chog.Match
                 }
             }
 
-            /// <summary>The thing thrown and where it comes from, out of a line of the library ("THROWS X FROM ITS Y").</summary>
+            /// <summary>
+            /// The thing thrown and where it comes from, out of a line of the library ("THROWS X FROM ITS Y"), without "ITS"
+            /// (22 October 2026, the owner: "remove every its"): ("SNOWBALLS", "RUSSIAN HAT"), ("TISM CAP", ""), ("CROWN SPIKES", "").
+            /// </summary>
             public static (string thing, string from) Parts(string line)
             {
                 var words = (line ?? "").Trim();
                 if (words.StartsWith("THROWS ", System.StringComparison.Ordinal))
                     words = words.Substring("THROWS ".Length);
                 var cut = words.IndexOf(" FROM ", System.StringComparison.Ordinal);
-                return cut < 0 ? (words, "") : (words.Substring(0, cut), words.Substring(cut + " FROM ".Length));
+                var thing = cut < 0 ? words : words.Substring(0, cut);
+                var from = cut < 0 ? "" : words.Substring(cut + " FROM ".Length);
+                return (WithoutIts(thing), WithoutIts(from));
+            }
+
+            private static string WithoutIts(string words)
+            {
+                if (words == "THE SPIKES OF ITS CROWN")
+                    return "CROWN SPIKES";
+                return words.StartsWith("ITS ", System.StringComparison.Ordinal) ? words.Substring("ITS ".Length) : words;
             }
 
             public static string Short(string line, string role)
@@ -157,9 +169,10 @@ namespace Chog.Match
                     return "";
                 var verb = Verb(role).ToLowerInvariant();
                 var how = How(role);
-                // The thing and the trait keep their capitals (TISM, BTC): only the small words are lowered.
+                // The thing and the trait keep their capitals (TISM, BTC): only the small words are lowered. Where it comes from
+                // closes the sentence ("Shoots SNOWBALLS, fast, from a distance. From RUSSIAN HAT."), with no "its".
                 var said = char.ToUpperInvariant(verb[0]) + verb.Substring(1) + " " + Plain(thing)
-                           + (from.Length > 0 ? " from " + Plain(from) : "") + (how.Length > 0 ? ", " + how : "") + ".";
+                           + (how.Length > 0 ? ", " + how : "") + "." + (from.Length > 0 ? " From " + Plain(from) + "." : "");
                 return said;
             }
 

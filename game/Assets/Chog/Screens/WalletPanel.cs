@@ -742,12 +742,12 @@ namespace Chog.Screens
             var thrown = ChogHeroModel.AttackWords.Parts(attackLine).thing;
             var kind = ChogHeroModel.AttackWords.Kind(roleId);
             _kitTitles[0].text = (lines[0].Gives ?? "").ToUpperInvariant();
-            _kitLines[0].text = "Class from its outfit: " + lines[0].Value;
+            _kitLines[0].text = "Outfit: " + lines[0].Value;
             _kitTitles[1].text = "BASIC: " + (thrown.Length > 0 ? thrown : kind);
             var detail = ChogHeroModel.AttackWords.Detail(attackLine, roleId);
             _kitLines[1].text = detail.Length > 0 ? kind + ". " + detail : kind;
             _kitTitles[2].text = "SPECIAL: " + (lines[1].Gives ?? "").ToUpperInvariant();
-            _kitLines[2].text = lines[1].Value == "none" ? "No eyes trait." : "From its eyes, " + lines[1].Value + ".";
+            _kitLines[2].text = lines[1].Value == "none" ? "No eyes trait." : "Eyes: " + lines[1].Value + ".";
         }
 
         private static long NowMs() => (long)(DateTime.UtcNow - UnixEpoch).TotalMilliseconds;

@@ -56,7 +56,7 @@ ATTACK_OF_HEAD = {
     "BTC Beanie": ("Pizza", SPIN),
     "Choggie Beanie": ("MiniChog", TUMBLE),
     "Mon Beanie": ("Yarn", TUMBLE),
-    "Rainbow Wig": ("RainbowBall", TUMBLE),
+    "Rainbow Wig": ("RainbowBall", SPIN),
     "Clown Nose": ("Nose", TUMBLE),
     "Plumber": ("HAT", POINT),
 }
@@ -93,7 +93,7 @@ ATTACK_OF_HELD = {
 # Then its full costume (ATTACK_OF_BODY), then the rainbow it pukes (the trait "Mouth", 145 Genesis), before its
 # hat or its crown (the owner, the same day: a dragon that pukes a rainbow throws fire): the Rainbow Wig's ball.
 RAINBOW_MOUTH = "Rainbow Puke"
-RAINBOW_THROWN = ("RainbowBall", TUMBLE)
+RAINBOW_THROWN = ("RainbowBall", SPIN)
 
 
 # What a player reads under the hero: the object, in words.
@@ -369,16 +369,24 @@ def build_yarn(shapes, word_pieces):
 
 
 def build_rainbow_ball(shapes, word_pieces):
+    """A rainbow, the arch of six bands with a white cloud at each foot, lying flat so that it spins like a frisbee (SPIN). (22 October
+    2026, the owner: "the rainbow attack does not read as a rainbow at all, I only see purple balls": the ball of six bands, tumbling,
+    showed one or two of them from the game camera, far above.) Its name stays "RainbowBall": the game finds its burst by it."""
     bands = ("Red", "Orange", "Yellow", "Green", "Blue", "Purple")
-    radius = 0.13
+    outer, step, half_flat, half_tall = 0.200, 0.027, 0.0145, 0.020   # bands wide enough to read from the game camera
+    segments = 14
     for index, band in enumerate(bands):
-        low = -radius + 2.0 * radius * index / len(bands)
-        high = -radius + 2.0 * radius * (index + 1) / len(bands)
-        stations = []
-        for step in range(4):
-            z = low + (high - low) * step / 3.0
-            stations.append((z - low, math.sqrt(max(radius * radius - z * z, 0.0001))))
-        tube(shapes, Z * low, Z, stations, shapes.named(band), outline=OUTLINE, sides=14)
+        radius = outer - step * index
+        rings = []
+        for at in range(segments + 1):
+            angle = math.pi * at / segments
+            outward = X * math.cos(angle) + Y * math.sin(angle)
+            rings.append((outward * radius - Y * 0.06, Z * half_tall, outward * half_flat))
+        shapes.shell(rings, 6, shapes.named(band), OUTLINE)
+    for side in (1.0, -1.0):
+        middle = X * side * (outer - step * 2.5) - Y * 0.06
+        for dx, dy, size in ((0.0, 0.0, 0.050), (side * 0.040, -0.018, 0.036), (-side * 0.036, -0.022, 0.034)):
+            ball(shapes, middle + Vector((dx, dy, 0.0)), size, shapes.named("Cloud"), stacks=5, sides=10)
 
 
 def build_nose(shapes, word_pieces):
@@ -503,7 +511,8 @@ OBJECTS = {
                  build_mini_chog, (0.72, 0.65, 0.95)),
     "Yarn": ({"Wool": (0.50, 0.78, 0.94), "Stripe": (0.48, 0.36, 0.92)}, (), build_yarn, (0.50, 0.78, 0.94)),
     "RainbowBall": ({"Red": (0.90, 0.16, 0.16), "Orange": (0.97, 0.55, 0.12), "Yellow": (0.98, 0.86, 0.18),
-                     "Green": (0.24, 0.75, 0.30), "Blue": (0.20, 0.50, 0.92), "Purple": (0.55, 0.28, 0.82)}, (),
+                     "Green": (0.24, 0.75, 0.30), "Blue": (0.20, 0.50, 0.92), "Purple": (0.55, 0.28, 0.82),
+                     "Cloud": (0.98, 0.98, 1.0)}, (),
                     build_rainbow_ball, (0.98, 0.86, 0.18)),
     "Nose": ({"Red": (0.91, 0.15, 0.17), "Glint": (1.0, 1.0, 1.0)}, ("Glint",), build_nose, (0.91, 0.15, 0.17)),
     "Bone": ({"Bone": (0.95, 0.94, 0.88)}, (), build_bone, (0.95, 0.94, 0.88)),

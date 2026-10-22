@@ -238,7 +238,7 @@ namespace Chog.Screens
             _className.text = role;
             _classLetter.text = role.Length > 0 ? role.Substring(0, 1) : "?";
             _classTile.color = role == "BRUTE" ? ChogTheme.Danger : role == "RANGER" ? ChogTheme.Confirm : role == "CONTROLLER" ? ChogTheme.Purple : ChogTheme.Quiet;
-            _classTrait.text = "Class from its outfit: " + lines[0].Value;
+            _classTrait.text = "Outfit: " + lines[0].Value;
 
             var roleId = (lines[0].Gives ?? "").ToLowerInvariant();
             var attackLine = ChogHeroModel.AttackLine(hero.MetadataId);
@@ -266,13 +266,13 @@ namespace Chog.Screens
             RefreshActions();
         }
 
-        // "From its eyes, Modern VR. A fan of light...", or "No aura. Full damage..." for a trait it does not wear.
+        // "Eyes: Modern VR. A fan of light...", or "No aura. Full damage..." for a trait it does not wear.
         private static string Source(string trait, string value, string summary)
         {
             var said = string.IsNullOrEmpty(summary) ? "" : " " + char.ToUpperInvariant(summary[0]) + summary.Substring(1);
             if (!said.EndsWith(".") && said.Length > 0)
                 said += ".";
-            return (value == "none" ? "No " + trait + "." : "From its " + trait + ", " + value + ".") + said;
+            return (value == "none" ? "No " + trait + "." : char.ToUpperInvariant(trait[0]) + trait.Substring(1) + ": " + value + ".") + said;
         }
 
         private void Row(int index, string title, string trait)

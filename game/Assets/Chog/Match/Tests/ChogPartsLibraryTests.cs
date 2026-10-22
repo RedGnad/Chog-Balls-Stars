@@ -156,10 +156,10 @@ namespace Chog.Match.Tests
             // The basic attack in the words of a class (ChogHeroModel.AttackWords).
             Assert.AreEqual("LONG SHOT", ChogHeroModel.AttackWords.Kind("ranger"));
             Assert.AreEqual("LOBS SNOWBALLS", ChogHeroModel.AttackWords.Short(russian.AttackLine, "controller"));
-            Assert.AreEqual("Strikes with its TISM CAP, up close.", ChogHeroModel.AttackWords.Detail(owner.AttackLine, "brute"));
-            Assert.AreEqual("Shoots SNOWBALLS from its RUSSIAN HAT, fast, from a distance.",
+            Assert.AreEqual("Strikes with TISM CAP, up close.", ChogHeroModel.AttackWords.Detail(owner.AttackLine, "brute"));
+            Assert.AreEqual("Shoots SNOWBALLS, fast, from a distance. From RUSSIAN HAT.",
                 ChogHeroModel.AttackWords.Detail(russian.AttackLine, "ranger"));
-            Assert.AreEqual("THROWS THE SPIKES OF ITS CROWN", ChogHeroModel.AttackWords.Short(bare.AttackLine, ""));
+            Assert.AreEqual("THROWS CROWN SPIKES", ChogHeroModel.AttackWords.Short(bare.AttackLine, ""));
         }
 
         [Test]

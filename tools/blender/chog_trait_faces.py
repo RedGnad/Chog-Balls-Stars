@@ -121,9 +121,13 @@ THIN_TEAR = {"FROM": (0.040, -0.040), "TO": -0.128, "WIDTH": (0.010, 0.012), "LI
              "WELL": (0.034, 0.012, 0.009)}
 # "Closed Eye Crying": an arch over each closed eye, thick in its middle, slanted, and a wide tear
 # under it with no dark line.
-CLOSED_ARCH = {"AT": (0.112, 0.012), "ARC": (0.050, 0.020, 0.015), "TILT": -0.10, "STEPS": 10}
-CLOSED_TEARS = {"FROM": (0.020, -0.010), "TO": -0.172, "WIDTH": (0.034, 0.042), "LINE": 0.0,
-                "SHINE": 0.0, "DRIFT": 0.008}
+# (22 October 2026, evening, the owner on #806: "the tears are buggy, and the eyes are still the wrong way round, reason". Traced on the 1000
+# point pictures of #806 and #24: each closed eye is a thick line that SAGS in its middle (◡: its middle 10 to 16 points below the line between
+# its ends), its outer end a little lower; ours were arches (∩). ARC's height is now negative. The tears ran down to 0.172 under the middle of
+# the face, past the jaw since the face was lowered: they hung under the chin as square sticks; on the pictures they end on the jaw, round.)
+CLOSED_ARCH = {"AT": (0.112, 0.012), "ARC": (0.052, -0.016, 0.020), "TILT": -0.12, "STEPS": 10}
+CLOSED_TEARS = {"FROM": (0.020, -0.012), "TO": -0.128, "WIDTH": (0.032, 0.040), "LINE": 0.0,
+                "SHINE": 0.0, "DRIFT": 0.012}
 # "Dead": a thick cross on each eye: half the length of a stroke, its thickness, its turn.
 # (THICKNESS 0.022 and HALF 0.044 until 22 October 2026: the strokes of the pictures are a fifth of the width of the
 # cross, ours a seventh.)
@@ -180,8 +184,11 @@ WHITE_EYE = {
 ANGRY = {**WHITE_EYE, "SIZE": (0.056, 0.050), "LID": (0.22, 0.22, 0.015, 0.014), "PUPIL": (0.040, 0.046),
          "LOOK": ((0.020, -0.010), (0.020, -0.010)), "GLINTS": ((-0.012, 0.004, 0.010, 0.011),)}
 # "Vertical": a wide almond, a narrow upright pupil with a light stripe down it.
-VERTICAL = {**WHITE_EYE, "SIZE": (0.060, 0.032), "LINE": 0.011, "PUPIL": (0.011, 0.026),
-            "GLINTS": ((0.0, 0.004, 0.0035, 0.012),)}
+# (22 October 2026, evening, the owner on #1117: "some eyes must be improved, and this time really well". At 1000 points (#1117, #45, #296,
+# #1133) the eye is a long flat almond, about 2.3 times as wide as tall, in a bold outline, its pupil a black upright capsule a little left of
+# the middle, about 0.2 of the width and 0.7 of the height, a short white bar high on its left. Ours were ovals with a hairline pupil.)
+VERTICAL = {**WHITE_EYE, "SIZE": (0.072, 0.027), "LINE": 0.013, "PUPIL": (0.015, 0.022), "LOOK": ((-0.008, 0.0), (-0.008, 0.0)),
+            "GLINTS": ((-0.005, 0.008, 0.0045, 0.009),)}
 # "Smirk": an almond whose outer end is lower, a thick arched upper lid, the pupil looking to the left
 # of the picture.
 # (22 October 2026, evening: the two different eyes of the strict audit were taken back with the rest of it, the owner finding
@@ -262,8 +269,10 @@ RETRO_GLASS_NUMBERS = {"RIM": 0.11, "THICKNESS": 0.022, "LENS_BULGE": 0.003, "OU
 # has NO dark pupil: it is one steel blue disc under the lid, with a large pale blue highlight high on its left and a small white dot
 # under that. The dark pupil disc and its rim made the circle. HIGHLIGHT: to the side of the middle of the iris, above it, half
 # width, half height (the same side for both eyes: where the light is), drawn in the colour "Pupil"; GLINTS the white dot.)
-RETRO_EYES = {"IRIS": (0.004, -0.008, 0.068, 0.066), "HIGHLIGHT": (-0.024, 0.006, 0.024, 0.028), "LID": (0.013, 0.030, 0.30),
-              "GLINTS": ((-0.030, -0.026, 0.008, 0.009),), "LIFT": 0.0025}
+# (Evening, the owner: "much better, but make the eyes a little smaller, they go past the glasses": the iris, 0.068 by 0.066, reached past
+# the lens (0.104 by 0.074, its frame inside that). Now 0.056 by 0.054, and its highlight and glint with it.)
+RETRO_EYES = {"IRIS": (0.004, -0.008, 0.056, 0.054), "HIGHLIGHT": (-0.020, 0.005, 0.020, 0.023), "LID": (0.012, 0.024, 0.30),
+              "GLINTS": ((-0.025, -0.021, 0.007, 0.008),), "LIFT": 0.0025}
 # "3D Glass" (CHOG #361, #379): the lens of "Anime Glass" more square, in a thick light grey frame; the
 # lens over the right eye of the character blue, the one over its left eye red.
 GLASSES_3D_NUMBERS = {"LENS": (0.126, 0.016, 0.100, 0.066), "LENS_SQUARENESS": 4.0, "LENS_TAPER": 0.04,

@@ -23,7 +23,9 @@ namespace Chog.Screens
         private const float Seconds = 30f;
         // How long after zero the other players wait for the host before starting the match themselves.
         public const float HostGraceSeconds = 8f;
-        private static readonly Vector2 Place = new Vector2(0.5f, 0.535f);
+        // Under the card of the Genesis (GenesisHeroCard, 178 to 478 from the top of a 1080 screen), above CHANGE TEAM (635).
+        private static readonly Vector2 Place = new Vector2(0.5f, 0.509f);
+        private const float DiscSize = 100f;
 
         private TextMeshProUGUI _number;
         private TextMeshProUGUI _caption;
@@ -56,12 +58,12 @@ namespace Chog.Screens
 
         private void Build()
         {
-            _disc = ChogUi.Pinned("Disc", transform, Place, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(112f, 112f)).gameObject;
-            var plate = ChogUi.Plate("Plate", _disc.transform, Vector2.zero, Vector2.one, ChogTheme.Action, 56);
+            _disc = ChogUi.Pinned("Disc", transform, Place, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(DiscSize, DiscSize)).gameObject;
+            var plate = ChogUi.Plate("Plate", _disc.transform, Vector2.zero, Vector2.one, ChogTheme.Action, 50);
             plate.gameObject.AddComponent<Shadow>().effectDistance = new Vector2(0f, -6f);
-            _number = ChogUi.Title("Number", _disc.transform, new Vector2(0f, 0.08f), Vector2.one, 66f);
+            _number = ChogUi.Title("Number", _disc.transform, new Vector2(0f, 0.08f), Vector2.one, 60f);
             _caption = ChogUi.Number("Caption", transform, Vector2.zero, Vector2.zero, 24f, TextAlignmentOptions.Center, ChogTheme.Hex("FFE27A"));
-            ChogUi.Pin(_caption.rectTransform, Place, new Vector2(0.5f, 1f), new Vector2(0f, -64f), new Vector2(550f, 34f));
+            ChogUi.Pin(_caption.rectTransform, Place, new Vector2(0.5f, 1f), new Vector2(0f, -DiscSize * 0.5f - 8f), new Vector2(550f, 34f));
             _startedAt = Time.unscaledTime;
         }
 

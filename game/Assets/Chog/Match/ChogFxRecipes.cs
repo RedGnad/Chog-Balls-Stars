@@ -175,6 +175,9 @@ namespace Chog.Match
                     return FxLayer.Of(ChogFx.Burning, 0.32f);
                 case "WaterDrop":
                     return FxLayer.Of(ChogFx.Bubbles, 0.3f, FxColour.Tinted, SeaWater);
+                // Stars of every colour behind a thrown rainbow (22 October 2026, the owner: it did not read as a rainbow).
+                case "RainbowBall":
+                    return FxLayer.Of(ChogFx.RainbowStars, 0.34f);
                 default:
                     return default;
             }

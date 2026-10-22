@@ -17,10 +17,13 @@ namespace Chog.Screens
         private const string ObjectName = "GenesisHeroCard";
         private const string TextName = "Text";
 
-        // In units of the preparation screen: the card fits between the two team columns.
-        private const float Width = 470f;
-        private const float Height = 390f;
-        private const float PortraitSize = 96f;
+        // In units of the preparation screen: the card fits between the two team columns, above the clock of the room
+        // (22 October 2026, the owner: the card, 390 tall, hid the countdown under it). Raised by Lift over the place of
+        // the class buttons it replaces.
+        private const float Width = 520f;
+        private const float Height = 300f;
+        private const float Lift = 48f;
+        private const float PortraitSize = 78f;
         private const float Margin = 8f;
 
         private static readonly Color PanelColor = ChogTheme.Card;
@@ -76,7 +79,7 @@ namespace Chog.Screens
             card.anchorMin = like.anchorMin;
             card.anchorMax = like.anchorMax;
             card.pivot = new Vector2(0.5f, 0.5f);
-            card.anchoredPosition = anchoredPosition;
+            card.anchoredPosition = anchoredPosition + new Vector2(0f, Lift);
             card.sizeDelta = new Vector2(Width, Height);
             card.gameObject.SetActive(true);
 
@@ -140,9 +143,11 @@ namespace Chog.Screens
                 if (color.a > 0f)
                     gives = "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + gives + "</color>";
 
-                text.Append("\n<size=68%><color=").Append(TraitColor).Append('>')
-                    .Append(line.Trait.ToUpperInvariant()).Append(" : ").Append(line.Value).Append("</color></size>")
-                    .Append("\n<b>").Append(gives).Append("</b>  <size=72%>").Append(line.Summary).Append("</size>");
+                // One line a trait: what it gives, what that does, then the trait it comes from, small (two lines a trait
+                // until 22 October 2026: the card grew over the clock of the room).
+                text.Append("\n<b>").Append(gives).Append("</b>  <size=72%>").Append(line.Summary)
+                    .Append("  <color=").Append(TraitColor).Append(">(").Append(line.Trait.ToLowerInvariant()).Append(": ")
+                    .Append(line.Value).Append(")</color></size>");
             }
 
             // What mastery still has to unlock: the reason to play this Genesis again.

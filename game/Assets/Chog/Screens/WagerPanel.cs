@@ -40,9 +40,12 @@ namespace Chog.Screens
         private static readonly Color PanelColor = ChogTheme.Card;
         private static readonly Color AccentColor = ChogTheme.Cheek;
         private static readonly Color ButtonTextColor = Color.white;
-        // The free corner of the preparation screen, under the first team's slots.
-        private static readonly Vector2 PanelMin = new Vector2(0.02f, 0.02f);
-        private static readonly Vector2 PanelMax = new Vector2(0.38f, 0.17f);
+        // The free corner of the preparation screen, under the first team's slots, framed in gold with the coin of
+        // $CHOG and a stake button that beats while a stake can be made (22 October 2026, the owner: "the stake window is
+        // too discreet and badly put forward").
+        private static readonly Vector2 PanelMin = new Vector2(0.015f, 0.025f);
+        private static readonly Vector2 PanelMax = new Vector2(0.385f, 0.175f);
+        private const float CoinShare = 0.16f;
         // Where the test tokens button sits, and the line beside it when it is shown.
         private static readonly Vector2 TapMin = new Vector2(0.70f, 0.50f);
         private static readonly Vector2 StatusMax = new Vector2(0.97f, 0.97f);
@@ -178,10 +181,24 @@ namespace Chog.Screens
             // A tap on the panel puts a failed stake away.
             gameObject.AddComponent<Button>().onClick.AddListener(GenesisWager.Dismiss);
 
-            _status = Text(template, "Status", new Vector2(0.03f, 0.45f), StatusMax, Color.white, 30f, transform);
+            var frame = gameObject.AddComponent<Outline>();
+            frame.effectColor = ChogTheme.Gold;
+            frame.effectDistance = new Vector2(4f, -4f);
+            var token = Resources.Load<Texture2D>("ChogTokenCoin");
+            if (token != null)
+            {
+                var coin = Child("Coin", transform, new Vector2(0.015f, 0.47f), new Vector2(CoinShare - 0.01f, 0.97f));
+                var picture = coin.gameObject.AddComponent<Image>();
+                picture.sprite = Sprite.Create(token, new Rect(0f, 0f, token.width, token.height), new Vector2(0.5f, 0.5f), 100f);
+                picture.preserveAspect = true;
+                picture.raycastTarget = false;
+            }
+            _status = Text(template, "Status", new Vector2(CoinShare, 0.45f), StatusMax, Color.white, 32f, transform);
+            ChogTheme.AsTitle(_status);
             _less = MakeButton(template, "Less", new Vector2(0.03f, 0.06f), new Vector2(0.15f, 0.42f), "-", out _);
             _more = MakeButton(template, "More", new Vector2(0.17f, 0.06f), new Vector2(0.29f, 0.42f), "+", out _);
             _stake = MakeButton(template, "Stake", new Vector2(0.32f, 0.06f), new Vector2(0.97f, 0.42f), "", out _stakeLabel);
+            ((Image)_stake.targetGraphic).color = ChogTheme.Gold;
             // The dollars under the amount are smaller: the label reads rich text.
             _stakeLabel.richText = true;
             // On the testnet only: test tokens from the tap of the test token, beside the line.
@@ -214,6 +231,10 @@ namespace Chog.Screens
 
         private void Update()
         {
+            // The stake button beats while a stake can be made.
+            if (_stake != null)
+                _stake.transform.localScale = _stake.interactable && _stake.gameObject.activeSelf
+                    ? Vector3.one * (1f + 0.045f * Mathf.Sin(Time.unscaledTime * 5f)) : Vector3.one;
             if (Time.unscaledTime < _readAt || string.IsNullOrEmpty(PlayerWallet.Session) || GenesisWager.IsBusy)
                 return;
 

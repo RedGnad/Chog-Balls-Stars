@@ -136,6 +136,16 @@ namespace TwinStickShooter
             ? Chog.Screens.ChogTheme.ClassName(characterInfo.Name)
             : Chog.Screens.GenesisHeroCard.CleanName(genesisName) + "\n" + GenesisCast.KitLabel(VerifiedFrame, entityRef);
         Teams[team.Index].TeamCharacters[characterIndex].color = characterInfo.NameColor;
+        // The name and the kit of a Genesis take two lines: the text shrinks to stay in its slot (22 October 2026, the owner:
+        // "the detail of the player does not fit in its window").
+        var slotText = Teams[team.Index].TeamCharacters[characterIndex];
+        if (slotText.enableAutoSizing == false)
+        {
+          slotText.fontSizeMax = slotText.fontSize;
+          slotText.fontSizeMin = 10f;
+          slotText.enableAutoSizing = true;
+          slotText.overflowMode = TMPro.TextOverflowModes.Truncate;
+        }
 
         characterIndex++;
       }
