@@ -566,9 +566,15 @@ LASER = {
     # it was the eye of "Normal Eye", cut by a slanted brow: an angry look the pictures of lasers never draw.
     # Its middle (to the side, above), half width and half height, segments; then the hot spot: the radius of
     # the glow (the beam's colour) and of the core in it.
-    "EYE_AT": (0.112, 0.010),
-    "EYE_SIZE": (0.045, 0.064),
-    "EYE_SEGMENTS": 14,
+    # (22 October 2026, the owner on the dragon #16: "the eyes do not really match, frowned against ovals". The pictures of
+    # Side=Right (#52, #102, #107, #41, #72, #16, #42) draw each eye as a dark almond, a little wider than high (0.14 by 0.13 on the pictures, the beam about a quarter of it), whose top is
+    # cut by a flat lid that slopes down towards the nose: a frown; the beam leaves its middle. Until then a whole tall oval,
+    # 0.090 by 0.128. EYE_LID: where the lid cuts the eye above its middle (against its half height) and how much it rises
+    # per unit towards the outer side.)
+    "EYE_AT": (0.112, 0.006),
+    "EYE_SIZE": (0.070, 0.064),
+    "EYE_LID": (0.28, 0.40),
+    "EYE_SEGMENTS": 20,
     "GLOW": (0.024, 0.012),
 }
 HAPPY = {
@@ -2187,8 +2193,14 @@ def draw_laser_eyes(part, surface, numbers, dark, glow, core):
     middles = []
     for side in (1.0, -1.0):
         middle = (side * numbers.EYE_AT[0], numbers.EYE_AT[1])
-        draw_shape(part, surface, dark, oval(middle, half_width, half_height, numbers.EYE_SEGMENTS), DRAWN[0],
-                   middle=middle)
+        cut, slope = numbers.EYE_LID
+
+        def lid(place, middle=middle, side=side):
+            return middle[1] + half_height * cut + slope * (place - middle[0]) * side
+
+        edge = [(place, min(up, lid(place))) for place, up in oval(middle, half_width, half_height, numbers.EYE_SEGMENTS)]
+        inside = (middle[0], (middle[1] - half_height + lid(middle[0])) * 0.5)
+        draw_shape(part, surface, dark, edge, DRAWN[0], middle=inside)
         draw_shape(part, surface, glow, oval(middle, glow_radius, glow_radius, 10), DRAWN[1], middle=middle)
         draw_shape(part, surface, core, oval(middle, core_radius, core_radius, 8), DRAWN[2], middle=middle)
         middles.append(middle)
