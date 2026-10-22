@@ -1089,3 +1089,23 @@ the art, then before | after in the same views as lot 1).
   library 1,970 Genesis, 0 failures, 0 lacking a part, 3,660,417 bytes.
 - **Not done / not verified**: not seen in Unity. The dorsal fin is seen edge on from the game camera from behind (a line, with its
   outline); the teeth are small at the true phone size and the snout hides the upper ones a little from the game camera in front.
+
+## 22 October 2026: the costumes reasoned as objects, lot 3: the astronaut
+
+Sheet: [costumes-astro-2026-10-22.jpg](../../research/evidence/costumes-astro-2026-10-22.jpg) (6 astronauts: #249, #572, #1529, #947, #675,
+#708; the art, then before | after).
+
+- **What the Astro Suit is**: a space suit with an opaque white helmet over the whole head. #572 and #1416: a thick grey ring frames a
+  round visor opening; through it show the face and the fringe of the Chog's hair (its colour, a zigzag edge) above the face, inside the
+  ring; the hair stays in the helmet. Around it: a ribbed unit at the side of the helmet, a ribbed hose, the collar, the chest box, the
+  pack, the flag at the shoulder. The owner, on the glass of lot 4a: "I don't understand why you put transparency and grain, it's useless,
+  just make an astronaut costume."
+- **Changed** (`ASTRO`, `build_astro`, entry `Astro Suit`): the glass is gone; the helmet shell is opaque white (`Helmet`) with an outline,
+  1.20 times the head (1.32 for the glass); no leaf of the crown (`NO_CROWN`), the fringe of the base stays (`FRINGE`); the legs are white
+  trousers over the skin and grey boots (`Boot`) over the feet (until now purple legs and pink feet came out of a white suit; `add_trousers`
+  and `add_boots` take a number of sides). The ring has 18 stations (28) and the helmet 20 by 5, the trousers and boots 10 sides, for the
+  budget. The glass mode of the hero shader and of the renders (`glass_material`) is kept, unused.
+- **Checked**: 6 astronauts before | after; `--budget`: largest hero #710 7,971, the astronauts up to 7,907 (#1855), none over 8,000 (the first
+  try, 28 ring stations, had ten over).
+- **Not done / not verified**: not seen in Unity. The gloves are still the pink mittens of the base (no budget left for a white glove);
+  the flag and the hose are small at the size of the game, as before.

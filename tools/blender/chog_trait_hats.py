@@ -2049,7 +2049,7 @@ COSTUME = {
 }
 
 
-def add_trousers(maker, part, material, numbers):
+def add_trousers(maker, part, material, numbers, sides=12):
     """A leg of trousers over each leg, from the ankle up into the suit."""
     body = maker.body
     for side in (1.0, -1.0):
@@ -2059,13 +2059,13 @@ def add_trousers(maker, part, material, numbers):
         across = X * (body.LEG_HALF_WIDTH + numbers.TROUSERS)
         deep = Y * (body.LEG_HALF_DEPTH + numbers.TROUSERS)
         part.shell([(on_leg(0.03), across, deep), (on_leg(body.LEG_ENTERS_TORSO), across, deep),
-                    (on_leg(body.LEG_TOP), across * 0.9, deep * 0.9)], 12, material, numbers.OUTLINE_THICKNESS)
+                    (on_leg(body.LEG_TOP), across * 0.9, deep * 0.9)], sides, material, numbers.OUTLINE_THICKNESS)
     # The seat, between the legs and under the suit, so no skin shows there.
     height, half_tall, half_wide, half_deep = numbers.SEAT
     part.shell(base.ball_rings(Z * height, Z, X, half_tall, half_wide, half_deep, 5), 12, material, 0.0)
 
 
-def add_boots(maker, part, material, larger):
+def add_boots(maker, part, material, larger, sides=12):
     """A shell over each foot, the foot of the body made "larger", in the colour of the costume."""
     from mathutils import Matrix
     body = maker.body
@@ -2080,7 +2080,7 @@ def add_boots(maker, part, material, larger):
             top = height * tall
             rings.append((heel + ahead * length * along + Z * top * 0.42, across * width * 0.5 * wide, Z * top * 0.58))
         rings.append((heel + ahead * length + Z * height * 0.30, Vector(), Vector()))
-        points, _ = part.shell(rings, 12, material, 0.012)
+        points, _ = part.shell(rings, sides, material, 0.012)
         for point in points:
             point.co.z = max(point.co.z, 0.0)
 
@@ -2759,7 +2759,7 @@ ASTRO = {
     # leaves coming out of it: a sunflower. Now a round ring across the way the face looks, a shell behind it.)
     "RING_SIZE": 1.12,
     "RING_RADIUS": 0.046,
-    "RING_STATIONS": 28,
+    "RING_STATIONS": 18,
     # The helmet (22 October 2026, from the 24 pictures, which draw a round glass helmet round the whole head, the
     # crown and the face inside it, and none of the spikes outside): a shell over the back and the top of the head,
     # closed (sides, rows), in a glass material (drawn on a share of the pixels, with no outline of its own: the dark
@@ -2770,8 +2770,8 @@ ASTRO = {
     # DOME: points round it, rows from the ring up to the top. DOME_SIZE: how many times the head it is at the top
     # (the room the hair needs under it); it starts at the ring and is that large from DOME_FULL polar degrees
     # (from straight behind the face) up.
-    "DOME": (24, 6),
-    "DOME_SIZE": 1.32,
+    "DOME": (20, 5),
+    "DOME_SIZE": 1.20,
     "DOME_FULL": 55.0,
     # The ribbed unit at the side of the helmet, on the right of the character (the left of the pictures): where
     # (to the side, behind the middle of the head, height above its middle), then its stations (along, radius).
@@ -2803,12 +2803,17 @@ ASTRO = {
 def build_astro(maker):
     """The space suit of the pictures (22 October 2026): a white suit with long sleeves (grey stripes down them), a thick
     collar, the flag patch on the top of the right sleeve, a box on the chest, the ribbed hose from the helmet's unit
-    down to the chest, a pack on the back; and a round helmet: a thick ring round the face and a glass dome over the rest of the
-    head (a material drawn on a share of the pixels, with no outline), a ribbed unit at its right side. The face is open
-    in the ring, as the pictures draw it; the crown of the head is under the glass as short leaves, none comes through."""
+    down to the chest, a pack on the back, white legs and grey boots; and a round helmet: an opaque white shell over the whole
+    head, a thick ring round the face, a ribbed unit at its right side. The face is open in the ring, as the pictures draw it,
+    and through it show the face and the fringe of the Chog's hair; no leaf of the crown comes out of the helmet."""
     numbers = SimpleNamespace(**ASTRO)
     build_track(maker)
     torso, body = maker.parts[0][0], maker.body
+    # The legs and the feet of the suit (22 October 2026): until then the bare skin of the Chog (purple legs, pink feet) came out
+    # of a white space suit.
+    # (10 sides, not 12, and the ring below on 18 stations: the budget of 8,000 triangles.)
+    add_trousers(maker, torso, torso.named("Main"), SimpleNamespace(**COSTUME), sides=10)
+    add_boots(maker, torso, torso.named("Boot"), COSTUME["BOOTS"], sides=10)
     height, out_by, radius = numbers.COLLAR
     half_width, half_depth = KIT.torso_section(body, height)
     path, wide, thick = [], [], []
@@ -2897,7 +2902,7 @@ def build_astro(maker):
         wide.append(radial * numbers.RING_RADIUS)
         thick.append(looking * numbers.RING_RADIUS)
     slab(ring, path, wide, thick, ring.named("Ring"), numbers.OUTLINE_THICKNESS, sides=6)
-    # The glass: from the ring (tucked into its tube, as the shell was) to the top, widening smoothly to DOME_SIZE.
+    # The helmet shell: opaque white, from the ring (tucked into its tube) to the top, widening smoothly to DOME_SIZE.
     sides, rows = numbers.DOME
     angles = [2.0 * math.pi * index / sides for index in range(sides)]
 
@@ -2911,7 +2916,7 @@ def build_astro(maker):
         psi = 90.0 * (1.0 - row / rows)
         loops.append([on_shell(psi, angle, dome_scale(psi)) for angle in angles])
     loops[-1] = [on_shell(0.0, 0.0, dome_scale(0.0))]
-    KIT.add_loops(ring, loops, ring.named("Glass"), 0.0)
+    KIT.add_loops(ring, loops, ring.named("Helmet"), numbers.OUTLINE_THICKNESS)
     side, behind, up = numbers.VENT_AT
     start = surface.middle + Vector((side, behind, up))
     ring.shell(base.tube_rings(start, Vector((-1.0, 0.0, 0.0)), Y, numbers.VENT), 8, ring.named("Vent"),
@@ -3273,17 +3278,18 @@ CLOTHES.update({
     # glass is not drawn; the pictures show the crown inside it, so the crown stays.
     "Astro Suit": {"kind": "Astro", "colours": {"Main": (0.90, 0.88, 0.84), "Collar": (0.70, 0.70, 0.72),
                                                 "Stripe": (0.52, 0.56, 0.69), "Ring": (0.72, 0.73, 0.76),
-                                                "Glass": (0.80, 0.90, 0.98), "Vent": (0.64, 0.65, 0.70),
+                                                "Helmet": (0.95, 0.94, 0.93), "Boot": (0.66, 0.67, 0.74),
+                                                "Vent": (0.64, 0.65, 0.70),
                                                 "Panel": (0.52, 0.55, 0.70), "Hose": (0.34, 0.38, 0.50),
                                                 "FlagRed": (0.80, 0.14, 0.20), "FlagWhite": (0.96, 0.96, 0.97),
                                                 "FlagBlue": (0.16, 0.22, 0.58)},
                    "numbers": {"STEP": 0.076, "SLEEVE": LONG_SLEEVE},
-                   # The helmet's glass is drawn on a share of the pixels (light 3 of the library, "glass").
-                   "glass": ("Glass",),
-                   # The pictures draw the crown inside a round glass helmet, none outside it: the leaves stay,
-                   # short, under the glass (until 22 October 2026 the star came out of the ring like a sunflower,
-                   # then no leaf at all under an opaque shell).
-                   "head": {"LEAVES": ASTRO_CROWN, "LEAF_SIDES": 4, "SECTORS": (180,)},
+                   # (The helmet was a glass drawn on a share of the pixels until the evening of 22 October 2026: the owner,
+                   # "I don't understand why you put transparency and grain, it's useless, just make an astronaut costume".
+                   # The glass mode of the shader and of the renders stays, unused.) The pictures draw the hair of the Chog
+                   # (its colour, a zigzag edge) inside the ring, above the face, and nothing of it outside the helmet: no
+                   # crown, the fringe of the base stays.
+                   "head": {"LEAVES": NO_CROWN, "FRINGE": True},
                    "print_missing": "the glass over the face (the pictures draw none: the face is open in the ring)"},
     "Duck Float": {"kind": "DuckFloat", "colours": {"Duck": (0.93, 0.68, 0.20), "Beak": (0.92, 0.48, 0.12),
                                                     "Eye": (0.10, 0.07, 0.04)}},
