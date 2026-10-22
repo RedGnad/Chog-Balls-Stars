@@ -1534,3 +1534,14 @@ Sheet, 10 Genesis, the art beside the front and the three quarter close, before 
 Unlike the bare eyes of batches 4 and 5, these are objects worn over the eyes and the pictures draw them as a pair of equal pieces: no per-eye difference to add. Changed: the headsets (Classic and Modern VR) are taller,
 a rounded visor 0.072 high in the middle (0.064). Approximate, not changed: Modern VR's glossy rim and its curved glint are plainer than the art's; the 3D Glass lenses are a little larger and the frame a little thinner than the art's;
 the BTC coins are a little smaller than the art's; Thug is as drawn.
+
+### Batch 4: the remaining Side=Left values
+
+Sheet: [clothes-batch4-2026-10-22.jpg](../../research/evidence/clothes-batch4-2026-10-22.jpg) (#218, #641 Army Vest, #474, #556 Guko, #358, #1745 Gojo, #63, #217 BBC, #189, #229 Zero THOTS; the art, then before | after). 43 Genesis of the 24 values were built.
+
+- **Army Vest** (11): camouflage blotches over the olive plate and the small flag patch (red and white stripes, blue canton) on the chest; was plain olive.
+- **Guko** (9): the black spiky emblem of the vest; the blue undershirt sleeves and the belt are not drawn.
+- **Gojo** (4): the round button of the high collar (a disc).
+- **BBC** and **Zero THOTS** (9, 11): the words sit low on the shirt in the art and were too high: BBC 0.062 at 0.340, ZERO THOTS on one line, 0.040 at 0.345.
+- **Judged faithful, unchanged**: Glitch, Sky and Peach Hoodie, Blue Sleeveless, purple and dark vest, Toad pink and green suits (the eyes were set apart in lot 5), Pink and Cyan Shirt, Red 143 Jersey, Boner, the tanks, the holed jackets, Blue Mafia. The tee words (white and dark tee) stay undone: no way to tell which word goes on which Genesis.
+- **Checked**: `--budget`: largest #1742 7,996, none over 8,000. Not verified in Unity.
