@@ -1,0 +1,258 @@
+{
+ "about": "The submission banner (tools/blender/make_key_art.py, tools/release/compose_banner.py): blue team at the left, red at the right, charging and throwing their own attacks across the middle, each tower behind its team. Blender axes: x to the right, y away from the camera, z up; a hero is 1.15 high. facing: degrees about z, 0 faces the camera. The camera's focal is 1600 pixels across 1920: a point x units aside at a depth d lands 1600 x / d pixels from the middle.",
+ "size": [
+  1920,
+  1080
+ ],
+ "camera": {
+  "at": [
+   0.0,
+   -9.6,
+   1.05
+  ],
+  "look": [
+   0.0,
+   0.0,
+   0.78
+  ],
+  "lens": 30.0,
+  "roll": -2.5
+ },
+ "towers": [
+  {
+   "side": "Ours",
+   "at": [
+    -4.5,
+    8.4
+   ],
+   "facing": 22.0,
+   "scale": 0.85
+  },
+  {
+   "side": "Theirs",
+   "at": [
+    4.5,
+    8.4
+   ],
+   "facing": -22.0,
+   "scale": 0.85
+  }
+ ],
+ "heroes": [
+  {
+   "number": 91,
+   "team": "blue",
+   "at": [
+    -1.0,
+    2.4
+   ],
+   "facing": 64.0,
+   "pose": {
+    "run": 1.0,
+    "strike": 0.25
+   }
+  },
+  {
+   "number": 29,
+   "team": "red",
+   "at": [
+    1.05,
+    2.6
+   ],
+   "facing": -64.0,
+   "pose": {
+    "run": 1.0,
+    "strike": 0.25
+   }
+  },
+  {
+   "number": 77,
+   "team": "blue",
+   "at": [
+    -1.85,
+    -0.6
+   ],
+   "facing": 58.0,
+   "pose": {
+    "run": 1.0,
+    "strike": 0.25,
+    "left": [
+     0,
+     0,
+     -40
+    ]
+   }
+  },
+  {
+   "number": 27,
+   "team": "red",
+   "at": [
+    1.9,
+    -0.4
+   ],
+   "facing": -58.0,
+   "pose": {
+    "run": 1.0,
+    "strike": 0.25
+   }
+  },
+  {
+   "number": 42,
+   "team": "blue",
+   "at": [
+    -2.3,
+    -4.95
+   ],
+   "facing": 46.0,
+   "lift": 0.22,
+   "pose": {
+    "run": 1.0,
+    "strike": 0.25,
+    "body": [
+     10,
+     0,
+     0
+    ]
+   },
+   "scale": 1.1
+  },
+  {
+   "number": 215,
+   "team": "red",
+   "at": [
+    2.35,
+    -4.8
+   ],
+   "facing": -46.0,
+   "pose": {
+    "run": 1.0,
+    "strike": 0.25,
+    "body": [
+     8,
+     0,
+     0
+    ]
+   },
+   "scale": 1.1
+  }
+ ],
+ "objects": [
+  {
+   "kind": "Snowball",
+   "team": "blue",
+   "at": [
+    -0.3,
+    2.2,
+    1.55
+   ],
+   "from": [
+    -0.85,
+    2.35,
+    1.0
+   ],
+   "scale": 0.95
+  },
+  {
+   "kind": "RainbowBall",
+   "team": "red",
+   "at": [
+    0.35,
+    2.4,
+    1.5
+   ],
+   "from": [
+    0.9,
+    2.55,
+    1.0
+   ],
+   "turn": [
+    0,
+    30,
+    0
+   ],
+   "scale": 0.95
+  },
+  {
+   "kind": "StarYellow",
+   "team": "blue",
+   "at": [
+    -0.75,
+    -0.5,
+    1.2
+   ],
+   "from": [
+    -1.65,
+    -0.6,
+    0.95
+   ],
+   "turn": [
+    80,
+    0,
+    20
+   ],
+   "scale": 1.0,
+   "glow": true
+  },
+  {
+   "kind": "Spear",
+   "team": "red",
+   "at": [
+    0.8,
+    -0.4,
+    1.15
+   ],
+   "from": [
+    1.7,
+    -0.4,
+    0.95
+   ],
+   "turn": [
+    0,
+    0,
+    90
+   ],
+   "scale": 1.0
+  },
+  {
+   "kind": "Fireball",
+   "team": "blue",
+   "at": [
+    -0.6,
+    -3.9,
+    1.2
+   ],
+   "from": [
+    -2.0,
+    -4.85,
+    1.05
+   ],
+   "turn": [
+    0,
+    0,
+    -60
+   ],
+   "scale": 1.0,
+   "glow": true
+  },
+  {
+   "kind": "WaterDrop",
+   "team": "red",
+   "at": [
+    0.6,
+    -3.8,
+    1.15
+   ],
+   "from": [
+    2.05,
+    -4.7,
+    1.0
+   ],
+   "turn": [
+    0,
+    0,
+    60
+   ],
+   "scale": 1.0
+  }
+ ]
+}

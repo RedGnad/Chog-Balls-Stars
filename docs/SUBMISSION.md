@@ -8,10 +8,32 @@ submitting. Character counts are for the 8,000-character fields.
 ## 01 Basics
 
 - **Project name:** Chog Balls Stars (chosen by the owner on 22 October 2026, after Chog Arena, a name many projects share; Chog Genesis is the NFT collection)
-- **Banner:** to make from a capture of the menu with a hero in 3D, or of the heroes sheet
-  (`research/evidence/heroes-and-attack-objects-headless-2026-10-15.png`). Read on chogathon.chog.xyz
+- **Banner:** `research/evidence/banner-key-art-2026-10-23.jpg` (made on 23 October 2026 from the game's own 3D heroes, attack
+  objects and towers in Blender: `tools/blender/make_key_art.py`, `tools/release/compose_banner.py`). Read on chogathon.chog.xyz
   that day (its page's own styles): project cards show the image at 16:9 and another view at 16:7,
   both `object-fit: cover`; so 1920 by 1080 with what matters inside the middle 16:7 band.
+
+**Short description** (asked by the owner on 23 October 2026: every strength, concise and striking; a hook, five benefits with
+proof, one call to action; every line is what the game does today)
+
+> **Your Chog Genesis, alive in a 3v3 arena.**
+>
+> Connect your wallet and your NFT becomes a 3D hero built from its own traits. All 1,969 Genesis, each
+> one different.
+>
+> - **Your NFT is the character.** Its outfit gives its class, its eyes its special, its aura the effect,
+>   what it wears or holds its attack: fireballs from a Dragon suit, snowballs from a Russian Hat,
+>   spinning coins from a Dollar Cap.
+> - **Fast 3v3 on your phone.** Three-minute sieges or coin races in the browser, nothing to install;
+>   bots fill the empty seats.
+> - **Wins nobody can fake.** Our server replays every match from Photon's own record of the inputs
+>   before anything counts.
+> - **Real stakes on Monad.** Stake $CHOG on your team, rent or lend your Genesis, unlock its second
+>   form; part of every payment is burned.
+> - **Your Genesis builds a legacy.** Its career, badges and mastery are written on Monad and follow the
+>   NFT to its next holder.
+>
+> **Play now on your phone. No Genesis? Play a Recruit and find yours.**
 
 **Description**
 
@@ -65,7 +87,7 @@ submitting. Character counts are for the 8,000-character fields.
 
 ## 03 For judges
 
-- **GitHub repo:** `https://github.com/RedGnad/chogathon` (private today: **[not yet]** shared with
+- **GitHub repo:** `https://github.com/RedGnad/Chog-Balls-Stars` (renamed by the owner on 22 October 2026; private today: **[not yet]** shared with
   the organisers or made public).
 - **Judge access instructions (draft):**
 
@@ -129,6 +151,28 @@ submitting. Character counts are for the 8,000-character fields.
 
 > The special attacks in 3D; the ladder's seasons and matchmaking by rating in the game (both
 > already kept by the services); more items for a Genesis in the shop; tournaments staked in $CHOG.
+
+## 07 Go to market (asked by the owner on 23 October 2026: simple, highest return first, mobile, events)
+
+> **1. Start with the people who already own a hero.** 1,969 Chog Genesis holders: each one connects
+> and plays their own NFT, in 3D, with its traits as powers. We reach them where they already are,
+> the Chog and Monad communities on X and Discord, with a short clip of their own Genesis fighting.
+>
+> **2. Mobile, zero install.** A link opens the game in the phone's browser, held sideways; it can be
+> added to the home screen and opens full screen. Every post, reply or DM is a play button.
+>
+> **3. Loops already in the game.** A holder lends their Genesis with a free link (the friend plays
+> it, the career stays on the NFT) or rents it out for $CHOG. A player without a Genesis plays a
+> Recruit and sees what each Genesis would give them.
+>
+> **4. Events, the cheapest players to win (next).** Weekly community nights, holders against
+> holders in 3v3, with $CHOG pots on the stake contract and every result replayed by our judge;
+> hosted with Chog and Monad community accounts. The ladder's seasons bring players back.
+>
+> **5. Playing adds value to the NFT.** Careers, badges and mastery are written on Monad and follow
+> the Genesis to its next holder.
+>
+> **6. Cheap to run.** Free tiers today (Photon, Vercel, Render); paid ones only when players come.
 
 ## The 3-minute video (script)
 
