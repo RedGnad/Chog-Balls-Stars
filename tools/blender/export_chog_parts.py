@@ -478,19 +478,19 @@ def main():
 
     def attack_for(found, worn):
         """The piece a hero's basic attack throws and how it moves (see chog_attack_objects): what it holds in
-        its hand, else the rainbow it pukes, else its full costume, its hat, the bone of a skull, the spikes of
-        its crown (22 October 2026, the owner's order)."""
+        its hand, else its full costume, else the rainbow it pukes, else its hat, the bone of a skull, the
+        spikes of its crown (22 October 2026, the owner's order: a dragon that pukes a rainbow throws fire)."""
         held = attacks.ATTACK_OF_HELD.get(found.get("Accessory") or "")
         if held:
             part = by_key.get(("trait", "Accessory", found["Accessory"], found.get("Side", "Right")))
             if part:
                 return part[0], held[0]
-        if found.get("Mouth") == attacks.RAINBOW_MOUTH:
-            return attack_pieces[attacks.RAINBOW_THROWN[0]], attacks.RAINBOW_THROWN[1]
-        key, style = attacks.attack_of(found.get("Head"))
         costume = attacks.attack_of_costume(found.get("Head"), found.get("Body"))
         if costume:
             return attack_pieces[costume[0]], costume[1]
+        if found.get("Mouth") == attacks.RAINBOW_MOUTH:
+            return attack_pieces[attacks.RAINBOW_THROWN[0]], attacks.RAINBOW_THROWN[1]
+        key, style = attacks.attack_of(found.get("Head"))
         if bases.is_skull(found) and not found.get("Head"):
             key, style = "Bone", attacks.TUMBLE
         if key == "HAT":

@@ -90,8 +90,8 @@ ATTACK_OF_HELD = {
     "Fwog": (TUMBLE, "FWOGS"),
     "PEPE": (TUMBLE, "PEPES"),
 }
-# Then the rainbow it pukes (the trait "Mouth", 145 Genesis), before its costume, its hat or its crown (the owner,
-# the same day): the ball of rainbow the Rainbow Wig throws.
+# Then its full costume (ATTACK_OF_BODY), then the rainbow it pukes (the trait "Mouth", 145 Genesis), before its
+# hat or its crown (the owner, the same day: a dragon that pukes a rainbow throws fire): the Rainbow Wig's ball.
 RAINBOW_MOUTH = "Rainbow Puke"
 RAINBOW_THROWN = ("RainbowBall", TUMBLE)
 
@@ -113,10 +113,10 @@ def label_of(head_value, skull=False, body_value=None, held_value=None, mouth_va
     """The line under a hero: what it throws, and from which trait (in the order attack_for chooses)."""
     if held_value in ATTACK_OF_HELD:
         return "THROWS " + ATTACK_OF_HELD[held_value][1] + " FROM ITS HAND"
-    if mouth_value == RAINBOW_MOUTH:
-        return "THROWS " + WORDS[RAINBOW_THROWN[0]] + " FROM ITS MOUTH"
     if not head_value and body_value in ATTACK_OF_BODY:
         return "THROWS " + WORDS[ATTACK_OF_BODY[body_value][0]] + " FROM ITS " + body_value.upper()
+    if mouth_value == RAINBOW_MOUTH:
+        return "THROWS " + WORDS[RAINBOW_THROWN[0]] + " FROM ITS MOUTH"
     key, _ = attack_of(head_value)
     if not head_value:
         return "THROWS BONES" if skull else "THROWS THE SPIKES OF ITS CROWN"

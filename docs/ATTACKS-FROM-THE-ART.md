@@ -66,8 +66,8 @@ purple); the taped banana bounces off in bananas; the brain ends in a pink squel
 ## What it holds, then a rainbow (22 October 2026, decided by the owner)
 
 The order a hero's basic attack is chosen in (`export_chog_parts.attack_for`): what it holds in its hand
-(the trait "Accessory"), else the rainbow it pukes (Mouth "Rainbow Puke"), else its full costume, else its
-hat, else the bone of a skull or the spikes of its crown. A held thing is thrown as a hat is: the very part
+(the trait "Accessory"), else its full costume, else the rainbow it pukes (Mouth "Rainbow Puke"), else its
+hat, else the bone of a skull or the spikes of its crown (a dragon that pukes a rainbow throws fire). A held thing is thrown as a hat is: the very part
 the hero holds (`chog_trait_accessories`), its copy leaving the hand while the hand keeps it.
 
 | Held (Genesis) | Moves | What hits |
