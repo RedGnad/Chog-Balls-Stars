@@ -1203,3 +1203,23 @@ mouths, the art then before | after (front close, three quarter close, bust, her
   the same small dark oval under the ball as on #195 and #210.
 - **Checked**: 7 Genesis before | after; `--budget`: largest #630 7,991 (it wears the nose; +10 triangles), none over 8,000; library 1,970 Genesis, 0 failures.
   Not verified in Unity.
+
+## 23 October 2026: lot 7, the owner's review of the heroes (turning them on the hero stage)
+
+### 7.1 The Russian Hat (ushanka)
+
+Sheet: [costumes-ushanka-2026-10-23.jpg](../../research/evidence/costumes-ushanka-2026-10-23.jpg) (9 Genesis of both Sides, the art then before | after: front
+close, three quarter, side, hero stage).
+
+- **What the art draws** (67 Genesis, #39, #58, #90, #148, #166 on Side=Right, #34, #91, #137, #144 on Side=Left): a tall crown of fur, a cylinder
+  standing high above the head, its lower edge a thick wavy roll across the brow (the eyes just under it), with two big ear flaps hanging
+  beside the face to the jaw: fur on Side=Right, dark leather with two snaps on Side=Left, edged with fur. No teeth of hair under the fur.
+  The old hat was a low cap with a thin roll and flaps laid on the head.
+- **Changed** (`USHANKA`, `build_ushanka`): the crown is an oval cylinder 0.35 by 0.275 half wide, its lower edge following the new face (the
+  face top is 0.29 above the neck now: 0.292 at the front, higher at the sides, 0.17 behind), flaring from the head over 0.2 of its height as a
+  roll of fur (the lower three bands in `Fur`, 8 bumps), a barrel of 6 per cent, its top at 0.52 with a rounded dome 0.07 higher
+  (the old crown was 0.10 above the head); the flaps hang nearly upright beside the face (0.33 to 0.34 out) from 0.33 down to -0.075, with
+  their fur rim and snaps on Side=Left; the teeth of hair on the brow are off (`FRINGE`). The leaves under the rim (`USHANKA_RIM_ROW`) follow.
+- **Checked**: 9 Genesis before | after; `--budget`: largest #630 7,991, the hat heroes up to #608 7,932, none over 8,000; library 1,970 Genesis, 0 failures.
+  Not verified in Unity. The top of the hat is hidden by the frame of every picture of the art, so its height is estimated from the brow line to the top
+  of the frame (at least 0.7 of the face).

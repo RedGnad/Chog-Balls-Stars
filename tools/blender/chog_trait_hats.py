@@ -189,32 +189,40 @@ def paint_where(part, faces, rule):
 # dark leather flaps and two white snaps on each.
 # ---------------------------------------------------------------------------------------------
 USHANKA = {
-    "SIDES": 16,
-    # The roll of fur: polar degrees of its lower and upper edge, by degrees from the front, and
-    # how much larger than the head it is at its middle. Lower at the back, as a fur hat sits.
-    # (The front roll is kept over the brow and close to the head: the eyes lie just under it.)
-    "FUR_LOWER": ((0.0, 76.0), (90.0, 86.0), (180.0, 92.0)),
-    "FUR_UPPER": ((0.0, 52.0), (90.0, 58.0), (180.0, 60.0)),
-    "FUR_SIZE": ((0.0, 1.16), (90.0, 1.24), (180.0, 1.24)),
-    "FUR_WAVES": (9, 0.035),          # bumps of the fur around the head, how deep against its size
-    # The crown: how much larger than the head, how many rows from inside the fur to the top.
-    "CROWN_SIZE": 1.10,
-    "CROWN_ROWS": 3,
-    # An ear flap: degrees from the front, polar degrees where it starts (inside the fur) and ends,
-    # how far it stands off the head at its top and at its foot, half width, half thickness.
-    # (Until 15 October 2026: 66 degrees, 80 to 132, 1.10 to 1.20, 0.072 wide. The leaves of the sides
-    # hid the flaps, and they lay against the head: from the camera of the game no flap showed. On the
-    # pictures they hang beside the face down to the chin, wider than an eye, and splay out.)
-    "FLAP": (68.0, 74.0, 140.0, 1.14, 1.34, 0.098, 0.026),
-    # Where a flap is leather (the colour "Snap" is given: Side=Left), a rim of fur around it: how much
-    # wider and longer the rim is, and how far behind the leather it lies.
-    "FLAP_RIM": (0.020, 0.024, 0.012),
+    "SIDES": 24,
+    # (23 October 2026, the owner: "not tall enough and does not match". On the 67 pictures the fur crown stands high above the head,
+    # a tall cylinder of fur whose lower edge is a thick wavy roll across the brow, with the ear flaps hanging down beside the face
+    # to the jaw: fur flaps on Side=Right, dark leather flaps with snaps on Side=Left. Until then a low cap with a thin roll and short
+    # flaps laid on the head.)
+    # The crown is a tall oval cylinder, as it is worn: its lower edge by degrees from the front (height above the neck in the axes
+    # of the head: just over the brow, higher at the sides, low at the back), how far it flares from the head to the wall, the wall
+    # (half width, half depth, how far its middle stands behind the middle of the head), the height of the top of the wall, and how
+    # high its rounded top rises above that.
+    "LOW": ((0.0, 0.292), (60.0, 0.275), (110.0, 0.235), (180.0, 0.170)),
+    "FLARE": 0.20,
+    "BULGE": 0.06,        # the wall swells a little at its middle, as a fur crown does
+    "WALL": (0.350, 0.275, 0.035),
+    "TOP": 0.520,
+    "DOME": 0.070,
+    # The rows of the wall as shares of its height from the lower edge (the first, tucked on the head, the next ones the roll of fur),
+    # the shares at which the colour of the fur gives way to that of the crown (the first bands are fur), and the bumps of the fur round
+    # the lower edge (how many, how deep against the wall).
+    "ROWS": (0.0, 0.05, 0.11, 0.20, 0.55, 1.0),
+    "FUR_BANDS": 3,
+    "FUR_WAVES": (8, 0.030),
+    # An ear flap: how far out of the middle at its top, at its middle and at its foot (it hangs nearly upright beside the face), how
+    # far ahead of the middle of the head, its heights (top, then foot), half width at the top and at the foot, half thickness.
+    "FLAP": ((0.325, 0.340, 0.335, 0.325), -0.015, (0.330, 0.230, 0.120, 0.0, -0.075), (0.098, 0.090, 0.082, 0.072, 0.055), 0.030),
+    # Where a flap is leather (the colour "Snap" is given: Side=Left), a rim of fur behind it: how much wider and longer the rim is,
+    # and how far behind the leather it lies.
+    "FLAP_RIM": (0.020, 0.024, 0.014),
     "SNAPS": ((0.42, 0.015), (0.74, 0.015)),   # along the flap from its top, radius
     "OUTLINE_THICKNESS": 0.020,
     # The fur hat covers the head down to the brow and over the ears: no leaf comes out of it at the
-    # top. The pictures of Side=Right show spikes beside and behind it (Side=Left, framed on the face,
-    # none): the lowest pair of the star, behind the flaps, the pair of the back row and the leaf
+    # top, and the teeth of hair on the brow are under the fur. The pictures of Side=Right show spikes beside and behind it (Side=Left,
+    # framed on the face, none): the lowest pair of the star, behind the flaps, the pair of the back row and the leaf
     # straight back stay, brought out under the fur, which sits low: they point down more than under a cap.
+    "FRINGE": False,
     "LEAVES": (GONE, GONE, GONE, leaf(1.3, 128.0, 30.0, 0.45), GONE, leaf(1.3, 130.0, 45.0, 0.45),
                leaf(1.3, None, 120.0, 0.45)),
 }
@@ -225,60 +233,70 @@ def build_ushanka(maker):
     part, surface = maker.part(), maker.surface
     sides, outline = numbers.SIDES, numbers.OUTLINE_THICKNESS
     angles = [2.0 * math.pi * index / sides for index in range(sides)]
+    middle, half = surface.middle, surface.half
+    wall_wide, wall_deep, wall_back = numbers.WALL
+    waves, depth = numbers.FUR_WAVES
 
-    # The fur: four rows, both edges on the head, the two middle rows standing off it.
-    count, depth = numbers.FUR_WAVES
+    def head_radii(z):
+        reach = math.sqrt(max(1.0 - ((z - middle.z) / half.z) ** 2, 0.0))
+        return half.x * reach, half.y * reach
+
+    def point(angle, z, wide, deep, centre_y):
+        return Vector((math.cos(angle) * wide, centre_y + math.sin(angle) * deep, z))
+
+    # The crown: rows from the lower edge, tucked on the head, flaring out to the wall, up the wall, then a rounded top.
     loops = []
-    for row, (share_up, sized) in enumerate(((0.0, 0.0), (0.30, 1.0), (0.72, 1.0), (1.0, 0.0))):
+    for share in numbers.ROWS:
         loop = []
         for angle in angles:
-            front = from_front(angle)
-            low, high = math.radians(interpolate(numbers.FUR_LOWER, front)), math.radians(
-                interpolate(numbers.FUR_UPPER, front))
-            polar = low + (high - low) * share_up
-            size = 1.0 + (interpolate(numbers.FUR_SIZE, front) - 1.0) * sized
-            size *= 1.0 + depth * sized * math.cos(count * angle + row * math.pi)
-            loop.append(on_head(surface, angle, polar, size))
+            low = interpolate(numbers.LOW, from_front(angle))
+            z = low + (numbers.TOP - low) * share
+            head_wide, head_deep = head_radii(z)
+            grow = math.sin(0.5 * math.pi * min(1.0, share / numbers.FLARE))
+            barrel = 1.0 + numbers.BULGE * math.sin(math.pi * share) * grow
+            wide = (head_wide * 1.02 + (wall_wide - head_wide * 1.02) * grow) * barrel
+            deep = (head_deep * 1.02 + (wall_deep - head_deep * 1.02) * grow) * barrel
+            centre_y = wall_back * grow
+            if share < 0.5:
+                bump = 1.0 + depth * grow * math.cos(waves * angle)
+                wide, deep = wide * bump, deep * bump
+            loop.append(point(angle, z, wide, deep, centre_y))
         loops.append(loop)
-    none, whole = (0.0,) * sides, (1.0,) * sides
-    KIT.add_loops(part, loops, part.named("Fur"), outline, shares=[none, whole, whole, none])
+    for lift in (30.0, 60.0):
+        phi = math.radians(lift)
+        loops.append([point(angle, numbers.TOP + numbers.DOME * math.sin(phi), wall_wide * math.cos(phi), wall_deep * math.cos(phi),
+                            wall_back) for angle in angles])
+    loops.append([Vector((0.0, wall_back, numbers.TOP + numbers.DOME))])
+    shares = [(0.0,) * sides] + [(1.0,) * sides] * (len(loops) - 2) + [(1.0,)]
+    bands, _ = KIT.add_loops(part, loops, part.named("Crown"), outline, shares=shares)
+    for band in bands[:numbers.FUR_BANDS]:
+        part.paint(band, part.named("Fur"))
 
-    # The crown, from inside the fur to the top.
-    crown_rim = tuple((front, polar + 6.0) for front, polar in numbers.FUR_UPPER)
-    dome(part, surface, part.named("Crown"), sides, crown_rim, numbers.CROWN_ROWS, numbers.CROWN_SIZE, outline,
-         tuck=1.0)
-
-    # The flaps, beside the face.
-    degrees, start, end, size_top, size_foot, half_wide, half_thick = numbers.FLAP
+    # The flaps, hanging beside the face.
+    out_x, ahead, heights, widths, half_thick = numbers.FLAP
     colours = maker.entry["colours"]
+    leather = "Snap" in colours
     for side in (1.0, -1.0):
-        angle = math.radians(270.0 + side * degrees)
-        stations = 4
-        across = Vector((-math.sin(angle), math.cos(angle), 0.0))
-
         def flap(wider, longer, behind):
             path, wide, thick = [], [], []
-            for index in range(stations):
-                share = index / (stations - 1)
-                polar = math.radians(start + (end + longer - start) * share)
-                out = head_normal(surface, angle, polar)
-                path.append(on_head(surface, angle, polar, size_top + (size_foot - size_top) * share) - out * behind)
-                rounded = 1.0 if index < stations - 1 else 0.55
-                wide.append(across * (half_wide + wider) * rounded)
-                thick.append(out * half_thick)
+            last = len(heights) - 1
+            for index, (z, half_wide) in enumerate(zip(heights, widths)):
+                x = side * (out_x[min(index, len(out_x) - 1)] - behind)
+                foot = index + 1 if index == last else index
+                path.append(Vector((x, middle.y + ahead, z - (longer if index == last else 0.0))))
+                rounded = 1.0 if index < last else 0.55
+                wide.append(Y * (half_wide + wider) * rounded)
+                thick.append(X * side * half_thick)
             return path, wide, thick
 
         slab(part, *flap(0.0, 0.0, 0.0), part.named("Flap"), outline)
-        if "Snap" in colours:
+        if leather:
             wider, longer, behind = numbers.FLAP_RIM
-            slab(part, *flap(wider, math.degrees(longer / 0.3), behind), part.named("Fur"), outline)
-        if "Snap" in colours:
+            slab(part, *flap(wider, longer, behind), part.named("Fur"), outline)
             for along, radius in numbers.SNAPS:
-                polar = math.radians(start + (end - start) * along)
-                out = head_normal(surface, angle, polar)
-                centre = on_head(surface, angle, polar, size_top + (size_foot - size_top) * along) + out * (
-                    half_thick + 0.004)
-                disc_on(part, surface, centre, out, radius, part.named("Snap"))
+                index = min(len(heights) - 1, int(round(along * (len(heights) - 1))))
+                centre = Vector((side * (out_x[min(index, len(out_x) - 1)] + half_thick + 0.004), middle.y + ahead, heights[index]))
+                disc_on(part, surface, centre, X * side, radius, part.named("Snap"))
 
 
 # ---------------------------------------------------------------------------------------------
