@@ -56,12 +56,12 @@ namespace Chog.Editor
         }
 
         // Builds the enabled network scenes and returns the path of the written build report.
-        internal static string NetworkWebGL()
+        internal static string NetworkWebGL(bool clean = false)
         {
-            return BuildWebGL(EditorBuildSettings.scenes.Where(s => s.enabled && File.Exists(s.path)).Select(s => s.path).ToArray());
+            return BuildWebGL(EditorBuildSettings.scenes.Where(s => s.enabled && File.Exists(s.path)).Select(s => s.path).ToArray(), clean);
         }
 
-        private static string BuildWebGL(string[] scenes)
+        private static string BuildWebGL(string[] scenes, bool clean = false)
         {
             if (!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.WebGL, BuildTarget.WebGL))
                 throw new BuildFailedException("Install WebGL Build Support for this Unity editor.");
@@ -121,7 +121,7 @@ namespace Chog.Editor
                     scenes = scenes,
                     locationPathName = outputPath,
                     target = BuildTarget.WebGL,
-                    options = BuildOptions.None
+                    options = clean ? BuildOptions.CleanBuildCache : BuildOptions.None
                 });
             }
             finally

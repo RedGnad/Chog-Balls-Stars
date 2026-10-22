@@ -100,7 +100,10 @@ namespace Chog.Editor
             }
 
             // Step 3: build, unless the request only asked for a refresh.
-            var refreshOnly = File.ReadAllText(RequestPath).Trim() == "refresh";
+            var request = File.ReadAllText(RequestPath).Trim();
+            var refreshOnly = request == "refresh";
+            // "clean": the same build from an empty build cache (a stale IL2CPP output fails to link).
+            var clean = request == "clean";
             var imported = File.ReadAllText(ImportedPath);
             Finish();
             if (refreshOnly)
@@ -112,7 +115,7 @@ namespace Chog.Editor
             Write("building", "WebGL build started. " + imported, null);
             try
             {
-                var report = QualificationBuild.NetworkWebGL();
+                var report = QualificationBuild.NetworkWebGL(clean);
                 Write("succeeded", "WebGL build finished. " + imported, report);
             }
             catch (Exception exception)
