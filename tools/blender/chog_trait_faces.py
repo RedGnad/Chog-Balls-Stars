@@ -274,8 +274,10 @@ BASE_EYE = {**SIDE_EYE, "SIZE": (0.052, 0.050), "CUT": 0.36, "SLOPE": 0.10, "LID
 # "XD": a thick chevron on each eye, its point towards the nose: half width, half height, thickness.
 # (22 October 2026, batch 5, on #85, #180, #273, #342: the near chevron is large, 0.062 by 0.060 with thick strokes, 0.022; the far one a narrow one, 0.020 by 0.046.)
 XD = {"AT": (0.112, 0.004), "HALF": (0.040, 0.036), "THICKNESS": 0.016,
-      "EYES": {-1.0: {"AT": (0.122, 0.000), "HALF": (0.062, 0.058), "THICKNESS": 0.022},
-               1.0: {"AT": (0.106, 0.008), "HALF": (0.022, 0.046), "THICKNESS": 0.014}}}
+      # (The lower arm of the near chevron ended 0.058 under its middle, on the pink cheek, which read as a dark ringed dot on the cheek, seen by the owner on #85 and #273. The art has the whole
+      # chevron above the cheek: its middle now 0.018 above the middle of the face and its arms 0.048 high, so the lower arm ends at -0.030, the top of the cheek.)
+      "EYES": {-1.0: {"AT": (0.122, 0.018), "HALF": (0.062, 0.048), "THICKNESS": 0.022},
+               1.0: {"AT": (0.106, 0.022), "HALF": (0.022, 0.040), "THICKNESS": 0.014}}}
 
 # ---------------------------------------------------------------------------------------------
 # Eyes that are objects.
