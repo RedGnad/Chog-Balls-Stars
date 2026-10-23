@@ -1,5 +1,8 @@
 # État courant et décisions
 
+**23 October 2026, 00:42 UTC (lead: the home screen without the "3 v 3, bots fill the empty places" line; deployed).**
+- **The owner:** that line under PLAY is noise. Removed (`ChogHome`). Build `20261023T003644542Z-e33b909c978444faac8f4a64259d31cd`, stamp unchanged; judge fixtures agree.
+
 **23 October 2026, 00:25 UTC (lead: audit of the money path, stake and rental; fixes deployed).**
 - **Audit** (read-only, then each finding checked in the code before any change): nothing lets anyone steal, forge or double-pay, every stake stays refundable (`refundExpired`), the signatures bind chain, contract and match (no replay between v2 and v3), the permit and the stake succeed or fail together, the payouts lose nothing (fuzz tests), the rental pays by the second and stops on a sale. Found and fixed:
   - **A winner could lose the gain:** the contract gives every stake back to anyone an hour after the first stake while the match is still open, whatever the referee decided, and only a player's CLAIM brought the decision. The services now bring it themselves as soon as the match is judged (`wager.bring`, `settlementData`: settle with the Genesis players, or voidMatch), which also spares the winner the claim.

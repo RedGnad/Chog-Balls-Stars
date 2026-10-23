@@ -59,8 +59,6 @@ namespace Chog.Screens
         public static readonly Vector2 ModeMax = new Vector2(0.72f, 0.278f);
         public static readonly Vector2 PlayMin = new Vector2(0.735f, 0.105f);
         public static readonly Vector2 PlayMax = new Vector2(0.98f, 0.278f);
-        private static readonly Vector2 HintMin = new Vector2(0.735f, 0.052f);
-        private static readonly Vector2 HintMax = new Vector2(0.98f, 0.092f);
 
         private static readonly Color Lilac = ChogTheme.Hex("E9E4FF");
 
@@ -387,8 +385,6 @@ namespace Chog.Screens
             }
             if (party != null)
                 party.gameObject.SetActive(false);
-
-            ChogUi.Body("Hint", transform, HintMin, HintMax, 24f, TextAlignmentOptions.Center, Lilac).text = "3 v 3, bots fill the empty places";
         }
 
         private void Update()
