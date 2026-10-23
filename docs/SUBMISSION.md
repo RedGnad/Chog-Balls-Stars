@@ -17,7 +17,7 @@ submitting. Character counts are for the 8,000-character fields.
 brutal MOBA where the Chogs come alive, not "your Genesis is your hero", which every project says: a hook,
 the features grouped by what they give the player, one call to action. Checked that day against the code and the live
 services: rental up to 30 days, 10% burned; second form 100 $CHOG; 5% of lost stakes to the Genesis players; ladder
-Bronze to Star; seasons are off live and are not claimed)
+Bronze to Star; season 1 live since 23 October, 02:05 UTC, ending 6 November, nothing paid at its end)
 
 > **Bet $CHOG on a brutal 3v3 MOBA where the Chogs come alive.**
 >
