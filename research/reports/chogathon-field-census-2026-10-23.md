@@ -159,3 +159,41 @@ episode storyboard, Chog TV and the $CHOG accounting.
 **Coverage, said plainly (the owner, 10:20 UTC):** of 84 distinct projects, about 17 were looked at in depth, picked by
 how close they are to ours and by the names the owner gave. CHOG STUDIO was on our list since 00:30 and never opened.
 The grades of the projects looked at stand on evidence; a ranking of the whole field does not.
+
+## The whole field on the grid (23 October, 11:30 UTC, asked by the owner)
+
+All 87 distinct projects of the gallery (title and author), each graded on the anchored grid above. Every app was
+opened and photographed, every address an entry names was checked on Monad; the 13 not yet examined that reached
+the top on the first pass were then played or read in depth by two agents on the same grid (read-only, no wallet).
+Grades and evidence: `research/evidence/chogathon-grading-2026-10-23.json`. "First pass" rows were not played.
+
+| # | Project | N | F | R | C | E | Weighted | Basis |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | CHOG BALLS STARS | 4 | 4 | 4 | 4 | 4 | 4.00 | ours, self-graded |
+| 2 | Chogslist | 4 | 3 | 4 | 4 | 4 | 3.80 | examined in depth (gate pass) |
+| 3 | CHOG STUDIO | 4 | 3 | 4 | 4 | 4 | 3.80 | audited |
+| 4 | ChogSwipe | 4 | 4 | 3 | 4 | 4 | 3.80 | examined in depth (gate pass) |
+| 5 | Animr | 4 | 3 | 3 | 5 | 4 | 3.75 | audited |
+| 6 | Last Print | 4 | 3 | 3 | 4 | 4 | 3.60 | examined in depth (gate borderline) |
+| 7 | CHOG : ROOM ZERO | 3 | 4 | 3 | 4 | 4 | 3.50 | audited; NFT gate at risk |
+| 8 | Grand Theft Chog | 3 | 3 | 4 | 4 | 4 | 3.50 | audited, played through |
+| 9 | The Chog World | 4 | 3 | 4 | 3 | 3 | 3.50 | audited, not played |
+| 10 | ChogChoir | 4 | 3 | 3 | 3 | 4 | 3.45 | audited |
+| 11 | Chog Contracts | 4 | 3 | 3 | 4 | 3 | 3.45 | examined in depth (gate pass) |
+| 12 | CHOG-TWAIN | 4 | 2 | 3 | 4 | 4 | 3.40 | examined in depth (gate pass) |
+| 13 | Chug world | 4 | 2 | 3 | 4 | 4 | 3.40 | audited |
+| 14 | monorb | 3 | 4 | 3 | 4 | 3 | 3.35 | examined in depth (gate borderline) |
+| 15 | Chog Chaos League | 3 | 2 | 4 | 4 | 4 | 3.30 | first pass: live round 483 on screen |
+| 16 | Chog League | 3 | 3 | 3 | 4 | 4 | 3.30 | audited |
+| 17 | Chog Pet | 3 | 3 | 3 | 4 | 4 | 3.30 | examined in depth (gate borderline) |
+| 18 | Plumpy and the Purple Moon | 3 | 3 | 3 | 4 | 4 | 3.30 | first pass |
+| 19 | Soryn | 3 | 3 | 3 | 4 | 4 | 3.30 | first pass |
+| 20 | chog buddy | 4 | 2 | 3 | 4 | 3 | 3.25 | first pass |
+| 21 | Chogmog | 4 | 3 | 2 | 4 | 3 | 3.25 | examined in depth (gate borderline) |
+| 22 | ChogTales: The Daily Manga | 4 | 2 | 3 | 4 | 3 | 3.25 | audited |
+| 23 | Chogsticks | 4 | 1 | 3 | 4 | 4 | 3.20 | first pass |
+| 24 | Dybbo | 4 | 2 | 2 | 4 | 4 | 3.20 | audited |
+
+The other 63 are at 3.15 or less; 26 below 2.5 (tools without the NFT at their core, testnet only, dead links).
+monorb builds each Genesis in 3D from its traits (three guest spins, `chog.js`), on Monad testnet with a test
+collection. ChogPit's landing writes "412 raiders in pit" while its own data says 5.
