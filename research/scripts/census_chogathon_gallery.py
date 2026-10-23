@@ -45,7 +45,10 @@ def main():
     # The example projects written in the page, to tell them from real ones.
     seeds = re.findall(r'\{ t: "([^"]+)", d: "', html[html.find("const _projects = ["):html.find("const _starred")])
 
-    query = base.group(1) + "/rest/v1/projects?select=*&order=created_at.desc"
+    # The columns the page itself selects (23 October 2026): "select=*" includes banner_url, up to 6 MB of base64 a row, which
+    # passes Postgres' statement timeout (HTTP 500), as the page's own comment says.
+    columns = "id,user_id,title,description,app_link,author,tokens,status,created_at,video_url,tech_stack,gtm_plan"
+    query = base.group(1) + "/rest/v1/projects?select=" + columns + "&order=created_at.desc"
     read_status, body = fetch(query, {"apikey": key.group(1), "Authorization": "Bearer " + key.group(1), "Accept": "application/json"})
     rows = json.loads(body)
 
