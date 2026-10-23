@@ -1,5 +1,17 @@
 # État courant et décisions
 
+**23 October 2026, 00:25 UTC (lead: audit of the money path, stake and rental; fixes deployed).**
+- **Audit** (read-only, then each finding checked in the code before any change): nothing lets anyone steal, forge or double-pay, every stake stays refundable (`refundExpired`), the signatures bind chain, contract and match (no replay between v2 and v3), the permit and the stake succeed or fail together, the payouts lose nothing (fuzz tests), the rental pays by the second and stops on a sale. Found and fixed:
+  - **A winner could lose the gain:** the contract gives every stake back to anyone an hour after the first stake while the match is still open, whatever the referee decided, and only a player's CLAIM brought the decision. The services now bring it themselves as soon as the match is judged (`wager.bring`, `settlementData`: settle with the Genesis players, or voidMatch), which also spares the winner the claim.
+  - A signed stake someone else sent first now counts as made (the relayed copy reverts); relayed stakes are limited to one a wallet every 8 s and six at once (the sender's queue is shared).
+  - A wallet that cannot sign the permit, or whose signed stake the chain refuses, stakes with its two transactions instead.
+  - A staked match played with test options is called off, as it does not rank.
+  - "Your Genesis earns" no longer shows when a side had no stake (the contract then pays no share).
+  - Rental: a holder's claim no longer ends in a false failure while a rental runs (seen paid once less is waiting); END NOW is reached by a wallet that also rents one out; a choice of days that would pass 30 in all, counting the days paid, is off (it reverted on chain).
+  - Not changed: a first ticket can fix an absurd amount or a stake on the wrong team forces a void (no money lost); the start of a match is dated by the arrival of Photon's first webhook; the owner's admin wallet may stake while trying any Genesis.
+- **Deployed:** build `20261023T001503061Z-bc844e9ccbc340ffb58f59d4732cccd8`, stamp unchanged.
+- **Verified:** 136 service tests (the settle and void calldata, the relay throttle); 95 contract tests; screen typecheck 0 errors; judge fixtures agree. Not yet seen: a live staked match paid by the services.
+
 **23 October 2026, 00:12 UTC (lead: the 1:1 closer to their art; deployed).**
 - **The owner:** the 1:1 "not ambitious or accurate enough yet". Compared with their art (`try-ones-baseline.jpg`, `try-ones-baseline2.jpg`).
 - **Deployed:** build `20261023T000812982Z-78b0bd0674594ef0bbc89260d300f076`, stamp unchanged. Devil #1376: a small smile with one white fang (a gold-tooth grin until now), larger brighter horns with a white light along each. Skull #392 and zombie #494: big black sockets lit by an orange ember or a green light, no coloured ring. Zombie: pale fur and skin, the purple left to its shirt. Angel #1159: seven larger white feathers a wing, lit from within, a thicker glowing halo. Warrior #1290: a gold wing sweeping up and back from each side of the helm. Manga #1006: a warmer grey (the game's purple shading still tints it). Sheets `try-ones-try1.jpg`, `try-ones-try2.jpg`.

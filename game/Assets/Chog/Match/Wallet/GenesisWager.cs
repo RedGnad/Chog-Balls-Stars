@@ -406,20 +406,27 @@ namespace Chog.Match
                         StakeBySignature(player, ticket);
                         return;
                     }
-                    MonadTransactions.AllowPayment(player, Token, Address, ticket.amount, "the stake is",
-                        () => SetStep(WagerStep.Approving, WagerAction.Stake, ""),
-                        () =>
-                        {
-                            SetStep(WagerStep.Sending, WagerAction.Stake, "");
-                            MonadTransactions.Send(player, Address, StakeData(ticket.matchKey, ticket.team, ticket.amount, ticket.deadline, ticket.signature),
-                                StakeGasLimit, "the stake", () =>
-                                {
-                                    Remember(ticket.gameId, ticket.matchKey, ticket.team, ticket.amount);
-                                    Confirm(() => HasStaked, ReadMine, "the stake");
-                                }, Fail);
-                        }, Fail, Currency);
+                    StakeByTransactions(player, ticket);
                 }, Fail);
             }));
+        }
+
+        // The stake as two transactions of the wallet: let the contract take the amount, then stake (versions 1 and 2, and the way
+        // back for a wallet that cannot sign the permit of version 3).
+        private static void StakeByTransactions(string player, TicketAnswer ticket)
+        {
+            MonadTransactions.AllowPayment(player, Token, Address, ticket.amount, "the stake is",
+                () => SetStep(WagerStep.Approving, WagerAction.Stake, ""),
+                () =>
+                {
+                    SetStep(WagerStep.Sending, WagerAction.Stake, "");
+                    MonadTransactions.Send(player, Address, StakeData(ticket.matchKey, ticket.team, ticket.amount, ticket.deadline, ticket.signature),
+                        StakeGasLimit, "the stake", () =>
+                        {
+                            Remember(ticket.gameId, ticket.matchKey, ticket.team, ticket.amount);
+                            Confirm(() => HasStaked, ReadMine, "the stake");
+                        }, Fail);
+                }, Fail, Currency);
         }
 
         /// <summary>
@@ -549,7 +556,15 @@ namespace Chog.Match
                     var signature = (answer ?? "").Trim('"');
                     if (error != null || signature.Length != 132 || !signature.StartsWith("0x"))
                     {
-                        Fail(code, "the stake was not signed" + (error != null ? ": " + error : ""));
+                        // A wallet that cannot sign typed data (or signs it in a way the token cannot check) stakes with its two
+                        // transactions instead (the audit, 23 October 2026); a player who closed the window did not fail.
+                        if (code == MonadTransactions.UserRefused)
+                            Fail(code, "the stake was not signed");
+                        else
+                        {
+                            Debug.LogWarning("CHOG_WAGER the wallet did not sign the permit (" + error + "): staking with transactions");
+                            StakeByTransactions(player, ticket);
+                        }
                         return;
                     }
 
@@ -567,6 +582,15 @@ namespace Chog.Match
                     {
                         if (relayStatus != 200)
                         {
+                            // The chain refused the signed stake (a smart wallet's signature the token cannot read, a permit already
+                            // used): the wallet stakes with its transactions instead while the ticket still holds.
+                            var refusal = relayText ?? "";
+                            if (relayStatus == 409 && (refusal.Contains("\"refused_by_chain\"") || refusal.Contains("\"reverted\"")))
+                            {
+                                Debug.LogWarning("CHOG_WAGER the signed stake was refused (" + MessageOf(relayText, relayStatus) + "): staking with transactions");
+                                StakeByTransactions(player, ticket);
+                                return;
+                            }
                             Fail(0, "the stake was refused: " + MessageOf(relayText, relayStatus));
                             return;
                         }
@@ -966,7 +990,9 @@ namespace Chog.Match
         /// </summary>
         public static string EarnedAsGenesisPlayer()
         {
-            if (Version < 2 || Outcome != WagerOutcome.Won || s_genesisPlayers.Length == 0)
+            // Nothing when a side had no stake: the contract then gives every stake back and pays no Genesis share (the audit,
+            // 23 October 2026).
+            if (Version < 2 || Outcome != WagerOutcome.Won || s_genesisPlayers.Length == 0 || LastWinners == 0 || LastLosers == 0)
                 return "0";
             var mine = false;
             foreach (var player in s_genesisPlayers)

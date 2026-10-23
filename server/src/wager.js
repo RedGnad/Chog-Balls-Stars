@@ -89,12 +89,36 @@ const TOKEN_NAME = selector('name()');
 const TOKEN_NONCES = selector('nonces(address)');
 const TOKEN_DOMAIN_SEPARATOR = selector('DOMAIN_SEPARATOR()');
 const PERMIT_SECONDS = 600;
+const RELAY_GAP_MS = 8000;
+const RELAY_IN_FLIGHT = 6;
+const SETTLE_V1 = selector('settle(bytes32,uint8,bytes)');
+const SETTLE = selector('settle(bytes32,uint8,address[],bytes)');
+const VOID_MATCH = selector('voidMatch(bytes32,bytes)');
 const word = value => BigInt(value).toString(16).padStart(64, '0');
 const hexWord = text => text.replace(/^0x/, '').toLowerCase().padStart(64, '0');
 const STAKERS_OF = selector('stakersOf(bytes32)');
 
 const sameBook = (a, b) => a.length === b.length
   && a.every(one => b.some(other => other.address === one.address && other.team === one.team));
+
+/** Bytes as a contract reads them: their length, then the bytes filled up to whole words. */
+const bytesOf = hex => {
+  const digits = hex.replace(/^0x/, '').toLowerCase();
+  return word(digits.length / 2) + digits.padEnd(Math.ceil(digits.length / 64) * 64, '0');
+};
+
+/**
+ * The call that brings a decision to the contract (decision()): voidMatch for a match called off, else settle, with the wallets
+ * that played a Genesis from version 2 on ("withGenesis"). The same calldata the game builds (GenesisWager.SettleData, VoidData).
+ */
+export function settlementData(decided, withGenesis) {
+  const key = hexWord(decided.matchKey);
+  if (decided.void) return '0x' + VOID_MATCH + key + word(2 * 32) + bytesOf(decided.signature);
+  if (!withGenesis) return '0x' + SETTLE_V1 + key + word(decided.winnerTeam) + word(3 * 32) + bytesOf(decided.signature);
+  const players = decided.genesisPlayers ?? [];
+  return '0x' + SETTLE + key + word(decided.winnerTeam) + word(4 * 32) + word(4 * 32 + 32 * (1 + players.length))
+    + word(players.length) + players.map(hexWord).join('') + bytesOf(decided.signature);
+}
 
 /**
  * What one staker gains on top of their stake when their team wins: an equal share of what
@@ -317,6 +341,9 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     const calledOff = why => ({ matchKey, void: true, why, signature: referee.signVoid({ matchKey }) });
     const { verdict, tickets } = match;
     if (verdict.void) return calledOff(verdict.why ?? 'the match could not be judged');
+    // A match started with test options (a charged special for all, chosen Genesis bots) is not a match money is paid on, as it is
+    // not one that ranks (ranks.js); the audit, 23 October 2026.
+    if (verdict.testOptions === true) return calledOff('the match was played with test options');
     if (!tickets.lockedAt) return calledOff('the stakes were never locked');
     const { stakers } = await onChain(matchKey);
     if (!sameBook(tickets.book, stakers)) return calledOff('a stake was made after the stakes were locked');
@@ -388,10 +415,29 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
    * referee's key paying the gas. The contract checks both signatures; the sender refuses a transaction that would revert, so a
    * wrong request costs nothing.
    */
+  // One relayed stake a wallet every RELAY_GAP_MS, and at most RELAY_IN_FLIGHT at once: the sender's queue is shared with the
+  // careers, the rentals and the decisions, and each relay may wait for its receipt (the audit, 23 October 2026: free sessions
+  // could fill the queue and push real stakes past their ticket).
+  const lastRelayOf = new Map();
+  let relaysInFlight = 0;
+
   async function relay({ address, matchKey, team, amount, deadline, signature, permitDeadline, v, r, s }) {
     if (!contract) return { refused: 'no_wager' };
     if (!settings) await describe();
     if (!settings.version3 || !sender) return { refused: 'no_relay' };
+    const key = String(address).toLowerCase();
+    if (now() - (lastRelayOf.get(key) ?? -Infinity) < RELAY_GAP_MS) return { refused: 'too_soon' };
+    if (relaysInFlight >= RELAY_IN_FLIGHT) return { refused: 'relay_busy' };
+    lastRelayOf.set(key, now());
+    relaysInFlight += 1;
+    try {
+      return await relayed({ address, matchKey, team, amount, deadline, signature, permitDeadline, v, r, s });
+    } finally {
+      relaysInFlight -= 1;
+    }
+  }
+
+  async function relayed({ address, matchKey, team, amount, deadline, signature, permitDeadline, v, r, s }) {
     const hex32 = text => typeof text === 'string' && /^0x[0-9a-fA-F]{64}$/.test(text);
     if (!hex32(matchKey) || !hex32(r) || !hex32(s) || ![27, 28].includes(Number(v)) || ![0, 1].includes(Number(team))
       || !/^[1-9][0-9]*$/.test(String(amount)) || !Number.isInteger(Number(deadline)) || !Number.isInteger(Number(permitDeadline))
@@ -402,12 +448,42 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     const data = '0x' + STAKE_WITH_PERMIT + hexWord(address) + hexWord(matchKey) + word(team) + word(amount) + word(deadline)
       + word(10 * 32) + word(permitDeadline) + word(v) + hexWord(r) + hexWord(s)
       + word(65) + ticket.padEnd(192, '0');
+    // A stake already on the chain for this wallet and team is a stake made: someone sent the same signed stake first (anyone who saw
+    // it may, the contract checks the signatures, not the sender), and the relayed one then reverts (the audit, 23 October 2026).
+    const alreadyStaked = async () => {
+      try {
+        const { stakers } = await onChain(matchKey);
+        return stakers.some(staker => staker.address.toLowerCase() === address.toLowerCase() && staker.team === Number(team));
+      } catch {
+        return false;
+      }
+    };
     try {
       const sent = await sender.transact({ to: contract, data, purpose: `a stake of ${address} on ${matchKey}` });
-      return sent.ok === false ? { refused: 'reverted', hash: sent.hash } : { hash: sent.hash, done: sent.ok === true };
+      if (sent.ok === false) return (await alreadyStaked()) ? { hash: sent.hash, done: true, already: true } : { refused: 'reverted', hash: sent.hash };
+      return { hash: sent.hash, done: sent.ok === true };
     } catch (error) {
+      if (await alreadyStaked()) return { hash: null, done: true, already: true };
       return { refused: 'refused_by_chain', message: String(error.message).slice(0, 200) };
     }
+  }
+
+  /**
+   * Brings the decision of a judged match to the contract with the services' sender (23 October 2026, the audit of the money path:
+   * the contract gives every stake back to anyone who asks an hour after the first stake while the match is still open, whatever
+   * the referee decided, so a winner who had not claimed within the hour lost the gain). Sent as soon as the match is decided,
+   * which also spares a winner the claim. Nothing when no stake is open; a decision already brought by a player is not sent again.
+   */
+  async function bring(gameId) {
+    if (!contract || !sender) return { brought: false, reason: 'no_sender' };
+    const decided = await decision(gameId);
+    if (!decided || decided.pending) return { brought: false, reason: decided ? 'pending' : 'unknown' };
+    const stakes = await onChain(decided.matchKey);
+    if (stakes.state !== 'open') return { brought: false, reason: stakes.state };
+    if (!settings) await describe();
+    const data = settlementData(decided, settings.genesisShare !== null);
+    const sent = await sender.transact({ to: contract, data, purpose: `the payment of ${decided.matchKey}` });
+    return { brought: sent.ok !== false, hash: sent.hash ?? null };
   }
 
   async function outcome(gameId) {
@@ -422,5 +498,5 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     return { lost: true, matchKey, stakes, refundAfterSeconds: REFUND_AFTER_SECONDS };
   }
 
-  return { describe, onChain, ticket, lock, mine, decision, outcome, weekOf, permit, relay, address: contract };
+  return { describe, onChain, ticket, lock, mine, decision, outcome, weekOf, permit, relay, bring, address: contract };
 }

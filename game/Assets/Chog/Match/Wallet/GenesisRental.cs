@@ -363,6 +363,14 @@ namespace Chog.Match
         /// <summary>Whether the connected wallet has $CHOG to take out: earned as a holder or owed back as a renter.</summary>
         public static bool HasMoneyToClaim => AccountRead() && (EarnedWei != "0" || OwedBackWei != "0");
 
+        // What the wallet may take out, earned and owed back together, in the smallest unit.
+        private static System.Numerics.BigInteger ClaimableTotal()
+        {
+            System.Numerics.BigInteger.TryParse(EarnedWei, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var earned);
+            System.Numerics.BigInteger.TryParse(OwedBackWei, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var owed);
+            return earned + owed;
+        }
+
         private static bool AccountRead() => s_accountOf.Length == 42 && s_accountOf == PlayerWallet.Address;
 
         /// <summary>Whether the connected wallet rents this Genesis at this moment, as far as the game has read.</summary>
@@ -372,6 +380,18 @@ namespace Chog.Match
         }
 
         /// <summary>The second, since 1970, the connected wallet's rental of a Genesis ends; 0 when it rents nothing.</summary>
+        /// <summary>
+        /// How many days the connected wallet may still rent a Genesis for: the contract refuses a rental that would end more than
+        /// MaxDays from now, counting the days already paid (23 October 2026, the audit: "ADD 7" with 25 days left reverted, gas paid).
+        /// </summary>
+        public static int DaysLeftToAdd(int tokenId)
+        {
+            var until = RentedUntilSeconds(tokenId);
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var paidDays = until > now ? (int)Math.Ceiling((until - now) / 86400.0) : 0;
+            return Math.Max(0, MaxDays - paidDays);
+        }
+
         public static long RentedUntilSeconds(int tokenId)
         {
             return IsRenting(tokenId) ? RentedUntil[tokenId] : 0;
@@ -522,12 +542,15 @@ namespace Chog.Match
 
             var who = PlayerWallet.Address;
             var tokens = s_toSettle;
+            // Seen paid once less is waiting than before: a running rental out keeps earning by the second, so "nothing left" may
+            // never come (23 October 2026, the audit: every claim of a holder with a running rental ended in a false failure).
+            var before = ClaimableTotal();
             SetStep(RentalStep.Switching, RentalAction.Claim, 0, "");
             MonadTransactions.SwitchToMonad(() =>
             {
                 SetStep(RentalStep.Sending, RentalAction.Claim, 0, "");
                 MonadTransactions.Send(who, Address, ClaimData(tokens), ClaimGasLimit + ClaimGasPerGenesis * tokens.Length, "taking the $CHOG out",
-                    () => Confirm(0, () => !HasMoneyToClaim, ReadAccount, "taking the $CHOG out"), Fail);
+                    () => Confirm(0, () => ClaimableTotal() < before, ReadAccount, "taking the $CHOG out"), Fail);
             }, Fail);
         }
 
@@ -590,7 +613,7 @@ namespace Chog.Match
         /// </summary>
         public static void Rent(int tokenId, int days)
         {
-            if (!CanStart(tokenId) || days <= 0 || days > MaxDays || !TryGetOffer(tokenId, out var offer))
+            if (!CanStart(tokenId) || days <= 0 || days > DaysLeftToAdd(tokenId) || !TryGetOffer(tokenId, out var offer))
                 return;
 
             var renter = PlayerWallet.Address;

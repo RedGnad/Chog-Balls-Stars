@@ -255,6 +255,12 @@ async function judgeAndRecord(gameId) {
   }
   const match = await matches.get(gameId);
   // How far the record went and how long it took, so that a void match or a slow verdict can be explained from outside.
+  // The stakes of the match are paid (or given back) at once, by the services: see wager.bring.
+  if (wager?.bring) {
+    wager.bring(gameId)
+      .then(result => { if (result.brought || result.hash) console.log(`Stakes of ${gameId}: ${result.brought ? 'brought ' + result.hash : 'not brought (' + (result.reason ?? 'reverted') + ')'}`); })
+      .catch(error => console.warn(`Stakes of ${gameId} not brought: ${error.message}`));
+  }
   const summary = {
     gameId, judged: true, void: Boolean(verdict.void), why: verdict.why ?? null, winnerTeam: verdict.winnerTeam ?? null, players: verdict.players ?? null,
     mode: verdict.mode ?? null, scores: verdict.scores ?? null,
@@ -295,6 +301,9 @@ if (rental.address && sender) {
   }, 60000).unref();
 }
 
+// The sender brings the stakes players sign once (version 3) and the decisions of judged matches (bring); it is on mainnet, where
+// the wager is when not on the testnet.
+const wager = createWager({ chain: wagerChain, referee, matches, network: wagerPlace, store: matchStore, price, sender: wagerPlace.test ? undefined : sender });
 const api = createApi({
   publicOrigin,
   chain,
@@ -319,8 +328,7 @@ const api = createApi({
   }),
   build,
   photonAuthentication: environment.PHOTON_AUTH === '1',
-  // The sender brings the stakes players sign once (version 3); it is on mainnet, where the wager is when not on the testnet.
-  wager: createWager({ chain: wagerChain, referee, matches, network: wagerPlace, store: matchStore, price, sender: wagerPlace.test ? undefined : sender }),
+  wager,
   price,
   ledger,
   reownProjectId: await reownProjectId(dataFolder, environment.REOWN_PROJECT_ID),

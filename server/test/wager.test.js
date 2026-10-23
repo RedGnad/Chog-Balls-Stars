@@ -416,6 +416,31 @@ test('a stake signed once is brought by the services with the referee key, its c
   assert.equal(BigInt('0x' + words[5]), 320n, 'the ticket after the ten head words');
   assert.equal(BigInt('0x' + words[10]), 65n, 'a 65 byte ticket');
   assert.equal(words.length, 14);
-  assert.equal((await wager.relay({ address: player, matchKey: 'nope' })).refused, 'bad_request');
+  assert.equal((await wager.relay({ ...request })).refused, 'too_soon', 'one relayed stake a wallet every few seconds');
+  assert.equal((await wager.relay({ address: '0x' + 'ef'.repeat(20), matchKey: 'nope' })).refused, 'bad_request');
   assert.equal(sent.length, 1);
+});
+
+test('a decided match is brought to the contract by the services, settle or void encoded as the contract reads them', async () => {
+  const { settlementData } = await import('../src/wager.js');
+  const matchKey = '0x' + '01'.repeat(32);
+  const signature = '0x' + 'cd'.repeat(65);
+  const player = '0x' + 'ab'.repeat(20);
+  const settle = settlementData({ matchKey, winnerTeam: 1, genesisPlayers: [player], signature }, true);
+  assert.equal(settle.slice(0, 10), '0x061ab97d', 'settle(bytes32,uint8,address[],bytes)');
+  const words = settle.slice(10).match(/.{64}/g);
+  assert.equal(words[0], '01'.repeat(32));
+  assert.equal(BigInt('0x' + words[1]), 1n);
+  assert.equal(BigInt('0x' + words[2]), 128n, 'the list after the four head words');
+  assert.equal(BigInt('0x' + words[3]), 192n, 'the signature after the list of one');
+  assert.equal(BigInt('0x' + words[4]), 1n);
+  assert.equal(words[5], '0'.repeat(24) + 'ab'.repeat(20));
+  assert.equal(BigInt('0x' + words[6]), 65n);
+  assert.equal(words.length, 10, 'the 65 bytes in three words');
+  const called = settlementData({ matchKey, void: true, signature }, true);
+  assert.equal(called.slice(0, 10), '0xe3c01265', 'voidMatch(bytes32,bytes)');
+  const voidWords = called.slice(10).match(/.{64}/g);
+  assert.equal(BigInt('0x' + voidWords[1]), 64n);
+  assert.equal(BigInt('0x' + voidWords[2]), 65n);
+  assert.equal(voidWords.length, 6);
 });
