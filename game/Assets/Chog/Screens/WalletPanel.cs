@@ -300,7 +300,7 @@ namespace Chog.Screens
             ChogTheme.AsTitle(_title);
             _address = Text("Address", new Vector2(0.075f, 0.36f), new Vector2(0.56f, 0.43f), TextAlignmentOptions.Left,
                 ChogTheme.Purple, 22f);
-            _message = Text("Message", new Vector2(0.075f, 0.30f), new Vector2(0.56f, 0.60f), TextAlignmentOptions.TopLeft,
+            _message = Text("Message", new Vector2(0.075f, 0.08f), new Vector2(0.56f, 0.60f), TextAlignmentOptions.TopLeft,
                 ChogTheme.Muted, 25f);
 
             _connect = MakeButton("Connect", ConnectMin, ConnectMax, out _connectLabel, kind: ChogTheme.ButtonKind.Secondary);
@@ -508,6 +508,8 @@ namespace Chog.Screens
             _title.text = checkingPass ? "ONE MOMENT" : state == WalletState.Ready ? "NO GENESIS HERE" : "PLAY YOUR GENESIS";
             _address.text = PlayerWallet.ShortAddress(PlayerWallet.Address);
             _message.text = playing ? "" : checkingPass ? "Checking your invitation..." : PassProblem() + MessageFor(state);
+            // The lines of a visitor without a wallet carry their own colours; the others stay muted.
+            _message.color = state == WalletState.Disconnected && !checkingPass ? Color.white : ChogTheme.Muted;
             // On a phone browser without a wallet, the same button reopens the game where one is.
             var canOpen = PlayerWallet.CanOpenInWalletBrowser;
             _connectLabel.text = canOpen ? "OPEN IN METAMASK" : state == WalletState.Failed ? "TRY AGAIN" : "CONNECT WALLET";
@@ -607,6 +609,8 @@ namespace Chog.Screens
                 var footer = _connect.gameObject.activeSelf || _otherApp.gameObject.activeSelf ||
                     _market.gameObject.activeSelf || _signIn.gameObject.activeSelf;
                 _poster.anchorMin = new Vector2(0.01f, footer ? 0.18f : 0.01f);
+                // The card's words take the room the wallet buttons leave.
+                _message.rectTransform.anchorMin = new Vector2(0.075f, footer ? 0.20f : 0.08f);
             }
             // The signature is asked by itself whenever this wallet has no session: right after
             // connecting, after a rental, after a switch of account; for a wallet without a Genesis too
@@ -722,7 +726,12 @@ namespace Chog.Screens
                 case WalletState.NoProvider:
                     return "Open this page in MetaMask, Rabby or Backpack to play a Genesis you hold.";
                 case WalletState.Disconnected:
-                    return "Connect the wallet that owns your Chog Genesis.";
+                    // What a Genesis gets here, the bet first, then the one way in: the wallet button at the top right
+                    // (23 October 2026: this card said one line in a large empty panel, and the bet appeared nowhere).
+                    return "<color=#FDF7D3>Your Chog in 3D: its traits are its powers.\n" +
+                           "Bet $CHOG on your team, paid by a contract.\n" +
+                           "Its career is written on Monad.</color>\n\n" +
+                           "<color=#FFE27A>CONNECT at the top right to play yours.</color>";
                 case WalletState.Connecting:
                     return PlayerWallet.ThroughApp ? "Pick your wallet app and approve there, then come back here..."
                         : "Answer in your wallet...";

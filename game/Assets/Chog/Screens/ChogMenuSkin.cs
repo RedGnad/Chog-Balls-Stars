@@ -93,6 +93,76 @@ namespace Chog.Screens
             foreach (var text in root.GetComponentsInChildren<Text>(true))
                 if (!IsOurs(text.transform) && text.GetComponentInParent<InputField>(true) == null)
                     ChogTheme.AsTitle(text);
+
+            DressParty(root);
+        }
+
+        // FRIENDS opens the sample's party menu: create a private room, or join one with its code. It was the one
+        // screen left in the sample's blue, with the region and build name of its developers in its header
+        // (23 October 2026, the product walk). Same parts and same behaviour, in the look of our cards, with words a
+        // player reads at once.
+        private static void DressParty(Transform root)
+        {
+            Transform party = null;
+            foreach (var part in root.GetComponentsInChildren<Transform>(true))
+                if (part.name.Contains("ViewPartyMenu"))
+                    party = part;
+            if (party == null)
+                return;
+            var header = party.Find("MenuHeader");
+            if (header != null)
+            {
+                if (header.Find("Background") is Transform bar && bar.GetComponent<Image>() is Image fill)
+                {
+                    fill.sprite = ChogSprites.Rounded(12, 3, ChogTheme.Ink, ChogTheme.Card);
+                    fill.type = Image.Type.Sliced;
+                    fill.color = Color.white;
+                }
+                header.Find("VersionLabel")?.gameObject.SetActive(false);
+                Words(header.Find("HeaderLabel"), "PLAY WITH FRIENDS", ChogTheme.Cream);
+            }
+            PartyCard(party.Find("MenuCards/CreateCard"), "CREATE A ROOM", "Start a private match, then share its code with your friends.");
+            PartyCard(party.Find("MenuCards/JoinCard"), "JOIN A ROOM", "Type the code a friend gave you.");
+        }
+
+        private static void PartyCard(Transform card, string heading, string words)
+        {
+            if (card == null)
+                return;
+            ChogTheme.AsCard(card.Find("Background")?.GetComponent<Image>(), raised: true);
+            var title = card.Find("CardHeader") as RectTransform;
+            if (title != null)
+                title.sizeDelta = new Vector2(560f, Mathf.Max(title.sizeDelta.y, 56f));
+            Words(title, heading, ChogTheme.Hex("FFE27A"));
+            var text = card.Find("CardText") as RectTransform;
+            if (text != null)
+                text.sizeDelta = new Vector2(text.sizeDelta.x, Mathf.Max(text.sizeDelta.y, 64f));
+            Words(text, words, ChogTheme.Text);
+            if (card.Find("CodeInputButton/Background")?.GetComponent<Image>() is Image field)
+            {
+                field.sprite = ChogSprites.Rounded(14, 3, ChogTheme.PurpleSoft, ChogTheme.Night);
+                field.type = Image.Type.Sliced;
+                field.color = Color.white;
+            }
+        }
+
+        // The words of a text of the sample, whichever kind of text it is.
+        private static void Words(Transform part, string words, Color colour)
+        {
+            if (part == null)
+                return;
+            if (part.GetComponent<TMP_Text>() is TMP_Text text)
+            {
+                text.text = words;
+                text.color = colour;
+                text.textWrappingMode = TextWrappingModes.Normal;
+            }
+            else if (part.GetComponent<Text>() is Text legacy)
+            {
+                legacy.text = words;
+                legacy.color = colour;
+                legacy.horizontalOverflow = HorizontalWrapMode.Wrap;
+            }
         }
 
         // Opaque images that cover nearly all of "area": made transparent, so what is behind shows.

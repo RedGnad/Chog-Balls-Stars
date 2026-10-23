@@ -69,6 +69,7 @@ namespace Chog.Screens
         private GameObject _usernameView;
 
         private ChogHeroStage _stage;
+        private GameObject _betTag;
         private TextMeshProUGUI _ribbonName;
         private TextMeshProUGUI[] _chips;
 
@@ -382,6 +383,22 @@ namespace Chog.Screens
                     area.offsetMin = new Vector2(12f, 8f);
                     area.offsetMax = new Vector2(-12f, -4f);
                 }
+
+                // The game's promise on the button everyone looks at: a match can be played for $CHOG (23 October
+                // 2026, the product walk: the bet appeared nowhere before the preparation screen). A tag over the
+                // corner of PLAY, tilted like a sticker; shown only to a connected wallet while the services take
+                // stakes (Update), as a visitor without a wallet cannot stake.
+                if (play.transform.Find("ChogBetTag") == null)
+                {
+                    var tag = ChogUi.Plate("ChogBetTag", play.transform, new Vector2(0.40f, 0.80f), new Vector2(0.99f, 1.10f), ChogTheme.Cheek, 14);
+                    tag.rectTransform.localRotation = Quaternion.Euler(0f, 0f, 4f);
+                    ChogUi.Icon("Coin", tag.transform, ChogIcons.Icon.Coin, new Vector2(0.03f, 0.12f), new Vector2(0.23f, 0.88f)).raycastTarget = false;
+                    var words = ChogUi.Title("Words", tag.transform, new Vector2(0.22f, 0.06f), new Vector2(0.97f, 0.94f), 30f);
+                    words.text = "BET $CHOG";
+                    words.raycastTarget = false;
+                    _betTag = tag.gameObject;
+                    _betTag.SetActive(false);
+                }
             }
             if (party != null)
                 party.gameObject.SetActive(false);
@@ -389,6 +406,14 @@ namespace Chog.Screens
 
         private void Update()
         {
+            if (_betTag != null)
+            {
+                // "?bettag=1" on a page of this computer shows it without a wager, to look at its design.
+                var canBet = PlayerWallet.State == WalletState.Ready && GenesisWager.State == WagerState.Open
+                             || LocalGenesis.TestFlag(Application.absoluteURL, Application.isEditor, "bettag");
+                if (_betTag.activeSelf != canBet)
+                    _betTag.SetActive(canBet);
+            }
             if (_stage == null)
                 return;
             var played = WalletPanel.PlayedMetadataId;

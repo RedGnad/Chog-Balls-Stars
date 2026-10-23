@@ -134,11 +134,13 @@ namespace Chog.Screens
             var name = ChogUi.Title("Label", button.transform, new Vector2(0.06f, 0.24f), new Vector2(0.94f, 0.58f), 50f);
             var hint = ChogUi.Number("Hint", button.transform, new Vector2(0.06f, 0.08f), new Vector2(0.94f, 0.25f), 20f,
                 TextAlignmentOptions.Center, ChogTheme.Hex("D9D2FF"), false);
-            hint.text = "TAP TO CHANGE";
 
             void Show()
             {
                 name.text = LabelOf(Chosen);
+                // Whether the mode counts for the ladder, said before the match (23 October 2026: a coins match ended
+                // on "CASUAL MATCH" with no warning).
+                hint.text = (Chosen == EMatchMode.Siege ? "RANKED" : "CASUAL") + "  |  TAP TO CHANGE";
                 icon.sprite = ChogIcons.Get(IconOf(Chosen));
             }
             Show();
