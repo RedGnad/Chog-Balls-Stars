@@ -899,6 +899,11 @@ namespace Chog.Match
         private static void Fail(int code, string problem)
         {
             Debug.LogWarning("CHOG_WAGER stopped (" + code + "): " + problem);
+            // A stake that stopped gives its ticket back, so the stakes lock at once instead of waiting for its deadline (the
+            // services refuse it when the stake reached the chain after all).
+            if (Doing == WagerAction.Stake && !HasStaked && !string.IsNullOrEmpty(PlayerWallet.Session))
+                PlayerWallet.Run(GameServices.Call("wager/release", "{}", PlayerWallet.Session, (status, text) =>
+                    Debug.Log("CHOG_WAGER ticket given back: " + status)));
             // A player who closes the wallet did not fail at anything.
             if (code == MonadTransactions.UserRefused)
                 SetStep(WagerStep.Idle, WagerAction.None, "");

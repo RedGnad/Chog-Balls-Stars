@@ -20,6 +20,7 @@ const WAGER_REFUSALS = {
   refused_by_chain: 'the chain refused the stake',
   genesis_required: 'stakes are for Genesis players: play a Genesis you hold, rent or were lent',
   siege_only: 'stakes are for sieges',
+  already_staked: 'this wallet already staked on this match',
   too_soon: 'a stake of this wallet was just sent: wait a few seconds',
   relay_busy: 'too many stakes are being sent: try again in a moment',
   bad_team: 'team must be 0 or 1',
@@ -408,6 +409,15 @@ export function createApi({ chain, sessions, careers, ranks, seasons, rankStorag
     },
 
     // Locks the stakes of the match the signed-in wallet staked on, before the match begins.
+    // A ticket the wallet did not use (its stake was refused or failed), given back so the stakes lock at once.
+    'POST /api/wager/release': async request => {
+      const address = await signedIn(request);
+      if (!address) return failure(401, 'not_signed_in', 'sign in with the wallet first');
+      const released = wager ? await wager.release({ address }) : { refused: 'no_wager' };
+      if (released.refused) return failure(409, released.refused, WAGER_REFUSALS[released.refused] ?? 'refused');
+      return json(200, released);
+    },
+
     'POST /api/wager/lock': async request => {
       const address = await signedIn(request);
       if (!address) return failure(401, 'not_signed_in', 'sign in with the wallet first');

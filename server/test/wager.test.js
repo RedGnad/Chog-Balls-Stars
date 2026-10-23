@@ -498,3 +498,18 @@ test('a staked match left an hour without a result is given back by the services
   assert.equal(given[0].did, 'refund');
   assert.equal(sent[0], '0x' + selector('refundExpired(bytes32)') + key.slice(2));
 });
+
+test('a ticket given back after a refused signature lets the stakes lock at once and frees the amount', async () => {
+  const { api, matches, state } = services();
+  await matchOfTwo(matches);
+  const alice = await sessionOf(api, ALICE);
+  const bob = await sessionOf(api, BOB);
+  await call(api, 'POST', '/api/wager/ticket', alice, { team: 0, amount: AMOUNT });
+  const waiting = (await call(api, 'POST', '/api/wager/lock', bob)).body;
+  assert.equal(waiting.locked, false, 'Alice holds a ticket she may still use');
+  assert.equal((await call(api, 'POST', '/api/wager/release', alice)).body.released, true);
+  const dearer = await call(api, 'POST', '/api/wager/ticket', bob, { team: 1, amount: (50n * 10n ** 18n).toString() });
+  assert.equal(dearer.status, 200, 'nobody staked: the amount is free again');
+  state.stakes.set(matchKeyOf('game'), [{ address: BOB.address, team: 1 }]);
+  assert.equal((await call(api, 'POST', '/api/wager/release', bob)).body.error, 'already_staked', 'a used ticket stays');
+});

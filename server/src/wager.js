@@ -256,6 +256,15 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
    * waitSeconds} while a ticket is still out. Any wallet let into the match may ask, staker or
    * not: locking early only closes the stakes, and a lock that comes late calls the match off.
    */
+  /** Gives back this wallet's unused ticket of the match it is in (matches.release). */
+  async function release({ address }) {
+    if (!contract) return { refused: 'no_wager' };
+    const match = await matches.currentOf(address);
+    if (!match) return { refused: 'not_in_a_match' };
+    const { stakers } = await onChain(matchKeyOf(match.gameId));
+    return matches.release(match.gameId, { address, stakers });
+  }
+
   async function lock({ address }) {
     if (!contract) return { refused: 'no_wager' };
     const match = await matches.currentOf(address);
@@ -540,5 +549,5 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     return { lost: true, matchKey, stakes, refundAfterSeconds: REFUND_AFTER_SECONDS };
   }
 
-  return { describe, onChain, ticket, lock, mine, decision, outcome, weekOf, permit, relay, bring, sweep, address: contract };
+  return { describe, onChain, ticket, release, lock, mine, decision, outcome, weekOf, permit, relay, bring, sweep, address: contract };
 }

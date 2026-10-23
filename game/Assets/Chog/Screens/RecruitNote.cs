@@ -22,6 +22,11 @@ namespace Chog.Screens
 
         public static string Describe()
         {
+            // A wallet that holds a Genesis but did not sign in plays a recruit: it is told why, not left to wonder (the audit,
+            // 23 October 2026).
+            if (Chog.Match.PlayerWallet.State == Chog.Match.WalletState.Ready && Chog.Match.PlayerWallet.Tokens.Length > 0
+                && Chog.Match.PlayerWallet.SignIn != Chog.Match.SignInState.SignedIn)
+                return "<b><color=" + TitleColor + ">RECRUIT MODE</color></b>\n<size=75%>Sign in on the home screen to play your Genesis.</size>";
             // Two lines (23 October 2026, the owner: light words; a recruit plays for practice, rank and stakes need a Genesis; named RECRUIT MODE).
             return "<b><color=" + TitleColor + ">RECRUIT MODE</color></b>\n<size=75%>Play a Genesis to rank and bet.</size>";
         }

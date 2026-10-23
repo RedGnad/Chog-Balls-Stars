@@ -1,5 +1,12 @@
 # État courant et décisions
 
+**23 October 2026, 14:45 UTC (lead: closing the audit's open items; deployed).**
+- **A cancelled stake gives its ticket back** (`POST /api/wager/release`, called when a stake stops): the stakes lock at once instead of holding START up to 135 s, and when nobody staked the amount is free again; a used ticket stays (`already_staked`). Services 141 tests.
+- **Wallet requests and the sign-in time out** (120 s and 90 s, `PlayerWallet.Update`): a phone wallet that never answers no longer leaves a stake busy (which froze the lobby's clock and START NOW) or the sign-in stuck; a timed-out request reads as "not signed", nothing else is tried behind the player's back.
+- **A holder who did not sign in is told why it plays a recruit:** the lobby's note reads "Sign in on the home screen to play your Genesis".
+- The build failed once with the disk full; `prune_builds.py --apply` freed 930 MB of old builds. Build `20261023T144037187Z-a9a4d01b50e54527902f837148a8cc17`, stamp unchanged; judge fixtures agree.
+- Still open: a staker who leaves before START voids the match without a word to the other (stakes come back); a lent pass plus a connected wallet plays a recruit; two popups after a drop; the settings' region picker; one wallet in two tabs; no Reown disconnect; CHANGE TEAM's fourth player (simulation).
+
 **23 October 2026, 14:15 UTC (lead: adversarial audit of the judges' journeys; fixes deployed).**
 - The owner: the earlier audit missed the multiplayer failures, it was not adversarial enough. Two read-only agents walked the money and multiplayer journeys and the onboarding and session journeys through the code; I ran the multiplayer ones on the public address (host leaves the lobby: the second player becomes host with START NOW and the clock; three players: 2 v 1).
 - **Fixed now:**

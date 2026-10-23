@@ -217,6 +217,13 @@ namespace Chog.Match
         // Who waits for the wallet's answer to each request, by request number.
         private readonly Dictionary<int, Action<string, string, int>> _requests = new Dictionary<int, Action<string, string, int>>();
         private int _lastRequest;
+        // When each wallet request and the sign-in were asked: a wallet that never answers (a phone app left in the background, a
+        // window closed elsewhere) is given up on, so a stake or a sign-in is not stuck for the rest of the visit (23 October 2026,
+        // the audit: no request had a timeout, and a busy stake froze the lobby's clock and START NOW).
+        private readonly Dictionary<int, float> _requestAskedAt = new Dictionary<int, float>();
+        private float _signInAskedAt;
+        private const float RequestTimeoutSeconds = 120f;
+        private const float SignInTimeoutSeconds = 90f;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Create()
@@ -379,6 +386,7 @@ namespace Chog.Match
 
             var id = ++s_host._lastRequest;
             s_host._requests[id] = done;
+            s_host._requestAskedAt[id] = Time.unscaledTime;
             ChogWalletRequest(HostName, nameof(OnRequestAnswer), id, rpcMethod, parametersJson);
         }
 
@@ -422,6 +430,7 @@ namespace Chog.Match
                 return;
 
             SetSignIn(SignInState.Asking, "", "");
+            s_host._signInAskedAt = Time.unscaledTime;
             var address = Address;
             Run(GameServices.Call("session/challenge", JsonUtility.ToJson(new AddressRequest { address = address }), null,
                 (status, text) =>
@@ -585,6 +594,26 @@ namespace Chog.Match
 
         // Called by name from the browser bridge with the wallet's answer to a request.
         [Preserve]
+        private void Update()
+        {
+            if (SignIn == SignInState.Asking && Time.unscaledTime - _signInAskedAt > SignInTimeoutSeconds)
+                SetSignIn(SignInState.SignedOut, "", "the wallet did not answer: sign in again");
+            if (_requestAskedAt.Count == 0)
+                return;
+            foreach (var asked in new List<KeyValuePair<int, float>>(_requestAskedAt))
+            {
+                if (Time.unscaledTime - asked.Value < RequestTimeoutSeconds)
+                    continue;
+                _requestAskedAt.Remove(asked.Key);
+                if (_requests.TryGetValue(asked.Key, out var done))
+                {
+                    _requests.Remove(asked.Key);
+                    // Read as a refusal: nothing was signed, and no other way is tried behind the player's back.
+                    done?.Invoke(null, "the wallet did not answer", MonadTransactions.UserRefused);
+                }
+            }
+        }
+
         private void OnRequestAnswer(string json)
         {
             var answer = JsonUtility.FromJson<WalletAnswer>(json);
@@ -592,6 +621,7 @@ namespace Chog.Match
                 return;
 
             _requests.Remove(answer.id);
+            _requestAskedAt.Remove(answer.id);
             if (string.IsNullOrEmpty(answer.error))
                 done?.Invoke(answer.result ?? "null", null, 0);
             else

@@ -236,6 +236,24 @@ export function createMatches({ store, now = Date.now }) {
   });
 
   /**
+   * Gives back the ticket "address" holds and did not use (its stake was refused in the wallet or failed), so the stakes can be
+   * locked at once instead of waiting for its deadline; when nobody staked and no ticket is left, the match's amount is free
+   * again. "stakers" is who staked on the chain, read by the caller just before. A ticket given back and used later anyway only
+   * calls the match off (a stake after the lock). 23 October 2026, the audit: a cancelled signature held START up to 135 s.
+   */
+  const release = (gameId, { address, stakers }) => inTurn(gameId, async () => {
+    const match = await read(gameId, 'match');
+    if (!match) return { refused: 'unknown_match' };
+    if (match.tickets.lockedAt) return { refused: 'stakes_locked' };
+    const wallet = String(address).toLowerCase();
+    if (stakers.some(staker => String(staker.address).toLowerCase() === wallet)) return { refused: 'already_staked' };
+    match.tickets.issued = match.tickets.issued.filter(issued => String(issued.address).toLowerCase() !== wallet);
+    if (stakers.length === 0 && match.tickets.issued.length === 0) match.tickets.amount = null;
+    await save(gameId, 'match', match);
+    return { released: true };
+  });
+
+  /**
    * Locks the stakes of a match: no ticket is handed out afterwards, and "stakers" (who has
    * staked on the chain, read by the caller just before) becomes the book the match is paid on.
    * It waits while a ticket that was handed out could still be used: its holder has not staked
@@ -330,7 +348,7 @@ export function createMatches({ store, now = Date.now }) {
   const verdictOf = gameId => read(gameId, 'verdict');
 
   return {
-    entered, configs, admitted, added, removed, left, closed, started, chunk, claims, ticket, lock, decideOnce,
+    entered, configs, admitted, added, removed, left, closed, started, chunk, claims, ticket, release, lock, decideOnce,
     get, currentOf, latestOf, replayOf, setVerdict, verdictOf, folderOf,
   };
 }
