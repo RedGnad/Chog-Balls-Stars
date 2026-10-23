@@ -197,3 +197,36 @@ Grades and evidence: `research/evidence/chogathon-grading-2026-10-23.json`. "Fir
 The other 63 are at 3.15 or less; 26 below 2.5 (tools without the NFT at their core, testnet only, dead links).
 monorb builds each Genesis in 3D from its traits (three guest spins, `chog.js`), on Monad testnet with a test
 collection. ChogPit's landing writes "412 raiders in pit" while its own data says 5.
+
+## An impartial judge's reading (11:50 UTC, asked by the owner: "too biased in our favour?")
+
+Graded on the page's own questions: Novelty "Does it introduce a new way to use or interact with NFTs?", Fun "enjoyable,
+engaging, or exciting to use?", Retention "Will people come back and use it again?", Clarity "easy to understand and
+use?", Execution "Does it work well?"; "$CHOG Bonus: meaningful integration can earn you bonus points"; requirement "The
+Chog NFT must be essential" ("If you removed the NFT, would the experience still work the same way?"); 50 winners.
+
+Ours, regraded without favour: Novelty 3, not 4 (traits as fighting powers is the field's most common pattern, about
+twenty entries; per-trait 3D is shared with monorb and Chog Wave; bets and rental exist elsewhere; our strengths are
+production, not a new way to use the NFT); Retention 3, not 4 (a judge alone plays bots: a bet needs another staker,
+solo sieges stop at Silver, no economic loop seen working on mainnet); Fun 4, Clarity 4, Execution 4: **3.50**. NFT
+requirement: passes, but a Recruit plays the whole game, which a strict judge reads as "it still works without it".
+$CHOG bonus: designed deep (bets with burn, rental, shop), used on mainnet by nobody yet.
+Novelty 5 where the grid allows it on evidence: Chogslist (a labour market of anyone's Chogs, wages paid to each Chog's
+wallet; 10 runs settled, 26 $CHOG paid) and CHOG-TWAIN (two Chogs that look at each other become a daily pact between
+friends; 3 walks, 70 $CHOG pledged).
+
+| # | Project | N | F | R | C | E | Weighted | Requirement and bonus |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Chogslist | 5 | 3 | 4 | 4 | 4 | 4.10 | pass; $CHOG used |
+| 2 | CHOG STUDIO | 4 | 3 | 4 | 4 | 4 | 3.80 | pass; $CHOG paid per take |
+| 3 | Animr | 4 | 3 | 3 | 5 | 4 | 3.75 | pass; $CHOG traded |
+| 4 | CHOG-TWAIN | 5 | 2 | 3 | 4 | 4 | 3.70 | pass; $CHOG pledged |
+| 5 | Last Print | 4 | 3 | 3 | 4 | 4 | 3.60 | borderline (no NFT needed) |
+| 6 to 10 | ours, ChogSwipe, Grand Theft Chog, The Chog World, ROOM ZERO | | | | | | 3.50 | ROOM ZERO at risk; ours passes |
+
+What a collection needs in 2026 (secondary sources, most of them blogs, to read with care): a "K-shaped" market where
+the collections with cultural weight or recurring utility keep the liquidity; utility through access, membership and
+in-game use; a broad holder base; brand and IP. Chog is Monad's mascot meme brand ("onboard the masses, expand the
+brand"). Read that way, the entries that already move $CHOG to holders or spread the brand (Chogslist, CHOG STUDIO)
+answer it on evidence; ours answers it on paper (every Genesis in 3D is an IP asset for the brand, rental is income for
+holders, bets burn $CHOG) and has not yet shown it working.
