@@ -189,10 +189,16 @@ namespace Quantum.Menu {
     /// Is called when the <see cref="_playButton"/> is pressed using SendMessage() from the UI object.
     /// Initiates the connection and expects the connection object to set further screen states.
     /// </summary>
+    /// <summary>The region every quick match is played in when the player picked none.</summary>
+    public const string QuickMatchRegion = "eu";
+
     protected virtual async void OnPlayButtonPressed() {
       ConnectionArgs.Session = null;
       ConnectionArgs.Creating = false;
-      ConnectionArgs.Region = ConnectionArgs.PreferredRegion;
+      // Every quick match is played in one region, as Chogtanks did (FixedRegion "eu"), so two players anywhere in the world
+      // meet when they press PLAY; a region picked in the settings still wins (23 October 2026: each page took its own best
+      // region by ping, and two judges on two continents would never have met).
+      ConnectionArgs.Region = string.IsNullOrEmpty(ConnectionArgs.PreferredRegion) ? QuickMatchRegion : ConnectionArgs.PreferredRegion;
 
       Controller.Show<QuantumMenuUILoading>();
 

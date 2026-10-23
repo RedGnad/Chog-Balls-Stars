@@ -76,6 +76,8 @@ namespace TwinStickShooter
       Chog.Screens.WagerPanel.Show(transform, Teams[0].TeamCharacters[0], LocalTeam());
       // A way back to the menu before the match starts.
       Chog.Screens.PreparationBack.Show(transform, Teams[0].TeamCharacters[0]);
+      // The code of a room made with FRIENDS, for the friend to join.
+      Chog.Screens.PartyRoomCode.Show(transform, _connection != null ? _connection.SessionName : null);
 
       // The host's clock: the match starts by itself when nobody presses START.
       var hosts = _connection == null || _connection.Client.LocalPlayer.IsMasterClient;

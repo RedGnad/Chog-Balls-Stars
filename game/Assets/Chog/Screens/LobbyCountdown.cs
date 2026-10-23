@@ -82,6 +82,14 @@ namespace Chog.Screens
             if (GenesisWager.IsBusy)
                 _waited += Time.unscaledDeltaTime;
 
+            // A room made with FRIENDS waits for its host: the friend needs the time to type the code.
+            if (PartyRoomCode.InPartyRoom)
+            {
+                _disc.SetActive(false);
+                _caption.text = hosts ? "SHARE THE CODE, THEN START NOW" : Mathf.Max(0, players) + "/6 PLAYERS  |  THE HOST STARTS";
+                return;
+            }
+
             var left = Seconds - (Time.unscaledTime - _startedAt - _waited);
             _number.text = Mathf.Max(0, Mathf.CeilToInt(left)).ToString();
             _caption.text = players >= 6
