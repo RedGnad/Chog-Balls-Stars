@@ -65,3 +65,14 @@ rival above, no outside usage. What only we show working end to end: a real-time
 Photon's record in about 14 s, and $CHOG stakes held by a contract (refundable after an hour) rather than a server wallet.
 What a rival now shares: per-Genesis 3D from traits (Chog Wave), a "the server replays every run" fairness story (Grand
 Theft Chog), instant play without a wallet (ROOM ZERO, Grand Theft Chog).
+
+### Added after the owner's question (23 October, about 01:45 UTC): the two "World" entries
+
+| Project | N | F | R | C | E | NFT gate | Verified facts that matter |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| The Chog World (`chog.world`, @sebgroegb) | 4 | 3 to 4 | 5 | 3 | 4 | strong | Phaser 4 with a live server (`api.chog.world`, Colyseus); `/players-count` answered `{"online":0,"total":5}`; `/access-rules`: one Genesis needed to enter (spectators otherwise); traits as perks in the code (Laser eyes zap with L, Spartan Helmet, immune to lasers, Left side deals the roulette); in-world look: one hand-drawn base Chog recoloured by body colour, plus sheets for Skull, Radioactive and ten 1:1s (`assets/data/assets.json`), no trait drawn on the sprite in the public bundle; the NFT image is used as a portrait; $CHOG not spent on chain (sign-in only, the $CHOG to $MX conversion is announced, not live); repo private |
+| Chug world, "CHOG World" (`chog-world-mainnet.vercel.app`, @Sabercodes123) | 5 | 2 | 4 | 4 | 4 to 5 | very strong | an ERC-6551 wallet and an AI agent per Genesis, every move checked by a policy contract; on Monad: ChogOperator `0xaDaA7f21Fb843140E20115D84F51F6f85D5342D1`, Treasury `0x1814943bc12E643D1477b47F0B3cD495Fe07fce6` (holds exactly the 390 $CHOG seed, so no fee or payout yet), ChogState `0x33B273B62d3e364dc1Ec33aC2800AAeAb1067618`, all with code; their own text says no holder has played on mainnet yet (testnet: 7 Chogs, 14 battles); 94 Foundry tests claimed, not read |
+
+A third, "Chog World: Your Chog, Your Identity" (`chognftgame.netlify.app`), is a small social island with a two-line
+description and no video: not audited. Lesson: the gallery spells one of them "Chug world"; search the titles by
+keyword variants, not by the names heard.
