@@ -379,6 +379,17 @@ namespace Chog.Match
         /// wallet is asked up to three things: to be on Monad, to let the wager take the stake
         /// (skipped when it already may), and to stake.
         /// </summary>
+        /// <summary>
+        /// Whether a $CHOG balance read for the wallet covers a stake, both in the token's smallest unit; true while the balance is
+        /// not known (the chain then decides).
+        /// </summary>
+        public static bool CanAfford(string balanceWei, string amountWei)
+        {
+            if (!MonadTransactions.IsDigits(balanceWei) || !MonadTransactions.IsDigits(amountWei))
+                return true;
+            return BigInteger.Parse(balanceWei, CultureInfo.InvariantCulture) >= BigInteger.Parse(amountWei, CultureInfo.InvariantCulture);
+        }
+
         public static void Stake(int team, int wholeChog)
         {
             if (State != WagerState.Open || IsBusy || !InMatch || Locked || HasStaked || PlayerWallet.State != WalletState.Ready
@@ -387,6 +398,13 @@ namespace Chog.Match
 
             var player = PlayerWallet.Address;
             var amount = StakeWei.Length > 0 ? StakeWei : MonadTransactions.WholeToWei(wholeChog);
+            // A wallet without the stake is told at once, before any signature (23 October 2026, the audit: otherwise the
+            // signed stake fails, then the two transactions it falls back to fail too, gas spent for nothing).
+            if (!CanAfford(GenesisRental.BalanceWei, amount))
+            {
+                Fail(0, "not enough $CHOG: you hold " + MonadTransactions.PriceText(GenesisRental.BalanceWei));
+                return;
+            }
             SetStep(WagerStep.Asking, WagerAction.Stake, "");
             var body = "{\"team\":" + team + ",\"amount\":\"" + amount + "\"}";
             PlayerWallet.Run(GameServices.Call("wager/ticket", body, PlayerWallet.Session, (status, text) =>
