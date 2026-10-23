@@ -136,3 +136,16 @@ and the grade is marked "not played".
 
 One grade point on one criterion moves a project by 0.15 to 0.30: the grid separates our group from Chog Wave, not
 the second place from the seventh. If our Fun and Execution were 3, we would be at 3.65, still in the group.
+
+### CHOG STUDIO on the same grid (10:15 UTC)
+
+Two entries carry the name. CHOG STUDIO (`chogstudio.xyz`, @Dayzer__): an AI film studio where the holder's Genesis is
+the actor (a 3D actor made from its portrait, a persona from its traits, a voice), photos, 5 to 30 s clips (a "replace"
+mode swaps the person of a viral video for the Chog), episodes up to 2 minutes, paid in $CHOG per take. Seen: Chog TV
+(`/tv`, public) holds 9 clips and episodes starring 4 Genesis (#141, #1578, #1751, #1752) with votes (3, 2, 1) and a
+"top this week"; the clip on screen shows a convincing clay-like 3D Chog; `/api/pricing` answers live prices with the
+$CHOG rate and a 25% markup. Not seen: making a take (it needs a Genesis), the $CHOG deposits on chain, its repository.
+Grades: Novelty 4 (ChogTales is the one other entry making AI content from the NFT), Fun 3 (a creative loop, not a
+game), Retention 4 (filmography per token, votes, weekly theme, seen working), Clarity 4, Execution 4: **3.80**, second
+behind ours. The other, "Chog studio" (`chogstudio-pi.vercel.app`, @oxkael_), is a comic editor without AI or chain
+writes: 2, 2, 2, 4, 3, about 2.45.
