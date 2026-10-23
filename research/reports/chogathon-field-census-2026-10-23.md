@@ -97,3 +97,14 @@ Grand Theft Chog about 4.35; then a close group between 3.8 and 4.0: Chug world,
 3.9), with Animr likely there (not audited); then ChogTales, Dybbo, Chog League about 3.6 to 3.65, ChogSekai and ChogPit
 likely near (not audited); ROOM ZERO about 3.5 with its NFT gate at risk; Chog Wave 3.3; CHOG ARENA 3.05; CHOG KINGDOM
 2.85; Chog ToolHub 1.85.
+
+### Grand Theft Chog played through, 09:35 UTC (guest, practice vault, read-only)
+
+The owner doubted the earlier scores ("just mini-games?"). Played end to end with a headless browser: the city is 2D
+with each Chog shown as its flat NFT picture on a stand; a heist is two timing mini-games ("Stop the reels", "Pick
+the lock": tap when the pin is in the gold band) then a 75-second top-down maze in the vault (grab coins in runs,
+guards drawn as Chog pictures, Q hides, E fires laser eyes, crack the safe, get out before the doors lock), close to
+Pac-Man. Polished screens and a coherent loop, no real-time fight between players' heroes. The earlier Fun 4 and
+Retention 5 leaned on what its pages claim (seasons, live defence, events); scored on what was seen: Novelty 3.5,
+Fun 3, Retention 4, Clarity 4, Execution 4.5, about 3.7, inside the same band as the next four, ours included.
+The 1-to-5 scores of this report are one auditor's judgments without an anchored grid: read them as bands.
