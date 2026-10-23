@@ -108,3 +108,31 @@ Pac-Man. Polished screens and a coherent loop, no real-time fight between player
 Retention 5 leaned on what its pages claim (seasons, live defence, events); scored on what was seen: Novelty 3.5,
 Fun 3, Retention 4, Clarity 4, Execution 4.5, about 3.7, inside the same band as the next four, ours included.
 The 1-to-5 scores of this report are one auditor's judgments without an anchored grid: read them as bands.
+
+## Anchored grading, 23 October about 10:00 UTC (asked by the owner)
+
+The grid, fixed before grading. A level counts only on what was seen: played, read in the app, its code or its API,
+or checked on the chain. A project's own claims earn nothing. Where an NFT wall kept us out, the code is the evidence
+and the grade is marked "not played".
+
+| Level | Novelty (30) | Fun (20) | Retention (20) | Clarity (15) | Execution (15) |
+| --- | --- | --- | --- | --- | --- |
+| 1 | a reskin | no loop | nothing kept | not understood in a minute | broken |
+| 2 | known genre, one NFT twist | passive (idle, read, listen) | one stat kept | understood with the docs | partial, placeholders |
+| 3 | the NFT drives a core mechanic | short active loop, mini-games | progression that works | understood in the app with effort | works end to end, rough |
+| 4 | a combination at most one other entry shares | real-time play with skill and choices | progression plus a social or economic loop that works | clear pitch and a guided first minute | polished, live services, its chain parts checked |
+| 5 | a new category, nobody else, seen in use | 4 plus humans against humans seen | 4 plus players seen coming back | 4 plus proofs at hand and nothing confusing | 4 plus public tested code and its chain flows really used |
+
+| Project | N | F | R | C | E | Weighted | Main evidence | Not seen |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Chog Balls Stars (ours, self-graded) | 4 | 4 | 4 | 4 | 4 | 4.00 | real-time 3v3 in our captures, 1,969 heroes in 3D, careers on chain, season 1 live, contracts with code, public tested repo | humans against humans today; a stake on wager v3 (none yet) |
+| Animr | 4 | 3 | 3 | 5 | 4 | 3.75 | a 9-stop judge tour without a wallet; two contracts with code (`0x7720Ed65...513d`, `0x92D3d4Af...987b`) | the trading loop and the Daily Bell working |
+| Grand Theft Chog | 3 | 3 | 4 | 4 | 4 | 3.50 | played through: 2 timing mini-games and a maze; `/api/war` live; public repo with tests and CI | live defence by gang members; burns on chain |
+| The Chog World | 4 | 3 | 4 | 3 | 3 | 3.50 | bundle: perks from traits, casino, trading floor, houses; `/players-count` 0 online, 5 in all | not played (NFT wall) |
+| CHOG : ROOM ZERO | 3 | 4 | 3 | 4 | 4 | 3.50 | played: a real-time shooter, fun at once; boards of 7 and 1 players | NFT gate at risk: generic sprites, the NFT adds one power |
+| ChogChoir | 4 | 3 | 3 | 3 | 4 | 3.45 | each Chog sings from its traits (landing played); choir rounds on testnet and mainnet | mainnet use (none found) |
+| Chug world (CHOG World) | 4 | 2 | 3 | 4 | 4 | 3.40 | three mainnet contracts with code; treasury still at its 390 $CHOG seed | its agents and progression working |
+| Chog Wave | 3 | 3 | 2 | 2 | 3 | 2.65 | 236 trait parts in 3D; a custodial "vault"; empty leaderboard; login wall | its card duels |
+
+One grade point on one criterion moves a project by 0.15 to 0.30: the grid separates our group from Chog Wave, not
+the second place from the seventh. If our Fun and Execution were 3, we would be at 3.65, still in the group.
