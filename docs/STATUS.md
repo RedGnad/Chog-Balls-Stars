@@ -1,5 +1,10 @@
 # État courant et décisions
 
+**23 October 2026, 11:55 UTC (lead: checks before the judges play together).**
+- **Pairing, checked live:** two headless players on the public address pressing PLAY six seconds apart met in the same siege lobby ("2/6 PLAYERS"). Both were put on TEAM 1: two judges who stake without one of them tapping CHANGE TEAM stake on the same side, and the contract gives everything back. Judges in different regions do not meet through PLAY (each client picks its best region); FRIENDS and its code carry the region.
+- **Bet fairness, read in `ChogWager.sol`:** a lone staker, or stakes on one side only, or a draw: every stake back, nothing burned, no Genesis share (`test_ASideWithoutAStakerGivesEveryStakeBack`, `test_ADrawGivesEveryStakeBack`); only stakers are paid, a teammate who did not stake gets nothing of the gain; everyone in a match stakes the same amount; on lost stakes 5% is burned and 5% goes in equal parts to the wallets that played a Genesis in the match, staked or not (live `/api/wager`: burnedShare 500, genesisShare 500); every stake comes back after an hour without a result. ChogWager v3 has still seen no stake.
+- Today's live verdicts: 11:31 judged in 11 s; 11:25 and 11:26 void, "the match did not reach its end".
+
 **23 October 2026, 06:05 UTC (lead: the last items of the product walk; deployed).**
 - Quantum's statistics box (frame number, ping, graphs on a tap) is hidden on the public address and kept on pages of this computer.
 - The sample's windows ("Connection Failed", the name to type) are our raised card with gold and cream words.
