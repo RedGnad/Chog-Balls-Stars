@@ -57,7 +57,7 @@ LOOKS = {
            "Head": "1:1 Gold Helmet", "Body": "1:1 Warrior Tee"},
     1373: {"Base": "Origin", "Skin": "1:1 Gold", "Eyes": "1:1 Gold Eye", "Mouth": "Smile", "Head": "1:1 Gold Shine",
            "Body": "1:1 Gold Plating"},
-    1376: {"Base": "Origin", "Skin": "1:1 Devil", "Eyes": "1:1 Devil Eye", "Mouth": "1:1 Fang",
+    1376: {"Base": "Origin", "Skin": "1:1 Devil", "Eyes": "1:1 Devil Eye", "Mouth": "normal smile",
            "Head": "1:1 Devil Horns", "Body": "1:1 Devil Suit"},
 }
 # Whose hands and feet take the colour of the skin, not the pink mittens of a Chog.
@@ -70,9 +70,9 @@ BLUSH = {1006: (0.66, 0.66, 0.68), 53: (0.96, 0.44, 0.08), 1373: (0.92, 0.46, 0.
 SKINS = {
     "1:1 Flame": {"skin": (0.97, 0.46, 0.10), "top": (1.00, 0.82, 0.22), "face": (0.99, 0.62, 0.17)},
     "1:1 Scream": {"skin": (0.30, 0.22, 0.70), "face": (0.95, 0.80, 0.58)},
-    "1:1 Zombie": {"skin": (0.40, 0.28, 0.68), "face": (0.84, 0.90, 0.76)},
+    "1:1 Zombie": {"skin": (0.78, 0.84, 0.74), "face": (0.84, 0.90, 0.76)},
     "1:1 Pepe": {"skin": (0.40, 0.28, 0.68), "face": (0.93, 0.84, 0.72)},
-    "1:1 Manga": {"skin": (0.78, 0.78, 0.79), "face": (0.97, 0.97, 0.97)},
+    "1:1 Manga": {"skin": (0.80, 0.79, 0.74), "face": (0.99, 0.98, 0.95)},
     "1:1 Angel": {"skin": (0.95, 0.88, 0.72), "face": (0.98, 0.93, 0.83)},
     "1:1 Warrior": {"skin": (0.62, 0.30, 0.86), "face": (0.98, 0.80, 0.84)},
     # (22 October 2026, second pass: polished metal runs from a deep orange gold at the feet to a bright yellow at the top; it was 0.95 0.70 0.10 to 1.00 0.88 0.40.)
@@ -108,8 +108,10 @@ def round_eye(white, dark, pupil=(0.030, 0.035), **numbers):
 
 EYES = {
     "1:1 Glowing Eye": round_eye((1.00, 0.98, 0.78), (1.00, 0.84, 0.30), (0.046, 0.052), LINE=(0.086, 0.094), WHITE=(0.068, 0.076)),
-    "1:1 Socket Eye": round_eye((0.10, 0.07, 0.06), (0.98, 0.55, 0.12), (0.026, 0.030)),
-    "1:1 Zombie Eye": round_eye((0.07, 0.07, 0.08), (0.36, 0.95, 0.32), (0.020, 0.024)),
+    # (23 October 2026, the owner: the 1:1 "not ambitious or accurate enough". #392 and #494 draw big black sockets with an ember
+    # or a green light inside, no coloured ring: the ring of "Dark" is the size of the socket, so only the socket and the light show.)
+    "1:1 Socket Eye": round_eye((0.04, 0.03, 0.03), (1.00, 0.56, 0.10), (0.030, 0.034), LINE=(0.084, 0.096), WHITE=(0.084, 0.096)),
+    "1:1 Zombie Eye": round_eye((0.03, 0.03, 0.04), (0.42, 1.00, 0.36), (0.026, 0.030), LINE=(0.080, 0.090), WHITE=(0.080, 0.090)),
     "1:1 Blue Eye": round_eye((0.93, 0.95, 1.00), (0.30, 0.48, 0.92), (0.040, 0.056), LINE=(0.070, 0.086), WHITE=(0.064, 0.080)),
     "1:1 Gold Eye": round_eye((1.00, 0.93, 0.62), (0.90, 0.68, 0.16), (0.032, 0.050), LINE=(0.056, 0.080), WHITE=(0.050, 0.074)),
     "1:1 Devil Eye": round_eye((0.95, 0.18, 0.18), (0.50, 0.02, 0.05), (0.036, 0.048), LINE=(0.064, 0.080), WHITE=(0.056, 0.072)),
@@ -139,7 +141,7 @@ def mouths(table):
 # ---------------------------------------------------------------------------------------------
 
 # (22 October 2026, from #1159: the halo is a large thick gold ring floating well above the crown, wider than the head; the brow over the open eye is a thick white bar.)
-HALO = {"HEIGHT": 0.77, "RADIUS": 0.27, "TUBE": 0.036, "TILT_DEG": 18.0, "AROUND": 16, "SIDES": 5,
+HALO = {"HEIGHT": 0.79, "RADIUS": 0.30, "TUBE": 0.046, "TILT_DEG": 18.0, "AROUND": 16, "SIDES": 5,
         "BROW": ((0.040, 0.090), (0.190, 0.108), 0.026)}
 
 
@@ -294,7 +296,12 @@ def build_brain(maker):
 # eyes are large and shiny. Until then a headband with two blades in a V and a small ball of a gem.)
 HELMET_CREST = {"GEM": (0.060, 0.082, 0.026), "STEM": ((0.0, 0.150), (0.0, 0.040), (0.0, -0.020)), "STEM_WIDTH": (0.052, 0.040, 0.026),
                 "PAINT": ((0.205, 0.100), (0.200, -0.090)), "PAINT_WIDTH": 0.020,
-                "GLINTS": ((-0.026, 0.034, 0.014),)}
+                "GLINTS": ((-0.026, 0.034, 0.014),),
+                # (23 October 2026, the owner: the 1:1 not ambitious enough. #1290's helmet is a winged helm: a gold wing sweeps up and back from
+                # each side of the band.) Where each wing leaves the band (to the side, above, on the face), its feathers (degrees from
+                # straight up towards the back, length), their width and thickness.
+                "WING_AT": (0.300, 0.150), "WING_FEATHERS": ((24.0, 0.28), (50.0, 0.23), (76.0, 0.17)), "WING_WIDTH": 0.105,
+                "WING_THICK": 0.012}
 
 
 def build_gold_helmet(maker):
@@ -314,6 +321,15 @@ def build_gold_helmet(maker):
     setting = front + out * 0.014 + up * tall * 0.60
     part.shell(base.ball_rings(setting, up, across, tall * 1.10, wide * 1.35, thick * 1.2, 4), 6, part.named("Band"), 0.010, smooth=False)
     part.shell(base.ball_rings(setting + out * 0.012, up, across, tall, wide, thick * 1.3, 4), 6, part.named("Gem"), 0.008, smooth=False)
+    # The wings of the helm, on each side of the band, sweeping up and back.
+    for sign in (1.0, -1.0):
+        root = surface.front(sign * numbers.WING_AT[0], numbers.WING_AT[1], 0.035)
+        side_out = (root - surface.middle).normalized()
+        for degrees, length in numbers.WING_FEATHERS:
+            angle = math.radians(degrees)
+            along = (Z * math.cos(angle) + Y * math.sin(angle) + side_out * 0.60).normalized()
+            across = along.cross(side_out).normalized()
+            blade(part, root, along, across, length, numbers.WING_WIDTH, numbers.WING_THICK, part.named("Band"), outline=0.010, sides=4)
     # The stem, the war paint and the glints go on a part of their own: the helmet is what the hero throws (the first part).
     part = maker.part()
     # The stem, a flat strip of gold on the face, from the band down to the bridge of the nose.
@@ -381,8 +397,10 @@ def build_cape(maker):
 
 # (22 October 2026, from #1159: the wings are large, layered white feathers fanning out behind the shoulders, as tall as the head; until then four feathers
 # 0.36 to 0.56 long, 0.075 wide, in a blade of 8 sides.)
-WINGS = {"ROOT": (0.07, 0.13), "FEATHERS": ((14.0, 0.66), (40.0, 0.76), (66.0, 0.72), (92.0, 0.58), (118.0, 0.42)),
-         "WIDTH": 0.140, "THICK": 0.020, "BACK_DEG": 35.0}
+# (23 October 2026: the art's wings are great white fans as wide as the body is tall; seven feathers, a third longer and wider, lit from
+# within, until then five greyish ones.)
+WINGS = {"ROOT": (0.07, 0.13), "FEATHERS": ((8.0, 0.80), (28.0, 0.96), (48.0, 1.00), (68.0, 0.94), (88.0, 0.80), (108.0, 0.64), (128.0, 0.46)),
+         "WIDTH": 0.170, "THICK": 0.020, "BACK_DEG": 32.0}
 
 
 def build_wings(maker):
@@ -398,7 +416,8 @@ def build_wings(maker):
             along = (Z * math.cos(angle) + X * side * math.sin(angle) * math.cos(back) + Y * math.sin(back)).normalized()
             across = along.cross(Y).normalized()
             key = "Feather" if index % 2 == 0 else "Shade"
-            blade(part, root + along * 0.02, along, across, length, numbers.WIDTH, numbers.THICK, part.named(key), sides=6)
+            # (Five sides a feather, not six: seven feathers on each side are within the 8,000 triangles a hero may have.)
+            blade(part, root + along * 0.02, along, across, length, numbers.WIDTH, numbers.THICK, part.named(key), sides=5)
 
 
 TRIDENT = {"BELOW": 0.30, "ABOVE": 0.52, "SHAFT": 0.016, "PRONG": 0.10, "SPREAD": 0.055}
@@ -705,8 +724,11 @@ DEVIL_HORNS = {
     # (22 October 2026, from #1376: the horns are glossy red drops standing on the brow, curving outward, with a white light along each; the eyes are large and
     # glossy with a white glint. Until then the ridged horns of the radioactive Chogs in dark red.) Where each stands (to the side, above) on the face, how far
     # out of the head it leans, its height, the radius profile along it.
-    "AT": (0.185, 0.190), "LEAN": 0.60, "PROFILE": ((0.0, 0.078), (0.060, 0.088), (0.120, 0.064), (0.180, 0.032), (0.235, 0.0)),
+    "AT": (0.185, 0.190), "LEAN": 0.60, "PROFILE": ((0.0, 0.090), (0.075, 0.102), (0.150, 0.076), (0.225, 0.038), (0.295, 0.0)),
     "GLINTS": ((-0.022, 0.030, 0.013),),
+    # (23 October 2026) A white light along the front of each horn; the fang under the smile (its edge on the face: to the side, above).
+    "HORN_LIGHT": (0.30, 0.60, 0.022),
+    "FANG": ((0.016, -0.0985), (0.040, -0.0890), (0.030, -0.134)),
 }
 
 
@@ -720,8 +742,21 @@ def build_devil_horns(maker):
         out = host.outward(surface, sign * numbers.AT[0], numbers.AT[1])
         way = (Z * 1.0 + X * sign * numbers.LEAN + out * 0.25).normalized()
         part.shell(base.tube_rings(root - way * 0.03, way, out, numbers.PROFILE), 8, part.named("Horn"), 0.012)
+        start, end, light = numbers.HORN_LIGHT
+        length = numbers.PROFILE[-1][0]
+        face_out = (out - way * out.dot(way)).normalized()
+        a = root + way * (length * start) + face_out * (light * 3.4)
+        b = root + way * (length * end) + face_out * (light * 2.2)
+        part.shell(base.tube_rings(a, (b - a).normalized(), face_out, ((0.0, light * 0.5), ((b - a).length * 0.5, light),
+                                                                        ((b - a).length, 0.0))), 6, part.named("Glint"), 0.0)
         for side, above, radius in numbers.GLINTS:
             face_patch(part, surface, part.named("Glint"), (sign * (0.112 + side), 0.006 + above), radius, radius * 1.2, host.DRAWN[3], 8)
+    # The fang: white in a dark line, hanging from the smile.
+    fang = [tuple(place) for place in numbers.FANG]
+    middle = (sum(place[0] for place in fang) / 3.0, sum(place[1] for place in fang) / 3.0)
+    grown = [(middle[0] + (side - middle[0]) * 1.35, middle[1] + (above - middle[1]) * 1.25) for side, above in fang]
+    host.draw_shape(part, surface, part.named("FangLine"), grown, host.DRAWN[1])
+    host.draw_shape(part, surface, part.named("Fang"), fang, host.DRAWN[2])
 
 
 DEVIL_WINGS = {
@@ -781,7 +816,7 @@ def hats(headband_numbers):
     """The hats of the 1:1 and their numbers (the helmet lies where a headband does; the devil's horns are
     the ridged horns of the radioactive Chogs, one pair of them)."""
     entries = {
-        "1:1 Halo": {"shape": "Halo", "colours": {"Halo": (0.99, 0.78, 0.18), "Brow": (0.99, 0.99, 0.97)}, "unlit": ("Brow",)},
+        "1:1 Halo": {"shape": "Halo", "colours": {"Halo": (1.00, 0.84, 0.24), "Brow": (0.99, 0.99, 0.97)}, "unlit": ("Brow", "Halo")},
         "1:1 Skull Flames": {"shape": "SkullFlames", "colours": {"Fire": (0.98, 0.42, 0.08), "Core": (1.0, 0.86, 0.22)},
                              "unlit": ("Fire", "Core")},
         "1:1 Brain": {"shape": "Brain", "colours": {"Brain": (0.95, 0.52, 0.56), "Groove": (0.82, 0.36, 0.42),
@@ -793,7 +828,9 @@ def hats(headband_numbers):
         "1:1 Gold Helmet": {"shape": "GoldHelmet", "colours": {"Band": (0.98, 0.76, 0.16), "Line": (0.78, 0.52, 0.08),
                                                                 "Gem": (0.88, 0.10, 0.14), "Paint": (0.93, 0.30, 0.40),
                                                                 "Glint": (1.0, 1.0, 1.0)}, "unlit": ("Paint", "Glint")},
-        "1:1 Devil Horns": {"shape": "DevilHorns", "colours": {"Horn": (0.98, 0.10, 0.12), "Glint": (1.0, 0.96, 0.96)}, "unlit": ("Glint",)},
+        "1:1 Devil Horns": {"shape": "DevilHorns", "colours": {"Horn": (1.00, 0.16, 0.20), "Glint": (1.0, 0.96, 0.96),
+                                                               "Fang": (0.99, 0.99, 0.98), "FangLine": DARK},
+                            "unlit": ("Glint", "Fang", "FangLine")},
         "1:1 Flame Hair": {"shape": "FlameHair", "colours": {"Fire": (1.00, 0.55, 0.10), "Core": (1.00, 0.88, 0.28)}, "unlit": ("Fire", "Core")},
         "1:1 Gold Shine": {"shape": "GoldShine", "colours": {"Shine": (1.0, 0.97, 0.76)}, "unlit": ("Shine",)},
     }
@@ -830,7 +867,7 @@ def clothes(tee, costume):
                                  "numbers": {"COLLAR": (0.600, 0.640)}},
         "1:1 Warrior Tee": with_colours({**tee((0.45, 0.22, 0.62), (0.96, 0.62, 0.18)), "kind": "WarriorTee"},
                                         Fur=(0.98, 0.78, 0.26), FurShade=(0.92, 0.58, 0.16)),
-        "1:1 Angel Wings": {"kind": "Wings", "colours": {"Feather": (0.98, 0.98, 0.97), "Shade": (0.86, 0.87, 0.92)}},
+        "1:1 Angel Wings": {"kind": "Wings", "colours": {"Feather": (1.00, 1.00, 0.99), "Shade": (0.90, 0.92, 0.98)}, "unlit": ("Feather",)},
         "1:1 Devil Suit": {"kind": "DevilSuit", "colours": {"Main": (0.42, 0.06, 0.10), "Collar": (0.26, 0.03, 0.06),
                                                             "Trident": (0.56, 0.30, 0.80), "Wing": (0.52, 0.07, 0.12)}},
         "1:1 Frog Suit": {**costume((0.46, 0.74, 0.20), {"Hood": (0.46, 0.74, 0.20), "Rim": (0.80, 0.86, 0.24),
