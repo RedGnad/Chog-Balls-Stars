@@ -140,35 +140,26 @@ Bronze to Star; seasons are off live and are not claimed)
 > checked again by the services when a match starts; a lent or rented Genesis plays under the same
 > rules.
 
-## 05 Under the hood (and pre-existing work to declare)
+## 05 Under the hood
 
-- Built on Photon's Quantum 3 Twin Stick Shooter sample (its map, recoloured in the Chog night, its
-  controls, its bots and its menu framework, restyled), with its Cartoon FX assets still used for some
-  effects. **Open licence point (counted 17 October 2026):** 15 files of Jean Moreno's Cartoon FX are
-  still referenced by ten of the sample's effect prefabs (MeleeAttackVFX, ArrowDamageZoneVFX,
-  DamageZoneVFX, ArrowHitVFX, EnergyImpact, EnergyPulse, KnightBasicAttack, StepsSmoke, Character_Base,
-  CollectibleCoin), several from the legacy Cartoon FX packs, not only the free Remaster pack the
-  sample's page credits; and Photon's sample licence grants its non-code "Assets" for internal
-  development only (`research/research_notes/Audit architecture Photon MOBA Genesis/twin_stick_sample_reuse_licences.md`,
-  KQ2 and KQ5). Before a public repository or a release: replace those effects with our own, or
-  hold a licence for each pack used. **Since 17 October, evening, the fights use more of it:** 23
-  Cartoon FX Remaster prefabs (the CFXR2 and CFXR3 families found in the project, copied under our names
-  into `game/Assets/Chog/Effects/Resources/ChogFx`, with the textures, materials and shaders they
-  reference) play the explosions, fire, ice, electricity, sparks, smoke and splashes of a fight
-  (`game/README.md`, "The effects of a fight"). The owner said that day that the licence is not a problem
-  for a non-profit MVP; which Cartoon FX pack each prefab comes from was not checked.
-- Fonts Lilita One, Nunito and Koulen (SIL Open Font License); Koulen as on chog.xyz.
-- Sounds and music: 18 CC0 files (Kenney, OpenGameArt), each with its source in
-  `game/Assets/Chog/Audio/LICENSES.md`. The pictograms of the screens are drawn in code.
-- Written during the hackathon: the Genesis catalogue and trait rules, the 3D heroes and attack
-  objects (Blender scripts), the services and the judge, the contracts, every screen (home, hero
-  sheet, collection, end of match, scoreboard, settings, coach), the match look and its effects, the
-  structures (towers and cores) and the two modes (SIEGE and COINS).
+> **Repository:** https://github.com/RedGnad/Chog-Balls-Stars (public)
+>
+> **Tech stack:** Unity 6 (C#, WebGL), Photon Quantum 3, Blender (every hero, costume and attack object built by
+> Python scripts), Node.js services, a .NET 8 judge that replays every match, Solidity (Foundry) on Monad mainnet,
+> Reown AppKit and injected wallets (EIP-712, EIP-2612), Render, Vercel, Upstash Redis.
+>
+> **Pre-existing work:** none of ours in the code: everything in the repository was written during the hackathon.
+> The game is served from the Vercel project of our earlier Chog game, Chogtanks (chogtanks.vercel.app).
+
+The owner's reading (23 October 2026): "pre-existing work" means the team's own earlier work, not the development
+samples and libraries a game is built with; the hackathon's page says only "any pre-existing work you used". The game
+started from Photon's Quantum 3 Twin Stick Shooter sample (named once in the README's stack line); the fonts (SIL Open
+Font License) and the CC0 sounds keep their sources in `game/Assets/Chog/Audio/LICENSES.md`. The earlier game was read
+for its wallet setup on 9 October; no code of it was carried over (STATUS, "Lecture CHOGTANKS").
 
 ## 06 What's next
 
-> The special attacks in 3D; the ladder's seasons and matchmaking by rating in the game (both
-> already kept by the services); more items for a Genesis in the shop; tournaments staked in $CHOG.
+> The special attacks in 3D; matchmaking by rating in the game (already kept by the services); more items for a Genesis in the shop; tournaments staked in $CHOG.
 
 ## 07 Go to market (asked by the owner on 23 October 2026: simple, highest return first, mobile, events)
 
