@@ -22,8 +22,8 @@ namespace Chog.Screens
 
         public static string Describe()
         {
-            return "<b><color=" + TitleColor + ">YOU PLAY A RECRUIT</color></b>\n<size=75%>" + (100 - Recruit.HealthPercent) +
-                   "% less health, no Genesis attack.\nConnect your Genesis on the menu, or rent one, to play it.</size>";
+            // Two lines (23 October 2026, the owner: light words; a recruit plays for practice, rank and stakes need a Genesis).
+            return "<b><color=" + TitleColor + ">PRACTICE MATCH</color></b>\n<size=75%>Play a Genesis to rank and bet.</size>";
         }
 
         /// <summary>

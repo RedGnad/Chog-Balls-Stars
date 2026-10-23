@@ -137,8 +137,8 @@ namespace Chog.Screens
         {
             var waited = waitedSeconds / 60 + ":" + (waitedSeconds % 60).ToString("00", CultureInfo.InvariantCulture);
             return waitedSeconds < LongSeconds
-                ? "confirming the replay, about " + UsualSeconds / 60 + " min (" + waited + ")"
-                : "still confirming (" + waited + "): your stake is safe, see the home screen";
+                ? "verifying the result (" + waited + ")"
+                : "still verifying (" + waited + "): your stake is safe, see home";
         }
 
         private void Refresh()

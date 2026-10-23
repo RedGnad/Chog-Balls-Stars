@@ -100,6 +100,23 @@ test('guest seats cannot inflate a mixed human match reward', async () => {
   assert.equal((await ranks.of(address(2))).matches, 0);
 });
 
+test('a signed-in recruit counts toward what a match is worth but earns no points of it', async () => {
+  const store = createMemoryStore();
+  const matches = createMatches({ store });
+  const ranks = createRanks({ store, matches });
+  const id = 'genesis-and-recruit';
+  const recruit = { ...players[3], tokenId: 0 };
+  await matches.entered(id, { how: 'create', userId: address(1), app: match.app });
+  await matches.admitted(id, admission(players[0]));
+  await matches.admitted(id, admission(recruit));
+  const event = await ranks.record(id, { ...verdict, winnerTeam: 1, players: [players[0], recruit] });
+  assert.equal(event.reason, null);
+  assert.equal(event.authenticatedHumans, 2);
+  assert.deepEqual(event.players.map(player => player.address), [address(1)]);
+  assert.equal((await ranks.of(address(4))).matches, 0, 'the recruit won, and has no rank match');
+  assert.equal((await ranks.of(address(1))).matches, 1);
+});
+
 test('a bot-match loss subtracts its frozen amount but never takes points below zero', async () => {
   const store = createMemoryStore();
   const matches = createMatches({ store });

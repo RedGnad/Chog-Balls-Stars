@@ -139,13 +139,16 @@ export function createRanks({ store, matches, now = Date.now }) {
     if (existing !== null) return JSON.parse(existing);
     const match = await matches.get(gameId);
     const reason = rankEligibility(match, verdict);
-    const players = reason ? [] : verdict.players.flatMap(player => {
+    const signedIn = reason ? [] : verdict.players.flatMap(player => {
       const admitted = match.admissions.filter(entry => entry.player === player.player).at(-1);
       return isAddress(admitted.address) && admitted.right !== 'guest'
-        ? [{ address: admitted.address.toLowerCase(), team: player.team }] : [];
+        ? [{ address: admitted.address.toLowerCase(), team: player.team, genesis: player.tokenId > 0 }] : [];
     });
+    // Only the players of a Genesis earn points (23 October 2026, the owner: the NFT must be essential; a recruit
+    // plays for practice); every signed-in human still counts toward what a match is worth.
+    const players = signedIn.filter(player => player.genesis).map(({ address, team }) => ({ address, team }));
     const humanCount = reason ? null : verdict.players.length;
-    const authenticatedHumans = reason ? null : players.length;
+    const authenticatedHumans = reason ? null : signedIn.length;
     const scoring = reason ? null : scoringFor(authenticatedHumans);
     const event = { gameId, at: new Date(now()).toISOString(), reason, winnerTeam: verdict?.winnerTeam ?? null,
       humanCount, authenticatedHumans, scoring, players };

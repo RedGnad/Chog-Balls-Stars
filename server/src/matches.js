@@ -216,7 +216,11 @@ export function createMatches({ store, now = Date.now }) {
   const ticket = (gameId, { address, team, amount, deadline }) => inTurn(gameId, async () => {
     const match = await read(gameId, 'match');
     if (!match) return { refused: 'unknown_match' };
-    if (!match.admissions.some(admission => admission.address === address)) return { refused: 'not_admitted' };
+    const admitted = match.admissions.filter(admission => admission.address === address).at(-1);
+    if (!admitted) return { refused: 'not_admitted' };
+    // Stakes are for the players of a Genesis, held, rented or lent (23 October 2026, the owner: the NFT must be
+    // essential; a recruit plays for practice).
+    if (!(admitted.tokenId > 0)) return { refused: 'genesis_required' };
     if (match.tickets.lockedAt) return { refused: 'stakes_locked' };
     if (match.closedAt) return { refused: 'match_closed' };
     if (await read(gameId, 'verdict')) return { refused: 'match_judged' };

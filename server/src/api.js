@@ -18,6 +18,7 @@ const WAGER_REFUSALS = {
   bad_request: 'the ticket or the permit is not well formed',
   reverted: 'the stake was refused on the chain',
   refused_by_chain: 'the chain refused the stake',
+  genesis_required: 'stakes are for Genesis players: play a Genesis you hold, rent or were lent',
   too_soon: 'a stake of this wallet was just sent: wait a few seconds',
   relay_busy: 'too many stakes are being sent: try again in a moment',
   bad_team: 'team must be 0 or 1',

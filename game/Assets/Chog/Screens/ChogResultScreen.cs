@@ -320,6 +320,10 @@ namespace Chog.Screens
             // The points shown the moment the siege ended, before the replay confirmed them; null until then.
             private PlayerRankGain _shownGain;
             private bool _revealing;
+            // While the services replay the siege: the line counts the seconds and its bar moves, so the wait reads as
+            // work going on (23 October 2026, the owner: a still "CHECKING THE REPLAY" looked stuck).
+            private bool _verifying;
+            private RectTransform _verifyFill;
 
             public void BuildRecruitRank(Transform card)
             {
@@ -343,7 +347,7 @@ namespace Chog.Screens
                     _rankTier.text = "PLAYER RANK";
                     _rankValue.text = PlayerWallet.SignIn == SignInState.SignedIn ? "RANK LOADING" : "SIGN IN TO EARN";
                     _rankNext.text = "";
-                    Career.text = TokenId > 0 ? "Siege matches earn player points." : "Recruit has no Genesis mastery. Siege can earn player points.";
+                    Career.text = TokenId > 0 ? "Siege matches earn player points." : "Play a Genesis to earn player points.";
                 }
             }
 
@@ -369,9 +373,18 @@ namespace Chog.Screens
                     22f, TextAlignmentOptions.Center, ChogTheme.Cream);
                 var signedMatch = PlayerWallet.SignIn == SignInState.SignedIn && RankEligible &&
                     !BuildIdentity.PhotonVersion.Contains(BuildIdentity.PreviewSuffix);
-                _rankStatus.text = signedMatch ? "CHECKING THE REPLAY..." : "PLAYER RANK: CASUAL MATCH";
+                // Rank is for the players of a Genesis (held, rented or lent); a recruit plays for practice.
+                var practice = signedMatch && TokenId <= 0;
+                signedMatch &= !practice;
+                _rankStatus.text = practice ? "PRACTICE: PLAY A GENESIS TO RANK" : signedMatch ? "VERIFYING RESULT" : "CASUAL MATCH";
                 if (signedMatch)
                 {
+                    _verifyFill = ChogUi.Area("Progress", strip.transform, new Vector2(0.015f, 0.06f), new Vector2(0.015f, 0.16f));
+                    var fill = _verifyFill.gameObject.AddComponent<Image>();
+                    fill.color = ChogTheme.PurpleSoft;
+                    fill.raycastTarget = false;
+                    _verifying = true;
+                    StartCoroutine(Verifying());
                     RankAddress = PlayerWallet.Address;
                     RememberPendingRank(RankAddress, GameId);
                 }
@@ -417,7 +430,10 @@ namespace Chog.Screens
                 if (delta == 0 && gain.tierBefore == gain.tierAfter)
                 {
                     if (won != null && Humans == 1 && before >= RankRules.SoloCap)
-                        _rankStatus.text = "SOLO SIEGES RANK UP TO SILVER: PLAY WITH OTHERS FOR MORE";
+                    {
+                        _verifying = false;
+                        _rankStatus.text = "SOLO SIEGES STOP AT SILVER";
+                    }
                     return;
                 }
                 _shownGain = gain;
@@ -438,6 +454,30 @@ namespace Chog.Screens
                 Revealed.Add(GameId);
                 yield return RevealRank(gain, rank, provisional: true);
                 _revealing = false;
+            }
+
+            // Counts the seconds of the wait and moves the bar toward its end, never reaching it before the answer.
+            private IEnumerator Verifying()
+            {
+                var start = Time.unscaledTime;
+                while (_verifying && !_leaving && _rankStatus != null)
+                {
+                    var seconds = Time.unscaledTime - start;
+                    _rankStatus.text = "VERIFYING RESULT  " + Mathf.FloorToInt(seconds) + "s";
+                    if (_verifyFill != null)
+                        _verifyFill.anchorMax = new Vector2(0.015f + 0.97f * (1f - Mathf.Exp(-seconds / 12f)), 0.16f);
+                    yield return null;
+                }
+                if (_verifyFill != null)
+                    _verifyFill.gameObject.SetActive(false);
+            }
+
+            // The line's last words, once the wait is over.
+            private void Settle(string words, Color colour)
+            {
+                _verifying = false;
+                _rankStatus.text = words;
+                _rankStatus.color = colour;
             }
 
             private IEnumerator PollRank()
@@ -461,12 +501,12 @@ namespace Chog.Screens
                         yield break;
                     if (answer == null && ++failures >= 3)
                     {
-                        _rankStatus.text = "PLAYER RANK: SERVICE UNAVAILABLE, CHECK LATER";
+                        Settle("RESULT: SERVICE BUSY, SEE HOME", ChogTheme.Cream);
                         yield break;
                     }
                     if (answer != null && !answer.enabled)
                     {
-                        _rankStatus.text = "PLAYER RANK: NOT AVAILABLE YET";
+                        Settle("RANK IS OFF FOR NOW", ChogTheme.Cream);
                         ClearPendingRank(RankAddress, GameId);
                         yield break;
                     }
@@ -480,14 +520,13 @@ namespace Chog.Screens
                         {
                             while (_revealing && !_leaving)
                                 yield return null;
-                            _rankStatus.text = (gain.delta == _shownGain.delta ? "VERIFIED BY THE REPLAY  " : "CORRECTED BY THE REPLAY  ") +
-                                answer.rank.tier + "  " + answer.rank.points + " PTS  (" + signed + ")";
-                            _rankStatus.color = ChogTheme.Ok;
+                            // The services' numbers replace ours when they differ.
+                            Settle("RESULT VERIFIED  " + signed + " PTS", ChogTheme.Ok);
                             ShowRank(answer.rank, answer.rank.points);
                         }
                         else
                         {
-                            _rankStatus.text = "PLAYER RANK  " + answer.rank.tier + "  " + answer.rank.points + " PTS  (" + signed + ")";
+                            Settle("RESULT VERIFIED  " + signed + " PTS", ChogTheme.Ok);
                             if (gain.delta != 0 || gain.tierAfter != gain.tierBefore)
                                 yield return RevealRank(gain, answer.rank);
                             else
@@ -502,10 +541,7 @@ namespace Chog.Screens
                     {
                         while (_revealing && !_leaving)
                             yield return null;
-                        var prefix = _shownGain != null ? "NOT COUNTED BY THE REPLAY" : "NO RANK POINTS";
-                        _rankStatus.text = answer.rank != null
-                            ? prefix + "  |  " + answer.rank.tier + " " + answer.rank.points + " PTS"
-                            : prefix + " FOR THIS MATCH";
+                        Settle("NOT COUNTED", ChogTheme.Cream);
                         if (answer.rank != null)
                             ShowRank(answer.rank, answer.rank.points);
                         ClearPendingRank(RankAddress, GameId);
@@ -514,7 +550,7 @@ namespace Chog.Screens
                     yield return new WaitForSecondsRealtime(4f);
                 }
                 if (_rankStatus != null && !_leaving)
-                    _rankStatus.text = "PLAYER RANK: STILL VERIFYING, CHECK AGAIN FROM HOME";
+                    Settle("STILL VERIFYING: SEE HOME", ChogTheme.Cream);
             }
 
             // The flight of the points (22 October 2026, the owner: "we should literally see the points

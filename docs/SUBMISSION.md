@@ -43,7 +43,7 @@ Bronze to Star; season 1 live since 23 October, 02:05 UTC, ending 6 November, no
 > - Lend it to a friend for free with a link.
 >
 > **NO GENESIS? PLAY ANYWAY**
-> - Rent a hero by the day, play a holder's link, or start as a Recruit and pick the Genesis you want.
+> - Rent a hero by the day or play a holder's link. A Recruit plays for practice: no rank, no bets.
 >
 > **PROGRESS THAT STAYS WITH THE NFT**
 > - Each Genesis keeps a career on Monad (matches, wins, badges, mastery) that follows it to its next holder.
@@ -133,8 +133,8 @@ Bronze to Star; season 1 live since 23 October, 02:05 UTC, ending 6 November, no
 
 ## 04 Why Chog matters (the "NFT gate")
 
-> Take the NFT out and there is no hero: without a Genesis you are a grey recruit with 10% less
-> health and no Genesis attack. With one, everything you see and do comes from its traits: the 3D
+> Take the NFT out and there is no hero, no rank and no bet: without a Genesis you are a grey recruit
+> who plays for practice (10% less health, no Genesis attack, no player points, no stake). With one, everything you see and do comes from its traits: the 3D
 > character is built from them, the basic attack throws what it holds or wears, the special comes from
 > its eyes and its aura, the class from its outfit. Ownership is read on Monad mainnet at sign-in and
 > checked again by the services when a match starts; a lent or rented Genesis plays under the same

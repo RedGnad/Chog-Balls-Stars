@@ -104,12 +104,13 @@ const call = (api, method, path, session, body) => api(new Request(ORIGIN + path
   method, headers: session ? { Authorization: 'Bearer ' + session } : {}, body: body ? JSON.stringify(body) : undefined,
 })).then(async response => ({ status: response.status, body: await response.json() }));
 
-// Alice (player 0) and Bob (player 1) are let into the match "game" and its record starts.
-async function matchOfTwo(matches, gameId = 'game') {
+// Alice (player 0) and Bob (player 1) are let into the match "game" and its record starts. Bob is let in with a
+// rented Genesis (408) the judge's verdict below does not count as one, so the Genesis share stays Alice's alone.
+async function matchOfTwo(matches, gameId = 'game', bobToken = 408) {
   await matches.entered(gameId, { how: 'create', userId: ALICE.address, authCookie: null, app: { roomName: 'party' } });
   await matches.admitted(gameId, { userId: ALICE.address, actorNr: 1, playerSlot: 0, address: ALICE.address, tokenId: 1795 });
   await matches.added(gameId, { userId: ALICE.address, actorNr: 1, playerSlot: 0, player: 0 });
-  await matches.admitted(gameId, { userId: BOB.address, actorNr: 2, playerSlot: 0, address: BOB.address, tokenId: 0 });
+  await matches.admitted(gameId, { userId: BOB.address, actorNr: 2, playerSlot: 0, address: BOB.address, tokenId: bobToken });
   await matches.added(gameId, { userId: BOB.address, actorNr: 2, playerSlot: 0, player: 1 });
   await matches.started(gameId, { GameId: gameId });
 }
@@ -197,6 +198,16 @@ test('a ticket is only for a wallet let into the match, and fixes what everyone 
   assert.equal(mine.roomName, 'party');
   assert.equal(mine.amount, AMOUNT);
   assert.deepEqual(mine.stakes.stakers, []);
+});
+
+test('a recruit plays for practice: no ticket to stake without a Genesis', async () => {
+  const { api, matches } = services();
+  await matchOfTwo(matches, 'game', 0);
+  const bob = await sessionOf(api, BOB);
+  const refused = await call(api, 'POST', '/api/wager/ticket', bob, { team: 1, amount: AMOUNT });
+  assert.equal(refused.status, 409);
+  assert.equal(refused.body.error, 'genesis_required');
+  assert.equal((await call(api, 'POST', '/api/wager/ticket', await sessionOf(api, ALICE), { team: 0, amount: AMOUNT })).status, 200);
 });
 
 test('the stakes are locked only when no ticket can be used any more, and then no ticket is given', async () => {

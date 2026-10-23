@@ -74,6 +74,10 @@ namespace Chog.Screens
             s_team = localTeam;
             if (GenesisWager.State != WagerState.Open || screen.Find(ObjectName) != null)
                 return;
+            // Stakes are for the players of a Genesis, held, rented or lent (the services refuse a recruit's ticket,
+            // "genesis_required"): a recruit plays for practice and sees no stake panel.
+            if (WalletPanel.PlayedTokenId <= 0)
+                return;
 
             // Wagering is opt-in. A player who has not signed in and is not in a wager should see a
             // clean preparation screen, rather than a second unexplained task beside starting a match.

@@ -123,10 +123,14 @@ namespace Quantum
       }
     }
 
+    // A player who joins takes the team with fewer players, the left one on a tie, as matchmade games balance their
+    // teams (23 October 2026, the owner: two humans who pressed PLAY landed on the same team, so they could not stake
+    // against each other). CHANGE TEAM still moves a player.
     private int FindValidTeam(Frame frame)
     {
-      var teamAPlayersCount = GetTeamPlayerCount(frame, 0);
-      return teamAPlayersCount <= Constants.MAX_TEAM_SIZE ? 0 : 1;
+      var left = GetTeamPlayerCount(frame, 0);
+      var right = GetTeamPlayerCount(frame, 1);
+      return right < left ? 1 : 0;
     }
 
     private TeamInfo* GetTeamInfo(Frame frame, PlayerRef player)

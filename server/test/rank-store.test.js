@@ -64,8 +64,8 @@ test('a rank credited to remote storage survives a service restart and racing ca
   const gameId = 'remote-rank-game';
   const address = '0x0000000000000000000000000000000000000001';
   await matches.entered(gameId, { how: 'create', userId: address, app: { appVersion: 'sim-example-siege' } });
-  await matches.admitted(gameId, { player: 1, tokenId: 0, address, right: null });
-  const players = [{ player: 1, team: 0, tokenId: 0 }];
+  await matches.admitted(gameId, { player: 1, tokenId: 1795, address, right: null });
+  const players = [{ player: 1, team: 0, tokenId: 1795 }];
   const ranks = createRanks({ store: createRemoteRankStore(options), matches });
   const win = { mode: 'Siege', testOptions: false, winnerTeam: 0, players };
   const [one, two] = await Promise.all([ranks.record(gameId, win), ranks.record(gameId, { ...win, winnerTeam: 1 })]);

@@ -25,7 +25,8 @@ match from Photon's own record of the inputs, then settled on Monad.
 ## Features
 
 **Bet on your team**
-- Stake $CHOG before the match; the winners share the losers' stakes, paid by the contract on the replayed result.
+- Play a Genesis and stake $CHOG before the match; the winners share the losers' stakes, paid by the contract on the
+  replayed result. Teams are balanced as players join, so two players face each other.
 - A stake never depends on our servers staying up: with no result an hour after the first stake, anyone can have every
   stake given back.
 - Part of every payment is burned; the players who played a Genesis in the match share a cut of the lost stakes.
@@ -41,7 +42,7 @@ match from Photon's own record of the inputs, then settled on Monad.
 **Earn with your Genesis**
 - Rent it out by the day for $CHOG, up to 30 days, without it ever leaving your wallet; the rent is earned by the second.
 - Lend it to a friend for free with a link.
-- No Genesis? Rent one by the day, play a holder's link, or start as a Recruit.
+- No Genesis? Rent one by the day or play a holder's link. A Recruit plays for practice: no rank, no stakes.
 
 **Progress that stays with the NFT**
 - Each Genesis keeps a career on Monad (matches, wins, badges, mastery) that follows it to its next holder.
@@ -90,7 +91,8 @@ Sources and tests: [`contracts/`](contracts/README.md) (Solidity, Foundry).
 ## For judges
 
 - **Play:** open [the game](https://chogtanks.vercel.app/chog-balls-stars/) on a phone held sideways or on a desktop.
-  Without a wallet you play a Recruit; connect a wallet that holds a Chog Genesis to play it.
+  Connect a wallet that holds a Chog Genesis to play it, rank and stake; two players who press PLAY together land on
+  opposite teams. Without one you play a Recruit, for practice.
 - **See the verdicts live:** [`/api/careers/recent`](https://chog-genesis-game.onrender.com/api/careers/recent) lists the
   last matches judged by the server: winner, scores, how far Photon's record went and how long judging took.
 - **Read the stake setup:** [`/api/wager`](https://chog-genesis-game.onrender.com/api/wager) answers the contract, its
