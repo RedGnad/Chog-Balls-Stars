@@ -268,6 +268,7 @@ namespace Chog.Match
         private sealed class LockAnswer
         {
             public bool locked;
+            public string calledOff;
             public int waitSeconds;
             public string error;
             public string message;
@@ -495,8 +496,12 @@ namespace Chog.Match
                 {
                     Locked = true;
                     LockWaitSeconds = 0;
-                    Debug.Log("CHOG_WAGER stakes locked");
-                    SetStep(WagerStep.Idle, WagerAction.None, "");
+                    Debug.Log("CHOG_WAGER stakes locked" + (string.IsNullOrEmpty(answer.calledOff) ? "" : ", called off: " + answer.calledOff));
+                    // A staker left before the start: the services gave every stake back, the match is played unstaked.
+                    if (!string.IsNullOrEmpty(answer.calledOff))
+                        SetStep(WagerStep.Failed, WagerAction.Lock, answer.calledOff);
+                    else
+                        SetStep(WagerStep.Idle, WagerAction.None, "");
                     start();
                     yield break;
                 }

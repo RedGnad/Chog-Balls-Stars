@@ -162,6 +162,14 @@ export function genesisPlayersOf(match) {
  * @param {ReturnType<import('./price.js').createPrice>} [options.price] the price of $CHOG, for the dollars of a week
  * @param {() => number} [options.now] milliseconds
  */
+// Whether a wallet left a room after it last entered it (Photon's game/leave against its join or create).
+function leftRoom(match, address) {
+  const who = String(address).toLowerCase();
+  const timeOf = entry => (typeof entry.at === 'number' ? entry.at : Date.parse(entry.at));
+  const latest = list => Math.max(-1, ...(list ?? []).filter(entry => String(entry.userId).toLowerCase() === who).map(timeOf));
+  return latest(match.left) > latest(match.entries);
+}
+
 export function createWager({ chain, referee, matches, network = wagerNetwork(), store, price, sender, now = Date.now }) {
   const contract = referee?.wager ?? null;
   if (referee && referee.chainId !== network.chainId) {
@@ -275,6 +283,18 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     if (locked.locked && store && Array.isArray(locked.book)) {
       for (const staker of locked.book) {
         if (isAddress(staker.address)) await store.set(stakedKey(staker.address, match.gameId), JSON.stringify({ gameId: match.gameId, at: locked.lockedAt }));
+      }
+    }
+    // A staker who left the room before the start (CANCEL, a closed tab) would make the match void at its end without a word to
+    // the others: it is called off now and every stake given back at once (the audit, 23 October 2026).
+    if (locked.locked && sender && Array.isArray(locked.book) && locked.book.length > 0) {
+      const journal = await matches.get(match.gameId);
+      if (journal && locked.book.some(staker => leftRoom(journal, staker.address))) {
+        const matchKey = matchKeyOf(match.gameId);
+        const data = settlementData({ matchKey, void: true, signature: referee.signVoid({ matchKey }) }, true);
+        await sender.transact({ to: contract, data, purpose: `the refund of ${matchKey}` })
+          .catch(error => console.warn(`Stakes of ${match.gameId} not given back: ${error.message}`));
+        return { ...locked, calledOff: 'a player who staked left: every stake is given back' };
       }
     }
     return locked;

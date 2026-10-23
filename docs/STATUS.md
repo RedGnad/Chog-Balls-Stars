@@ -1,5 +1,12 @@
 # État courant et décisions
 
+**23 October 2026, 14:58 UTC (lead: the audit's remaining items that can be closed simply; deployed).**
+- **A staker who left before the start** (Photon's game/leave after its last join): the lock now calls the match off on the chain at once and tells the host's page ("a player who staked left: every stake is given back"); the match is played unstaked. Services 142 tests (new: called off at the lock).
+- **A lent Genesis is played with its pass** when the connected wallet has no Genesis of its own to play and the pass counts (`PhotonIdentity.Credential`); it was played as a recruit.
+- **Settings:** the region's default entry reads "EU (DEFAULT)" (it is the quick matches' region, not the best by ping); the room size and the version can be seen, not changed (either one matched nobody).
+- Still open (rare): two popups after a drop; one wallet in two tabs gets Photon's raw error; no Reown disconnect; CHANGE TEAM's fourth player (simulation).
+- Build `20261023T145402744Z-471d6b6436924c37997b7188ff193769`, stamp unchanged; judge fixtures agree.
+
 **23 October 2026, 14:45 UTC (lead: closing the audit's open items; deployed).**
 - **A cancelled stake gives its ticket back** (`POST /api/wager/release`, called when a stake stops): the stakes lock at once instead of holding START up to 135 s, and when nobody staked the amount is free again; a used ticket stays (`already_staked`). Services 141 tests.
 - **Wallet requests and the sign-in time out** (120 s and 90 s, `PlayerWallet.Update`): a phone wallet that never answers no longer leaves a stake busy (which froze the lobby's clock and START NOW) or the sign-in stuck; a timed-out request reads as "not signed", nothing else is tried behind the player's back.

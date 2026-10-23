@@ -513,3 +513,22 @@ test('a ticket given back after a refused signature lets the stakes lock at once
   state.stakes.set(matchKeyOf('game'), [{ address: BOB.address, team: 1 }]);
   assert.equal((await call(api, 'POST', '/api/wager/release', bob)).body.error, 'already_staked', 'a used ticket stays');
 });
+
+test('a staker who left before the start has the match called off at the lock, every stake given back at once', async () => {
+  const sent = [];
+  const sender = { transact: async ({ data }) => { sent.push(data); return { ok: true, hash: '0x' + 'ef'.repeat(32) }; } };
+  const { api, matches, state } = services({ sender });
+  await matchOfTwo(matches);
+  const alice = await sessionOf(api, ALICE);
+  const bob = await sessionOf(api, BOB);
+  await call(api, 'POST', '/api/wager/ticket', alice, { team: 0, amount: AMOUNT });
+  await call(api, 'POST', '/api/wager/ticket', bob, { team: 1, amount: AMOUNT });
+  state.stakes.set(matchKeyOf('game'), [{ address: ALICE.address, team: 0 }, { address: BOB.address, team: 1 }]);
+  state.clock += 5000;
+  await matches.left('game', { userId: BOB.address, actorNr: 2 });
+  const locked = (await call(api, 'POST', '/api/wager/lock', alice)).body;
+  assert.equal(locked.locked, true);
+  assert.match(locked.calledOff, /left/);
+  assert.equal(sent.length, 1);
+  assert.ok(sent[0].startsWith('0x' + selector('voidMatch(bytes32,bytes)')), 'the match is called off on the chain');
+});

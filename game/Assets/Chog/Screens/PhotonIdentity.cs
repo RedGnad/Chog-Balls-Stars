@@ -58,8 +58,13 @@ namespace Chog.Screens
         /// What is sent to Photon for this player: the wallet's session first, then a guest's
         /// pass, then nothing. The name is the parameter, the value what it carries.
         /// </summary>
-        public static (string name, string value) Credential(string session, string pass)
+        public static (string name, string value) Credential(string session, string pass, bool walletPlaysGenesis = true)
         {
+            // A lent Genesis is played with its pass when the connected wallet has no Genesis of its own to play (the audit,
+            // 23 October 2026: the session went first, the services found no right for that wallet, and the lent hero became a
+            // recruit). A wallet with a Genesis keeps its session.
+            if (!string.IsNullOrEmpty(pass) && !walletPlaysGenesis)
+                return (PassParameter, pass);
             if (!string.IsNullOrEmpty(session))
                 return (SessionParameter, session);
 
@@ -118,7 +123,10 @@ namespace Chog.Screens
         private void Update()
         {
             var asked = SignInNeededToPlay;
-            var (name, value) = asked ? Credential(PlayerWallet.Session, GuestPass.Pass) : (null, null);
+            // Only a pass the services said counts takes the place of the session.
+            var walletPlaysGenesis = PlayerWallet.State == WalletState.Ready && PlayerWallet.Playable.Length > 0
+                                     || GuestPass.State != GuestPassState.Valid;
+            var (name, value) = asked ? Credential(PlayerWallet.Session, GuestPass.Pass, walletPlaysGenesis) : (null, null);
             if (_givenOnce && asked == _givenAsked && string.Equals(name, _givenName) && string.Equals(value, _givenValue))
                 return;
 

@@ -166,7 +166,8 @@ namespace Quantum.Menu {
     public override void Show() {
       base.Show();
 
-      _entryRegion.SetOptions(Config.AvailableRegions, ConnectionArgs.PreferredRegion, s => string.IsNullOrEmpty(s) ? "Best" : s);
+      // No region picked means the one every quick match is played in (QuantumMenuUIMain.QuickMatchRegion), not the best by ping.
+      _entryRegion.SetOptions(Config.AvailableRegions, ConnectionArgs.PreferredRegion, s => string.IsNullOrEmpty(s) ? QuantumMenuUIMain.QuickMatchRegion.ToUpperInvariant() + " (DEFAULT)" : s);
       _entryAppVersion.SetOptions(_appVersions, ConnectionArgs.AppVersion, s => s.Equals(Config.MachineId) ? $"Build ({Config.MachineId})" : s);
       _entryFramerate.SetOptions(_graphicsSettings.CreateFramerateOptions, _graphicsSettings.Framerate, s => (s == -1 ? "Platform Default" : s.ToString()));
       _entryResolution.SetOptions(_graphicsSettings.CreateResolutionOptions, _graphicsSettings.Resolution, s =>
@@ -177,6 +178,9 @@ namespace Quantum.Menu {
 #endif
       _entryGraphicsQuality.SetOptions(_graphicsSettings.CreateGraphicsQualityOptions, _graphicsSettings.QualityLevel, s => QualitySettings.names[s]);
       _uiMaxPlayers.SetTextWithoutNotify(Math.Clamp(ConnectionArgs.MaxPlayerCount, 1, Config.MaxPlayerCount).ToString());
+      // A room size or a version other than the game's own matches nobody (the audit, 23 October 2026): shown, not changed.
+      _uiMaxPlayers.interactable = false;
+      _uiAppVersion.interactable = false;
       _uiFullscreen.isOn = _graphicsSettings.Fullscreen;
       _uiVSyncCount.isOn = _graphicsSettings.VSync;
 
