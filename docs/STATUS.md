@@ -1,5 +1,8 @@
 # État courant et décisions
 
+**23 October 2026, 01:20 UTC (lead: the candy crate skin back to Siege only; deployed).**
+- **The owner:** Siege had our custom crate skin, Coins the sample's crate texture in our colour, and both now showed the candy skin. `ChogArenaCoverSkin` now applies only in `GameplaySiege` (`ArenaScenes.SiegeSceneName`). Checked on a local match of each mode (build `20261023T010613751Z-b886ee5e33da4f67a2e3aeacb6ffbea9`): Coins shows the plank crates tinted pink, Siege the candy crates. Stamp unchanged; judge fixtures agree. The first build failed with the disk full; it passed once the owner freed space.
+
 **23 October 2026, 00:42 UTC (lead: the home screen without the "3 v 3, bots fill the empty places" line; deployed).**
 - **The owner:** that line under PLAY is noise. Removed (`ChogHome`). Build `20261023T003644542Z-e33b909c978444faac8f4a64259d31cd`, stamp unchanged; judge fixtures agree.
 

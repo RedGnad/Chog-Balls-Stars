@@ -18,6 +18,9 @@ namespace Chog.Match
         /// <summary>Every scene of a match is named starting with this: "Gameplay", "GameplaySiege".</summary>
         public const string Prefix = "Gameplay";
 
+        /// <summary>The scene of the siege's own map.</summary>
+        public const string SiegeSceneName = "GameplaySiege";
+
         /// <summary>The paths of the maps in the Quantum asset database (QuantumUnityDB).</summary>
         public const string CoinsMapPath = "QuantumUser/Resources/Map1";
         public const string SiegeMapPath = "QuantumUser/Resources/SiegeMap";

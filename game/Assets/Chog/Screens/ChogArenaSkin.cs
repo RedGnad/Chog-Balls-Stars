@@ -85,7 +85,11 @@ namespace Chog.Screens
             // The Photon sample's cover collision stays exactly where it is. Its repeated cage mesh is
             // replaced only at runtime by three batched candy-block surfaces, built from the original
             // renderer bounds. There are no new colliders, triggers or map objects.
-            ChogArenaCoverSkin.Apply(roots, shader);
+            // Only the siege's crates take the candy skin; the coins keep the sample's crates in the arena's colours (23 October 2026,
+            // the owner: "in siege the blocks with our own texture, in coins the crate texture in our colour"; the coins map names its
+            // crates "Crate" too, so both arenas had the candy skin).
+            if (scene.name == ArenaScenes.SiegeSceneName)
+                ChogArenaCoverSkin.Apply(roots, shader);
             var paletteAmbient = ColourOf(colours[ArenaPalettes.Ambient]);
             ChogMatchLook.LightArena(roots, paletteAmbient, ambientGiven ? paletteAmbient : (Color?)null);
             ChogMatchPost.Attach(roots);
