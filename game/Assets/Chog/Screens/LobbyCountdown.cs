@@ -23,8 +23,10 @@ namespace Chog.Screens
         private const float Seconds = 30f;
         // How long after zero the other players wait for the host before starting the match themselves.
         public const float HostGraceSeconds = 8f;
-        // Under the card of the Genesis (GenesisHeroCard, 178 to 478 from the top of a 1080 screen), above CHANGE TEAM (635).
-        private static readonly Vector2 Place = new Vector2(0.5f, 0.509f);
+        // Just above START NOW (its top 840 from the top of a 1080 screen), its line of players above it, so the
+        // clock and the button read as one (23 October 2026, the owner: the preparation screen was cluttered; CHANGE
+        // TEAM, which sat under the clock, went to the corner of CANCEL).
+        private static readonly Vector2 Place = new Vector2(0.5f, 0.319f);
         private const float DiscSize = 100f;
 
         private TextMeshProUGUI _number;
@@ -63,7 +65,7 @@ namespace Chog.Screens
             plate.gameObject.AddComponent<Shadow>().effectDistance = new Vector2(0f, -6f);
             _number = ChogUi.Title("Number", _disc.transform, new Vector2(0f, 0.08f), Vector2.one, 60f);
             _caption = ChogUi.Number("Caption", transform, Vector2.zero, Vector2.zero, 24f, TextAlignmentOptions.Center, ChogTheme.Hex("FFE27A"));
-            ChogUi.Pin(_caption.rectTransform, Place, new Vector2(0.5f, 1f), new Vector2(0f, -DiscSize * 0.5f - 8f), new Vector2(550f, 34f));
+            ChogUi.Pin(_caption.rectTransform, Place, new Vector2(0.5f, 0f), new Vector2(0f, DiscSize * 0.5f + 8f), new Vector2(650f, 34f));
             _startedAt = Time.unscaledTime;
         }
 
@@ -83,8 +85,8 @@ namespace Chog.Screens
             var left = Seconds - (Time.unscaledTime - _startedAt - _waited);
             _number.text = Mathf.Max(0, Mathf.CeilToInt(left)).ToString();
             _caption.text = players >= 6
-                ? "6/6 HUMANS  |  STARTS BY ITSELF"
-                : Mathf.Max(0, players) + "/6 HUMANS  |  BOTS FILL AT START";
+                ? "6/6 PLAYERS  |  STARTS BY ITSELF"
+                : Mathf.Max(0, players) + "/6 PLAYERS  |  BOTS FILL THE REST";
             if (!StartsNow(hosts, left) || _fired)
                 return;
             _fired = true;

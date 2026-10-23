@@ -74,6 +74,13 @@ services:
       # The host disables rank automatically if its startup write probe fails.
       - key: RANK_ENABLED
         value: "1"
+      # The ladder's first season (server/src/seasons.js), from 23 October 2026: when it ends, every wallet
+      # above Gold comes down toward it and the list of its players with their final tier is written once.
+      # Nothing is paid by itself.
+      - key: SEASON_ID
+        value: "season-1"
+      - key: SEASON_ENDS_AT
+        value: "2026-11-06T00:00:00Z"
       - key: CAREERS_ADDRESS
         value: "0x335bf7bc610645546e2b00de6a9fd0c4709d6111"
       # The deployed wager contract and the key of its referee (contracts/README.md): both or

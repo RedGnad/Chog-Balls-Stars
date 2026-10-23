@@ -80,6 +80,11 @@ namespace Chog.Screens
 
         private static string PendingKey(string address) => "chog.rank.pending." + address.ToLowerInvariant();
 
+        private static readonly System.Collections.Generic.HashSet<string> Revealed = new System.Collections.Generic.HashSet<string>();
+
+        /// <summary>Whether the result screen already played this match's points (in this visit of the page).</summary>
+        public static bool WasRevealed(string gameId) => !string.IsNullOrEmpty(gameId) && Revealed.Contains(gameId);
+
         public static string PendingRankGameId(string address) => string.IsNullOrEmpty(address)
             ? "" : PlayerPrefs.GetString(PendingKey(address), "");
 
@@ -177,6 +182,8 @@ namespace Chog.Screens
             var resultFrame = game != null && game.Frames != null ? game.Frames.Verified : null;
             controls.RankEligible = playing && !string.IsNullOrEmpty(controls.GameId) &&
                 resultFrame != null && MatchModes.IsSiege(resultFrame);
+            controls.WinnerTeam = winnerTeam;
+            controls.Humans = resultFrame != null ? HumansIn(resultFrame) : 0;
             controls.VictoryTitle = title;
             controls.VictoryGlow = playing && ChogHeroModel.Has(metadataId)
                 ? host.transform.Find("Glow")?.GetComponent<Image>() : null;
@@ -204,6 +211,17 @@ namespace Chog.Screens
             again.onClick.AddListener(() => controls.Leave(true));
             menu.onClick.AddListener(() => controls.Leave(false));
             return true;
+        }
+
+        // The players of the match, bots left out.
+        private static int HumansIn(Frame frame)
+        {
+            var count = 0;
+            var players = frame.Filter<PlayerLink>();
+            while (players.Next(out _, out var link))
+                if (link.PlayerRef != PlayerRef.None)
+                    count++;
+            return count;
         }
 
         // Half of the screen in a team's colour, darker at the bottom.
@@ -270,6 +288,10 @@ namespace Chog.Screens
             public int PointsBefore = -1;
             public bool WaitingForRecord;
             public bool Won;
+            // The team that won (0 or 1; anything else is a draw) and the humans who played the match, for the
+            // points this siege is worth as soon as it ends (RankRules).
+            public int WinnerTeam = -1;
+            public int Humans;
             public bool RankEligible;
             public string RankAddress;
             public TextMeshProUGUI VictoryTitle;
@@ -295,6 +317,9 @@ namespace Chog.Screens
             private Task _disconnectTask;
             private bool _closing;
             private QuantumMenuUIController _menuController;
+            // The points shown the moment the siege ended, before the replay confirmed them; null until then.
+            private PlayerRankGain _shownGain;
+            private bool _revealing;
 
             public void BuildRecruitRank(Transform card)
             {
@@ -328,7 +353,9 @@ namespace Chog.Screens
                     return;
                 _rankTier.text = rank.tier;
                 _rankValue.text = displayedPoints + " PLAYER POINTS";
-                _rankNext.text = rank.next > 0 ? "NEXT RANK AT " + rank.next + " POINTS" : "TOP RANK";
+                var season = PlayerRanks.SeasonLine();
+                _rankNext.text = (rank.next > 0 ? "NEXT RANK AT " + rank.next + " POINTS" : "TOP RANK")
+                    + (season.Length > 0 ? "  |  " + season : "");
                 _rankFill.anchorMax = new Vector2(rank.next > 0
                     ? Mathf.Clamp((float)displayedPoints / rank.next, 0.001f, 1f) : 1f, 1f);
                 Career.text = rank.matches + " VERIFIED SIEGE MATCHES";
@@ -342,7 +369,7 @@ namespace Chog.Screens
                     22f, TextAlignmentOptions.Center, ChogTheme.Cream);
                 var signedMatch = PlayerWallet.SignIn == SignInState.SignedIn && RankEligible &&
                     !BuildIdentity.PhotonVersion.Contains(BuildIdentity.PreviewSuffix);
-                _rankStatus.text = signedMatch ? "RANK CHECKING IN BACKGROUND. PLAY AGAIN" : "PLAYER RANK: CASUAL MATCH";
+                _rankStatus.text = signedMatch ? "CHECKING THE REPLAY..." : "PLAYER RANK: CASUAL MATCH";
                 if (signedMatch)
                 {
                     RankAddress = PlayerWallet.Address;
@@ -364,7 +391,53 @@ namespace Chog.Screens
                     30f, TextAlignmentOptions.Center, ChogTheme.Cream);
                 _rankMoment.gameObject.SetActive(false);
                 if (signedMatch)
+                {
+                    ShowPointsAtOnce();
                     StartCoroutine(PollRank());
+                }
+            }
+
+            // The reward moment the instant the siege ends (23 October 2026, the owner never saw it: it waited for the
+            // replay, about 20 s, under a line that said PLAY AGAIN). The points come from the ladder's own scoring
+            // (RankRules), marked as checked by the replay until the services answer; their answer replaces them.
+            private void ShowPointsAtOnce()
+            {
+                var rank = PlayerRanks.Current?.rank;
+                if (rank == null || Humans < 1)
+                    return;
+                bool? won = WinnerTeam == 0 || WinnerTeam == 1 ? Won : (bool?)null;
+                var before = rank.points;
+                var delta = RankRules.DeltaFor(Humans, before, won);
+                var after = before + delta;
+                var gain = new PlayerRankGain
+                {
+                    gameId = GameId, delta = delta, before = before, after = after,
+                    tierBefore = RankRules.TierFor(before), tierAfter = RankRules.TierFor(after)
+                };
+                if (delta == 0 && gain.tierBefore == gain.tierAfter)
+                {
+                    if (won != null && Humans == 1 && before >= RankRules.SoloCap)
+                        _rankStatus.text = "SOLO SIEGES RANK UP TO SILVER: PLAY WITH OTHERS FOR MORE";
+                    return;
+                }
+                _shownGain = gain;
+                StartCoroutine(RevealAtOnce(gain, new PlayerRank
+                {
+                    tier = gain.tierAfter, points = after, next = RankRules.NextFor(after),
+                    matches = rank.matches + 1, wins = rank.wins + (won == true ? 1 : 0)
+                }));
+            }
+
+            private IEnumerator RevealAtOnce(PlayerRankGain gain, PlayerRank rank)
+            {
+                // After the title's entrance, when the buttons answer.
+                yield return new WaitForSecondsRealtime(ArmSeconds);
+                if (_leaving)
+                    yield break;
+                _revealing = true;
+                Revealed.Add(GameId);
+                yield return RevealRank(gain, rank, provisional: true);
+                _revealing = false;
             }
 
             private IEnumerator PollRank()
@@ -402,12 +475,24 @@ namespace Chog.Screens
                         answer.rank?.last != null && answer.rank.last.gameId == GameId)
                     {
                         var gain = answer.rank.last;
-                        _rankStatus.text = "PLAYER RANK  " + answer.rank.tier + "  " + answer.rank.points +
-                            " PTS  (" + (gain.delta >= 0 ? "+" : "") + gain.delta + ")";
-                        if (gain.delta != 0 || gain.tierAfter != gain.tierBefore)
-                            yield return RevealRank(gain, answer.rank);
-                        else
+                        var signed = (gain.delta >= 0 ? "+" : "") + gain.delta;
+                        if (_shownGain != null)
+                        {
+                            while (_revealing && !_leaving)
+                                yield return null;
+                            _rankStatus.text = (gain.delta == _shownGain.delta ? "VERIFIED BY THE REPLAY  " : "CORRECTED BY THE REPLAY  ") +
+                                answer.rank.tier + "  " + answer.rank.points + " PTS  (" + signed + ")";
+                            _rankStatus.color = ChogTheme.Ok;
                             ShowRank(answer.rank, answer.rank.points);
+                        }
+                        else
+                        {
+                            _rankStatus.text = "PLAYER RANK  " + answer.rank.tier + "  " + answer.rank.points + " PTS  (" + signed + ")";
+                            if (gain.delta != 0 || gain.tierAfter != gain.tierBefore)
+                                yield return RevealRank(gain, answer.rank);
+                            else
+                                ShowRank(answer.rank, answer.rank.points);
+                        }
                         if (!_leaving)
                             ClearPendingRank(RankAddress, GameId);
                         yield break;
@@ -415,9 +500,12 @@ namespace Chog.Screens
                     if (match != null && match.gameId == GameId &&
                         match.status != "verifying" && match.status != "preparing")
                     {
+                        while (_revealing && !_leaving)
+                            yield return null;
+                        var prefix = _shownGain != null ? "NOT COUNTED BY THE REPLAY" : "NO RANK POINTS";
                         _rankStatus.text = answer.rank != null
-                            ? "NO RANK POINTS  |  " + answer.rank.tier + " " + answer.rank.points + " PTS"
-                            : "NO RANK POINTS FOR THIS MATCH";
+                            ? prefix + "  |  " + answer.rank.tier + " " + answer.rank.points + " PTS"
+                            : prefix + " FOR THIS MATCH";
                         if (answer.rank != null)
                             ShowRank(answer.rank, answer.rank.points);
                         ClearPendingRank(RankAddress, GameId);
@@ -440,7 +528,7 @@ namespace Chog.Screens
             private const float SparkSize = 44f;
             private const float SparkCoreSize = 18f;
 
-            private IEnumerator RevealRank(PlayerRankGain gain, PlayerRank rank)
+            private IEnumerator RevealRank(PlayerRankGain gain, PlayerRank rank, bool provisional = false)
             {
                 while (_reward != null && _reward.gameObject.activeSelf && !_leaving)
                     yield return null;
@@ -489,7 +577,8 @@ namespace Chog.Screens
                     }
                 }
                 ShowRank(rank, gain.after);
-                ClearPendingRank(RankAddress, GameId);
+                if (!provisional)
+                    ClearPendingRank(RankAddress, GameId);
                 yield return new WaitForSecondsRealtime(1.1f);
                 _rankMoment.gameObject.SetActive(false);
             }

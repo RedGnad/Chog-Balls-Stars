@@ -457,7 +457,8 @@ namespace Chog.Screens
                 var gain = answer?.rank?.last;
                 if (gain != null && gain.gameId == gameId)
                 {
-                    if (gain.delta != 0 || gain.tierBefore != gain.tierAfter)
+                    // The result screen already played these points the moment the siege ended.
+                    if ((gain.delta != 0 || gain.tierBefore != gain.tierAfter) && !ChogResultScreen.WasRevealed(gameId))
                     {
                         _rankReveal = StartCoroutine(RevealRankOnHome(gain, answer.rank, address, gameId));
                         yield return _rankReveal;

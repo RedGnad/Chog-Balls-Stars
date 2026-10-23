@@ -94,7 +94,8 @@ namespace TwinStickShooter
     {
       for (int i = 0; i < Teams[teamIndex].TeamPlayers.Length; i++)
       {
-        Teams[teamIndex].TeamPlayers[i].text = "--";
+        // A seat nobody holds yet: another player may take it, a bot does at the start.
+        Teams[teamIndex].TeamPlayers[i].text = "<alpha=#80>OPEN";
         Teams[teamIndex].TeamCharacters[i].text = "";
       }
 

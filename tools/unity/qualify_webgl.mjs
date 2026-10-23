@@ -187,6 +187,23 @@ try {
     if(value.banner?.trim())throw new Error('Unity banner: '+value.banner.trim());
   }
   if(!loaded)throw new Error('Unity loader timeout');
+  // CHOG_BROWSER_FILM_MS=<milliseconds> keeps every frame drawn for that long once the page has
+  // loaded (browser-film-NNN-<ms>ms.jpg): for screens that move by themselves, such as the
+  // reward preview (?rewardpreview=1), which a screenshot every few hundred milliseconds misses.
+  const filmLoaded=Number(process.env.CHOG_BROWSER_FILM_MS||0);
+  if(filmLoaded>0){
+    const frames=[],began=Date.now();
+    onFrame=frame=>{
+      frames.push({data:frame.data,at:frame.metadata.timestamp*1000});
+      command('Page.screencastFrameAck',{sessionId:frame.sessionId}).catch(()=>{});
+    };
+    await command('Page.startScreencast',{format:'jpeg',quality:80,everyNthFrame:1});
+    await sleep(filmLoaded);
+    await command('Page.stopScreencast');onFrame=null;
+    let number=0;
+    for(const frame of frames)
+      await writeFile(artifact(`browser-film-${String(++number).padStart(3,'0')}-${Math.max(0,Math.round(frame.at-began))}ms.jpg`),Buffer.from(frame.data,'base64'));
+  }
   await sleep(Number(process.env.CHOG_BROWSER_SETTLE_MS||1800));await screenshot('browser-menu.png');
   // A tap of the menu: a finger on a touch page (the game picks its controls from what was last
   // used, ControlModeWatcher), the left mouse button on a desktop one.

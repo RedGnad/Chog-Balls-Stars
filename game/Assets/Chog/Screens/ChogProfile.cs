@@ -158,7 +158,9 @@ namespace Chog.Screens
                 _tier.text = rank.tier;
                 _points.text = rank.points + " PLAYER POINTS";
                 _fill.anchorMax = new Vector2(rank.next > 0 ? Mathf.Clamp((float)rank.points / rank.next, 0.001f, 1f) : 1f, 1f);
-                _next.text = rank.next > 0 ? "Next rank at " + rank.next + " points" : "Top rank";
+                var season = PlayerRanks.SeasonLine();
+                _next.text = (rank.next > 0 ? "Next rank at " + rank.next + " points" : "Top rank")
+                    + (season.Length > 0 ? "  |  " + season : "");
                 var rate = rank.matches > 0 ? Mathf.RoundToInt(100f * rank.wins / rank.matches) + "%" : "-";
                 _stats.text = "<b>" + rank.matches + "</b> played\n<b>" + rank.wins + "</b> won\n<b>" + rate + "</b> win rate"
                     + (rank.lastReset != null && !string.IsNullOrEmpty(rank.lastReset.tierBefore)

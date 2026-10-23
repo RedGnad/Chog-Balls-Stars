@@ -110,6 +110,30 @@ namespace Chog.Screens
             if (selection.GetComponent<ChogPreparationCopy>() == null)
                 selection.gameObject.AddComponent<ChogPreparationCopy>();
 
+            // The screen names the match it prepares and how it is won, in place of "TEAM PREPARATION", and the
+            // middle column keeps the hero, the clock and START only (23 October 2026, the owner: this screen was
+            // cluttered): CHANGE TEAM goes above CANCEL, in the corner of the ways out.
+            var siege = selection.gameObject.scene.name == ArenaScenes.SiegeSceneName;
+            var heading = Find(selection, "Title");
+            var title = heading != null ? heading.Find("Name") : null;
+            var titleText = title != null ? title.GetComponent<TMP_Text>() : null;
+            if (titleText != null)
+                titleText.text = siege ? "SIEGE" : "COINS";
+            if (selection.Find("ChogModeGoal") == null)
+            {
+                var goal = ChogUi.Body("ChogModeGoal", selection, new Vector2(0.25f, 0.805f), new Vector2(0.75f, 0.855f), 30f,
+                    TextAlignmentOptions.Center, ChogTheme.Hex("FFE27A"));
+                goal.text = siege ? "BRING DOWN THEIR CORE TO WIN" : "HOLD 10 COINS AND THE LEAD FOR 15 SECONDS";
+            }
+            if (Find(selection, "ChangeTeamButton") is RectTransform change)
+            {
+                change.anchorMin = new Vector2(0.80f, 0.15f);
+                change.anchorMax = new Vector2(0.97f, 0.24f);
+                change.pivot = new Vector2(0.5f, 0.5f);
+                change.anchoredPosition = Vector2.zero;
+                change.sizeDelta = Vector2.zero;
+            }
+
             // The player's own rank stays in preparation, away from fighter health and attack cues.
             var rank = PlayerRanks.Current?.rank;
             if (rank != null && selection.Find("ChogPlayerRank") == null)
