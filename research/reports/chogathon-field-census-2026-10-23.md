@@ -80,3 +80,20 @@ keyword variants, not by the names heard.
 Our own proof, read at 01:28 UTC (`python3 -I research/scripts/count_wager_events.py`): ChogWager v3 has seen one
 transaction since its deployment (block 115733839 to 115766306, its setup) and no stake; `/api/season` answers
 `{"enabled":false}`. Our main difference, a bet paid by a contract, has nothing on chain yet for a judge to see.
+
+## Second census, 09:19 UTC (5 h 40 before the close)
+
+`research/evidence/chogathon-gallery-2026-10-23-0919.json`: 134 rows, 84 distinct titles (110 rows at 00:30). New since
+then, read from their descriptions only (apps answered HTTP 200, ChogSekai 307): ChogPit (real-time extraction shooter,
+each token seeds its own raidable pit; its Raider Pass `0x6655F23193142CC1E323522C363A52CDea8E3CE2` has code on Monad,
+5 minted of 40), Animr (each Chog an AI trader with an ERC-6551 wallet, 0G Compute, a judge tour), ChogSekai (Godot 3D
+continent, 1,969 Chogs as AI agents, 24-hour seasons), monorb (Three.js 3D adventure and PvP; "everyone plays as a
+guest, so any of the 1,969 Chogs can appear": weak on the NFT gate), Soryn (tactical creature battler, 500 $CHOG or a
+Chog unlocks multiplayer), Chog Swarm (autonomous racing agents compiled from traits), Choguild, Chogslist, chogOS,
+DeClub, ChogQuest, Chog Hideout, Chog Beauty Arena, Etalabs, Jetpack Chogride, CHOG Genesis Card Checker.
+
+A judge's ranking, weighted by the published criteria (one auditor's estimates; ours self-assessed):
+Grand Theft Chog about 4.35; then a close group between 3.8 and 4.0: Chug world, The Chog World, ChogChoir, ours (about
+3.9), with Animr likely there (not audited); then ChogTales, Dybbo, Chog League about 3.6 to 3.65, ChogSekai and ChogPit
+likely near (not audited); ROOM ZERO about 3.5 with its NFT gate at risk; Chog Wave 3.3; CHOG ARENA 3.05; CHOG KINGDOM
+2.85; Chog ToolHub 1.85.
