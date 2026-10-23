@@ -75,9 +75,12 @@ namespace Chog.Screens
             if (GenesisWager.State != WagerState.Open || screen.Find(ObjectName) != null)
                 return;
             // Stakes are for the players of a Genesis, held, rented or lent (the services refuse a recruit's ticket,
-            // "genesis_required"): a recruit plays for practice and sees no stake panel.
+            // "genesis_required"): a recruit sees the panel locked under a GENESIS ONLY banner.
             if (WalletPanel.PlayedTokenId <= 0)
+            {
+                ShowLocked(screen, template);
                 return;
+            }
 
             // Wagering is opt-in. A player who has not signed in and is not in a wager should see a
             // clean preparation screen, rather than a second unexplained task beside starting a match.
@@ -89,6 +92,57 @@ namespace Chog.Screens
             var panel = new GameObject(ObjectName, typeof(RectTransform), typeof(Image));
             panel.transform.SetParent(screen, false);
             panel.AddComponent<WagerPanel>().Build(template);
+        }
+
+        private const string LockedName = "ChogWagerLocked";
+
+        // The stake panel as a recruit sees it (23 October 2026, the owner: shown, crossed by a big playful banner
+        // that says a real Genesis is needed): the same gold-framed card, dimmed, and a tilted pink ribbon with the
+        // key of RENT, where a Genesis is found by the day.
+        private static void ShowLocked(Transform screen, TextMeshProUGUI template)
+        {
+            if (screen.Find(LockedName) != null)
+                return;
+            var panel = new GameObject(LockedName, typeof(RectTransform), typeof(Image), typeof(CanvasGroup));
+            var area = (RectTransform)panel.transform;
+            area.SetParent(screen, false);
+            area.anchorMin = PanelMin;
+            area.anchorMax = PanelMax;
+            area.offsetMin = Vector2.zero;
+            area.offsetMax = Vector2.zero;
+            var background = panel.GetComponent<Image>();
+            background.color = PanelColor;
+            ChogTheme.AsCard(background);
+            background.raycastTarget = false;
+            panel.AddComponent<Outline>().effectColor = ChogTheme.Gold;
+            panel.GetComponent<CanvasGroup>().blocksRaycasts = false;
+
+            // Behind the ribbon, dimmed: the coin, the line and a stake button that cannot be pressed.
+            var behind = ChogUi.Area("Behind", area, Vector2.zero, Vector2.one).gameObject.AddComponent<CanvasGroup>();
+            behind.alpha = 0.35f;
+            var token = Resources.Load<Texture2D>("ChogTokenCoin");
+            if (token != null)
+            {
+                var coin = Child("Coin", behind.transform, new Vector2(0.015f, 0.47f), new Vector2(CoinShare - 0.01f, 0.97f)).gameObject.AddComponent<Image>();
+                coin.sprite = Sprite.Create(token, new Rect(0f, 0f, token.width, token.height), new Vector2(0.5f, 0.5f), 100f);
+                coin.preserveAspect = true;
+                coin.raycastTarget = false;
+            }
+            var line = Text(template, "Status", new Vector2(CoinShare, 0.45f), StatusMax, Color.white, 32f, behind.transform);
+            ChogTheme.AsTitle(line);
+            line.text = "BET $CHOG ON YOUR TEAM";
+            var button = ChogUi.Plate("Stake", behind.transform, new Vector2(0.32f, 0.06f), new Vector2(0.97f, 0.42f), ChogTheme.Gold, 14);
+            ChogUi.Title("Words", button.transform, Vector2.zero, Vector2.one, 34f).text = "STAKE";
+
+            var ribbon = ChogUi.Plate("Ribbon", area, new Vector2(-0.03f, 0.26f), new Vector2(1.03f, 0.74f), ChogTheme.Cheek, 16);
+            ribbon.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -6f);
+            ribbon.gameObject.AddComponent<Shadow>().effectDistance = new Vector2(0f, -6f);
+            var key = ChogUi.Icon("Key", ribbon.transform, ChogIcons.Icon.Key, new Vector2(0.04f, 0.12f), new Vector2(0.17f, 0.88f));
+            key.raycastTarget = false;
+            key.color = ChogTheme.Cream;
+            var words = ChogUi.Title("Words", ribbon.transform, new Vector2(0.18f, 0.04f), new Vector2(0.97f, 0.96f), 54f);
+            words.text = "GENESIS ONLY";
+            words.color = ChogTheme.Cream;
         }
 
         /// <summary>Starts the match once its stakes are locked; at once when there is nothing to lock.</summary>

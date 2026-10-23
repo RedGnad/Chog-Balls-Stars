@@ -22,8 +22,8 @@ namespace Chog.Screens
 
         public static string Describe()
         {
-            // Two lines (23 October 2026, the owner: light words; a recruit plays for practice, rank and stakes need a Genesis).
-            return "<b><color=" + TitleColor + ">PRACTICE MATCH</color></b>\n<size=75%>Play a Genesis to rank and bet.</size>";
+            // Two lines (23 October 2026, the owner: light words; a recruit plays for practice, rank and stakes need a Genesis; named RECRUIT MODE).
+            return "<b><color=" + TitleColor + ">RECRUIT MODE</color></b>\n<size=75%>Play a Genesis to rank and bet.</size>";
         }
 
         /// <summary>

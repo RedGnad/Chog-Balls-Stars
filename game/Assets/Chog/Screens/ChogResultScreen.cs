@@ -376,7 +376,7 @@ namespace Chog.Screens
                 // Rank is for the players of a Genesis (held, rented or lent); a recruit plays for practice.
                 var practice = signedMatch && TokenId <= 0;
                 signedMatch &= !practice;
-                _rankStatus.text = practice ? "PRACTICE: PLAY A GENESIS TO RANK" : signedMatch ? "VERIFYING RESULT" : "CASUAL MATCH";
+                _rankStatus.text = practice ? "RECRUIT MODE: PLAY A GENESIS TO RANK" : signedMatch ? "VERIFYING RESULT" : "CASUAL MATCH";
                 if (signedMatch)
                 {
                     _verifyFill = ChogUi.Area("Progress", strip.transform, new Vector2(0.015f, 0.06f), new Vector2(0.015f, 0.16f));

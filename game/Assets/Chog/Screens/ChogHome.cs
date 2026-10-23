@@ -620,7 +620,7 @@ namespace Chog.Screens
             {
                 _ribbonName.text = "RECRUIT";
                 _roleText.text = "RECRUIT";
-                ShowChips("PRACTICE", "NO RANK, NO BETS", "-" + (100 - Quantum.Recruit.HealthPercent) + "% HEALTH");
+                ShowChips("UNRANKED", "NO BETS", "-" + (100 - Quantum.Recruit.HealthPercent) + "% HEALTH");
             }
         }
 
