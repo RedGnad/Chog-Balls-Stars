@@ -101,7 +101,7 @@ Sources and tests: [`contracts/`](contracts/README.md) (Solidity, Foundry).
 
 ## Tech stack
 
-Unity 6 (C#, WebGL) · Photon Quantum 3 · Blender (every hero, costume, attack object and tower modelled by Python
+Unity 6 (C#, WebGL) · Photon Quantum 3 (started from its Twin Stick Shooter sample) · Blender (every hero, costume, attack object and tower modelled by Python
 scripts) · Node.js services · .NET 8 judge · Solidity (Foundry) on Monad · Reown AppKit and injected wallets
 (EIP-712, EIP-2612) · Render, Vercel, Upstash Redis.
 
@@ -131,11 +131,3 @@ sh tools/release/check_judge.sh <path to dotnet>        # the judge agrees with 
 
 Running the services locally: `node server/src/local.js` (see [server/README.md](server/README.md)). Building the
 game needs Unity 6000.6 with WebGL (see [game/README.md](game/README.md)).
-
-## Credits
-
-Built on Photon's Quantum 3 Twin Stick Shooter sample (its map, controls, bots and menu framework, restyled), with
-Cartoon FX effects from the sample. Fonts: Lilita One, Nunito, Koulen (SIL Open Font License). Sounds and music: CC0
-files from Kenney and OpenGameArt, each listed in `game/Assets/Chog/Audio/LICENSES.md`. Chog Genesis art and traits
-belong to their collection; everything else (the 3D heroes, the services, the judge, the contracts, the screens) was
-written during the hackathon.
