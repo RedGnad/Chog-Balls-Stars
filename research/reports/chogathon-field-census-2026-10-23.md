@@ -76,3 +76,7 @@ Theft Chog), instant play without a wallet (ROOM ZERO, Grand Theft Chog).
 A third, "Chog World: Your Chog, Your Identity" (`chognftgame.netlify.app`), is a small social island with a two-line
 description and no video: not audited. Lesson: the gallery spells one of them "Chug world"; search the titles by
 keyword variants, not by the names heard.
+
+Our own proof, read at 01:28 UTC (`python3 -I research/scripts/count_wager_events.py`): ChogWager v3 has seen one
+transaction since its deployment (block 115733839 to 115766306, its setup) and no stake; `/api/season` answers
+`{"enabled":false}`. Our main difference, a bet paid by a contract, has nothing on chain yet for a judge to see.
