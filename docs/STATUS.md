@@ -1,5 +1,11 @@
 # État courant et décisions
 
+**23 October 2026, 06:05 UTC (lead: the last items of the product walk; deployed).**
+- Quantum's statistics box (frame number, ping, graphs on a tap) is hidden on the public address and kept on pages of this computer.
+- The sample's windows ("Connection Failed", the name to type) are our raised card with gold and cream words.
+- TOP: under the Genesis it holds, three dimmed "OPEN SPOT, win a match with your Genesis" rows; nobody invented.
+- Build `20261023T055538200Z-14428979b36e4e0a9559e66caa205533`, stamp unchanged; judge fixtures agree.
+
 **23 October 2026, 05:55 UTC (lead: the bet shown before the match, FRIENDS in the game's look, ranked or casual on the mode; deployed).**
 - **The bet before the lobby:** a pink "BET $CHOG" sticker on the corner of PLAY for a connected wallet while the services take stakes (any connected wallet can stake; a visitor without one cannot, so it is not shown to them). `?bettag=1` on a page of this computer shows it for a look.
 - **The home card without a wallet** says what a Genesis gets here, in cream: its 3D and powers, the bet paid by a contract, its career on Monad, then "CONNECT at the top right to play yours" in gold. No second connect button (the owner's rule of 22 October: the top right one only).

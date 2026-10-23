@@ -95,6 +95,37 @@ namespace Chog.Screens
                     ChogTheme.AsTitle(text);
 
             DressParty(root);
+            DressPopUps(root);
+        }
+
+        // The sample's windows (an error such as "Connection Failed", the name to type) were panels of its own teal
+        // and blue (23 October 2026, the product walk): our raised card, its words in cream, the field in the night.
+        private static void DressPopUps(Transform root)
+        {
+            foreach (var part in root.GetComponentsInChildren<Transform>(true))
+            {
+                if (part.name != "PoUp")
+                    continue;
+                ChogTheme.AsCard(part.Find("Background")?.GetComponent<Image>(), raised: true);
+                Colour(part.Find("PopUpHeader"), ChogTheme.Hex("FFE27A"));
+                Colour(part.Find("PopUpText"), ChogTheme.Text);
+                if (part.Find("InputFieldButton/Background")?.GetComponent<Image>() is Image field)
+                {
+                    field.sprite = ChogSprites.Rounded(14, 3, ChogTheme.PurpleSoft, ChogTheme.Night);
+                    field.type = Image.Type.Sliced;
+                    field.color = Color.white;
+                }
+            }
+        }
+
+        private static void Colour(Transform part, Color colour)
+        {
+            if (part == null)
+                return;
+            if (part.GetComponent<TMP_Text>() is TMP_Text text)
+                text.color = colour;
+            else if (part.GetComponent<Text>() is Text legacy)
+                legacy.color = colour;
         }
 
         // FRIENDS opens the sample's party menu: create a private room, or join one with its code. It was the one

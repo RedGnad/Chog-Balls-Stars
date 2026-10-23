@@ -43,6 +43,13 @@ namespace Chog.Screens
                         ChogMenuSkin.LogTree(found, 0);
                 }
 
+                // Quantum's statistics box (frame number and ping; a tap opens graphs) is for the people who build the
+                // game: kept on a page of this computer, hidden on the public address (23 October 2026, the product walk:
+                // it read as a debug window over every match).
+                var stats = Find(root.transform, "QuantumStats");
+                if (stats != null && !LocalGenesis.TestEntriesAllowed(Application.absoluteURL, Application.isEditor))
+                    stats.gameObject.SetActive(false);
+
                 // Touch controls are calm, flat controls: one outline per visible piece, no glow,
                 // splash, concentric effect or chunky-button treatment. The outer move zone and its
                 // movable thumb are separate controls, while attacks are one direct button each.

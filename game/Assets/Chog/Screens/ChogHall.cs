@@ -131,12 +131,18 @@ namespace Chog.Screens
                     return;
                 }
 
+                // Under the Genesis it holds, a young board shows a few open spots and how to take one, so it reads as
+                // new rather than broken (23 October 2026, the product walk: one row alone in an empty card). Nobody is
+                // invented: an open spot names no Genesis.
+                var open = careers.Length > 0 ? Mathf.Min(OpenSpots, _rows.Length - careers.Length) : 0;
                 for (var i = 0; i < _rows.Length; i++)
                 {
                     var shown = i < careers.Length;
-                    _rows[i].gameObject.SetActive(shown);
+                    _rows[i].gameObject.SetActive(shown || i < careers.Length + open);
                     if (shown)
                         Fill(_rows[i], careers[i]);
+                    else if (i < careers.Length + open)
+                        FillOpen(_rows[i]);
                 }
 
                 _status.text = "";
@@ -145,6 +151,17 @@ namespace Chog.Screens
                       "its career starts here."
                     : "";
             });
+        }
+
+        private const int OpenSpots = 3;
+
+        // A spot nobody holds yet: no picture, dimmed words.
+        private static void FillOpen(RectTransform row)
+        {
+            GenesisPortrait.Show(row, 0, PortraitSize, new Vector2(0.12f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero);
+            var words = row.Find("Words")?.GetComponent<TextMeshProUGUI>();
+            if (words != null)
+                words.text = "<alpha=#80>OPEN SPOT\n<size=70%>Win a match with your Genesis</size>";
         }
 
         // One Genesis: its picture, its name (in gold for the player's own), wins, matches and mastery.
