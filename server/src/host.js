@@ -304,6 +304,13 @@ if (rental.address && sender) {
 // The sender brings the stakes players sign once (version 3) and the decisions of judged matches (bring); it is on mainnet, where
 // the wager is when not on the testnet.
 const wager = createWager({ chain: wagerChain, referee, matches, network: wagerPlace, store: matchStore, price, sender: wagerPlace.test ? undefined : sender });
+// Every minute the services bring the result of each judged match still open on the chain, and give back the ones left an
+// hour without one (wager.sweep): no player needs gas of their own, and a winner never loses the gain to a refund.
+setInterval(() => {
+  wager.sweep()
+    .then(done => { for (const one of done) console.log(`Stakes swept: ${one.did} ${one.gameId}: ${one.brought ? one.hash : (one.reason ?? 'not sent')}`); })
+    .catch(error => console.warn(`Stakes not swept: ${error.message}`));
+}, 60_000).unref?.();
 const api = createApi({
   publicOrigin,
   chain,

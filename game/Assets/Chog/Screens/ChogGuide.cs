@@ -29,7 +29,7 @@ namespace Chog.Screens
              "special once it is charged.\n\nOn a computer: W A S D to move, the mouse to aim, left click to " +
              "attack, right click or Space for the special."),
             ("HOW TO WIN",
-             "Pick the mode beside QUICK PLAY. SIEGE: each team defends a tower and a core. Bring down the enemy " +
+             "Pick the mode beside PLAY. SIEGE: each team defends a tower and a core. Bring down the enemy " +
              "core and your team wins at once; after three minutes, the team that did the most damage to the other " +
              "team's tower and core wins.\n\nCOINS: pick up the coins in the middle; a hero who falls drops its own. " +
              "Hold ten and the lead for fifteen seconds to win.\n\nYour Genesis keeps its career: matches, wins, badges."),

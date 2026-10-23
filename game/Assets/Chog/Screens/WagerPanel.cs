@@ -74,6 +74,9 @@ namespace Chog.Screens
             s_team = localTeam;
             if (GenesisWager.State != WagerState.Open || screen.Find(ObjectName) != null)
                 return;
+            // Stakes are for sieges, the ranked mode, the only one the money path was rehearsed on (the audit, 23 October 2026).
+            if (screen.gameObject.scene.name != ArenaScenes.SiegeSceneName)
+                return;
             // Stakes are for the players of a Genesis, held, rented or lent (the services refuse a recruit's ticket,
             // "genesis_required"): a recruit sees the panel locked under a GENESIS ONLY banner.
             if (WalletPanel.PlayedTokenId <= 0)

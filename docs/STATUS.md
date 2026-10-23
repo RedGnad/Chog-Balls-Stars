@@ -1,5 +1,18 @@
 # État courant et décisions
 
+**23 October 2026, 14:15 UTC (lead: adversarial audit of the judges' journeys; fixes deployed).**
+- The owner: the earlier audit missed the multiplayer failures, it was not adversarial enough. Two read-only agents walked the money and multiplayer journeys and the onboarding and session journeys through the code; I ran the multiplayer ones on the public address (host leaves the lobby: the second player becomes host with START NOW and the clock; three players: 2 v 1).
+- **Fixed now:**
+  - **Payouts swept:** `wager.bring` was sent once; if it failed, anyone could refund the match an hour later and the winner lost the gain, and the fallback claim needed the player's own gas. Every minute the services now bring the result of each watched match still open on the chain, and give back a match left an hour (plus 2 minutes) without a result, paying the gas (`wager.sweep`, matches watched from their first ticket; 2 new tests).
+  - **START locks whenever a ticket was given** (it skipped the lock when no stake had reached the chain yet, and a stake signed a moment later voided the match).
+  - **CHANGE TEAM is frozen after a stake** (it voided the match without a word).
+  - **Stakes are for sieges** (the Coins money path was never rehearsed): no stake panel in Coins, the services refuse a coins ticket (`siege_only`).
+  - **Friends' rooms are invisible to quick play** (a PLAY could land in a friends' room, which now waits for its host: `IsRoomVisible` false when a session code is set).
+  - **A refused kept session is dropped** ("the wallet session has run out" failed every PLAY the same way): `QuantumMenuUIController.ConnectionFailed` makes the home screen ask for the signature again.
+  - The party code's region check (`>` where `>=` was meant) and the guide's "QUICK PLAY".
+- **Open, by severity:** a dead ticket (a player who cancelled in the wallet) holds START up to 135 s ("LOCKING..."); a staker who leaves before START voids the match silently; wallet requests (stake, sign-in) have no timeout; a holder who refuses the sign-in plays a recruit without a word; a lent pass plus a connected wallet plays a recruit; a dropped player sees two popups; the settings' region picker can isolate a player; the same wallet in two tabs gets Photon's raw error; a Reown wallet cannot be disconnected; CHANGE TEAM accepts a fourth player (simulation, `>` instead of `>=`).
+- Build `20261023T140857827Z-f4abb42d52ec444db4f67374e60c3c2e`, stamp unchanged; judge fixtures agree; services 140 tests.
+
 **23 October 2026, 13:50 UTC (lead: friends and players far apart meet; deployed).**
 - **The owner: why is our lobby not as clean as Chogtanks'?** Chogtanks pinned every player to one Photon region (`FixedRegion: eu`) and showed "Room code: XXXX". We kept the Quantum sample's menu: each page took its own best region by ping, so two players on two continents never met through PLAY, and the code of a room made with FRIENDS showed only in the sample's overlay behind the settings wheel; our own 30-second clock then started such a room before a friend could join.
 - **Now:** every quick match is played in `eu` unless the player picked a region in the settings (`QuantumMenuUIMain.QuickMatchRegion`); a room made with FRIENDS shows its code at the top left of the lobby, a tap copies it (`PartyRoomCode`), and waits for its host's START NOW ("SHARE THE CODE, THEN START NOW"). The code still carries the creator's region for JOIN A ROOM. Seen on a local build: code 1867MNC9 shown, no start after 40 s. Build `20261023T134351779Z-444c465a22b8401592e4594abf9d5465`, stamp unchanged; judge fixtures agree.

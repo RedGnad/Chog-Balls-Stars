@@ -152,6 +152,9 @@ namespace Quantum.Menu {
       }
     }
     
+    /// <summary>The words of a failed connection, for the game to act on (a wallet session the services no longer accept).</summary>
+    public static event System.Action<string> ConnectionFailed;
+
     /// <summary>
     /// Default connection error handling is reused in a couple places.
     /// </summary>
@@ -166,6 +169,7 @@ namespace Quantum.Menu {
       if (result.Success) {
         controller.Show<QuantumMenuUIGameplay>();
       } else if (result.FailReason != ConnectFailReason.ApplicationQuit) {
+        ConnectionFailed?.Invoke(result.DebugMessage ?? "");
         var popup = controller.PopupAsync(result.DebugMessage, "Connection Failed");
         if (result.WaitForCleanup != null) {
           await Task.WhenAll(result.WaitForCleanup, popup);

@@ -50,7 +50,7 @@ test('the referee signs the digests the contract computes', () => {
 });
 
 // Services with a wager contract whose stakes the test writes, and a clock the test moves.
-function services({ contractReferee, network = wagerNetwork(), genesisShare } = {}) {
+function services({ contractReferee, network = wagerNetwork(), genesisShare, sender } = {}) {
   const referee = createReferee({ privateKey: REFEREE_KEY, chainId: network.chainId, wager: WAGER });
   // "paid" holds the keys of the matches the contract has settled.
   const state = { clock: 1_790_000_000_000, stakes: new Map(), paid: new Set(), referee: contractReferee ?? referee.address };
@@ -89,7 +89,7 @@ function services({ contractReferee, network = wagerNetwork(), genesisShare } = 
   const careers = createCareers({ load: async () => saved, save: async value => { saved = value; } });
   // A $CHOG at 0.0015 USD, as on 21 October 2026.
   const price = { usdOfWei: async wei => Number(BigInt(wei) / 10n ** 12n) / 1e6 * 0.0015 };
-  const wager = createWager({ chain, referee, matches, network, now, store, price });
+  const wager = createWager({ chain, referee, matches, network, now, store, price, sender });
   const api = createApi({ chain, sessions, careers, wager, publicOrigin: ORIGIN });
   return { state, api, matches, wager, referee, store };
 }
@@ -454,4 +454,47 @@ test('a decided match is brought to the contract by the services, settle or void
   assert.equal(BigInt('0x' + voidWords[1]), 64n);
   assert.equal(BigInt('0x' + voidWords[2]), 65n);
   assert.equal(voidWords.length, 6);
+});
+
+test('every minute the services bring an unpaid judged match, and give back one left an hour without a result', async () => {
+  const sent = [];
+  const sender = { transact: async ({ data }) => { sent.push(data); return { ok: true, hash: '0x' + 'ab'.repeat(32) }; } };
+  const { api, matches, state, wager } = services({ sender });
+  await matchOfTwo(matches);
+  const alice = await sessionOf(api, ALICE);
+  const bob = await sessionOf(api, BOB);
+  await call(api, 'POST', '/api/wager/ticket', alice, { team: 0, amount: AMOUNT });
+  await call(api, 'POST', '/api/wager/ticket', bob, { team: 1, amount: AMOUNT });
+  const key = matchKeyOf('game');
+  state.stakes.set(key, [{ address: ALICE.address, team: 0 }, { address: BOB.address, team: 1 }]);
+  state.clock += 5000;
+  assert.equal((await call(api, 'POST', '/api/wager/lock', alice)).body.locked, true);
+  assert.deepEqual(await wager.sweep(), [], 'nothing to do before a result or the hour');
+
+  await matches.setVerdict('game', verdict());
+  const brought = await wager.sweep();
+  assert.equal(brought.length, 1);
+  assert.equal(brought[0].did, 'bring');
+  assert.equal(sent.length, 1, 'the result is sent to the contract');
+  state.paid.add(key);
+  assert.deepEqual(await wager.sweep(), [], 'a paid match is left alone');
+  assert.equal(sent.length, 1);
+});
+
+test('a staked match left an hour without a result is given back by the services, who pay its gas', async () => {
+  const sent = [];
+  const sender = { transact: async ({ data }) => { sent.push(data); return { ok: true, hash: '0x' + 'cd'.repeat(32) }; } };
+  const { api, matches, state, wager } = services({ sender });
+  await matchOfTwo(matches);
+  const alice = await sessionOf(api, ALICE);
+  await call(api, 'POST', '/api/wager/ticket', alice, { team: 0, amount: AMOUNT });
+  const key = matchKeyOf('game');
+  state.stakes.set(key, [{ address: ALICE.address, team: 0 }]);
+  state.clock += 3600 * 1000;
+  assert.deepEqual(await wager.sweep(), [], 'the contract allows it now, the services leave a margin for a late result');
+  state.clock += 121 * 1000;
+  const given = await wager.sweep();
+  assert.equal(given.length, 1);
+  assert.equal(given[0].did, 'refund');
+  assert.equal(sent[0], '0x' + selector('refundExpired(bytes32)') + key.slice(2));
 });

@@ -466,7 +466,9 @@ namespace Chog.Match
             SetStep(WagerStep.Locking, WagerAction.Lock, "");
             ReadMine(() =>
             {
-                if (!InMatch || Staked.Count == 0 || Locked)
+                // Locked whenever a ticket was given, even before its stake reached the chain (23 October 2026, the audit: a START
+                // pressed while the other player was still signing began the match unlocked, and the late stake voided it).
+                if (!InMatch || StakeWei.Length == 0 || Locked)
                 {
                     SetStep(WagerStep.Idle, WagerAction.None, "");
                     start();

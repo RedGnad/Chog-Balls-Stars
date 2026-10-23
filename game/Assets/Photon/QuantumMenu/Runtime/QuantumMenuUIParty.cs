@@ -166,7 +166,7 @@ namespace Quantum.Menu {
         ConnectionArgs.Region = _regionRequest.Result[regionIndex].Code;
       } else {
         var regionIndex = Config.CodeGenerator.DecodeRegion(inputRegionCode);
-        if (regionIndex < 0 || regionIndex > _regionRequest.Result.Count) {
+        if (regionIndex < 0 || regionIndex >= _regionRequest.Result.Count) {
           await Controller.PopupAsync($"The session code '{inputRegionCode}' is not a valid session code (cannot decode the region).", "Invalid Session Code");
           return;
         }

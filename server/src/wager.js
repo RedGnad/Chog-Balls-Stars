@@ -94,6 +94,9 @@ const RELAY_IN_FLIGHT = 6;
 const SETTLE_V1 = selector('settle(bytes32,uint8,bytes)');
 const SETTLE = selector('settle(bytes32,uint8,address[],bytes)');
 const VOID_MATCH = selector('voidMatch(bytes32,bytes)');
+const REFUND_EXPIRED = selector('refundExpired(bytes32)');
+// A match is given back by the services this long after the contract allows it, so a late result still has its chance.
+const SWEEP_MARGIN_SECONDS = 120;
 const word = value => BigInt(value).toString(16).padStart(64, '0');
 const hexWord = text => text.replace(/^0x/, '').toLowerCase().padStart(64, '0');
 const STAKERS_OF = selector('stakersOf(bytes32)');
@@ -170,6 +173,9 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
 
   // Where the matches a wallet staked on are noted: one key per wallet and match.
   const stakedKey = (address, gameId) => `staked-${address.toLowerCase()}/${folderOf(gameId)}`;
+  // The matches a ticket was given for, until their stakes are paid or given back: what sweep() looks after.
+  const watchedKey = gameId => `wager-watch/${folderOf(gameId)}`;
+  const watch = gameId => store?.set(watchedKey(gameId), JSON.stringify({ gameId, done: false }));
 
   /** What a game page needs to stake; {enabled: false} when there is no wager or it is set up wrong. */
   async function describe() {
@@ -236,6 +242,7 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     const deadline = Math.floor(now() / 1000) + TICKET_SECONDS;
     const granted = await matches.ticket(match.gameId, { address, team, amount, deadline });
     if (granted.refused) return granted;
+    await watch(match.gameId);
     const matchKey = matchKeyOf(match.gameId);
     return {
       gameId: match.gameId, matchKey, team, amount, deadline,
@@ -486,6 +493,41 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     return { brought: sent.ok !== false, hash: sent.hash ?? null };
   }
 
+  /**
+   * Every minute (host.js): the result of each watched match whose stakes are still on the chain is brought again, and a match
+   * still open REFUND_AFTER_SECONDS after its first stake, with no result, is given back by the services, so that no player
+   * needs gas of their own and a winner never loses the gain to a refund (23 October 2026, the audit: bring() was sent once,
+   * and anyone could refund an unpaid match an hour later). Answers what it did, for the log and the tests.
+   */
+  async function sweep() {
+    if (!contract || !sender || !store?.list) return [];
+    const done = [];
+    for (const key of await store.list('wager-watch/')) {
+      const noted = JSON.parse((await store.get(key)) ?? 'null');
+      if (!noted || noted.done) continue;
+      const matchKey = matchKeyOf(noted.gameId);
+      const stakes = await onChain(matchKey).catch(() => null);
+      if (!stakes) continue;
+      if (stakes.state === 'settled' || stakes.state === 'refunded') {
+        await store.set(key, JSON.stringify({ ...noted, done: true }));
+        continue;
+      }
+      if (stakes.state !== 'open') continue;
+      const decided = await decision(noted.gameId).catch(() => null);
+      if (decided && !decided.pending) {
+        const brought = await bring(noted.gameId).catch(error => ({ brought: false, reason: error.message }));
+        done.push({ gameId: noted.gameId, did: 'bring', ...brought });
+        continue;
+      }
+      if (stakes.firstStakeAt > 0 && now() / 1000 >= stakes.firstStakeAt + REFUND_AFTER_SECONDS + SWEEP_MARGIN_SECONDS) {
+        const sent = await sender.transact({ to: contract, data: '0x' + REFUND_EXPIRED + matchKey.slice(2), purpose: `the refund of ${matchKey}` })
+          .catch(error => ({ ok: false, error: error.message }));
+        done.push({ gameId: noted.gameId, did: 'refund', brought: sent.ok !== false, hash: sent.hash ?? null });
+      }
+    }
+    return done;
+  }
+
   async function outcome(gameId) {
     const decided = await decision(gameId);
     if (decided) return { ...decided, stakes: await onChain(decided.matchKey), refundAfterSeconds: REFUND_AFTER_SECONDS };
@@ -498,5 +540,5 @@ export function createWager({ chain, referee, matches, network = wagerNetwork(),
     return { lost: true, matchKey, stakes, refundAfterSeconds: REFUND_AFTER_SECONDS };
   }
 
-  return { describe, onChain, ticket, lock, mine, decision, outcome, weekOf, permit, relay, bring, address: contract };
+  return { describe, onChain, ticket, lock, mine, decision, outcome, weekOf, permit, relay, bring, sweep, address: contract };
 }

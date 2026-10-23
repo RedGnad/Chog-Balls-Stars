@@ -176,6 +176,9 @@ namespace Quantum.Menu {
         MaxPlayers = connectArgs.MaxPlayerCount,
         RoomName = connectArgs.Session,
         CanOnlyJoin = string.IsNullOrEmpty(connectArgs.Session) == false && !connectArgs.Creating,
+        // A room made with FRIENDS is joined by its code only: quick matches never fall into it (23 October 2026, the audit:
+        // a PLAY could land in a friends' room, which waits for its host's START NOW).
+        IsRoomVisible = string.IsNullOrEmpty(connectArgs.Session),
         PluginName = connectArgs.PhotonPluginName,
         AsyncConfig = new AsyncConfig() {
           TaskFactory = AsyncConfig.CreateUnityTaskFactory(),

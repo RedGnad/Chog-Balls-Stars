@@ -221,6 +221,8 @@ export function createMatches({ store, now = Date.now }) {
     // Stakes are for the players of a Genesis, held, rented or lent (23 October 2026, the owner: the NFT must be
     // essential; a recruit plays for practice).
     if (!(admitted.tokenId > 0)) return { refused: 'genesis_required' };
+    // Stakes are for sieges, the ranked mode (the game names its Photon version "-siege" or "-coins").
+    if (String(match.app?.appVersion ?? '').endsWith('-coins')) return { refused: 'siege_only' };
     if (match.tickets.lockedAt) return { refused: 'stakes_locked' };
     if (match.closedAt) return { refused: 'match_closed' };
     if (await read(gameId, 'verdict')) return { refused: 'match_judged' };

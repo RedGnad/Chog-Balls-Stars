@@ -34,7 +34,20 @@ namespace Chog.Screens
         private void Start()
         {
             Dress(transform);
+            if (!s_listening)
+            {
+                // A kept wallet session the services refuse ("the wallet session has run out") is dropped, so the home screen asks
+                // for the signature again instead of failing every PLAY the same way (23 October 2026, the audit).
+                s_listening = true;
+                QuantumMenuUIController.ConnectionFailed += words =>
+                {
+                    if (words.Contains("session has run out"))
+                        PlayerWallet.ForgetSession();
+                };
+            }
         }
+
+        private static bool s_listening;
 
         // The screens that cover the whole window (not the pop-ups, not the one over the match).
         private static readonly string[] FullScreens = { "MainMenu", "PartyMenu", "Settings", "Loading", "Scenes" };

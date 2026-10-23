@@ -29,6 +29,7 @@ namespace TwinStickShooter
     private const float SlotPanelCenterY = -25f;
     private const float SlotPortraitSize = 120f;
     private readonly int[,] _slotGenesis = new int[2, 3];
+    private UnityEngine.UI.Button _changeTeam;
 
     public override void OnActivate(Frame frame)
     {
@@ -76,6 +77,21 @@ namespace TwinStickShooter
       Chog.Screens.WagerPanel.Show(transform, Teams[0].TeamCharacters[0], LocalTeam());
       // A way back to the menu before the match starts.
       Chog.Screens.PreparationBack.Show(transform, Teams[0].TeamCharacters[0]);
+      // CHANGE TEAM fades once this player has staked on the team it is in.
+      if (_changeTeam == null)
+      {
+        foreach (var button in GetComponentsInChildren<UnityEngine.UI.Button>(true))
+        {
+          if (button.name == "ChangeTeamButton")
+          {
+            _changeTeam = button;
+          }
+        }
+      }
+      if (_changeTeam != null)
+      {
+        _changeTeam.interactable = !Chog.Match.GenesisWager.HasStaked;
+      }
       // The code of a room made with FRIENDS, for the friend to join.
       Chog.Screens.PartyRoomCode.Show(transform, _connection != null ? _connection.SessionName : null);
 
@@ -297,6 +313,12 @@ namespace TwinStickShooter
 
     public void ChangeTeamClicked()
     {
+      // A stake is for the team it was made on: changing team after it would only call the match off (the audit, 23 October 2026).
+      if (Chog.Match.GenesisWager.HasStaked)
+      {
+        return;
+      }
+
       var changeTeamCommand = new SelectCharacterCommands.ChangePlayerTeamCommand();
       Game.SendCommand(changeTeamCommand);
     }
