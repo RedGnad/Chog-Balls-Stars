@@ -149,3 +149,13 @@ Grades: Novelty 4 (ChogTales is the one other entry making AI content from the N
 game), Retention 4 (filmography per token, votes, weekly theme, seen working), Clarity 4, Execution 4: **3.80**, second
 behind ours. The other, "Chog studio" (`chogstudio-pi.vercel.app`, @oxkael_), is a comic editor without AI or chain
 writes: 2, 2, 2, 4, 3, about 2.45.
+CHOG STUDIO's money, from its live `/api/pricing` (10:25 UTC): the player pays, from a $CHOG balance topped up by a
+plain transfer (their text: price shown before each take, nothing paid when a take fails, the rest withdrawable). The
+list converts provider prices at the live $CHOG rate with `markup: 0.25`; a 480p video is about $0.59 for 5 s and $1.19
+for 10 s (about 430 and 860 $CHOG at $0.00139). The generation is done by third-party models through an API (their stack:
+"Pika API" with Claude and GPT models); their own part is the actor made from the token, the persona and voice, the
+episode storyboard, Chog TV and the $CHOG accounting.
+
+**Coverage, said plainly (the owner, 10:20 UTC):** of 84 distinct projects, about 17 were looked at in depth, picked by
+how close they are to ours and by the names the owner gave. CHOG STUDIO was on our list since 00:30 and never opened.
+The grades of the projects looked at stand on evidence; a ranking of the whole field does not.
